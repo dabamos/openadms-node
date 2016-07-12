@@ -1,0 +1,65 @@
+[
+    {
+        "Name": "set_direction",
+        "Description": "Set the horizontal and vertical direction.",
+        "Receivers": ["PreProcessor"],
+        "Enabled": true,
+        "Onetime": false,
+        "AwaitTime": 0.5,
+        "SleepTime": 3.0,
+        "Queries":
+        [
+            {
+                "ID": null,
+                "Request": "%R1Q,9027:[% hz %],[% v %],2,1,0\r\n",
+                "ResponsePattern": "(%.*0)",
+                "ResponseDelimiter": "\r",
+                "ResponseDescriptions": "none",
+                "ResponseTypes": "String",
+                "ResponseUnits": "none"
+            }
+        ]
+    },
+    {
+        "Name": "get_distance",
+        "Description": "Get the distance.",
+        "Receivers": ["PreProcessor"],
+        "Enabled": true,
+        "Onetime": false,
+        "AwaitTime": 2.0,
+        "SleepTime": 2.0,
+        "Queries":
+        [
+            {
+                "ID": null,
+                "Request": "%R1Q,2008:1,1\r\n",
+                "ResponsePattern": "(%.*0)",
+                "ResponseDelimiter": "\r",
+                "ResponseDescriptions": "none",
+                "ResponseTypes": ["String"],
+                "ResponseUnits": ["none"]
+            }
+        ]
+    },
+    {
+        "Name": "get_full_measurement",
+        "Description": "Get a complete measurement.",
+        "Receivers": ["PreProcessor", "FileExporter"],
+        "Enabled": true,
+        "Onetime": false,
+        "AwaitTime": 0.5,
+        "SleepTime": 10.0,
+        "Queries":
+        [
+            {
+                "ID": "[% id %]",
+                "Request": "%R1Q,2167:5000,1\r\n",
+                "ResponsePattern": "%R1P,0,0:([0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*)",
+                "ResponseDelimiter": "\r",
+                "ResponseDescriptions": ["ReturnCode", "Hz", "V", "AccAngle", "C", "L", "AccIncl", "SlopeDist", "DistTime"],
+                "ResponseTypes": ["Integer", "Float", "Float", "Float", "Float", "Float", "Float", "Float", "Integer"],
+                "ResponseUnits": ["none", "rad", "rad", "rad", "rad", "rad", "rad", "m", "ns"]
+            }
+        ]
+    }
+]
