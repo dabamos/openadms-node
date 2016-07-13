@@ -4,6 +4,7 @@
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.processing.PolarTransformer",
+        "AtmosphericCorrector": "modules.processing.AtmosphericCorrector",
         "USB0": "modules.port.SerialPort",
         "USB1": "modules.port.SerialPort"
     },
@@ -30,7 +31,7 @@
             "USB1":
             {
                 "Port": "/dev/ttyU1",
-                "BaudRate": 4800,
+                "BaudRate": 9600,
                 "ByteSize": 8,
                 "StopBits": 1,
                 "Parity": "none",
@@ -46,7 +47,7 @@
         {
             "Description": "Leica TM30 totalstation",
             "Type": "Totalstation",
-    "Observations": {
+            "Observations": {
                    "Init":
                     [
                         {
@@ -57,9 +58,6 @@
                             "Onetime": true,
                             "AwaitTime": 1.0,
                             "SleepTime": 1.0,
-                            "Queries":
-                            [
-                                {
                                     "ID": null,
                                     "Request": "%R1Q,5003:\r\n",
                                     "ResponsePattern": "R1P,0,0:0,(\\d+)",
@@ -67,8 +65,6 @@
                                     "ResponseDescriptions": "SensorID",
                                     "ResponseTypes": "String",
                                     "ResponseUnits": "none"
-                                }
-                            ]
                         },
                         {
                             "Name": "get_sensor_name",
@@ -78,9 +74,6 @@
                             "Onetime": true,
                             "AwaitTime": 1.0,
                             "SleepTime": 1.0,
-                            "Queries":
-                            [
-                                {
                                     "ID": null,
                                     "Request": "%R1Q,5004:\r\n",
                                     "ResponsePattern": "R1P,0,0:0,\"([\\w\\d\\s\\.]+)",
@@ -88,8 +81,6 @@
                                     "ResponseDescriptions": "SensorName",
                                     "ResponseTypes": "String",
                                     "ResponseUnits": "none"
-                                }
-                            ]
                         }
                     ],
         "P1": [
@@ -99,17 +90,13 @@
                 "Enabled": true,
                 "Name": "set_direction",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,9027:0.0,1.59113,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseDescriptions": "none",
                         "ResponsePattern": "(%.*0)",
                         "ResponseTypes": "String",
-                        "ResponseUnits": "none"
-                    }
-                ],
+                        "ResponseUnits": "none",
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -121,8 +108,6 @@
                 "Enabled": true,
                 "Name": "get_distance",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -133,9 +118,7 @@
                         ],
                         "ResponseUnits": [
                             "none"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -147,8 +130,6 @@
                 "Enabled": true,
                 "Name": "get_full_measurement",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": "P1",
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -185,11 +166,10 @@
                             "rad",
                             "m",
                             "ns"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor",
+                    "AtmosphericCorrector",
                     "PolarTransformer",
                     "FileExporter"
                 ],
@@ -203,17 +183,13 @@
                 "Enabled": true,
                 "Name": "set_direction",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,9027:0.38098,1.58264,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseDescriptions": "none",
                         "ResponsePattern": "(%.*0)",
                         "ResponseTypes": "String",
-                        "ResponseUnits": "none"
-                    }
-                ],
+                        "ResponseUnits": "none",
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -225,8 +201,6 @@
                 "Enabled": true,
                 "Name": "get_distance",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -237,9 +211,7 @@
                         ],
                         "ResponseUnits": [
                             "none"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -251,8 +223,6 @@
                 "Enabled": true,
                 "Name": "get_full_measurement",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": "P2",
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -289,11 +259,10 @@
                             "rad",
                             "m",
                             "ns"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor",
+                    "AtmosphericCorrector",
                     "PolarTransformer",
                     "FileExporter"
                 ],
@@ -307,17 +276,13 @@
                 "Enabled": true,
                 "Name": "set_direction",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,9027:0.9728,1.59095,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseDescriptions": "none",
                         "ResponsePattern": "(%.*0)",
                         "ResponseTypes": "String",
-                        "ResponseUnits": "none"
-                    }
-                ],
+                        "ResponseUnits": "none",
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -329,8 +294,6 @@
                 "Enabled": true,
                 "Name": "get_distance",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -341,9 +304,7 @@
                         ],
                         "ResponseUnits": [
                             "none"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -355,8 +316,6 @@
                 "Enabled": true,
                 "Name": "get_full_measurement",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": "P3",
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -393,11 +352,10 @@
                             "rad",
                             "m",
                             "ns"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor",
+                    "AtmosphericCorrector",
                     "PolarTransformer",
                     "FileExporter"
                 ],
@@ -411,17 +369,13 @@
                 "Enabled": true,
                 "Name": "set_direction",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,9027:2.16693,1.59124,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseDescriptions": "none",
                         "ResponsePattern": "(%.*0)",
                         "ResponseTypes": "String",
-                        "ResponseUnits": "none"
-                    }
-                ],
+                        "ResponseUnits": "none",
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -433,8 +387,6 @@
                 "Enabled": true,
                 "Name": "get_distance",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": null,
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -445,9 +397,7 @@
                         ],
                         "ResponseUnits": [
                             "none"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor"
                 ],
@@ -459,8 +409,6 @@
                 "Enabled": true,
                 "Name": "get_full_measurement",
                 "Onetime": false,
-                "Queries": [
-                    {
                         "ID": "P4",
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
@@ -497,11 +445,10 @@
                             "rad",
                             "m",
                             "ns"
-                        ]
-                    }
-                ],
+                        ],
                 "Receivers": [
                     "PreProcessor",
+                    "AtmosphericCorrector",
                     "PolarTransformer",
                     "FileExporter"
                 ],
@@ -519,44 +466,52 @@
                 "Init":
                 [
                     {
-                        "Name": "initialize",
-                        "Description": "Inititalize the sensor (power on, change command set, save).",
+                        "Name": "power_on",
+                        "Description": "power on.",
                         "Receivers": [],
                         "Enabled": true,
                         "Onetime": true,
                         "AwaitTime": 0.8,
                         "SleepTime": 1.0,
-                        "Queries":
-                        [
-                            {
-                                "ID": null,
-                                "Request": "A\r",
-                                "ResponsePattern": "(#)",
-                                "ResponseDelimiter": "\r",
-                                "ResponseDescriptions": ["PowerOn"],
-                                "ResponseTypes": ["String"],
-                                "ResponseUnits": ["none"]
-                            },
-                            {
-
-                                "ID": null,
-                                "Request": "CMDT 1\r",
-                                "ResponsePattern": "(\\*)",
-                                "ResponseDelimiter": "\r",
-                                "ResponseDescriptions": ["SetCmd"],
-                                "ResponseTypes": ["String"],
-                                "ResponseUnita": ["none"]
-                            },
-                            {
-                                "ID": null,
-                                "Request": "SAVE\r",
-                                "ResponsePattern": "(\\*)",
-                                "ResponseDelimiter": "\r",
-                                "ResponseDescriptions": ["Save"],
-                                "ResponseTypes": ["String"],
-                                "ResponseUnits": ["none"]
-                            }
-                        ]
+                        "ID": null,
+                        "Request": "A\r",
+                        "ResponsePattern": "(#)",
+                        "ResponseDelimiter": "\r",
+                        "ResponseDescriptions": ["PowerOn"],
+                        "ResponseTypes": ["String"],
+                        "ResponseUnits": ["none"]
+                    },
+                    {
+                        "Name": "set_cmd",
+                        "Description": "change command set.",
+                        "Receivers": [],
+                        "Enabled": true,
+                        "Onetime": true,
+                        "AwaitTime": 0.8,
+                        "SleepTime": 1.0,
+                        "ID": null,
+                        "Request": "CMDT 1\r",
+                        "ResponsePattern": "(\\*)",
+                        "ResponseDelimiter": "\r",
+                        "ResponseDescriptions": ["SetCmd"],
+                        "ResponseTypes": ["String"],
+                        "ResponseUnits": ["none"]
+                    },
+                    {
+                        "Name": "save",
+                        "Description": "save).",
+                        "Receivers": [],
+                        "Enabled": true,
+                        "Onetime": true,
+                        "AwaitTime": 0.8,
+                        "SleepTime": 1.0,
+                        "ID": null,
+                        "Request": "SAVE\r",
+                        "ResponsePattern": "(\\*)",
+                        "ResponseDelimiter": "\r",
+                        "ResponseDescriptions": ["Save"],
+                        "ResponseTypes": ["String"],
+                        "ResponseUnits": ["none"]
                     }
                 ],
                 "Main":
@@ -569,27 +524,56 @@
                         "Onetime": false,
                         "AwaitTime": 0.8,
                         "SleepTime": 10.0,
-                        "Queries":
-                        [
-                            {
-                                "ID": "T1",
-                                "Request": "TEMP ?\r",
-                                "ResponsePattern": "([+-]?\\d+\\.+\\d)",
-                                "ResponseDelimiter": "\r",
-                                "ResponseDescriptions": ["Temperature"],
-                                "ResponseTypes": ["Float"],
-                                "ResponseUnits": ["°C"]
-                            },
-                            {
-                                "ID": "P1",
-                                "Request": "PRES ?\r",
-                                "ResponsePattern": "([+-]?\\d+\\.+\\d)",
-                                "ResponseDelimiter": "\r",
-                                "ResponseDescriptions": ["Pressure"],
-                                "ResponseTypes": ["Float"],
-                                "ResponseUnits": ["mbar"]
-                            }
-                        ]
+                        "ID": "T1",
+                        "Request": "TEMP ?\r",
+                        "ResponsePattern": "([+-]?\\d+\\.+\\d)",
+                        "ResponseDelimiter": "\r",
+                        "ResponseDescriptions": ["Temperature"],
+                        "ResponseTypes": ["Float"],
+                        "ResponseUnits": ["°C"]
+                    },
+                    {
+                        "Name": "get_pressure",
+                        "Description": "Get air pressure value.",
+                        "Receivers": ["PreProcessor", "FileExporter"],
+                        "Enabled": true,
+                        "Onetime": false,
+                        "AwaitTime": 0.8,
+                        "SleepTime": 10.0,
+                        "ID": "P1",
+                        "Request": "PRES ?\r",
+                        "ResponsePattern": "([+-]?\\d+\\.+\\d)",
+                        "ResponseDelimiter": "\r",
+                        "ResponseDescriptions": ["Pressure"],
+                        "ResponseTypes": ["Float"],
+                        "ResponseUnits": ["mbar"]
+                    }
+                ]
+            }
+        },
+        "DFT_485":
+        {
+            "Description": "DFT 485 meteorology sensor",
+            "Type": "Weather Station",
+            "Observations":
+            {
+                "Main":
+                [
+                    {
+                        "Name": "get_values",
+                        "Description": "Get temperature, air pressure, and humidity values.",
+                        "Receivers": ["PreProcessor", "AtmosphericCorrector", "FileExporter"],
+                        "Enabled": true,
+                        "Onetime": false,
+                        "AwaitTime": 0.8,
+                        "SleepTime": 5.0,
+                        "ID": "Meteo",
+                        "Request": "?U\r\n",
+                        "ResponsePattern": "TD([\\d\\.]+), TE([\\d\\.]+), DR([\\d\\.]+), FE([\\d\\.]+),",
+                        "ResponseDelimiter": ", \r\n",
+                        "ResponseDescriptions": ["TempPress", "Temperature", "Pressure", "Humidity"],
+                        "ResponseTypes": ["Float", "Float", "Float", "Float"],
+                        "ResponseUnits": ["°C", "°C", "hPa", "%"]
                     }
                 ]
             }
@@ -597,7 +581,8 @@
     },
     "Connections":
     {
-        "USB0": "Leica_TM30"
+        "USB0": "Leica_TM30",
+        "USB1": "DFT_485"
     },
     "Scheduler":
     {
@@ -629,11 +614,11 @@
          "USB1":
         [
             {
-                "Enabled": false,
+                "Enabled": true,
                 "StartDate": "2016-02-01",
-                "EndDate": "2016-06-30",
+                "EndDate": "2016-07-30",
                 "Schedule": {},
-                "ObservationSets": ["Init", "Main"]
+                "ObservationSets": ["Main"]
             }
         ]
     },
@@ -657,8 +642,9 @@
     "FileExporter":
     {
         "FileExtension": ".csv",
+        "FileName": "{port}_{id}_{date}",
         "FileRotation": "monthly",
-        "Paths": ["./"],
+        "Paths": ["./data"],
         "Separator": ",",
         "DateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
     },

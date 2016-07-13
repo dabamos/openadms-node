@@ -48,36 +48,35 @@ class SerialPort(prototype.Prototype):
         # Add the name of this serial port to the observation data.
         obs_data.set('PortName', self._name)
 
-        # Send all requests of the given observation data one by one to
-        # the sensor and collect the responses.
-        for query in obs_data.get('Queries'):
-            # Send the request of the observation data to the attached sensor.
-            logger.info('Sending observation "{}" ("{}") to sensor "{}" '
-                        'on port "{}"'.format(obs_data.get('Name'),
-                                              self._sanitize(query['Request']),
-                                              obs_data.get('SensorName'),
-                                              self._name))
-            self._write(query['Request'])
+        # Send the request of the observation data to the attached sensor.
+        logger.info('Sending observation "{}" ("{}") to sensor "{}" on port '
+                    '"{}"'.format(obs_data.get('Name'),
+                                  self._sanitize(obs_data.get('Request')),
+                                  obs_data.get('SensorName'),
+                                  self._name))
 
-            # Wait some time to let the sensor do its sensoring stuff.
-            time.sleep(obs_data.get('AwaitTime'))
+        self._write(obs_data.get('Request'))
 
-            # Get the response of the sensor.
-            response = self._read(query['ResponseDelimiter'])
+        # Wait some time to let the sensor do its sensoring stuff.
+        time.sleep(obs_data.get('AwaitTime'))
+        # Get the response of the sensor.
+        response = self._read(obs_data.get('ResponseDelimiter'))
 
-            # Add a timestamp to the observation data. Please note that
-            # this is the time the last response was received (if there
-            # is more than one request).
-            obs_data.set('TimeStamp', time.time())
+        if response == '':
+            logger.warning('No response from sensor "{}" on port "{}"'
+                           .format(obs_data.get("SensorName"), self._name))
+            return
 
-            logger.info('Received "{}" from sensor "{}" on port "{}"'
-                        .format(self._sanitize(response),
-                                obs_data.get('SensorName'),
-                                self._name))
+        # Add a timestamp to the observation data.
+        obs_data.set('TimeStamp', time.time())
 
-            # Append the raw response of the sensor to the observation
-            # data's responses list.
-            query['Response'] = response
+        logger.info('Received "{}" from sensor "{}" on port "{}"'
+                    .format(self._sanitize(response),
+                            obs_data.get('SensorName'),
+                            self._name))
+
+        # Add the raw response of the sensor to the observation data set.
+        obs_data.set('Response', response)
 
         return obs_data
 
@@ -134,13 +133,17 @@ class SerialPort(prototype.Prototype):
 
         # Read from serial port until delimiter occurs.
         while True:
-            rxd = self._serial.read(1).decode()
-            response += rxd
+            try:
+                rxd = self._serial.read(1).decode()
+                response += rxd
 
-            # Did we get an end of line (e.g., '\r' or '\n')?
-            i = len(eol)
+                # Did we get an end of line (e.g., '\r' or '\n')?
+                i = len(eol)
 
-            if len(response) >= len(eol) and response[-i:] == eol:
+                if len(response) >= len(eol) and response[-i:] == eol:
+                    break
+            except UnicodeDecodeError:
+                logger.error('No sensor on port "{}"'.format(self._name))
                 break
 
         return response

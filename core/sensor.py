@@ -68,8 +68,7 @@ class Sensor(object):
         data['SensorType'] = self._type
 
         # Character '\' is escaped in JSON file.
-        for q in data['Queries']:
-            q['ResponsePattern'] = q['ResponsePattern'].replace('\\\\', '\\')
+        data['ResponsePattern'] = data['ResponsePattern'].replace('\\\\', '\\')
 
         return observation.ObservationData(data)
 

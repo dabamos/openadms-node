@@ -59,6 +59,7 @@ class FileExporter(prototype.Prototype):
         root = self._config_manager.config['FileExporter']
 
         self._file_extension = root['FileExtension']
+        self._file_name = root['FileName']
         self._file_rotation = {
             'none': FileRotation.NONE,
             'daily': FileRotation.DAILY,
@@ -106,20 +107,21 @@ class FileExporter(prototype.Prototype):
             # Every year a new file is created.
             FileRotation.YEARLY: ts.strftime('%Y')}[self._file_rotation]
 
-        # File name: consists of interface name, current date, and
-        # file extension.
-        file_name = obs_data.get('PortName')
-        file_name += '_{}'.format(date) if date is not None else ''
+        file_name = self._file_name
+        file_name = file_name.replace('{port}', obs_data.get('PortName'))
+        file_name = file_name.replace('{date}', '{}'.format(date) \
+                                      if date is not None else '')
+        file_name = file_name.replace('{id}', '{}'.format(obs_data.get('ID')) \
+                                      if obs_data.get('ID') is not None else '')
         file_name += self._file_extension
 
-        # Create a header if a new file has to be touched.
-        header = None
-
-        if not os.path.isfile(file_name):
-            header = '# {} on {}\n'.format(obs_data.get('SensorName'),
-                                           obs_data.get('PortName'))
-
         for path in self._paths:
+            # Create a header if a new file has to be touched.
+            header = None
+
+            if not os.path.isfile(path + file_name):
+                header = '# {} on {}\n'.format(obs_data.get('SensorName'),
+                                               obs_data.get('PortName'))
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
@@ -130,28 +132,27 @@ class FileExporter(prototype.Prototype):
                 dt = datetime.fromtimestamp(obs_data.get('TimeStamp'))
                 line = dt.strftime(self._date_time_format)
 
-                for query in obs_data.get('Queries'):
-                    try:
-                        if query['ID'] is not None:
-                            line += self._separator + query['ID']
+                try:
+                    if obs_data.get('ID') is not None:
+                        line += self._separator + obs_data.get('ID')
 
-                        descriptions = query['ResponseDescriptions']
-                        values = query['ResponseValues']
-                        units = query['ResponseUnits']
+                    descriptions = obs_data.get('ResponseDescriptions')
+                    values = obs_data.get('ResponseValues')
+                    units = obs_data.get('ResponseUnits')
 
-                        # Add values and units to the line.
-                        for d, v, u in itertools.zip_longest(descriptions,
-                            values, units):
-                            line += self._separator + format(d)
-                            line += self._separator + format(v)
-                            line += self._separator + format(u)
-                    except KeyError:
-                        logger.error('Observation data set of sensor "{}" on '
-                                     'port "{}" is incomplete'
-                                     .format(obs_data.get('SensorName'),
-                                             obs_data.get('PortName')))
-                        continue
+                    # Add values and units to the line.
+                    for d, v, u in itertools.zip_longest(descriptions,
+                        values, units):
+                        line += self._separator + format(d)
+                        line += self._separator + format(v)
+                        line += self._separator + format(u)
+                except KeyError:
+                    logger.error('Observation data set of sensor "{}" on '
+                                 'port "{}" is incomplete'
+                                 .format(obs_data.get('SensorName'),
+                                         obs_data.get('PortName')))
 
+                # Write line to file.
                 fh.write(line + '\n')
 
                 logger.info('Saved observation data from port "{}" to file '

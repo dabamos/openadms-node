@@ -30,6 +30,14 @@ import os
 import re
 import sys
 
+"""
+Target generator for NetADMS. FOR TESTING ONLY. Reads a CSV file with targets
+and a JSON file with observations/commands to merge them into a valid sensor
+configuration. This tool will be deprecated in near future, once the user
+interface has been finished.
+
+"""
+
 def grad2rad(angle):
     return angle * (math.pi / 200)
 
@@ -71,14 +79,13 @@ def main(t_file, c_file, o_file):
 
         for c in commands:
             result['Observations'][str(t_id)].append(copy.deepcopy(c))
-            queries = result['Observations'][str(t_id)][index]['Queries']
+            obs_data = result['Observations'][str(t_id)][index]
 
-            for q in queries:
-                if q['ID'] != None:
-                    q['ID'] = q['ID'].replace('[% id %]', t_id)
+            if obs_data['ID'] != None:
+                obs_data['ID'] = obs_data['ID'].replace('[% id %]', t_id)
 
-                q['Request'] = q['Request'].replace('[% hz %]', hz_rad)
-                q['Request'] = q['Request'].replace('[% v %]', v_rad)
+            obs_data['Request'] = obs_data['Request'].replace('[% hz %]', hz_rad)
+            obs_data['Request'] = obs_data['Request'].replace('[% v %]', v_rad)
 
             index = index + 1
 
@@ -93,7 +100,7 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(
         usage='%prog [options]',
         description='Target Generator',
-        epilog='\nTarget file generator for NetADMS.\n'
+        epilog='\nTarget file generator for OpenADMS.\n'
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
                '\nFor further information visit http://www.dabamos.de/.\n')
 
