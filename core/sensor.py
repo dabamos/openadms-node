@@ -23,7 +23,7 @@ import logging
 
 from core import observation
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class Sensor(object):

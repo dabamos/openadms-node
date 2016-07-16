@@ -31,7 +31,7 @@ from modules import prototype
 
 """Module for the export of sensor data to files and databases."""
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class FileRotation(Enum):

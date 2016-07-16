@@ -29,7 +29,7 @@ import time
 
 from modules import port
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class ConfigurationManager:

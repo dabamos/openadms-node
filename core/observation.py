@@ -22,7 +22,7 @@ limitations under the Licence.
 import json
 import logging
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class ObservationData(object):

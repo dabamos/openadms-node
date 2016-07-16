@@ -24,10 +24,10 @@ import logging
 
 from abc import ABCMeta, abstractmethod
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
-class Prototype(metaclass=ABCMeta):
+class Prototype(object, metaclass=ABCMeta):
     """Used as a prototype for other modules.
     """
 

@@ -25,7 +25,7 @@ import logging
 import threading
 import time
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class Scheduler(threading.Thread):

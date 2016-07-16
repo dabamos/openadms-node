@@ -27,7 +27,7 @@ from modules import prototype
 
 """Module for sensor communication."""
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class SerialPort(prototype.Prototype):
@@ -54,6 +54,10 @@ class SerialPort(prototype.Prototype):
                                   self._sanitize(obs_data.get('Request')),
                                   obs_data.get('SensorName'),
                                   self._name))
+        if self._serial == None:
+            logger.error('Could not write to port {} ({})'
+                         .format(self._name, self._serial_port_config.port))
+            return
 
         self._write(obs_data.get('Request'))
 
@@ -82,7 +86,8 @@ class SerialPort(prototype.Prototype):
 
     def close(self):
         logger.info('Closing port {} ({})'
-                    .format(self._serial_port_config.name, self._serial_port_config.port))
+                    .format(self._serial_port_config.name,
+                            self._serial_port_config.port))
         self._serial.close()
 
     def destroy(self, *args):
@@ -108,24 +113,28 @@ class SerialPort(prototype.Prototype):
     def _open(self):
         """Opens a serial port."""
         if self._name is None:
-            logger.error('No port name set!')
+            logger.error('No port name set')
             return
 
         if self._serial_port_config is None:
             self._serial_port_config = self._get_port_config()
 
-        logger.info('Opening port {} ({}) ...'.format(self._name,
-            self._serial_port_config.port))
+        logger.info('Opening port {} ({}) ...'
+            .format(self._name, self._serial_port_config.port))
 
-        self._serial = serial.Serial(
-            port=self._serial_port_config.port,            # Port (e.g., "/dev/tty0").
-            baudrate=self._serial_port_config.baudrate,    # Baudrate (e.g., "9600").
-            timeout=self._serial_port_config.timeout,      # Timeout in seconds.
-            bytesize=self._serial_port_config.bytesize,    # Data bytes (e.g., "8").
-            parity=self._serial_port_config.parity,        # Parity (e.g., "none")
-            stopbits=self._serial_port_config.stopbits,    # Stop bits (e.g., "1").
-            xonxoff=self._serial_port_config.xonxoff,      # Software flow control.
-            rtscts=self._serial_port_config.rtscts)        # Hardware flow control.
+        try:
+            self._serial = serial.Serial(
+                port=self._serial_port_config.port,            # Port (e.g., "/dev/tty0").
+                baudrate=self._serial_port_config.baudrate,    # Baudrate (e.g., "9600").
+                timeout=self._serial_port_config.timeout,      # Timeout in seconds.
+                bytesize=self._serial_port_config.bytesize,    # Data bytes (e.g., "8").
+                parity=self._serial_port_config.parity,        # Parity (e.g., "none")
+                stopbits=self._serial_port_config.stopbits,    # Stop bits (e.g., "1").
+                xonxoff=self._serial_port_config.xonxoff,      # Software flow control.
+                rtscts=self._serial_port_config.rtscts)        # Hardware flow control.
+        except serial.serialutil.SerialException:
+            logger.error('Permission denied for port {} ({})'
+                         .format(self._name, self._serial_port_config.port))
 
     def _read(self, eol):
         """Reads from serial port."""
@@ -143,7 +152,8 @@ class SerialPort(prototype.Prototype):
                 if len(response) >= len(eol) and response[-i:] == eol:
                     break
             except UnicodeDecodeError:
-                logger.error('No sensor on port "{}"'.format(self._name))
+                logger.error('No sensor on port "{}" ({})'
+                            .format(self._name, self._serial_port_config.port))
                 break
 
         return response

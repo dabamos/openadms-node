@@ -29,7 +29,7 @@ from modules import prototype
 
 """Module for sending observation data over a UDP socket."""
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 UDP_TARGET = '127.0.0.1'
 UDP_PORT = 7000

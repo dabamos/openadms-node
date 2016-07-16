@@ -622,6 +622,12 @@
             }
         ]
     },
+    "AtmosphericCorrector":
+    {
+        "Temperature": null,
+        "Pressure": null,
+        "Humidity": 0.6
+    },
     "PolarTransformer":
     {
         "USB0":

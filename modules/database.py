@@ -28,7 +28,7 @@ from modules import prototype
 
 """Module for database communication."""
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class DBMS(prototype.Prototype):

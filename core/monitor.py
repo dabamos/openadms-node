@@ -30,7 +30,7 @@ from core import sensor
 
 """Main monitoring module."""
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class Monitor(threading.Thread):

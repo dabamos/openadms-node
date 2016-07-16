@@ -26,14 +26,15 @@ import time
 
 from modules import prototype
 
-logger = logging.getLogger('netadms')
+logger = logging.getLogger('openadms')
 
 
 class AtmosphericCorrector(prototype.Prototype):
 
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
-        # self._config = self._config_manager.config[self._name]
+        self._config_manager = config_manager
+        self._config = self._config_manager.config[self._name]
 
         # Valid weather station types.
         self._ws_types = ['meteo', 'meteorological', 'meteorological station',
@@ -41,11 +42,44 @@ class AtmosphericCorrector(prototype.Prototype):
         # Valid total station types.
         self._ts_types = ['rts', 'tachymeter', 'total station',
                           'totalstation', 'tps', 'tst']
+        # ... should both better be part of the configuration?
 
         self._temperature = None
         self._pressure = None
-        self._humidity = None
+        self._humdity = None
         self._last_update = None
+
+        self.temperature = self._config['Temperature']
+        self.pressure = self._config['Pressure']
+        self.humidity = self._config['Humidity']
+
+    def action(self, obs_data):
+        sensor_type = obs_data.get('SensorType').lower()
+
+        # Update atmospheric data if sensor is a meteorological station.
+        if sensor_type in self._ws_types:
+            self._update_meteorological_data(obs_data)
+
+        # Check if atmospheric data has been set.
+        if self.temperature == None or self.pressure == None or \
+            self.humidity == None:
+            logger.warning('No atmospheric data set')
+            return obs_data
+
+        # Check the age of the atmospheric data.
+        max_age = 3600  # 1 hour
+
+        if self.last_update - time.time() > max_age:
+            logger.warning('Atmospheric data is older than {} hour(s)'
+                           .format(int(max_age / 3600)))
+
+        # Reduce the slope distance of the EDM measurement if the sensor is a
+        # robotic total station.
+        if sensor_type in self._ts_types:
+            ppm = self.get_ppm()
+            obs_data = self._reduce_distance(obs_data, ppm)
+
+        return obs_data
 
     def _reduce_distance(self, obs_data, ppm):
         descriptions = obs_data.get('ResponseDescriptions')
@@ -94,38 +128,31 @@ class AtmosphericCorrector(prototype.Prototype):
         # data set.
         for i in range(len(descriptions)):
             d = descriptions[i].lower()
+            v = values[i]
 
+            # Temperature.
             if d in ['temp', 'temperature']:
-                self._temperature = values[i]
-                self._last_update = time.time()
-                logger.debug('Updated temperature to {} °C'
-                             .format(self._temperature))
+                self.temperature = v
                 continue
 
+            # Air pressure.
             if d in ['airpressure', 'press', 'pressure']:
-                self._pressure = values[i]
-                self._last_update = time.time()
-                logger.debug('Updated pressure to {} hPa'
-                             .format(self._pressure))
+                self.pressure = v
                 continue
 
+            # Humidity.
             if d in ['humidity', 'moisture']:
                 if units[i] == '%':
                     # Unit is percent (e.g., 75 %).
-                    self._humidity = values[i] / 100
+                    self.humidity = v / 100
                 else:
                     # No unit (e.g., 0.75).
-                    self._humidity = values[i]
-
-                self._last_update = time.time()
-                logger.debug('Updated humidity to {}'
-                             .format(round(self._humidity, 2)))
-                continue
+                    self.humidity = v
 
     def sealevel_reduction(self):
         pass
 
-    def _get_ppm(self):
+    def get_ppm(self):
         """Calculates the atmospheric correction value in parts per million
         (ppm) for the reduction of distances gained by electronic distance
         measurement (EDM).
@@ -135,43 +162,49 @@ class AtmosphericCorrector(prototype.Prototype):
         stations of Leica Geosystems. For further information, please see Leica
         TM30 manual on page 76."""
         alpha = 1 / 273.15
-        div = (1 + alpha * self._temperature)
-        x = (7.5 * self._temperature / (237.3 + self._temperature)) + 0.7857
+        div = (1 + alpha * self.temperature)
+        x = (7.5 * self.temperature / (237.3 + self.temperature)) + 0.7857
 
-        s1 = 0.29525 * self._pressure
-        s2 = 4.126 * math.pow(10, -4) * self._humidity
+        s1 = 0.29525 * self.pressure
+        s2 = 4.126 * math.pow(10, -4) * self.humidity
 
         ppm = 286.34 - ((s1 / div) - ((s2 / div) * math.pow(10, int(x))))
 
         return ppm
 
-    def action(self, obs_data):
-        sensor_type = obs_data.get('SensorType').lower()
+    @property
+    def temperature(self):
+        return self._temperature
 
-        # Update atmospheric data if sensor is a meteorological station.
-        if sensor_type in self._ws_types:
-            self._update_meteorological_data(obs_data)
+    @property
+    def pressure(self):
+        return self._pressure
 
-        # Check if atmospheric data has been set.
-        if self._temperature == None or self._pressure == None or \
-            self._humidity == None:
-            logger.warning('No atmospheric data found')
-            return obs_data
+    @property
+    def humidity(self):
+        return self._humidity
 
-        # Check the age of the athmospheric data.
-        max_age = 3600  # 1 hour
+    @property
+    def last_update(self):
+        return self._last_update
 
-        if self._last_update - time.time() > max_age:
-            logger.warning('Atmospheric data is older than {} hour(s)'
-                           .format(int(max_age / 3600)))
+    @temperature.setter
+    def temperature(self, temperature):
+        self._temperature = temperature
+        self._last_update = time.time()
+        logger.debug('Updated temperature to {} °C'.format(self.temperature))
 
-        # Reduce the slope distance of the EDM measurement if the sensor is a
-        # robotic total station.
-        if sensor_type in self._ts_types:
-            ppm = self._get_ppm()
-            obs_data = self._reduce_distance(obs_data, ppm)
+    @pressure.setter
+    def pressure(self, pressure):
+        self._pressure = pressure
+        self._last_update = time.time()
+        logger.debug('Updated pressure to {} hPa'.format(self.pressure))
 
-        return obs_data
+    @humidity.setter
+    def humidity(self, humidity):
+        self._humidity = humidity
+        self._last_update = time.time()
+        logger.debug('Updated pressure to {}'.format(round(self.humidity, 2)))
 
     def destroy(self, *args):
         pass
@@ -191,7 +224,7 @@ class PolarTransformer(prototype.Prototype):
         prototype.Prototype.__init__(self, name, config_manager)
         self._config = self._config_manager.config[self._name]
 
-        # Acronyms of the valid sensor types:
+        # Acronyms of valid sensor types:
         #
         # RTS: Robotic Total Station
         # TPS: Tachymeter-Positionierungssystem
@@ -368,7 +401,7 @@ class PreProcessor(prototype.Prototype):
                     logger.debug('Converted raw value "{}" to '
                                  'float value "{}"'.format(g, v))
                 else:
-                    logger.warning('Value {} couldn\'t be converted '
+                    logger.warning('Value "{}" couldn\'t be converted '
                                    '(not float)'.format(g))
             # Convert raw value to int.
             elif t == 'integer':
@@ -378,7 +411,7 @@ class PreProcessor(prototype.Prototype):
                     logger.debug('Converted raw value "{}" to '
                                  'integer value "{}"'.format(g, v))
                 else:
-                    logger.warning('Value {} couldn\'t be converted '
+                    logger.warning('Value "{}" couldn\'t be converted '
                                    '(not integer)'.format(g))
             # Convert raw value to string.
             else:
