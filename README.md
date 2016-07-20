@@ -37,7 +37,7 @@ parameter. Run:
 $ python3 openadms.py --config ./config/my_config.json
 ```
 
-### Virtual Environment
+## Virtual Environment
 For the set-up of an independent Python environment the tool `pyvenv` can be
 used, which is part of Python 3:
 
