@@ -143,12 +143,12 @@ class DistanceCorrector(prototype.Prototype):
 
         ppm_group = self._get_response_group('PPM',
                                              'Float',
-                                             round(ppm, 5),
-                                             'none')
+                                             'none',
+                                             round(ppm, 5))
         r_dist_group = self._get_response_group('ReducedDist',
                                                 'Float',
-                                                round(r_dist, 5),
-                                                'm')
+                                                'm',
+                                                round(r_dist, 5))
 
         obs_data.get('ResponseGroups').append(ppm_group)
         obs_data.get('ResponseGroups').append(r_dist_group)
