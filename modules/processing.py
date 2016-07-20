@@ -137,21 +137,21 @@ class DistanceCorrector(prototype.Prototype):
         r_dist = dist + ((ppm * math.pow(10, -6)) * dist)
 
         logger.info('Reduced distance from {} m to {} m ({} ppm)'
-                    .format(round(dist, 4),
-                            round(r_dist, 4),
+                    .format(round(dist, 5),
+                            round(r_dist, 5),
                             round(ppm, 1)))
 
-        ppm_group = self._get_response_group('PPM',
-                                             'Float',
-                                             'none',
-                                             round(ppm, 5))
-        r_dist_group = self._get_response_group('ReducedDist',
-                                                'Float',
-                                                'm',
-                                                round(r_dist, 5))
+        response_ppm = self._get_response_group('PPM',
+                                               'Float',
+                                               'none',
+                                               round(ppm, 5))
+        response_r_dist = self._get_response_group('ReducedDist',
+                                                   'Float',
+                                                   'm',
+                                                   round(r_dist, 5))
 
-        obs_data.get('ResponseGroups').append(ppm_group)
-        obs_data.get('ResponseGroups').append(r_dist_group)
+        response_groups.append(response_ppm)
+        response_groups.append(response_r_dist)
 
         return obs_data
 
@@ -161,7 +161,9 @@ class DistanceCorrector(prototype.Prototype):
     def _update_meteorological_data(self, obs_data):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        for response in obs_data.get('ResponseGroups'):
+        response_groups = obs_data.get('ResponseGroups')
+
+        for response in response_groups:
             d = response['Description'].lower()
             u = response['Unit']
             v = response['Value']
@@ -271,6 +273,7 @@ class PolarTransformer(prototype.Prototype):
         # Check the configuration for the given sensor port.
         port_name = obs_data.get('PortName')
         sensor_type = obs_data.get('SensorType').lower()
+        response_groups = obs_data.get('ResponseGroups')
 
         if not sensor_type in self._valid_types:
             logger.error('Sensor is not of type "total station"')
@@ -288,13 +291,13 @@ class PolarTransformer(prototype.Prototype):
                          .format(port_name))
             return obs_data
 
-        response_groups = obs_data.get('ResponseGroups')
-
         hz = None
         v = None
         dist = None
+        r_dist = None
 
-        # Search for Hz, V, and slope distance from the observation data set.
+        # Search for Hz, V, and reduced/slope distance from the observation
+        # data set.
         for response in response_groups:
             description = response['Description'].lower()
             value = response['Value']
@@ -307,22 +310,24 @@ class PolarTransformer(prototype.Prototype):
             if description in ['v', 'vertical']:
                 v = value
 
+            # Slope distance if no reduced distance is set.
+            if description in ['dist', 'slopedist']:
+                dist = value
+
             # Reduced distance.
             if description in ['reduceddist', 'reduceddistance']:
-                dist = value
-
-            # Slope distance if no reduced distance is set.
-            if dist == None and description in ['dist', 'slopedist']:
-                dist = value
-
-            if hz != None and v != None and dist != None:
-                # Hz, V, and distance are found.
-                break
+                r_dist = value
 
         if hz == None or v == None or dist == None:
             logger.error('Observation is incomplete '
                          '(Hz, V, or distance is missing)')
             return obs_data
+
+        # Override slope distance with reduced distance.
+        if r_dist == None:
+            logger.warning('No reduced distance set')
+        else:
+            dist = r_dist
 
         # Radiant to grad (gon).
         hz_grad = hz * 200 / math.pi
@@ -345,9 +350,9 @@ class PolarTransformer(prototype.Prototype):
                                                        z))
 
         # Create dictionaries.
-        response_y = self._get_response_group('Y', 'Float', round(y, 5), 'm')
-        response_x = self._get_response_group('X', 'Float', round(x, 5), 'm')
-        response_z = self._get_response_group('Z', 'Float', round(z, 5), 'm')
+        response_y = self._get_response_group('Y', 'Float', 'm', round(y, 5))
+        response_x = self._get_response_group('X', 'Float', 'm', round(x, 5))
+        response_z = self._get_response_group('Z', 'Float', 'm', round(z, 5))
 
         # Add to observation data set.
         response_groups.append(response_y)

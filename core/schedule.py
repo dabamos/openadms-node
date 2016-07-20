@@ -74,21 +74,13 @@ class Job(object):
         self._sensor = sensor
         self._enabled = enabled
 
-        # Convert date to time stamp.
+        # Convert date to date and time.
         self._start_date = self.get_datetime(start_date, self._date_fmt)
         self._end_date = self.get_datetime(end_date, self._date_fmt)
-
-        # Add a time ("00:00:00") to the date in order to make start and end
-        # comparable.
-        self._start_datetime = dt.datetime.combine(self._start_date,
-                                                   dt.time.min)
-        self._end_datetime = dt.datetime.combine(self._end_date,
-                                                 dt.time.min)
 
         self._schedule = schedule
         self._observation_sets = observation_sets
         self._output_queue = output_queue
-
 
     @property
     def enabled(self):
@@ -102,7 +94,7 @@ class Job(object):
         now = dt.datetime.now()
         expired = False
 
-        if now > self._end_datetime:
+        if now > self._end_date:
             expired = True
             logger.debug('Job has expired')
 
@@ -115,7 +107,7 @@ class Job(object):
         now = dt.datetime.now()
 
         # Are we within the date range of the job?
-        if now >= self._start_datetime and now < self._end_datetime:
+        if now >= self._start_date and now < self._end_date:
             # No days definied, go on.
             if len(self._schedule) == 0:
                 return True

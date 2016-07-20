@@ -35,7 +35,6 @@ class ObservationData(object):
 
     def __init__(self, data):
         self._data = data
-        self._data['InterfaceName'] = None
         self._data['PortName'] = None
         self._data['Response'] = None
         self._data['TimeStamp'] = None

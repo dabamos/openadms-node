@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
-                                              maxBytes=10485760,
+                                              maxBytes=10485760, # 10 MB
                                               backupCount=1,
                                               encoding='utf8')
     fh.setLevel(level)
