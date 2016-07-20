@@ -77,12 +77,13 @@ class Monitor(threading.Thread):
             try:
                 schedules = self._config_manager.config['Scheduler'][port_name]
             except KeyError:
-                logger.error('No scheduler found for port {}'.format(port_name))
+                logger.error('No schedule found for port {}'.format(port_name))
                 continue
 
             # Create a new scheduler for every port (e.g., "USB0", "USB1", ...).
             self._schedulers[port_name] = schedule.Scheduler()
 
+            # Parse the schedules list and create jobs out of them.
             for s in schedules:
                 # Create new job.
                 job = schedule.Job(port_name,

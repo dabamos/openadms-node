@@ -26,6 +26,9 @@ import time
 
 from modules import prototype
 
+"""Module for data processing (pre-precessing, atmospheric corrections,
+transformations)."""
+
 logger = logging.getLogger('openadms')
 
 
@@ -60,8 +63,7 @@ class DistanceCorrector(prototype.Prototype):
 
         if (sensor_type not in self._ws_types) and \
             (sensor_type not in self._ts_types):
-            logger.warning('Wrong sensor type '
-                           '(not weather station or total station)')
+            logger.warning('Wrong sensor type ("{}")'.format(sensor_type))
             return obs_data
 
         # Update atmospheric data if sensor is a meteorological station.

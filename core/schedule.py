@@ -67,32 +67,42 @@ class Job(object):
 
     def __init__(self, port_name, sensor, enabled, start_date, end_date,
         schedule, observation_sets, output_queue):
+        self._date_fmt = '%Y-%m-%d'
+        self._time_fmt = '%H:%M:%S'
+
         self._port_name = port_name
         self._sensor = sensor
         self._enabled = enabled
-        self._start_date = start_date
-        self._end_date = end_date
+
+        # Convert date to time stamp.
+        self._start_date = self.get_datetime(start_date, self._date_fmt)
+        self._end_date = self.get_datetime(end_date, self._date_fmt)
+
+        # Add a time ("00:00:00") to the date in order to make start and end
+        # comparable.
+        self._start_datetime = dt.datetime.combine(self._start_date,
+                                                   dt.time.min)
+        self._end_datetime = dt.datetime.combine(self._end_date,
+                                                 dt.time.min)
+
         self._schedule = schedule
         self._observation_sets = observation_sets
         self._output_queue = output_queue
 
-        self._date_fmt = '%Y-%m-%d'
 
     @property
     def enabled(self):
         return self._enabled
 
     def get_datetime(self, dt_str, dt_fmt):
+        """Converts a date string to a time stamp."""
         return dt.datetime.strptime(dt_str, dt_fmt)
 
     def has_expired(self):
         now = dt.datetime.now()
-        end_dt = self.get_datetime(self._end_date, self._date_fmt)
-        end_date = dt.datetime.combine(end_dt, dt.time.min)
-
         expired = False
 
-        if now > end_date:
+        if now > self._end_datetime:
             expired = True
             logger.debug('Job has expired')
 
@@ -102,25 +112,20 @@ class Job(object):
         if not self._enabled:
             return False
 
-        start_date = self.get_datetime(self._start_date, self._date_fmt)
-        end_date = self.get_datetime(self._end_date, self._date_fmt)
-
-        # Add a time ("00:00:00") to the day in order to make start and end
-        # comparable.
-        start_datetime = dt.datetime.combine(start_date, dt.time.min)
-        end_datetime = dt.datetime.combine(end_date, dt.time.min)
-
         now = dt.datetime.now()
 
         # Are we within the date range of the job?
-        if now >= start_datetime and now < end_datetime:
+        if now >= self._start_datetime and now < self._end_datetime:
+            # No days definied, go on.
             if len(self._schedule) == 0:
                 return True
 
-            current_day = now.strftime('%A')    # Name of the current day.
+            # Name of the current day (e.g., "Monday").
+            current_day = now.strftime('%A')
 
-            # Ignore current day if it is not in the schedule.
+            # Ignore current day if it is not listed in the schedule.
             if current_day in self._schedule:
+                # Time ranges of the current day.
                 periods = self._schedule[current_day]
 
                 # No given time range means the job should be executed
@@ -130,14 +135,12 @@ class Job(object):
 
                 # Check all time ranges of the current day.
                 if len(periods) > 0:
-                    time_fmt = '%H:%M:%S'
-
                     for p in periods:
                         # Start and end time of the current day.
                         start_time = self.get_datetime(p['StartTime'],
-                                                       time_fmt).time()
+                                                       self._time_fmt).time()
                         end_time = self.get_datetime(p['EndTime'],
-                                                     time_fmt).time()
+                                                     self._time_fmt).time()
 
                         # Are we within the time range of the current day?
                         if now.time() >= start_time and \
