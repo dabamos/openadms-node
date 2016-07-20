@@ -29,12 +29,12 @@ from modules import prototype
 logger = logging.getLogger('openadms')
 
 
-class AtmosphericCorrector(prototype.Prototype):
+class DistanceCorrector(prototype.Prototype):
 
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
         self._config_manager = config_manager
-        self._config = self._config_manager.config[self._name]
+        config = self._config_manager.config[self._name]
 
         # Valid weather station types.
         self._ws_types = ['meteo', 'meteorological', 'meteorological station',
@@ -42,19 +42,27 @@ class AtmosphericCorrector(prototype.Prototype):
         # Valid total station types.
         self._ts_types = ['rts', 'tachymeter', 'total station',
                           'totalstation', 'tps', 'tst']
-        # ... should both better be part of the configuration?
+        # TODO ... maybe should be better part of the configuration?
 
-        self._temperature = None
-        self._pressure = None
-        self._humdity = None
-        self._last_update = None
+        self._is_atmospheric_correction = config['AtmosphericCorrectionEnabled']
+        self._is_sealevel_correction = config['SealevelCorrectionEnabled']
 
-        self.temperature = self._config['Temperature']
-        self.pressure = self._config['Pressure']
-        self.humidity = self._config['Humidity']
+        try:
+            self.temperature = config['Temperature']
+            self.pressure = config['Pressure']
+            self.humidity = config['Humidity']
+            self._last_update = time.time()
+        except KeyError:
+            debug.error('Configuration is invalid')
 
     def action(self, obs_data):
         sensor_type = obs_data.get('SensorType').lower()
+
+        if (sensor_type not in self._ws_types) and \
+            (sensor_type not in self._ts_types):
+            logger.warning('Wrong sensor type '
+                           '(not weather station or total station)')
+            return obs_data
 
         # Update atmospheric data if sensor is a meteorological station.
         if sensor_type in self._ws_types:
@@ -63,7 +71,7 @@ class AtmosphericCorrector(prototype.Prototype):
         # Check if atmospheric data has been set.
         if self.temperature == None or self.pressure == None or \
             self.humidity == None:
-            logger.warning('No atmospheric data set')
+            logger.warning('Temperature, air pressure, or humidity missing')
             return obs_data
 
         # Check the age of the atmospheric data.
@@ -76,81 +84,14 @@ class AtmosphericCorrector(prototype.Prototype):
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
         if sensor_type in self._ts_types:
-            ppm = self.get_ppm()
-            obs_data = self._reduce_distance(obs_data, ppm)
+            if self._is_atmospheric_correction:
+                ppm = self.get_ppm()
+                obs_data = self._do_atmospheric_correction(obs_data, ppm)
+
+            if self._is_sealevel_correction:
+                obs_data = self._do_sealevel_correction(obs_data)
 
         return obs_data
-
-    def _reduce_distance(self, obs_data, ppm):
-        descriptions = obs_data.get('ResponseDescriptions')
-        values = obs_data.get('ResponseValues')
-
-        dist = None
-
-        for i in range(len(descriptions)):
-            d = descriptions[i].lower()
-
-            # Search for slope distance.
-            if d in ['dist', 'slopedist']:
-                dist = values[i]
-                break
-
-        if dist == None:
-            logger.warning('No slope distance found for reduction')
-            return obs_data
-
-        # Reduce distance with given ppm value.
-        r_dist = dist + ((ppm * math.pow(10, -6)) * dist)
-
-        logger.debug('Reduced distance from {} m to {} m ({} ppm)'
-                     .format(round(dist, 4),
-                             round(r_dist, 4),
-                             round(ppm, 1)))
-
-        # Add PPM value.
-        obs_data.data['ResponseDescriptions'].append('ppm')
-        obs_data.data['ResponseValues'].append(round(ppm, 5))
-        obs_data.data['ResponseUnits'].append('none')
-
-        # Add reduced distance.
-        obs_data.data['ResponseDescriptions'].append('ReducedDist')
-        obs_data.data['ResponseValues'].append(round(r_dist, 5))
-        obs_data.data['ResponseUnits'].append('m')
-
-        return obs_data
-
-    def _update_meteorological_data(self, obs_data):
-        descriptions = obs_data.get('ResponseDescriptions')
-        values = obs_data.get('ResponseValues')
-        units = obs_data.get('ResponseUnits')
-
-        # Get temperature, air pressure, and humidity from the observation
-        # data set.
-        for i in range(len(descriptions)):
-            d = descriptions[i].lower()
-            v = values[i]
-
-            # Temperature.
-            if d in ['temp', 'temperature']:
-                self.temperature = v
-                continue
-
-            # Air pressure.
-            if d in ['airpressure', 'press', 'pressure']:
-                self.pressure = v
-                continue
-
-            # Humidity.
-            if d in ['humidity', 'moisture']:
-                if units[i] == '%':
-                    # Unit is percent (e.g., 75 %).
-                    self.humidity = v / 100
-                else:
-                    # No unit (e.g., 0.75).
-                    self.humidity = v
-
-    def sealevel_reduction(self):
-        pass
 
     def get_ppm(self):
         """Calculates the atmospheric correction value in parts per million
@@ -172,6 +113,86 @@ class AtmosphericCorrector(prototype.Prototype):
 
         return ppm
 
+    def _do_atmospheric_correction(self, obs_data, ppm):
+        """Reduces a given slope distance by a given PPM value."""
+        dist = None
+        response_groups = obs_data.get('ResponseGroups')
+
+        for response in response_groups:
+            d = response['Description'].lower()
+            v = response['Value']
+
+            # Search for slope distance.
+            if d in ['dist', 'slopedist']:
+                dist = v
+                break
+
+        if dist == None:
+            logger.warning('No slope distance found for reduction')
+            return obs_data
+
+        # Reduce distance by given ppm value.
+        r_dist = dist + ((ppm * math.pow(10, -6)) * dist)
+
+        logger.info('Reduced distance from {} m to {} m ({} ppm)'
+                    .format(round(dist, 4),
+                            round(r_dist, 4),
+                            round(ppm, 1)))
+
+        ppm_group = self._get_response_group('PPM',
+                                             'Float',
+                                             round(ppm, 5),
+                                             'none')
+        r_dist_group = self._get_response_group('ReducedDist',
+                                                'Float',
+                                                round(r_dist, 5),
+                                                'm')
+
+        obs_data.get('ResponseGroups').append(ppm_group)
+        obs_data.get('ResponseGroups').append(r_dist_group)
+
+        return obs_data
+
+    def _do_sealevel_correction(self, obs_data):
+        return obs_data
+
+    def _update_meteorological_data(self, obs_data):
+        """Updates the temperature, air pressure, and humidity attributes by
+        using the measured data of a weather station."""
+        for response in obs_data.get('ResponseGroups'):
+            d = response['Description'].lower()
+            u = response['Unit']
+            v = response['Value']
+
+            # Temperature.
+            if d in ['temp', 'temperature']:
+                self.temperature = v
+                continue
+
+            # Air pressure.
+            if d in ['airpressure', 'press', 'pressure']:
+                self.pressure = v
+                continue
+
+            # Humidity.
+            if d in ['humidity', 'moisture']:
+                if u == '%':
+                    # Unit is percent (e.g., 75 %).
+                    self.humidity = v / 100
+                else:
+                    # No unit (e.g., 0.75).
+                    self.humidity = v
+
+    def _get_response_group(self, d, t, u, v):
+        response = {}
+
+        response['Description'] = d
+        response['Type'] = t
+        response['Unit'] = u
+        response['Value'] = v
+
+        return response
+
     @property
     def temperature(self):
         return self._temperature
@@ -190,21 +211,33 @@ class AtmosphericCorrector(prototype.Prototype):
 
     @temperature.setter
     def temperature(self, temperature):
+        """Sets the temperature."""
         self._temperature = temperature
         self._last_update = time.time()
-        logger.debug('Updated temperature to {} °C'.format(self.temperature))
+
+        if temperature is not None:
+            logger.info('Updated temperature to {} °C'
+                        .format(round(temperature, 2)))
 
     @pressure.setter
     def pressure(self, pressure):
+        """Sets the air pressure."""
         self._pressure = pressure
         self._last_update = time.time()
-        logger.debug('Updated pressure to {} hPa'.format(self.pressure))
+
+        if pressure is not None:
+            logger.info('Updated pressure to {} hPa'
+                        .format(round(pressure, 2)))
 
     @humidity.setter
     def humidity(self, humidity):
+        """Sets the humidity."""
         self._humidity = humidity
         self._last_update = time.time()
-        logger.debug('Updated pressure to {}'.format(round(self.humidity, 2)))
+
+        if humidity is not None:
+            logger.info('Updated humidity to {}'
+                        .format(round(humidity, 2)))
 
     def destroy(self, *args):
         pass
@@ -232,6 +265,96 @@ class PolarTransformer(prototype.Prototype):
         self._valid_types = ['rts', 'tachymeter', 'total station',
                              'totalstation', 'tps', 'tst']
 
+    def action(self, obs_data):
+        # Check the configuration for the given sensor port.
+        port_name = obs_data.get('PortName')
+        sensor_type = obs_data.get('SensorType').lower()
+
+        if not sensor_type in self._valid_types:
+            logger.error('Sensor is not of type "total station"')
+            return obs_data
+
+        try:
+            sensor_y = self._config[port_name]['SensorPosition']['East']
+            sensor_x = self._config[port_name]['SensorPosition']['North']
+            sensor_z = self._config[port_name]['SensorPosition']['Height']
+
+            azimuth_y = self._config[port_name]['AzimuthPosition']['East']
+            azimuth_x = self._config[port_name]['AzimuthPosition']['North']
+        except KeyError:
+            logger.error('Configuration for port "{}" is invalid'
+                         .format(port_name))
+            return obs_data
+
+        response_groups = obs_data.get('ResponseGroups')
+
+        hz = None
+        v = None
+        dist = None
+
+        # Search for Hz, V, and slope distance from the observation data set.
+        for response in response_groups:
+            description = response['Description'].lower()
+            value = response['Value']
+
+            # Horizontal direction.
+            if description in ['hz', 'horizontal']:
+                hz = value
+
+            # Vertical angle.
+            if description in ['v', 'vertical']:
+                v = value
+
+            # Reduced distance.
+            if description in ['reduceddist', 'reduceddistance']:
+                dist = value
+
+            # Slope distance if no reduced distance is set.
+            if dist == None and description in ['dist', 'slopedist']:
+                dist = value
+
+            if hz != None and v != None and dist != None:
+                # Hz, V, and distance are found.
+                break
+
+        if hz == None or v == None or dist == None:
+            logger.error('Observation is incomplete '
+                         '(Hz, V, or distance is missing)')
+            return obs_data
+
+        # Radiant to grad (gon).
+        hz_grad = hz * 200 / math.pi
+        v_grad = v * 200 / math.pi
+
+        logger.debug('Starting polar transformation of target "{}" with '
+                     '[Hz = {:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m]'
+                     .format(obs_data.get('ID'),
+                             hz_grad,
+                             v_grad,
+                             dist))
+
+        (y, x, z) = self.transform(sensor_x, sensor_y, sensor_z,
+                                   azimuth_x, azimuth_y, hz, v, dist)
+
+        logger.info('Transformed target "{}" to [Y = {:3.4f}, '
+                    'X = {:3.4f}, Z = {:3.4f}]'.format(obs_data.get('ID'),
+                                                       y,
+                                                       x,
+                                                       z))
+
+        # Create dictionaries.
+        response_y = self._get_response_group('Y', 'Float', round(y, 5), 'm')
+        response_x = self._get_response_group('X', 'Float', round(x, 5), 'm')
+        response_z = self._get_response_group('Z', 'Float', round(z, 5), 'm')
+
+        # Add to observation data set.
+        response_groups.append(response_y)
+        response_groups.append(response_x)
+        response_groups.append(response_z)
+
+        return obs_data
+
+
     def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
         v, dist):
         """Calculates coordinates (Y, X, Z) out of horizontal direction,
@@ -258,83 +381,15 @@ class PolarTransformer(prototype.Prototype):
 
         return (y, x, z)
 
-    def action(self, obs_data):
-        # Check the configuration for the given sensor port.
-        port_name = obs_data.get('PortName')
+    def _get_response_group(self, d, t, u, v):
+        response = {}
 
-        if self._config[port_name] == None:
-            logger.error('No configuration found for port "{}"'.format(port_name))
-            return obs_data
+        response['Description'] = d
+        response['Type'] = t
+        response['Unit'] = u
+        response['Value'] = v
 
-        sensor_type = obs_data.get('SensorType').lower()
-
-        if not sensor_type in self._valid_types:
-            logger.error('Sensor is not of type "total station"')
-            return obs_data
-
-        sensor_y = self._config[port_name]['SensorPosition']['East']
-        sensor_x = self._config[port_name]['SensorPosition']['North']
-        sensor_z = self._config[port_name]['SensorPosition']['Height']
-
-        azimuth_y = self._config[port_name]['AzimuthPosition']['East']
-        azimuth_x = self._config[port_name]['AzimuthPosition']['North']
-
-        descriptions = obs_data.get('ResponseDescriptions')
-        values = obs_data.get('ResponseValues')
-
-        hz = None
-        v = None
-        dist = None
-
-        # Get Hz, V, and distance from the observation data set.
-        for i in range(len(descriptions)):
-            d = descriptions[i].lower()
-
-            if d == 'hz':
-                hz = values[i]
-
-            if d == 'v':
-                v = values[i]
-
-            if d in ['dist', 'slopedist']:
-                dist = values[i]
-
-        if hz == None or v == None or dist == None:
-            logger.warning('Observation is incomplete '
-                           '(Hz, V, or distance is missing)')
-
-        hz_grad = hz * 200 / math.pi
-        v_grad = v * 200 / math.pi
-
-        logger.debug('Starting polar transformation of target "{}" with '
-                     '[Hz = {:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m]'
-                     .format(obs_data.get('ID'),
-                             hz_grad,
-                             v_grad,
-                             dist))
-
-        (y, x, z) = self.transform(sensor_x, sensor_y, sensor_z,
-                                   azimuth_x, azimuth_y, hz, v, dist)
-
-        logger.debug('Transformed target "{}" to [Y = {:3.4f}, '
-                     'X = {:3.4f}, Z = {:3.4f}]'.format(obs_data.get('ID'),
-                                                        y,
-                                                        x,
-                                                        z))
-
-        obs_data.data['ResponseDescriptions'].append('Y')
-        obs_data.data['ResponseValues'].append(round(y, 5))
-        obs_data.data['ResponseUnits'].append('m')
-
-        obs_data.data['ResponseDescriptions'].append('X')
-        obs_data.data['ResponseValues'].append(round(x, 5))
-        obs_data.data['ResponseUnits'].append('m')
-
-        obs_data.data['ResponseDescriptions'].append('Z')
-        obs_data.data['ResponseValues'].append(round(z, 5))
-        obs_data.data['ResponseUnits'].append('m')
-
-        return obs_data
+        return response
 
     def destroy(self, *args):
         pass
@@ -350,24 +405,21 @@ class PreProcessor(prototype.Prototype):
 
     def action(self, obs_data):
         """Extracts the values from the raw responses of the observation data
-        using regular expressions. The result is forwarded by the message
-        broker."""
-        values = []
-
+        using regular expressions."""
         response = obs_data.get('Response')
         response_pattern = obs_data.get('ResponsePattern')
-        response_types = obs_data.get('ResponseTypes')
 
         pattern = re.compile(response_pattern)
         parsed = pattern.search(response)
 
         if not parsed:
-            logger.warning('Extraction pattern "{}" does not match response '
-                           '"{}" from sensor {} on {}'
-                           .format(response_pattern,
-                                   self._sanitize(response),
-                                   obs_data.get('SensorName'),
-                                   obs_data.get('PortName')))
+            logger.error('Extraction pattern "{}" does not match response '
+                         '"{}" from sensor {} on {}'
+                         .format(response_pattern,
+                                 self._sanitize(response),
+                                 obs_data.get('SensorName'),
+                                 obs_data.get('PortName')))
+            return obs_data
 
         # The regular expression pattern needs a least one defined group
         # by using the braces "(" and ")". Otherwise, an extraction of the
@@ -375,52 +427,55 @@ class PreProcessor(prototype.Prototype):
         #
         # Right: "(.*)"
         # Wrong: ".*"
-        groups = parsed.groups()
+        raw_responses = parsed.groups()
+        response_groups = obs_data.get('ResponseGroups')
 
-        if len(groups) == 0:
+        if len(raw_responses) == 0:
             logger.error('No group defined in regular expression pattern')
             return obs_data
 
-        # The results go in here.
-        values = []
+        if len(raw_responses) != len(response_groups):
+            logger.error('Number of regular expressions mismatch number of '
+                         'response values')
+            return obs_data
 
-        for i in range(len(groups)):
-            g = groups[i]
-            t = response_types[i].lower()
-
-            logger.debug('Extracted "{}" from raw response'.format(g))
+        for raw_response, response_group in zip(raw_responses, response_groups):
+            logger.debug('Extracted "{}" from raw response'
+                         .format(raw_response))
+            response_type = response_group['Type'].lower()
+            response_value = None
 
             # Convert raw value to float.
-            if t == 'float':
+            if response_type == 'float':
                 # Replace comma by dot.
-                dotted = g.replace(',', '.')
+                dot_response = raw_response.replace(',', '.')
 
-                if self._is_float(dotted):
-                    v = float(dotted)
+                if self._is_float(dot_response):
+                    response_value = float(dot_response)
 
                     logger.debug('Converted raw value "{}" to '
-                                 'float value "{}"'.format(g, v))
+                                 'float value "{}"'.format(raw_response,
+                                                           response_value))
                 else:
-                    logger.warning('Value "{}" couldn\'t be converted '
-                                   '(not float)'.format(g))
+                    logger.warning('Value "{}" could not be converted '
+                                   '(not float)'.format(raw_response))
             # Convert raw value to int.
-            elif t == 'integer':
-                if self._is_int(g):
-                    v = int(g)
+            elif response_type == 'integer':
+                if self._is_int(raw_response):
+                    response_value = int(raw_response)
 
-                    logger.debug('Converted raw value "{}" to '
-                                 'integer value "{}"'.format(g, v))
+                    logger.debug('Converted raw value "{}" to integer '
+                                 'value "{}"'.format(raw_response,
+                                                     response_value))
                 else:
                     logger.warning('Value "{}" couldn\'t be converted '
-                                   '(not integer)'.format(g))
+                                   '(not integer)'.format(raw_response))
             # Convert raw value to string.
             else:
                 # Well, in this case (input == output) do nothing.
                 continue
 
-            values.append(v)
-
-        obs_data.set('ResponseValues', values)
+            response_group['Value'] = response_value
 
         return obs_data
 

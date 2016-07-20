@@ -38,7 +38,7 @@ class SerialPort(prototype.Prototype):
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
 
-        self._serial = None         # PySerial object.
+        self._serial = None         # Pyserial object.
         self._serial_port_config = None
 
     def action(self, obs_data):
@@ -98,7 +98,7 @@ class SerialPort(prototype.Prototype):
             p = self._config_manager.config['Ports']['Serial'][self._name]
         except KeyError:
             logger.debug('No port {} in configuration'.format(self._name))
-            pass
+            return
 
         return SerialPortConfiguration(
             port=p['Port'],

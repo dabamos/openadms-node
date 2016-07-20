@@ -43,7 +43,7 @@ class Monitor(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True              # Stop monitor thread on ^C.
         self._queue = queue.Queue()     # I/O queue for observation data.
-        self._schedulers = {}           # One scheduler for every port.
+        self._schedulers = {}           # Scheduler objects go in here.
 
         # Create the configuration manager and load the settings from the JSON
         # configuration file (e.g., './config/config.json').
@@ -72,7 +72,7 @@ class Monitor(threading.Thread):
         # (sensor X on port Y).
         connections_config = self._config_manager.config['Connections']
 
-        # Create observation data.
+        # Create schedulers.
         for port_name, sensor_name in connections_config.items():
             try:
                 schedules = self._config_manager.config['Scheduler'][port_name]
@@ -80,9 +80,11 @@ class Monitor(threading.Thread):
                 logger.error('No scheduler found for port {}'.format(port_name))
                 continue
 
+            # Create a new scheduler for every port (e.g., "USB0", "USB1", ...).
             self._schedulers[port_name] = schedule.Scheduler()
 
             for s in schedules:
+                # Create new job.
                 job = schedule.Job(port_name,
                                    self._sensors_manager.get(sensor_name),
                                    s['Enabled'],
@@ -91,8 +93,10 @@ class Monitor(threading.Thread):
                                    s['Schedule'],
                                    s['ObservationSets'],
                                    self._queue)
+                # Add job to the scheduler.
                 self._schedulers[port_name].add(job)
 
+            # Start the scheduler thread.
             self._schedulers[port_name].start()
 
     def run(self):
@@ -101,12 +105,35 @@ class Monitor(threading.Thread):
         while True:
             if not self._queue.empty():
                 obs_data = self._queue.get()
-                next_receiver = obs_data.get('Receivers').pop(0)
+
+                # No receivers definied.
+                if len(obs_data.get('Receivers')) == 0:
+                    logging.debug('No receiver defined for observation "{}"'
+                                  .format(obs_data.get('Name')))
+                    continue
+
+                index = obs_data.get('NextReceiver')
+
+                # No index definied.
+                if index == None or index < 0:
+                    logger.warning('Next receiver of observation "{}" not '
+                                   'definied'.format(obs_data.get('Name')))
+                    continue
+
+                # Receivers list has been processed.
+                if index >= len(obs_data.get('Receivers')):
+                    logger.debug('Observation "{}" has been finished'
+                                 .format(obs_data.get('Name')))
+                    continue
+
+                next_receiver = obs_data.get('Receivers')[index]
+                index = index + 1
+                obs_data.set('NextReceiver', index)
 
                 if next_receiver not in self._modules_manager.workers:
                     logger.error('Module "{}" not found, discarding '
-                                 'observation data'
-                                 .format(next_receiver))
+                                 'observation "{}"'
+                                 .format(next_receiver, obs_data.get('Name')))
                     continue
 
                 self._modules_manager.workers[next_receiver].put(obs_data)

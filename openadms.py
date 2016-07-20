@@ -16,7 +16,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the Licence is distributed on an "AS IS" basis,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the Licence for the specific language governing permissions and
-limitations under the Licence.
+limitations under the Licence.      netadms
 """
 
 import coloredlogs
@@ -29,18 +29,21 @@ import time
 
 from core import monitor
 
-VERSION = 0.1
-LOG_FILE = 'openadms.log'
+logger = logging.getLogger('openadms')
 
+LOG_FILE = 'openadms.log'
+VERSION = 0.3
+VERSION_NAME = 'Copenhagen'
 
 def main(config_file):
+    v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
+
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
     logger.info(' _____             _____ ____  _____ _____')
     logger.info('|     |___ ___ ___|  _  |    \|     |   __|')
     logger.info('|  |  | . | -_|   |     |  |  | | | |__   |')
     logger.info('|_____|  _|___|_|_|__|__|____/|_|_|_|_____|')
-    logger.info('      |_|                             v.{}'.format(VERSION))
-    logger.info('Automatic Deformation Monitoring System')
+    logger.info('      |_| {:>33}'.format(v))
     logger.info('')
     logger.info('Copyright (c) Hochschule Neubrandenburg')
     logger.info('European Union Public Licence (EUPL) v.1.1')
@@ -96,7 +99,6 @@ if __name__ == '__main__':
     }.get(options.verbosity, logging.DEBUG)
 
     # Basic logging configuration.
-    logger = logging.getLogger('netadms')
     logger.setLevel(level)
 
     # '%(asctime)s - %(name)s - %(levelname)s - %(message)s'

@@ -172,9 +172,10 @@ class Worker(object):
                                .format(self._module.name, self._maxsize))
 
             if not self._input_queue.empty():
-                logger.debug('Sending observation data to module "{}"'
-                             .format(self._module.name))
                 obs_data = self._module.action(self._input_queue.get())
+
+                logger.debug('Sending observation "{}" to module "{}"'
+                             .format(obs_data.get('Name'), self._module.name))
 
                 if obs_data is None:
                     logger.warning('Module "{}" did not return any '

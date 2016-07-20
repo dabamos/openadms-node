@@ -36,13 +36,13 @@ class Sensor(object):
         self._name = name
         self._config_manager = config_manager
 
-        root = self._config_manager.config['Sensors'][self._name]
-        self._type = root['Type']
+        config = self._config_manager.config['Sensors'][self._name]
+        self._type = config['Type']
 
         # Create a dictionary of observation data.
         self._observation_sets = {}
 
-        for set_name, observations in root['Observations'].items():
+        for set_name, observations in config['Observations'].items():
             local_set = []
 
             # Add all commands of the observations set to the list.

@@ -37,8 +37,7 @@ class ObservationData(object):
         self._data = data
         self._data['InterfaceName'] = None
         self._data['PortName'] = None
-        self._data['Responses'] = []
-        self._data['ResponseValues'] = []
+        self._data['Response'] = None
         self._data['TimeStamp'] = None
 
     @property

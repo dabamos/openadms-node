@@ -19,7 +19,6 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import itertools
 import logging
 import os
 import time
@@ -136,13 +135,11 @@ class FileExporter(prototype.Prototype):
                     if obs_data.get('ID') is not None:
                         line += self._separator + obs_data.get('ID')
 
-                    descriptions = obs_data.get('ResponseDescriptions')
-                    values = obs_data.get('ResponseValues')
-                    units = obs_data.get('ResponseUnits')
+                    for response in obs_data.get('ResponseGroups'):
+                        d = response['Description']
+                        v = response['Value']
+                        u = response['Unit']
 
-                    # Add values and units to the line.
-                    for d, v, u in itertools.zip_longest(descriptions,
-                        values, units):
                         line += self._separator + format(d)
                         line += self._separator + format(v)
                         line += self._separator + format(u)
@@ -155,8 +152,9 @@ class FileExporter(prototype.Prototype):
                 # Write line to file.
                 fh.write(line + '\n')
 
-                logger.info('Saved observation data from port "{}" to file '
-                            '"{}"'.format(obs_data.get('PortName'),
+                logger.info('Saved observation "{}" from port "{}" to file '
+                            '"{}"'.format(obs_data.get('Name'),
+                                          obs_data.get('PortName'),
                                           path + file_name))
 
         return obs_data
