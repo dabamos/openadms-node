@@ -136,8 +136,8 @@ class Monitor(threading.Thread):
 
             # Receivers list has been processed.
             if index >= len(obs_data.get('Receivers')):
-                logger.debug('Observation "{}" has been finished'
-                             .format(obs_data.get('Name')))
+                logger.info('Observation "{}" has been finished'
+                            .format(obs_data.get('Name')))
                 continue
 
             # Get the name of the next receiver.

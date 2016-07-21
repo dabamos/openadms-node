@@ -105,7 +105,7 @@ if __name__ == '__main__':
     logger.setLevel(level)
 
     # '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    fmt = '%(asctime)s - %(levelname)7s - %(module)10s - %(message)s'
+    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
     date_fmt = '%Y-%m-%dT%H:%M:%S'
 
     formatter = logging.Formatter(fmt)

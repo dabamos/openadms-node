@@ -42,9 +42,15 @@ class SerialPort(prototype.Prototype):
         self._serial_port_config = None
         self._max_attempts = 3
 
+    def __del__(self):
+        if self._serial is not None:
+            self.close()
+
     def action(self, obs_data):
         if not self._serial:
             self._open()
+
+        response = ''
 
         # Add the name of this serial port to the observation data.
         obs_data.set('PortName', self._name)
@@ -91,12 +97,11 @@ class SerialPort(prototype.Prototype):
         # Add the raw response of the sensor to the observation data set.
         obs_data.set('Response', response)
 
-        return obs_data if response != '' else None
+        return obs_data
 
     def close(self):
         logger.info('Closing port {} ({})'
-                    .format(self._serial_port_config.name,
-                            self._serial_port_config.port))
+                    .format(self._name, self._serial_port_config.port))
         self._serial.close()
 
     def destroy(self, *args):
@@ -174,7 +179,7 @@ class SerialPort(prototype.Prototype):
                 break
 
             if time.time() - start_time > timeout:
-                logger.warning('Timout on port "{}" after {} s'
+                logger.warning('Timeout on port "{}" after {} s'
                                .format(self._name, timeout))
                 break
 

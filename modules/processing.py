@@ -47,6 +47,11 @@ class PreProcessor(prototype.Prototype):
         response = obs_data.get('Response')
         response_pattern = obs_data.get('ResponsePattern')
 
+        if response is None or response == '':
+            logger.warning('No response in observation "{}"'
+                           .format(obs_data.get('Name')))
+            return obs_data
+
         pattern = re.compile(response_pattern)
         parsed = pattern.search(response)
 
@@ -73,16 +78,22 @@ class PreProcessor(prototype.Prototype):
             return obs_data
 
         if len(raw_responses) != len(response_sets):
-            logger.warning('Number of results mismatch number of defined '
-                           'result groups of observation "{}"'
+            logger.warning('Number of responses mismatch number of defined '
+                           'response sets of observation "{}"'
                            .format(obs_data.get('Name')))
 
             if len(raw_responses) > len(response_sets):
                 return
 
         for raw_response, response_set in zip(raw_responses, response_sets):
-            logger.debug('Extracted "{}" from raw response'
-                         .format(raw_response))
+            if raw_response is None:
+                logger.error('Extraction of observation "{}" failed'
+                             .format(obs_data.get('Name')))
+                return obs_data
+
+            logger.debug('Extracted "{}" from raw response of observation "{}"'
+                         .format(raw_response, obs_data.get('Name')))
+
             response_type = response_set['Type'].lower()
             response_value = None
 
@@ -150,6 +161,11 @@ class PreProcessor(prototype.Prototype):
 
 class ReturnCodeInspector(prototype.Prototype):
 
+    """
+    Inspects the return code in observation data sent by sensors of Leica
+    Geosystems.
+    """
+
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
         # config = self._config_manager.config[self._name]
@@ -158,21 +174,31 @@ class ReturnCodeInspector(prototype.Prototype):
         response_sets = obs_data.get('ResponseSets')
         return_code = None
 
-        for response in response_sets:
-            d = response['Description'].lower()
-            v = response['Value']
+        if len('ResponseSets') == 0:
+            logger.warning('Observation "{}" has no responses'
+                           .format(obs_data.get('Name')))
+            return obs_data
 
-            if d in ['returncode', 'errorcode']:
-                return_code = v
-                break
+        for response in response_sets:
+            try:
+                d = response['Description'].lower()
+                v = response['Value']
+
+                if d in ['returncode', 'errorcode']:
+                    return_code = v
+                    break
+            except KeyError:
+                logger.warning('Data missing in response set of '
+                               'observation "{}"'
+                               .format(obs_data.get('Name')))
 
         if return_code is None:
-            logger.debug('No return code found in observation "{}"'
+            logger.debug('Return code not found in observation "{}"'
                          .format(obs_data.get('Name')))
             return obs_data
 
         if return_code == 0:
-            logger.info('No error occured on observation "{}" (code "{}")'
+            logger.info('Observation "{}" was successful (code "{}")'
                         .format(obs_data.get('Name'), return_code))
         else:
             logger.warning('Error occured on observation "{}" (code "{}")'

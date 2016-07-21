@@ -95,12 +95,17 @@ class DistanceCorrector(prototype.Prototype):
 
         # Search for slope distance.
         for response in response_sets:
-            d = response['Description'].lower()
-            v = response['Value']
+            try:
+                d = response['Description'].lower()
+                v = response['Value']
 
-            if d in ['dist', 'slopedist']:
-                dist = v
-                break
+                if d in ['dist', 'slopedist']:
+                    dist = v
+                    break
+            except KeyError:
+                logger.warning('Data missing in response set of '
+                               'observation "{}"'
+                               .format(obs_data.get('Name')))
 
         if dist == None:
             logger.warning('No slope distance found for reduction')
@@ -186,28 +191,34 @@ class DistanceCorrector(prototype.Prototype):
         response_sets = obs_data.get('ResponseSets')
 
         for response in response_sets:
-            d = response['Description'].lower()
-            u = response['Unit']
-            v = response['Value']
+            try:
+                d = response['Description'].lower()
+                u = response['Unit']
+                v = response['Value']
 
-            # Temperature.
-            if d in ['temp', 'temperature']:
-                self.temperature = v
-                continue
+                # Temperature.
+                if d in ['temp', 'temperature']:
+                    self.temperature = v
+                    continue
 
-            # Air pressure.
-            if d in ['airpressure', 'press', 'pressure']:
-                self.pressure = v
-                continue
+                # Air pressure.
+                if d in ['airpressure', 'press', 'pressure']:
+                    self.pressure = v
+                    continue
 
-            # Humidity.
-            if d in ['humidity', 'moisture']:
-                if u == '%':
-                    # Unit is percent (e.g., 75 %).
-                    self.humidity = v / 100
-                else:
-                    # No unit (e.g., 0.75).
-                    self.humidity = v
+                # Humidity.
+                if d in ['humidity', 'moisture']:
+                    if u == '%':
+                        # Unit is percent (e.g., 75 %).
+                        self.humidity = v / 100
+                    else:
+                        # No unit (e.g., 0.75).
+                        self.humidity = v
+            except KeyError:
+                logger.warning('Data missing in response set of '
+                               'observation "{}"'
+                               .format(obs_data.get('Name')))
+
 
     def _get_response_set(self, d, t, u, v):
         response = {}
@@ -346,24 +357,29 @@ class PolarTransformer(prototype.Prototype):
         # Search for Hz, V, and reduced/slope distance from the observation
         # data set.
         for response in response_sets:
-            description = response['Description'].lower()
-            value = response['Value']
+            try:
+                description = response['Description'].lower()
+                value = response['Value']
 
-            # Horizontal direction.
-            if description in ['hz', 'horizontal']:
-                hz = value
+                # Horizontal direction.
+                if description in ['hz', 'horizontal']:
+                    hz = value
 
-            # Vertical angle.
-            if description in ['v', 'vertical']:
-                v = value
+                # Vertical angle.
+                if description in ['v', 'vertical']:
+                    v = value
 
-            # Slope distance if no reduced distance is set.
-            if description in ['dist', 'slopedist']:
-                dist = value
+                # Slope distance if no reduced distance is set.
+                if description in ['dist', 'slopedist']:
+                    dist = value
 
-            # Reduced distance.
-            if description in ['reduceddist', 'reduceddistance']:
-                r_dist = value
+                # Reduced distance.
+                if description in ['reduceddist', 'reduceddistance']:
+                    r_dist = value
+            except KeyError:
+                logger.warning('Data missing in response set of '
+                               'observation "{}"'
+                               .format(obs_data.get('Name')))
 
         if hz == None or v == None or dist == None:
             logger.error('Observation is incomplete '

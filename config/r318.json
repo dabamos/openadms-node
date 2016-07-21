@@ -44,7 +44,7 @@
     },
     "Sensors":
     {
-        "STS_DTM":
+        "STS DTM":
         {
             "Description": "STS DTM meteorology sensor",
             "Type": "Weather Station",
@@ -163,7 +163,7 @@
                 ]
             }
         },
-        "Leica_TM30":
+        "Leica TM30":
         {
             "Description": "Leica TM30 total station",
             "Type": "Total Station",
@@ -173,7 +173,7 @@
                     {
                         "Name": "get_sensor_id",
                         "Description": "Get instrument identification code.",
-                        "Receivers": ["PreProcessor"],
+                        "Receivers": ["PreProcessor", "ReturnCodeInspector"],
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
@@ -181,9 +181,14 @@
                         "SleepTime": 1.0,
                         "ID": null,
                         "Request": "%R1Q,5003:\r\n",
-                        "ResponsePattern": "R1P,0,0:0,(\\d+)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,(\\d+))?",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
+                            {
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
+                                "Unit": "none"
+                            },
                             {
                                 "Description": "SensorID",
                                 "Type": "String",
@@ -194,7 +199,7 @@
                     {
                         "Name": "get_sensor_name",
                         "Description": "Get instrument name.",
-                        "Receivers": ["PreProcessor"],
+                        "Receivers": ["PreProcessor", "ReturnCodeInspector"],
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
@@ -202,9 +207,14 @@
                         "SleepTime": 5.0,
                         "ID": null,
                         "Request": "%R1Q,5004:\r\n",
-                        "ResponsePattern": "R1P,0,0:0,\"([\\w\\d\\s\\.]+)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,\"([\\w\\d\\s\\.]+))?",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
+                            {
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
+                                "Unit": "none"
+                            },
                             {
                                 "Description": "SensorName",
                                 "Type": "String",
@@ -223,18 +233,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 3.0
                     },
                     {
@@ -246,18 +257,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 2.0
                     },
                     {
@@ -338,18 +350,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 3.0
                     },
                     {
@@ -361,18 +374,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 2.0
                     },
                     {
@@ -453,18 +467,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 3.0
                     },
                     {
@@ -476,18 +491,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 2.0
                     },
                     {
@@ -568,18 +584,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 3.0
                     },
                     {
@@ -591,18 +608,19 @@
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
-                            "PreProcessor"
+                            "PreProcessor",
+                            "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
                         "ResponseSets": [
                             {
-                                "Description": "none",
-                                "Type": "String",
+                                "Description": "ReturnCode",
+                                "Type": "Integer",
                                 "Unit": "none"
                             }
                         ],
-                        "ResponsePattern": "(%.*0)",
+                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
                         "SleepTime": 2.0
                     },
                     {
@@ -615,6 +633,7 @@
                         "Onetime": false,
                         "Receivers": [
                             "PreProcessor",
+                            "ReturnCodeInspector",
                             "DistanceCorrector",
                             "PolarTransformer",
                             "FileExporter"
@@ -732,7 +751,7 @@
                 ]
             }
         },
-        "DFT_485":
+        "DFT 485":
         {
             "Description": "DFT 485 meteorology sensor",
             "Type": "Weather Station",
@@ -782,8 +801,8 @@
     },
     "Connections":
     {
-        "USB0": "STS_DTM",
-        "USB1": "Leica_TM30"
+        "USB0": "STS DTM",
+        "USB1": "Leica TM30"
     },
     "Scheduler":
     {
