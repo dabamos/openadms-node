@@ -35,6 +35,7 @@ LOG_FILE = 'openadms.log'
 VERSION = 0.3
 VERSION_NAME = 'Copenhagen'
 
+
 def main(config_file):
     v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
 
@@ -56,9 +57,11 @@ def main(config_file):
     # Run to infinity and beyond (probably not).
     stay_alive()
 
+
 def signal_handler(signal, frame):
     logger.info('Quitting ...')
     sys.exit(0)
+
 
 def stay_alive():
     while True:
@@ -113,7 +116,7 @@ if __name__ == '__main__':
 
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
-                                              maxBytes=10485760, # 10 MB
+                                              maxBytes=10485760,  # 10 MB
                                               backupCount=1,
                                               encoding='utf8')
     fh.setLevel(level)

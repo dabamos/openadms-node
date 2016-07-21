@@ -45,53 +45,118 @@ class DistanceCorrector(prototype.Prototype):
         # Valid total station types.
         self._ts_types = ['rts', 'tachymeter', 'total station',
                           'totalstation', 'tps', 'tst']
+        # Maximum age of atmospheric data.
+        self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
 
-        self._is_atmospheric_correction = config['AtmosphericCorrectionEnabled']
+        self._is_atmospheric_correction = config[
+            'AtmosphericCorrectionEnabled']
         self._is_sealevel_correction = config['SealevelCorrectionEnabled']
 
         try:
             self.temperature = config['Temperature']
             self.pressure = config['Pressure']
             self.humidity = config['Humidity']
-            self._last_update = time.time()
+            self.sensor_height = config['SensorHeight']
+
+            self.last_update = time.time()
         except KeyError:
             debug.error('Configuration is invalid')
 
     def action(self, obs_data):
         sensor_type = obs_data.get('SensorType').lower()
 
+        # Check sensor type.
         if (sensor_type not in self._ws_types) and \
-            (sensor_type not in self._ts_types):
+                (sensor_type not in self._ts_types):
             logger.warning('Wrong sensor type ("{}")'.format(sensor_type))
             return obs_data
 
-        # Update atmospheric data if sensor is a meteorological station.
+        # Update atmospheric data if sensor is a weather station.
         if sensor_type in self._ws_types:
             self._update_meteorological_data(obs_data)
+            return obs_data
 
         # Check if atmospheric data has been set.
         if self.temperature == None or self.pressure == None or \
-            self.humidity == None:
+                self.humidity == None:
             logger.warning('Temperature, air pressure, or humidity missing')
             return obs_data
 
         # Check the age of the atmospheric data.
-        max_age = 3600  # 1 hour
-
-        if self.last_update - time.time() > max_age:
+        if self.last_update - time.time() > self._max_age:
             logger.warning('Atmospheric data is older than {} hour(s)'
                            .format(int(max_age / 3600)))
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        if sensor_type in self._ts_types:
-            if self._is_atmospheric_correction:
-                ppm = self.get_ppm()
-                obs_data = self._do_atmospheric_correction(obs_data, ppm)
+        dist = None
+        response_sets = obs_data.get('ResponseSets')
 
-            if self._is_sealevel_correction:
-                obs_data = self._do_sealevel_correction(obs_data)
+        # Search for slope distance.
+        for response in response_sets:
+            d = response['Description'].lower()
+            v = response['Value']
+
+            if d in ['dist', 'slopedist']:
+                dist = v
+                break
+
+        if dist == None:
+            logger.warning('No slope distance found for reduction')
+            return obs_data
+
+        d_dist_1 = 0
+        d_dist_2 = 0
+
+        # Calculate the atmospheric reduction of the distance.
+        if self._is_atmospheric_correction:
+            ppm = self.get_ppm()
+            d_dist_1 = dist * ppm * math.pow(10, -6)
+
+            logger.debug('Reduced distance to atmosphere from {} m to '
+                         '{} m ({} ppm)'.format(round(dist, 5),
+                                                round(dist + d_dist_1, 5),
+                                                round(ppm, 2)))
+
+            response_ppm = self._get_response_set('PPM',
+                                                    'Float',
+                                                    'none',
+                                                    round(ppm, 5))
+            response_sets.append(response_ppm)
+
+        # Calculate the sealevel reduction of the distance.
+        if self._is_sealevel_correction:
+            earth_radius = 6.378 * math.pow(10, 6)
+
+            # Delta distance: -(height / R) * 10^6
+            d_dist_2 = -1 * (self.sensor_height / earth_radius)
+
+            logger.debug('Reduced distance to mean sea level from {} m to '
+                         '{} m ({} m)'.format(round(dist, 5),
+                                              round(dist + d_dist_2, 5),
+                                              round(d_dist_2, 5)))
+
+            response_sealevel = self._get_response_set('SealevelDelta',
+                                                         'Float',
+                                                         'm',
+                                                         round(d_dist_2, 5))
+            response_sets.append(response_sealevel)
+
+        # Add reduced distance to the observation set.
+        if d_dist_1 != 0 or d_dist_2 != 0:
+            r_dist = dist + d_dist_1 + d_dist_2
+
+            logger.info('Reduced distance from {} m to {} m ({} m)'
+                        .format(round(dist, 5),
+                                round(r_dist, 5),
+                                round(d_dist_2 + d_dist_2, 5)))
+
+            response_r_dist = self._get_response_set('ReducedDist',
+                                                       'Float',
+                                                       'm',
+                                                       round(r_dist, 5))
+            response_sets.append(response_r_dist)
 
         return obs_data
 
@@ -115,55 +180,12 @@ class DistanceCorrector(prototype.Prototype):
 
         return ppm
 
-    def _do_atmospheric_correction(self, obs_data, ppm):
-        """Reduces a given slope distance by a given PPM value."""
-        dist = None
-        response_groups = obs_data.get('ResponseGroups')
-
-        for response in response_groups:
-            d = response['Description'].lower()
-            v = response['Value']
-
-            # Search for slope distance.
-            if d in ['dist', 'slopedist']:
-                dist = v
-                break
-
-        if dist == None:
-            logger.warning('No slope distance found for reduction')
-            return obs_data
-
-        # Reduce distance by given ppm value.
-        r_dist = dist + ((ppm * math.pow(10, -6)) * dist)
-
-        logger.info('Reduced distance from {} m to {} m ({} ppm)'
-                    .format(round(dist, 5),
-                            round(r_dist, 5),
-                            round(ppm, 1)))
-
-        response_ppm = self._get_response_group('PPM',
-                                               'Float',
-                                               'none',
-                                               round(ppm, 5))
-        response_r_dist = self._get_response_group('ReducedDist',
-                                                   'Float',
-                                                   'm',
-                                                   round(r_dist, 5))
-
-        response_groups.append(response_ppm)
-        response_groups.append(response_r_dist)
-
-        return obs_data
-
-    def _do_sealevel_correction(self, obs_data):
-        return obs_data
-
     def _update_meteorological_data(self, obs_data):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        response_groups = obs_data.get('ResponseGroups')
+        response_sets = obs_data.get('ResponseSets')
 
-        for response in response_groups:
+        for response in response_sets:
             d = response['Description'].lower()
             u = response['Unit']
             v = response['Value']
@@ -187,7 +209,7 @@ class DistanceCorrector(prototype.Prototype):
                     # No unit (e.g., 0.75).
                     self.humidity = v
 
-    def _get_response_group(self, d, t, u, v):
+    def _get_response_set(self, d, t, u, v):
         response = {}
 
         response['Description'] = d
@@ -213,6 +235,10 @@ class DistanceCorrector(prototype.Prototype):
     def last_update(self):
         return self._last_update
 
+    @property
+    def sensor_height(self):
+        return self._sensor_height
+
     @temperature.setter
     def temperature(self, temperature):
         """Sets the temperature."""
@@ -220,7 +246,7 @@ class DistanceCorrector(prototype.Prototype):
         self._last_update = time.time()
 
         if temperature is not None:
-            logger.info('Updated temperature to {} °C'
+            logger.info('Updated temperature to {} C'
                         .format(round(temperature, 2)))
 
     @pressure.setter
@@ -243,6 +269,29 @@ class DistanceCorrector(prototype.Prototype):
             logger.info('Updated humidity to {}'
                         .format(round(humidity, 2)))
 
+    @last_update.setter
+    def last_update(self, last_update):
+        self._last_update = last_update
+
+    @sensor_height.setter
+    def sensor_height(self, sensor_height):
+        self._sensor_height = sensor_height
+
+    def destroy(self, *args):
+        pass
+
+
+class HelmertTransformer(prototype.Prototype):
+
+    """
+    Calculates a 3-dimensional coordinates of a view point using the Helmert
+    transformation.
+    """
+
+    def __init__(self, name, config_manager):
+        prototype.Prototype.__init__(self, name, config_manager)
+        config = self._config_manager.config[self._name]
+
     def destroy(self, *args):
         pass
 
@@ -259,7 +308,7 @@ class PolarTransformer(prototype.Prototype):
 
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
-        self._config = self._config_manager.config[self._name]
+        config = self._config_manager.config[self._name]
 
         # Acronyms of valid sensor types:
         #
@@ -269,26 +318,21 @@ class PolarTransformer(prototype.Prototype):
         self._valid_types = ['rts', 'tachymeter', 'total station',
                              'totalstation', 'tps', 'tst']
 
+        self._sensor_y = config['SensorPosition']['East']
+        self._sensor_x = config['SensorPosition']['North']
+        self._sensor_z = config['SensorPosition']['Height']
+
+        self._azimuth_y = config['AzimuthPosition']['East']
+        self._azimuth_x = config['AzimuthPosition']['North']
+
     def action(self, obs_data):
         # Check the configuration for the given sensor port.
         port_name = obs_data.get('PortName')
         sensor_type = obs_data.get('SensorType').lower()
-        response_groups = obs_data.get('ResponseGroups')
+        response_sets = obs_data.get('ResponseSets')
 
         if not sensor_type in self._valid_types:
             logger.error('Sensor is not of type "total station"')
-            return obs_data
-
-        try:
-            sensor_y = self._config[port_name]['SensorPosition']['East']
-            sensor_x = self._config[port_name]['SensorPosition']['North']
-            sensor_z = self._config[port_name]['SensorPosition']['Height']
-
-            azimuth_y = self._config[port_name]['AzimuthPosition']['East']
-            azimuth_x = self._config[port_name]['AzimuthPosition']['North']
-        except KeyError:
-            logger.error('Configuration for port "{}" is invalid'
-                         .format(port_name))
             return obs_data
 
         hz = None
@@ -298,7 +342,7 @@ class PolarTransformer(prototype.Prototype):
 
         # Search for Hz, V, and reduced/slope distance from the observation
         # data set.
-        for response in response_groups:
+        for response in response_sets:
             description = response['Description'].lower()
             value = response['Value']
 
@@ -340,8 +384,14 @@ class PolarTransformer(prototype.Prototype):
                              v_grad,
                              dist))
 
-        (y, x, z) = self.transform(sensor_x, sensor_y, sensor_z,
-                                   azimuth_x, azimuth_y, hz, v, dist)
+        (y, x, z) = self.transform(self._sensor_x,
+                                   self._sensor_y,
+                                   self._sensor_z,
+                                   self._azimuth_x,
+                                   self._azimuth_y,
+                                   hz,
+                                   v,
+                                   dist)
 
         logger.info('Transformed target "{}" to [Y = {:3.4f}, '
                     'X = {:3.4f}, Z = {:3.4f}]'.format(obs_data.get('ID'),
@@ -349,21 +399,20 @@ class PolarTransformer(prototype.Prototype):
                                                        x,
                                                        z))
 
-        # Create dictionaries.
-        response_y = self._get_response_group('Y', 'Float', 'm', round(y, 5))
-        response_x = self._get_response_group('X', 'Float', 'm', round(x, 5))
-        response_z = self._get_response_group('Z', 'Float', 'm', round(z, 5))
+        # Create dictionaries (name, type, unit, value).
+        response_y = self._get_response_set('Y', 'Float', 'm', round(y, 5))
+        response_x = self._get_response_set('X', 'Float', 'm', round(x, 5))
+        response_z = self._get_response_set('Z', 'Float', 'm', round(z, 5))
 
         # Add to observation data set.
-        response_groups.append(response_y)
-        response_groups.append(response_x)
-        response_groups.append(response_z)
+        response_sets.append(response_y)
+        response_sets.append(response_x)
+        response_sets.append(response_z)
 
         return obs_data
 
-
     def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
-        v, dist):
+                  v, dist):
         """Calculates coordinates (Y, X, Z) out of horizontal direction,
         vertical angle, and slope distance to a target point by doing a
         3-dimensional polar transformation."""
@@ -372,7 +421,7 @@ class PolarTransformer(prototype.Prototype):
             # Because arctan(0) = 0.
             azimuth_angle = 0
         else:
-            azimuth_angle = math.atan((azimuth_y - sensor_y) / \
+            azimuth_angle = math.atan((azimuth_y - sensor_y) /
                                       (azimuth_x - sensor_x))
 
         point_angle = azimuth_angle + hz
@@ -388,7 +437,7 @@ class PolarTransformer(prototype.Prototype):
 
         return (y, x, z)
 
-    def _get_response_group(self, d, t, u, v):
+    def _get_response_set(self, d, t, u, v):
         response = {}
 
         response['Description'] = d
@@ -400,6 +449,7 @@ class PolarTransformer(prototype.Prototype):
 
     def destroy(self, *args):
         pass
+
 
 class PreProcessor(prototype.Prototype):
 
@@ -435,21 +485,21 @@ class PreProcessor(prototype.Prototype):
         # Right: "(.*)"
         # Wrong: ".*"
         raw_responses = parsed.groups()
-        response_groups = obs_data.get('ResponseGroups')
+        response_sets = obs_data.get('ResponseSets')
 
         if len(raw_responses) == 0:
             logger.error('No group defined in regular expression pattern')
             return obs_data
 
-        if len(raw_responses) != len(response_groups):
+        if len(raw_responses) != len(response_sets):
             logger.error('Number of regular expressions mismatch number of '
                          'response values')
             return obs_data
 
-        for raw_response, response_group in zip(raw_responses, response_groups):
+        for raw_response, response_set in zip(raw_responses, response_sets):
             logger.debug('Extracted "{}" from raw response'
                          .format(raw_response))
-            response_type = response_group['Type'].lower()
+            response_type = response_set['Type'].lower()
             response_value = None
 
             # Convert raw value to float.
@@ -482,7 +532,7 @@ class PreProcessor(prototype.Prototype):
                 # Well, in this case (input == output) do nothing.
                 continue
 
-            response_group['Value'] = response_value
+            response_set['Value'] = response_value
 
         return obs_data
 

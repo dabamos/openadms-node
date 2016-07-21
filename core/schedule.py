@@ -66,7 +66,7 @@ class Scheduler(threading.Thread):
 class Job(object):
 
     def __init__(self, port_name, sensor, enabled, start_date, end_date,
-        schedule, observation_sets, output_queue):
+                 schedule, observation_sets, output_queue):
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
@@ -136,7 +136,7 @@ class Job(object):
 
                         # Are we within the time range of the current day?
                         if now.time() >= start_time and \
-                            now.time() < end_time:
+                                now.time() < end_time:
                             return True
 
         return False

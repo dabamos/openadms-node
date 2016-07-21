@@ -87,7 +87,7 @@ class ModulesManager(object):
             return
 
         class_inst = getattr(importlib.import_module(module_path),
-            class_name)(module_name, self._config_manager)
+                             class_name)(module_name, self._config_manager)
 
         # Create worker for the module.
         w = Worker(class_inst)
@@ -147,7 +147,7 @@ class Worker(object):
     Worker binds a module to run the ``action()`` method within a thread.
     """
 
-    def __init__(self, module, maxsize = 10):
+    def __init__(self, module, maxsize=10):
         self._module = module
         self._maxsize = maxsize
         self._input_queue = queue.Queue(self._maxsize)

@@ -80,7 +80,8 @@ class Monitor(threading.Thread):
                 logger.error('No schedule found for port {}'.format(port_name))
                 continue
 
-            # Create a new scheduler for every port (e.g., "USB0", "USB1", ...).
+            # Create a new scheduler for every port (e.g., "USB0", "USB1",
+            # ...).
             self._schedulers[port_name] = schedule.Scheduler()
 
             # Parse the schedules list and create jobs out of them.
@@ -116,7 +117,7 @@ class Monitor(threading.Thread):
                 index = obs_data.get('NextReceiver')
 
                 # No index definied.
-                if index == None or index < 0:
+                if index is None or index < 0:
                     logger.warning('Next receiver of observation "{}" not '
                                    'definied'.format(obs_data.get('Name')))
                     continue

@@ -120,17 +120,24 @@ class SerialPort(prototype.Prototype):
             self._serial_port_config = self._get_port_config()
 
         logger.info('Opening port {} ({}) ...'
-            .format(self._name, self._serial_port_config.port))
+                    .format(self._name, self._serial_port_config.port))
 
         try:
             self._serial = serial.Serial(
-                port=self._serial_port_config.port,            # Port (e.g., "/dev/tty0").
-                baudrate=self._serial_port_config.baudrate,    # Baudrate (e.g., "9600").
-                timeout=self._serial_port_config.timeout,      # Timeout in seconds.
-                bytesize=self._serial_port_config.bytesize,    # Data bytes (e.g., "8").
-                parity=self._serial_port_config.parity,        # Parity (e.g., "none")
-                stopbits=self._serial_port_config.stopbits,    # Stop bits (e.g., "1").
-                xonxoff=self._serial_port_config.xonxoff,      # Software flow control.
+                # Port (e.g., "/dev/tty0").
+                port=self._serial_port_config.port,
+                # Baudrate (e.g., "9600").
+                baudrate=self._serial_port_config.baudrate,
+                # Timeout in seconds.
+                timeout=self._serial_port_config.timeout,
+                # Data bytes (e.g., "8").
+                bytesize=self._serial_port_config.bytesize,
+                # Parity (e.g., "none")
+                parity=self._serial_port_config.parity,
+                # Stop bits (e.g., "1").
+                stopbits=self._serial_port_config.stopbits,
+                # Software flow control.
+                xonxoff=self._serial_port_config.xonxoff,
                 rtscts=self._serial_port_config.rtscts)        # Hardware flow control.
         except serial.serialutil.SerialException:
             logger.error('Permission denied for port {} ({})'
@@ -153,7 +160,7 @@ class SerialPort(prototype.Prototype):
                     break
             except UnicodeDecodeError:
                 logger.error('No sensor on port "{}" ({})'
-                            .format(self._name, self._serial_port_config.port))
+                             .format(self._name, self._serial_port_config.port))
                 break
 
         return response
@@ -178,28 +185,28 @@ class SerialPortConfiguration(object):
     """
 
     def __init__(self, port, baudrate, bytesize, stopbits, parity, timeout,
-            xonxoff, rtscts):
+                 xonxoff, rtscts):
         """Converts data from JSON style to serial.Serial style."""
         self._port = port
         self._baudrate = baudrate
         self._bytesize = {
-                5: serial.FIVEBITS,
-                6: serial.SIXBITS,
-                7: serial.SEVENBITS,
-                8: serial.EIGHTBITS
-                }[bytesize]
+            5: serial.FIVEBITS,
+            6: serial.SIXBITS,
+            7: serial.SEVENBITS,
+            8: serial.EIGHTBITS
+        }[bytesize]
         self._stopbits = {
-                1: serial.STOPBITS_ONE,
-                1.5: serial.STOPBITS_ONE_POINT_FIVE,
-                2: serial.STOPBITS_TWO
-                }[stopbits]
+            1: serial.STOPBITS_ONE,
+            1.5: serial.STOPBITS_ONE_POINT_FIVE,
+            2: serial.STOPBITS_TWO
+        }[stopbits]
         self._parity = {
-                'none': serial.PARITY_NONE,
-                'even': serial.PARITY_EVEN,
-                'odd': serial.PARITY_ODD,
-                'mark': serial.PARITY_MARK,
-                'space': serial.PARITY_SPACE
-                }[parity]
+            'none': serial.PARITY_NONE,
+            'even': serial.PARITY_EVEN,
+            'odd': serial.PARITY_ODD,
+            'mark': serial.PARITY_MARK,
+            'space': serial.PARITY_SPACE
+        }[parity]
         self._timeout = timeout
         self._xonxoff = xonxoff
         self._rtscts = rtscts

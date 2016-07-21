@@ -34,4 +34,3 @@ logger = logging.getLogger('openadms')
 class DBMS(prototype.Prototype):
 
     def __init__():
-        

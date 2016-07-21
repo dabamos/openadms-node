@@ -34,6 +34,7 @@ logger = logging.getLogger('openadms')
 UDP_TARGET = '127.0.0.1'
 UDP_PORT = 7000
 
+
 class UDPSend(prototype.Prototype):
 
     """
@@ -65,7 +66,7 @@ class UDPSend(prototype.Prototype):
                                  (UDP_TARGET, UDP_PORT))
 
         logger.info('Sent observation data from {} to {} on port {} (UDP)'.
-            format(obs_data.get('InterfaceName'), UDP_TARGET, UDP_PORT))
+                    format(obs_data.get('InterfaceName'), UDP_TARGET, UDP_PORT))
 
         return obs_data
 

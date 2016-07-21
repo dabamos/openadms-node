@@ -33,8 +33,20 @@ class ObservationData(object):
     transformed to JSON format.
     """
 
-    def __init__(self, data):
-        self._data = data
+    def __init__(self, data=None):
+        if data is None:
+            self._data = {}
+
+            # Initialize dictionary.
+            self._data['Enabled'] = True
+            self._data['ID'] = None
+            self._data['Name']
+            self._data['NextReceiver'] = 0
+            self._data['Receivers'] = []
+            self._data['ResponseSets'] = {}
+        else:
+            self._data = data
+
         self._data['PortName'] = None
         self._data['Response'] = None
         self._data['TimeStamp'] = None
@@ -62,7 +74,7 @@ class ObservationData(object):
         Returns:
             Returns a value from the observation data.
         """
-        return self._data[key]
+        return self._data.get(key, None)
 
     def set(self, key, value):
         """Sets key and value in the data set.

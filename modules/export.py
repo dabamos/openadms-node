@@ -108,9 +108,9 @@ class FileExporter(prototype.Prototype):
 
         file_name = self._file_name
         file_name = file_name.replace('{port}', obs_data.get('PortName'))
-        file_name = file_name.replace('{date}', '{}'.format(date) \
+        file_name = file_name.replace('{date}', '{}'.format(date)
                                       if date is not None else '')
-        file_name = file_name.replace('{id}', '{}'.format(obs_data.get('ID')) \
+        file_name = file_name.replace('{id}', '{}'.format(obs_data.get('ID'))
                                       if obs_data.get('ID') is not None else '')
         file_name += self._file_extension
 
@@ -119,8 +119,10 @@ class FileExporter(prototype.Prototype):
             header = None
 
             if not os.path.isfile(path + file_name):
-                header = '# {} on {}\n'.format(obs_data.get('SensorName'),
-                                               obs_data.get('PortName'))
+                header = '# Target "{}" of "{}" on "{}"\n' \
+                         .format(obs_data.get('ID'),
+                                 obs_data.get('SensorName'),
+                                 obs_data.get('PortName'))
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
@@ -135,7 +137,7 @@ class FileExporter(prototype.Prototype):
                     if obs_data.get('ID') is not None:
                         line += self._separator + obs_data.get('ID')
 
-                    for response in obs_data.get('ResponseGroups'):
+                    for response in obs_data.get('ResponseSets'):
                         d = response['Description']
                         v = response['Value']
                         u = response['Unit']
