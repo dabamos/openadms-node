@@ -68,6 +68,12 @@ class Monitor(threading.Thread):
             sensor_inst = sensor.Sensor(sensor_name, self._config_manager)
             self._sensors_manager.add(sensor_name, sensor_inst)
 
+        self._init_schedulers()
+
+    def _init_schedulers(self):
+        """Initializes all the schedulers."""
+        logger.debug('Initializing schedulers ...')
+
         # List of assignments between sensors and serial ports
         # (sensor X on port Y).
         connections_config = self._config_manager.config['Connections']
@@ -75,28 +81,31 @@ class Monitor(threading.Thread):
         # Create schedulers.
         for port_name, sensor_name in connections_config.items():
             try:
-                schedules = self._config_manager.config['Scheduler'][port_name]
+                port_schedules = self._config_manager.config['Scheduler'][port_name]
             except KeyError:
-                logger.error('No schedule found for port {}'.format(port_name))
+                logger.error('No timetable found for port {}'.format(port_name))
                 continue
 
             # Create a new scheduler for every port (e.g., "USB0", "USB1",
             # ...).
             self._schedulers[port_name] = schedule.Scheduler()
 
-            # Parse the schedules list and create jobs out of them.
-            for s in schedules:
-                # Create new job.
-                job = schedule.Job(port_name,
-                                   self._sensors_manager.get(sensor_name),
-                                   s['Enabled'],
-                                   s['StartDate'],
-                                   s['EndDate'],
-                                   s['Schedule'],
-                                   s['ObservationSets'],
-                                   self._queue)
-                # Add job to the scheduler.
-                self._schedulers[port_name].add(job)
+            # Run through the port schedules and create jobs.
+            for port_schedule in port_schedules:
+                job_names = port_schedule['ObservationSets']
+
+                for job_name in job_names:
+                    # Create new job.
+                    job = schedule.Job(job_name,
+                                       port_name,
+                                       self._sensors_manager.get(sensor_name),
+                                       port_schedule['Enabled'],
+                                       port_schedule['StartDate'],
+                                       port_schedule['EndDate'],
+                                       port_schedule['Schedule'],
+                                       self._queue)
+                    # Add job to the scheduler.
+                    self._schedulers[port_name].add(job)
 
             # Start the scheduler thread.
             self._schedulers[port_name].start()
@@ -110,16 +119,17 @@ class Monitor(threading.Thread):
 
                 # No receivers definied.
                 if len(obs_data.get('Receivers')) == 0:
-                    logging.debug('No receiver defined for observation "{}"'
+                    logging.debug('No receivers defined for observation "{}"'
                                   .format(obs_data.get('Name')))
                     continue
 
+                # Index of the receivers list.
                 index = obs_data.get('NextReceiver')
 
                 # No index definied.
                 if index is None or index < 0:
                     logger.warning('Next receiver of observation "{}" not '
-                                   'definied'.format(obs_data.get('Name')))
+                                   'defined'.format(obs_data.get('Name')))
                     continue
 
                 # Receivers list has been processed.
@@ -128,7 +138,10 @@ class Monitor(threading.Thread):
                                  .format(obs_data.get('Name')))
                     continue
 
+                # Get the name of the next receiver.
                 next_receiver = obs_data.get('Receivers')[index]
+
+                # Set the index to the subsequent receiver.
                 index = index + 1
                 obs_data.set('NextReceiver', index)
 
@@ -138,6 +151,7 @@ class Monitor(threading.Thread):
                                  .format(next_receiver, obs_data.get('Name')))
                     continue
 
+                # Fire and forget.
                 self._modules_manager.workers[next_receiver].put(obs_data)
 
             # Prevent thread from taking to much CPU time.

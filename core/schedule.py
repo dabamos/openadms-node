@@ -37,7 +37,10 @@ class Scheduler(threading.Thread):
 
     def add(self, job):
         self._jobs.append(job)
-        logger.debug('Added new job to jobs list')
+        logger.debug('Added new job "{}" for sensor "{}" on port "{}" '
+                     'to jobs list'.format(job.name,
+                                           job.sensor.name,
+                                           job.port_name))
 
     def cancel(self, job):
         self._jobs.remove(job)
@@ -65,11 +68,12 @@ class Scheduler(threading.Thread):
 
 class Job(object):
 
-    def __init__(self, port_name, sensor, enabled, start_date, end_date,
-                 schedule, observation_sets, output_queue):
+    def __init__(self, name, port_name, sensor, enabled, start_date, end_date,
+                 schedule, output_queue):
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
+        self._name = name
         self._port_name = port_name
         self._sensor = sensor
         self._enabled = enabled
@@ -79,7 +83,6 @@ class Job(object):
         self._end_date = self.get_datetime(end_date, self._date_fmt)
 
         self._schedule = schedule
-        self._observation_sets = observation_sets
         self._output_queue = output_queue
 
     @property
@@ -142,37 +145,43 @@ class Job(object):
         return False
 
     def run(self):
-        for set_name in self._observation_sets:
-            try:
-                observation_set = self._sensor.get_observation_set(set_name)
-            except KeyError:
-                logger.error('Observation set "{}" not found'.format(set_name))
+        observation_set = self._sensor.get_observation_set(self._name)
+
+        logger.debug('Job is running observation set "{}" of sensor "{}" '
+                     'on port "{}"'.format(self._name,
+                                           self._sensor.name,
+                                           self._port_name))
+
+        for obs_data in observation_set:
+            # Continue if observation is disabled.
+            if not obs_data.get('Enabled'):
                 continue
 
-            logger.debug('Job is running observation set "{}" of sensor "{}" '
-                         'on port "{}"'.format(set_name,
-                                               self._sensor.name,
-                                               self._port_name))
+            # Disable the observation if it should run one time only (for
+            # instance, for initialization purposes).
+            if obs_data.get('Onetime'):
+                obs_data.set('Enabled', False)
 
-            for obs_data in observation_set:
-                # Continue if observation is disabled.
-                if not obs_data.get('Enabled'):
-                    continue
+            # Make a deep copy since we don't want to do any changes to the
+            # observation data in our set.
+            obs_data_copy = copy.deepcopy(obs_data)
+            obs_data_copy.data['Receivers'].insert(0, self._port_name)
 
-                # Disable the observation if it should run one time only (for
-                # instance, for initialization).
-                if obs_data.get('Onetime'):
-                    obs_data.set('Enabled', False)
+            sleep_time = obs_data_copy.get('SleepTime')
 
-                # Make a deep copy since we don't want to do any changes to the
-                # observation data in our set.
-                obs_data_copy = copy.deepcopy(obs_data)
-                obs_data_copy.data['Receivers'].insert(0, self._port_name)
+            # Put the observation data into the output queue (fire and forget).
+            self._output_queue.put(obs_data_copy)
 
-                sleep_time = obs_data_copy.get('SleepTime')
+            time.sleep(sleep_time)
 
-                # Put the observation data into the output queue (fire and
-                # forget).
-                self._output_queue.put(obs_data_copy)
+    @property
+    def name(self):
+        return self._name
 
-                time.sleep(sleep_time)
+    @property
+    def port_name(self):
+        return self._port_name
+
+    @property
+    def sensor(self):
+        return self._sensor

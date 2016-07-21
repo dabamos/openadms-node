@@ -67,8 +67,8 @@ class SerialPort(prototype.Prototype):
         response = self._read(obs_data.get('ResponseDelimiter'))
 
         if response == '':
-            logger.warning('No response from sensor "{}" on port "{}"'
-                           .format(obs_data.get("SensorName"), self._name))
+            logger.error('No response from sensor "{}" on port "{}"'
+                         .format(obs_data.get("SensorName"), self._name))
             return
 
         # Add a timestamp to the observation data.
@@ -143,9 +143,10 @@ class SerialPort(prototype.Prototype):
             logger.error('Permission denied for port {} ({})'
                          .format(self._name, self._serial_port_config.port))
 
-    def _read(self, eol):
+    def _read(self, eol, timeout = 10.0):
         """Reads from serial port."""
         response = ''
+        start_time = time.time()
 
         # Read from serial port until delimiter occurs.
         while True:
@@ -161,6 +162,11 @@ class SerialPort(prototype.Prototype):
             except UnicodeDecodeError:
                 logger.error('No sensor on port "{}" ({})'
                              .format(self._name, self._serial_port_config.port))
+                break
+
+            if time.time() - start_time > timeout:
+                logger.warning('Timout on port "{}" after {} s'
+                               .format(self._name, timeout))
                 break
 
         return response

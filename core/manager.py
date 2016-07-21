@@ -154,28 +154,21 @@ class Worker(object):
 
     def put(self, obs_data):
         """Puts an observation data object into the queue."""
-        try:
-            self._input_queue.put(obs_data)
-        except queue.Queue.Full:
-            logger.warning('Input queue of module "{}" is full (more than '
-                           '{} observations)'.format(self._module.name,
-                                                     self._threshold))
-            pass
+        if self._input_queue.full():
+            logger.warning('Input queue of module "{}" is full '
+                           '(> {} observations)'
+                           .format(self._module.name, self._maxsize))
+            return
+
+        self._input_queue.put(obs_data)
+
 
     def run(self, output_queue):
         """Takes an observation data object from the input queue and puts the
         result of the callback function back into the output queue."""
         while True:
-            if self._input_queue.full():
-                logger.warning('Input queue of module "{}" is full '
-                               '(> {} observations)'
-                               .format(self._module.name, self._maxsize))
-
             if not self._input_queue.empty():
                 obs_data = self._module.action(self._input_queue.get())
-
-                logger.debug('Sending observation "{}" to module "{}"'
-                             .format(obs_data.get('Name'), self._module.name))
 
                 if obs_data is None:
                     logger.warning('Module "{}" did not return any '
@@ -183,10 +176,11 @@ class Worker(object):
                                    .format(self._module.name))
                     continue
 
-                # Only put observation data back into the queue if there are
-                # any receivers left.
-                if len(obs_data.get('Receivers')) > 0:
-                    output_queue.put(obs_data)
+                logger.debug('Sending observation "{}" to module "{}"'
+                             .format(obs_data.get('Name'), self._module.name))
+
+                # Flush the observation data.
+                output_queue.put(obs_data)
 
             # Prevent thread from taking to much CPU time.
             time.sleep(0.01)
