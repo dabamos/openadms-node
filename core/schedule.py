@@ -30,9 +30,10 @@ logger = logging.getLogger('openadms')
 
 class Scheduler(threading.Thread):
 
-    def __init__(self):
+    def __init__(self, output_queue):
         threading.Thread.__init__(self)
         self.daemon = True
+        self._output_queue = output_queue
         self._jobs = []
 
     def add(self, job):
@@ -61,7 +62,7 @@ class Scheduler(threading.Thread):
                         continue
 
                     if job.is_pending():
-                        job.run()
+                        job.run(self._output_queue)
 
             time.sleep(0.1)
 
@@ -69,7 +70,7 @@ class Scheduler(threading.Thread):
 class Job(object):
 
     def __init__(self, name, port_name, sensor, enabled, start_date, end_date,
-                 schedule, output_queue):
+        schedule):
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
@@ -83,7 +84,6 @@ class Job(object):
         self._end_date = self.get_datetime(end_date, self._date_fmt)
 
         self._schedule = schedule
-        self._output_queue = output_queue
 
     @property
     def enabled(self):
@@ -144,7 +144,7 @@ class Job(object):
 
         return False
 
-    def run(self):
+    def run(self, output_queue):
         observation_set = self._sensor.get_observation_set(self._name)
 
         logger.debug('Job is running observation set "{}" of sensor "{}" '
@@ -170,7 +170,7 @@ class Job(object):
             sleep_time = obs_data_copy.get('SleepTime')
 
             # Put the observation data into the output queue (fire and forget).
-            self._output_queue.put(obs_data_copy)
+            output_queue.put(obs_data_copy)
 
             time.sleep(sleep_time)
 

@@ -3,8 +3,9 @@
     {
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
-        "PolarTransformer": "modules.processing.PolarTransformer",
-        "DistanceCorrector": "modules.processing.DistanceCorrector",
+        "PolarTransformer": "modules.totalstation.PolarTransformer",
+        "DistanceCorrector": "modules.totalstation.DistanceCorrector",
+        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
         "USB0": "modules.port.SerialPort",
         "USB1": "modules.port.SerialPort"
     },
@@ -64,7 +65,7 @@
                         "Request": "A\r",
                         "ResponsePattern": "(#)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "PowerOn",
                                 "Type": "String",
@@ -85,7 +86,7 @@
                         "Request": "CMDT 1\r",
                         "ResponsePattern": "(\\*)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "SetCmd",
                                 "Type": "String",
@@ -106,7 +107,7 @@
                         "Request": "SAVE\r",
                         "ResponsePattern": "(\\*)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "Save",
                                 "Type": "String",
@@ -130,7 +131,7 @@
                         "Request": "TEMP ?\r",
                         "ResponsePattern": "([+-]?\\d+\\.+\\d)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
@@ -151,7 +152,7 @@
                         "Request": "PRES ?\r",
                         "ResponsePattern": "([+-]?\\d+\\.+\\d)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "Pressure",
                                 "Type": "Float",
@@ -164,8 +165,8 @@
         },
         "Leica_TM30":
         {
-            "Description": "Leica TM30 totalstation",
-            "Type": "Totalstation",
+            "Description": "Leica TM30 total station",
+            "Type": "Total Station",
             "Observations": {
                 "Init":
                 [
@@ -182,7 +183,7 @@
                         "Request": "%R1Q,5003:\r\n",
                         "ResponsePattern": "R1P,0,0:0,(\\d+)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "SensorID",
                                 "Type": "String",
@@ -203,7 +204,7 @@
                         "Request": "%R1Q,5004:\r\n",
                         "ResponsePattern": "R1P,0,0:0,\"([\\w\\d\\s\\.]+)",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "SensorName",
                                 "Type": "String",
@@ -226,7 +227,7 @@
                         ],
                         "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -249,7 +250,7 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -264,18 +265,19 @@
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "ID": "P1",
-                        "Name": "get_full_measurement",
+                        "Name": "get_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
                             "PreProcessor",
+                            "ReturnCodeInspector",
                             "DistanceCorrector",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
                                 "Type": "Integer",
@@ -322,7 +324,7 @@
                                 "Unit": "ns"
                             }
                         ],
-                        "ResponsePattern": "%R1P,0,0:([0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*)",
+                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
                         "SleepTime": 10.0
                     }
                 ],
@@ -340,7 +342,7 @@
                         ],
                         "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -363,7 +365,7 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -378,18 +380,19 @@
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "ID": "P2",
-                        "Name": "get_full_measurement",
+                        "Name": "get_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
                             "PreProcessor",
+                            "ReturnCodeInspector",
                             "DistanceCorrector",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
                                 "Type": "Integer",
@@ -436,7 +439,7 @@
                                 "Unit": "ns"
                             }
                         ],
-                        "ResponsePattern": "%R1P,0,0:([0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*)",
+                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
                         "SleepTime": 10.0
                     }
                 ],
@@ -454,7 +457,7 @@
                         ],
                         "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -477,7 +480,7 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -492,18 +495,19 @@
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "ID": "P3",
-                        "Name": "get_full_measurement",
+                        "Name": "get_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
                             "PreProcessor",
+                            "ReturnCodeInspector",
                             "DistanceCorrector",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
                                 "Type": "Integer",
@@ -550,7 +554,7 @@
                                 "Unit": "ns"
                             }
                         ],
-                        "ResponsePattern": "%R1P,0,0:([0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*)",
+                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
                         "SleepTime": 10.0
                     }
                 ],
@@ -568,7 +572,7 @@
                         ],
                         "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -591,7 +595,7 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "none",
                                 "Type": "String",
@@ -606,7 +610,7 @@
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "ID": "P4",
-                        "Name": "get_full_measurement",
+                        "Name": "get_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -617,7 +621,7 @@
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r",
-                        "ResponseGroups": [
+                        "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
                                 "Type": "Integer",
@@ -664,8 +668,66 @@
                                 "Unit": "ns"
                             }
                         ],
-                        "ResponsePattern": "%R1P,0,0:([0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*)",
+                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
                         "SleepTime": 10.0
+                    }
+                ]
+            }
+        },
+        "ADAM-4015":
+        {
+            "Description": "ADAM-4015 I/O module.",
+            "Type": "I/O",
+            "Observations":
+            {
+                "Main":
+                [
+                    {
+                        "Name": "get_values",
+                        "Description": "Get temperature values.",
+                        "Receivers": ["PreProcessor", "FileExporter"],
+                        "NextReceiver": 0,
+                        "Enabled": true,
+                        "Onetime": false,
+                        "AwaitTime": 0.8,
+                        "SleepTime": 10.0,
+                        "ID": "Pt100",
+                        "Request": "#01\r",
+                        "ResponsePattern": ">[+-][\\d\\.]{6}[+-][\\d\\.]{6}[+-][\\d\\.]{6}[+-][\\d\\.]{6}([+-][\\d\\.]{6})([+-][\\d\\.]{6})",
+                        "ResponseDelimiter": "\r",
+                        "ResponseSets":
+                        [
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            }
+                        ]
                     }
                 ]
             }
@@ -682,6 +744,7 @@
                         "Name": "get_values",
                         "Description": "Get temperature, air pressure, and humidity values.",
                         "Receivers": ["PreProcessor", "DistanceCorrector", "FileExporter"],
+                        "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": false,
                         "AwaitTime": 0.8,
@@ -690,9 +753,28 @@
                         "Request": "?U\r\n",
                         "ResponsePattern": "TD([\\d\\.]+), TE([\\d\\.]+), DR([\\d\\.]+), FE([\\d\\.]+),",
                         "ResponseDelimiter": ", \r\n",
-                        "ResponseDescriptions": ["TempPress", "Temperature", "Pressure", "Humidity"],
-                        "ResponseTypes": ["Float", "Float", "Float", "Float"],
-                        "ResponseUnits": ["°C", "°C", "hPa", "%"]
+                        "ResponseSets": [
+                            {
+                                "Description": "TempPress",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Temperature",
+                                "Type": "Float",
+                                "Unit": "°C"
+                            },
+                            {
+                                "Description": "Pressure",
+                                "Type": "Float",
+                                "Unit": "hPa"
+                            },
+                            {
+                                "Description": "Humidity",
+                                "Type": "Float",
+                                "Unit": "%"
+                            }
+                        ]
                     }
                 ]
             }
@@ -747,23 +829,27 @@
         "Pressure": null,
         "Humidity": 0.6,
         "AtmosphericCorrectionEnabled": true,
-        "SealevelCorrectionEnabled": true
+        "SealevelCorrectionEnabled": true,
+        "SensorHeight": 100.0
+    },
+    "HelmertTransformer":
+    {
+        "StationName": "P6",
+        "TiePoints": ["P1", "P2", "P3", "P4"],
+        "MaximumStandardDeviation": 10.0
     },
     "PolarTransformer":
     {
-        "USB1":
+        "SensorPosition":
         {
-            "SensorPosition":
-            {
-                "East": 1000.0000,
-                "North": 2000.0000,
-                "Height": 100.0000
-            },
-            "AzimuthPosition":
-            {
-                "East": 1007.4992,
-                "North": 2000.0000
-            }
+            "East": 1000.0000,
+            "North": 2000.0000,
+            "Height": 100.0000
+        },
+        "AzimuthPosition":
+        {
+            "East": 1007.4992,
+            "North": 2000.0000
         }
     },
     "FileExporter":

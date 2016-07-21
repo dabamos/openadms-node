@@ -83,12 +83,11 @@ class Monitor(threading.Thread):
             try:
                 port_schedules = self._config_manager.config['Scheduler'][port_name]
             except KeyError:
-                logger.error('No timetable found for port {}'.format(port_name))
+                logger.error('No schedule found for port {}'.format(port_name))
                 continue
 
-            # Create a new scheduler for every port (e.g., "USB0", "USB1",
-            # ...).
-            self._schedulers[port_name] = schedule.Scheduler()
+            # Create a new scheduler for every port (e.g., "USB0", ...).
+            self._schedulers[port_name] = schedule.Scheduler(self._queue)
 
             # Run through the port schedules and create jobs.
             for port_schedule in port_schedules:
@@ -102,60 +101,60 @@ class Monitor(threading.Thread):
                                        port_schedule['Enabled'],
                                        port_schedule['StartDate'],
                                        port_schedule['EndDate'],
-                                       port_schedule['Schedule'],
-                                       self._queue)
+                                       port_schedule['Schedule'])
                     # Add job to the scheduler.
                     self._schedulers[port_name].add(job)
 
             # Start the scheduler thread.
             self._schedulers[port_name].start()
 
-    def run(self):
+    def run(self, sleep_time = 0.01):
         """Takes observation data objects from the main queue and redirects
         them to the receiver modules."""
         while True:
-            if not self._queue.empty():
-                obs_data = self._queue.get()
+            if self._queue.empty():
+                # Prevent thread from taking to much CPU time.
+                time.sleep(sleep_time)
+                continue
 
-                # No receivers definied.
-                if len(obs_data.get('Receivers')) == 0:
-                    logging.debug('No receivers defined for observation "{}"'
-                                  .format(obs_data.get('Name')))
-                    continue
+            obs_data = self._queue.get()
 
-                # Index of the receivers list.
-                index = obs_data.get('NextReceiver')
+            # No receivers definied.
+            if len(obs_data.get('Receivers')) == 0:
+                logging.debug('No receivers defined for observation "{}"'
+                              .format(obs_data.get('Name')))
+                continue
 
-                # No index definied.
-                if index is None or index < 0:
-                    logger.warning('Next receiver of observation "{}" not '
-                                   'defined'.format(obs_data.get('Name')))
-                    continue
+            # Index of the receivers list.
+            index = obs_data.get('NextReceiver')
 
-                # Receivers list has been processed.
-                if index >= len(obs_data.get('Receivers')):
-                    logger.debug('Observation "{}" has been finished'
-                                 .format(obs_data.get('Name')))
-                    continue
+            # No index definied.
+            if index is None or index < 0:
+                logger.warning('Next receiver of observation "{}" not '
+                               'defined'.format(obs_data.get('Name')))
+                continue
 
-                # Get the name of the next receiver.
-                next_receiver = obs_data.get('Receivers')[index]
+            # Receivers list has been processed.
+            if index >= len(obs_data.get('Receivers')):
+                logger.debug('Observation "{}" has been finished'
+                             .format(obs_data.get('Name')))
+                continue
 
-                # Set the index to the subsequent receiver.
-                index = index + 1
-                obs_data.set('NextReceiver', index)
+            # Get the name of the next receiver.
+            next_receiver = obs_data.get('Receivers')[index]
 
-                if next_receiver not in self._modules_manager.workers:
-                    logger.error('Module "{}" not found, discarding '
-                                 'observation "{}"'
-                                 .format(next_receiver, obs_data.get('Name')))
-                    continue
+            # Set the index to the subsequent receiver.
+            index = index + 1
+            obs_data.set('NextReceiver', index)
 
-                # Fire and forget.
-                self._modules_manager.workers[next_receiver].put(obs_data)
+            if next_receiver not in self._modules_manager.workers:
+                logger.error('Module "{}" not found, discarding '
+                             'observation "{}"'
+                             .format(next_receiver, obs_data.get('Name')))
+                continue
 
-            # Prevent thread from taking to much CPU time.
-            time.sleep(0.01)
+            # Fire and forget.
+            self._modules_manager.workers[next_receiver].put(obs_data)
 
     @property
     def config_manager(self):

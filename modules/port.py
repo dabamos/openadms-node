@@ -40,6 +40,7 @@ class SerialPort(prototype.Prototype):
 
         self._serial = None         # Pyserial object.
         self._serial_port_config = None
+        self._max_attempts = 3
 
     def action(self, obs_data):
         if not self._serial:
@@ -59,17 +60,25 @@ class SerialPort(prototype.Prototype):
                          .format(self._name, self._serial_port_config.port))
             return
 
-        self._write(obs_data.get('Request'))
+        for attempt in range(self._max_attempts):
+            if attempt > 0:
+                logger.info('Trying attempt {} of {} ...'
+                            .format(attempt + 1, self._max_attempts))
 
-        # Wait some time to let the sensor do its sensoring stuff.
-        time.sleep(obs_data.get('AwaitTime'))
-        # Get the response of the sensor.
-        response = self._read(obs_data.get('ResponseDelimiter'))
+            self._write(obs_data.get('Request'))
 
-        if response == '':
+            # Wait some time to let the sensor do its sensoring stuff.
+            time.sleep(obs_data.get('AwaitTime'))
+
+            # Get the response of the sensor.
+            response = self._read(obs_data.get('ResponseDelimiter'))
+
+            if response != '':
+                break
+
+            # Try next attempt if response is empty.
             logger.error('No response from sensor "{}" on port "{}"'
                          .format(obs_data.get("SensorName"), self._name))
-            return
 
         # Add a timestamp to the observation data.
         obs_data.set('TimeStamp', time.time())
@@ -82,7 +91,7 @@ class SerialPort(prototype.Prototype):
         # Add the raw response of the sensor to the observation data set.
         obs_data.set('Response', response)
 
-        return obs_data
+        return obs_data if response != '' else None
 
     def close(self):
         logger.info('Closing port {} ({})'
