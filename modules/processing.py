@@ -47,7 +47,7 @@ class PreProcessor(prototype.Prototype):
         response = obs_data.get('Response')
         response_pattern = obs_data.get('ResponsePattern')
 
-        if response is None or response == '':
+        if not response or response == '':
             logger.warning('No response in observation "{}"'
                            .format(obs_data.get('Name')))
             return obs_data
@@ -85,10 +85,12 @@ class PreProcessor(prototype.Prototype):
             if len(raw_responses) > len(response_sets):
                 return
 
+        # Convert the type of the parsed raw values from string to the actual
+        # data type.
         for raw_response, response_set in zip(raw_responses, response_sets):
-            if raw_response is None:
-                logger.error('Extraction of observation "{}" failed'
-                             .format(obs_data.get('Name')))
+            if not raw_response:
+                logger.error('Extraction of raw response of observation "{}" '
+                             'failed'.format(obs_data.get('Name')))
                 return obs_data
 
             logger.debug('Extracted "{}" from raw response of observation "{}"'
@@ -192,8 +194,8 @@ class ReturnCodeInspector(prototype.Prototype):
                                'observation "{}"'
                                .format(obs_data.get('Name')))
 
-        if return_code is None:
-            logger.debug('Return code not found in observation "{}"'
+        if not return_code:
+            logger.debug('No return code found in observation "{}"'
                          .format(obs_data.get('Name')))
             return obs_data
 

@@ -170,7 +170,7 @@ class Worker(object):
             if not self._input_queue.empty():
                 obs_data = self._module.action(self._input_queue.get())
 
-                if obs_data is None:
+                if not obs_data:
                     logger.warning('Module "{}" did not return any '
                                    'observation data'
                                    .format(self._module.name))

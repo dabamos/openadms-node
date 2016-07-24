@@ -157,7 +157,7 @@ class SerialPort(prototype.Prototype):
             logger.error('Permission denied for port {} ({})'
                          .format(self._name, self._serial_port_config.port))
 
-    def _read(self, eol, timeout = 10.0):
+    def _read(self, eol, timeout=10.0):
         """Reads from serial port."""
         response = ''
         start_time = time.time()

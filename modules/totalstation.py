@@ -78,8 +78,7 @@ class DistanceCorrector(prototype.Prototype):
             return obs_data
 
         # Check if atmospheric data has been set.
-        if self.temperature == None or self.pressure == None or \
-                self.humidity == None:
+        if not self.temperature or not self.pressure or not self.humidity:
             logger.warning('Temperature, air pressure, or humidity missing')
             return obs_data
 
@@ -107,7 +106,7 @@ class DistanceCorrector(prototype.Prototype):
                                'observation "{}"'
                                .format(obs_data.get('Name')))
 
-        if dist == None:
+        if not dist:
             logger.warning('No slope distance found for reduction')
             return obs_data
 
@@ -256,7 +255,7 @@ class DistanceCorrector(prototype.Prototype):
         self._temperature = temperature
         self._last_update = time.time()
 
-        if temperature is not None:
+        if temperature:
             logger.info('Updated temperature to {} C'
                         .format(round(temperature, 2)))
 
@@ -266,7 +265,7 @@ class DistanceCorrector(prototype.Prototype):
         self._pressure = pressure
         self._last_update = time.time()
 
-        if pressure is not None:
+        if pressure:
             logger.info('Updated pressure to {} hPa'
                         .format(round(pressure, 2)))
 
@@ -276,7 +275,7 @@ class DistanceCorrector(prototype.Prototype):
         self._humidity = humidity
         self._last_update = time.time()
 
-        if humidity is not None:
+        if humidity:
             logger.info('Updated humidity to {}'
                         .format(round(humidity, 2)))
 
@@ -381,14 +380,14 @@ class PolarTransformer(prototype.Prototype):
                                'observation "{}"'
                                .format(obs_data.get('Name')))
 
-        if hz == None or v == None or dist == None:
+        if not hz or not v or not dist:
             logger.error('Observation is incomplete '
                          '(Hz, V, or distance is missing)')
             return obs_data
 
         # Override slope distance with reduced distance.
-        if r_dist == None:
-            logger.warning('No reduced distance set')
+        if not r_dist:
+            logger.warning('Distance has not been reduced')
         else:
             dist = r_dist
 

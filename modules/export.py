@@ -109,9 +109,9 @@ class FileExporter(prototype.Prototype):
         file_name = self._file_name
         file_name = file_name.replace('{port}', obs_data.get('PortName'))
         file_name = file_name.replace('{date}', '{}'.format(date)
-                                      if date is not None else '')
+                                      if date else '')
         file_name = file_name.replace('{id}', '{}'.format(obs_data.get('ID'))
-                                      if obs_data.get('ID') is not None else '')
+                                      if obs_data.get('ID') else '')
         file_name += self._file_extension
 
         for path in self._paths:
@@ -126,7 +126,7 @@ class FileExporter(prototype.Prototype):
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
-                if header is not None:
+                if header:
                     fh.write(header)
 
                 # Convert Unix time stamp to date and time.
@@ -134,7 +134,7 @@ class FileExporter(prototype.Prototype):
                 line = dt.strftime(self._date_time_format)
 
                 try:
-                    if obs_data.get('ID') is not None:
+                    if obs_data.get('ID'):
                         line += self._separator + obs_data.get('ID')
 
                     for response in obs_data.get('ResponseSets'):

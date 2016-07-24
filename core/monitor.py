@@ -129,7 +129,7 @@ class Monitor(threading.Thread):
             index = obs_data.get('NextReceiver')
 
             # No index definied.
-            if index is None or index < 0:
+            if (index is None) or (index < 0):
                 logger.warning('Next receiver of observation "{}" not '
                                'defined'.format(obs_data.get('Name')))
                 continue

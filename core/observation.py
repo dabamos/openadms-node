@@ -34,7 +34,7 @@ class ObservationData(object):
     """
 
     def __init__(self, data=None):
-        if data is None:
+        if not data:
             self._data = {}
 
             # Initialize dictionary.
