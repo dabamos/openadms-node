@@ -62,7 +62,7 @@ class ConfigurationManager:
         self._config = config
 
 
-class ModulesManager(object):
+class ModuleManager(object):
 
     """
     ModulesManager loads and manages Python modules.
@@ -117,7 +117,7 @@ class ModulesManager(object):
         return self._workers
 
 
-class SensorsManager(object):
+class SensorManager(object):
 
     """
     SensorManager stores sensor.Sensor objects.

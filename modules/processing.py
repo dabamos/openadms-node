@@ -34,23 +34,23 @@ logger = logging.getLogger('openadms')
 
 class PreProcessor(prototype.Prototype):
 
-    """Extracts values from the raw responses of a given observation data set
+    """Extracts values from the raw responses of a given observation set
     and converts them to the defined types.
     """
 
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
 
-    def action(self, obs_data):
-        """Extracts the values from the raw responses of the observation data
+    def action(self, obs):
+        """Extracts the values from the raw responses of the observation
         using regular expressions."""
-        response = obs_data.get('Response')
-        response_pattern = obs_data.get('ResponsePattern')
+        response = obs.get('Response')
+        response_pattern = obs.get('ResponsePattern')
 
         if not response or response == '':
             logger.warning('No response in observation "{}"'
-                           .format(obs_data.get('Name')))
-            return obs_data
+                           .format(obs.get('Name')))
+            return obs
 
         pattern = re.compile(response_pattern)
         parsed = pattern.search(response)
@@ -60,9 +60,9 @@ class PreProcessor(prototype.Prototype):
                          '"{}" from sensor {} on {}'
                          .format(response_pattern,
                                  self._sanitize(response),
-                                 obs_data.get('SensorName'),
-                                 obs_data.get('PortName')))
-            return obs_data
+                                 obs.get('SensorName'),
+                                 obs.get('PortName')))
+            return obs
 
         # The regular expression pattern needs a least one defined group
         # by using the braces "(" and ")". Otherwise, an extraction of the
@@ -71,16 +71,16 @@ class PreProcessor(prototype.Prototype):
         # Right: "(.*)"
         # Wrong: ".*"
         raw_responses = parsed.groups()
-        response_sets = obs_data.get('ResponseSets')
+        response_sets = obs.get('ResponseSets')
 
         if len(raw_responses) == 0:
             logger.error('No group defined in regular expression pattern')
-            return obs_data
+            return obs
 
         if len(raw_responses) != len(response_sets):
             logger.warning('Number of responses mismatch number of defined '
                            'response sets of observation "{}"'
-                           .format(obs_data.get('Name')))
+                           .format(obs.get('Name')))
 
             if len(raw_responses) > len(response_sets):
                 return
@@ -90,11 +90,11 @@ class PreProcessor(prototype.Prototype):
         for raw_response, response_set in zip(raw_responses, response_sets):
             if not raw_response:
                 logger.error('Extraction of raw response of observation "{}" '
-                             'failed'.format(obs_data.get('Name')))
-                return obs_data
+                             'failed'.format(obs.get('Name')))
+                return obs
 
             logger.debug('Extracted "{}" from raw response of observation "{}"'
-                         .format(raw_response, obs_data.get('Name')))
+                         .format(raw_response, obs.get('Name')))
 
             response_type = response_set['Type'].lower()
             response_value = None
@@ -131,7 +131,7 @@ class PreProcessor(prototype.Prototype):
 
             response_set['Value'] = response_value
 
-        return obs_data
+        return obs
 
     def destroy(self, *args):
         pass
@@ -154,17 +154,17 @@ class PreProcessor(prototype.Prototype):
 
     def _sanitize(self, s):
         """Removes some non-printable characters from a string."""
-        san = s.replace('\n', '\\n')
-        san = san.replace('\r', '\\r')
-        san = san.replace('\t', '\\t')
+        sanitized = s.replace('\n', '\\n')\
+                     .replace('\r', '\\r')\
+                     .replace('\t', '\\t')
 
-        return san
+        return sanitized
 
 
 class ReturnCodeInspector(prototype.Prototype):
 
     """
-    Inspects the return code in observation data sent by sensors of Leica
+    Inspects the return code in observation sent by sensors of Leica
     Geosystems.
     """
 
@@ -172,14 +172,14 @@ class ReturnCodeInspector(prototype.Prototype):
         prototype.Prototype.__init__(self, name, config_manager)
         # config = self._config_manager.config[self._name]
 
-    def action(self, obs_data):
-        response_sets = obs_data.get('ResponseSets')
+    def action(self, obs):
+        response_sets = obs.get('ResponseSets')
         return_code = None
 
         if len('ResponseSets') == 0:
             logger.warning('Observation "{}" has no responses'
-                           .format(obs_data.get('Name')))
-            return obs_data
+                           .format(obs.get('Name')))
+            return obs
 
         for response in response_sets:
             try:
@@ -192,21 +192,21 @@ class ReturnCodeInspector(prototype.Prototype):
             except KeyError:
                 logger.warning('Data missing in response set of '
                                'observation "{}"'
-                               .format(obs_data.get('Name')))
+                               .format(obs.get('Name')))
 
         if not return_code:
             logger.debug('No return code found in observation "{}"'
-                         .format(obs_data.get('Name')))
-            return obs_data
+                         .format(obs.get('Name')))
+            return obs
 
         if return_code == 0:
             logger.info('Observation "{}" was successful (code "{}")'
-                        .format(obs_data.get('Name'), return_code))
+                        .format(obs.get('Name'), return_code))
         else:
             logger.warning('Error occured on observation "{}" (code "{}")'
-                           .format(obs_data.get('Name'), return_code))
+                           .format(obs.get('Name'), return_code))
 
-        return obs_data
+        return obs
 
     def destroy(self, *args):
         pass

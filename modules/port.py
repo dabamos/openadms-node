@@ -46,20 +46,20 @@ class SerialPort(prototype.Prototype):
         if self._serial is not None:
             self.close()
 
-    def action(self, obs_data):
+    def action(self, obs):
         if not self._serial:
             self._open()
 
         response = ''
 
-        # Add the name of this serial port to the observation data.
-        obs_data.set('PortName', self._name)
+        # Add the name of this serial port to the observation.
+        obs.set('PortName', self._name)
 
-        # Send the request of the observation data to the attached sensor.
+        # Send the request of the observation to the attached sensor.
         logger.info('Sending observation "{}" ("{}") to sensor "{}" on port '
-                    '"{}"'.format(obs_data.get('Name'),
-                                  self._sanitize(obs_data.get('Request')),
-                                  obs_data.get('SensorName'),
+                    '"{}"'.format(obs.get('Name'),
+                                  self._sanitize(obs.get('Request')),
+                                  obs.get('SensorName'),
                                   self._name))
         if self._serial == None:
             logger.error('Could not write to port {} ({})'
@@ -68,36 +68,36 @@ class SerialPort(prototype.Prototype):
 
         for attempt in range(self._max_attempts):
             if attempt > 0:
-                logger.info('Trying attempt {} of {} ...'
-                            .format(attempt + 1, self._max_attempts))
+                logger.info('Attempt {} of {} ...'.format(attempt + 1,
+                                                          self._max_attempts))
 
-            self._write(obs_data.get('Request'))
+            # Write to the serial port.
+            self._write(obs.get('Request'))
 
             # Wait some time to let the sensor do its sensoring stuff.
-            time.sleep(obs_data.get('AwaitTime'))
+            time.sleep(obs.get('AwaitTime'))
 
             # Get the response of the sensor.
-            response = self._read(obs_data.get('ResponseDelimiter'))
+            response = self._read(obs.get('ResponseDelimiter'))
 
             if response != '':
+                logger.info('Received "{}" from sensor "{}" on port "{}"'
+                            .format(self._sanitize(response),
+                                    obs.get('SensorName'),
+                                    self._name))
                 break
 
             # Try next attempt if response is empty.
             logger.error('No response from sensor "{}" on port "{}"'
-                         .format(obs_data.get("SensorName"), self._name))
+                         .format(obs.get("SensorName"), self._name))
 
-        # Add a timestamp to the observation data.
-        obs_data.set('TimeStamp', time.time())
+        # Add a timestamp to the observation.
+        obs.set('TimeStamp', time.time())
 
-        logger.info('Received "{}" from sensor "{}" on port "{}"'
-                    .format(self._sanitize(response),
-                            obs_data.get('SensorName'),
-                            self._name))
+        # Add the raw response of the sensor to the observation set.
+        obs.set('Response', response)
 
-        # Add the raw response of the sensor to the observation data set.
-        obs_data.set('Response', response)
-
-        return obs_data
+        return obs
 
     def close(self):
         logger.info('Closing port {} ({})'
@@ -126,11 +126,7 @@ class SerialPort(prototype.Prototype):
 
     def _open(self):
         """Opens a serial port."""
-        if self._name is None:
-            logger.error('No port name set')
-            return
-
-        if self._serial_port_config is None:
+        if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
 
         logger.info('Opening port {} ({}) ...'
@@ -138,21 +134,14 @@ class SerialPort(prototype.Prototype):
 
         try:
             self._serial = serial.Serial(
-                # Port (e.g., "/dev/tty0").
                 port=self._serial_port_config.port,
-                # Baudrate (e.g., "9600").
                 baudrate=self._serial_port_config.baudrate,
-                # Timeout in seconds.
                 timeout=self._serial_port_config.timeout,
-                # Data bytes (e.g., "8").
                 bytesize=self._serial_port_config.bytesize,
-                # Parity (e.g., "none")
                 parity=self._serial_port_config.parity,
-                # Stop bits (e.g., "1").
                 stopbits=self._serial_port_config.stopbits,
-                # Software flow control.
                 xonxoff=self._serial_port_config.xonxoff,
-                rtscts=self._serial_port_config.rtscts)        # Hardware flow control.
+                rtscts=self._serial_port_config.rtscts)
         except serial.serialutil.SerialException:
             logger.error('Permission denied for port {} ({})'
                          .format(self._name, self._serial_port_config.port))

@@ -85,16 +85,16 @@ class FileExporter(prototype.Prototype):
 
         return paths
 
-    def action(self, obs_data):
+    def action(self, obs):
         """Append data to a flat file in CSV format.
 
         Args:
-            obs_date(ObservationData): The input observation data object.
+            obs_date(Observation): The input observation object.
 
         Returns:
-            obs_data(ObservationData): The output observation data object.
+            obs(Observation): The output observation object.
         """
-        ts = datetime.fromtimestamp(obs_data.get('TimeStamp'))
+        ts = datetime.fromtimestamp(obs.get('TimeStamp'))
 
         date = {
             # No file rotation, i.e., all data is stored in a single file.
@@ -107,11 +107,11 @@ class FileExporter(prototype.Prototype):
             FileRotation.YEARLY: ts.strftime('%Y')}[self._file_rotation]
 
         file_name = self._file_name
-        file_name = file_name.replace('{port}', obs_data.get('PortName'))
+        file_name = file_name.replace('{port}', obs.get('PortName'))
         file_name = file_name.replace('{date}', '{}'.format(date)
                                       if date else '')
-        file_name = file_name.replace('{id}', '{}'.format(obs_data.get('ID'))
-                                      if obs_data.get('ID') else '')
+        file_name = file_name.replace('{id}', '{}'.format(obs.get('ID'))
+                                      if obs.get('ID') else '')
         file_name += self._file_extension
 
         for path in self._paths:
@@ -120,9 +120,9 @@ class FileExporter(prototype.Prototype):
 
             if not os.path.isfile(path + file_name):
                 header = '# Target "{}" of "{}" on "{}"\n' \
-                         .format(obs_data.get('ID'),
-                                 obs_data.get('SensorName'),
-                                 obs_data.get('PortName'))
+                         .format(obs.get('ID'),
+                                 obs.get('SensorName'),
+                                 obs.get('PortName'))
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
@@ -130,14 +130,14 @@ class FileExporter(prototype.Prototype):
                     fh.write(header)
 
                 # Convert Unix time stamp to date and time.
-                dt = datetime.fromtimestamp(obs_data.get('TimeStamp'))
+                dt = datetime.fromtimestamp(obs.get('TimeStamp'))
                 line = dt.strftime(self._date_time_format)
 
                 try:
-                    if obs_data.get('ID'):
-                        line += self._separator + obs_data.get('ID')
+                    if obs.get('ID'):
+                        line += self._separator + obs.get('ID')
 
-                    for response in obs_data.get('ResponseSets'):
+                    for response in obs.get('ResponseSets'):
                         d = response['Description']
                         v = response['Value']
                         u = response['Unit']
@@ -146,20 +146,19 @@ class FileExporter(prototype.Prototype):
                         line += self._separator + format(v)
                         line += self._separator + format(u)
                 except KeyError:
-                    logger.error('Observation data set of sensor "{}" on '
-                                 'port "{}" is incomplete'
-                                 .format(obs_data.get('SensorName'),
-                                         obs_data.get('PortName')))
+                    logger.error('Observation set of sensor "{}" on port "{}" '
+                                 'is incomplete'.format(obs.get('SensorName'),
+                                                        obs.get('PortName')))
 
                 # Write line to file.
                 fh.write(line + '\n')
 
                 logger.info('Saved observation "{}" from port "{}" to file '
-                            '"{}"'.format(obs_data.get('Name'),
-                                          obs_data.get('PortName'),
+                            '"{}"'.format(obs.get('Name'),
+                                          obs.get('PortName'),
                                           path + file_name))
 
-        return obs_data
+        return obs
 
     def destroy(self, *args):
         pass

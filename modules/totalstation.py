@@ -49,8 +49,7 @@ class DistanceCorrector(prototype.Prototype):
         self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
 
-        self._is_atmospheric_correction = config[
-            'AtmosphericCorrectionEnabled']
+        self._is_atmospheric_correction = config['AtmosphericCorrectionEnabled']
         self._is_sealevel_correction = config['SealevelCorrectionEnabled']
 
         try:
@@ -63,24 +62,24 @@ class DistanceCorrector(prototype.Prototype):
         except KeyError:
             debug.error('Configuration is invalid')
 
-    def action(self, obs_data):
-        sensor_type = obs_data.get('SensorType').lower()
+    def action(self, obs):
+        sensor_type = obs.get('SensorType').lower()
 
         # Check sensor type.
         if (sensor_type not in self._ws_types) and \
                 (sensor_type not in self._ts_types):
             logger.warning('Wrong sensor type ("{}")'.format(sensor_type))
-            return obs_data
+            return obs
 
         # Update atmospheric data if sensor is a weather station.
         if sensor_type in self._ws_types:
-            self._update_meteorological_data(obs_data)
-            return obs_data
+            self._update_meteorological_data(obs)
+            return obs
 
         # Check if atmospheric data has been set.
         if not self.temperature or not self.pressure or not self.humidity:
             logger.warning('Temperature, air pressure, or humidity missing')
-            return obs_data
+            return obs
 
         # Check the age of the atmospheric data.
         if self.last_update - time.time() > self._max_age:
@@ -90,7 +89,7 @@ class DistanceCorrector(prototype.Prototype):
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
         dist = None
-        response_sets = obs_data.get('ResponseSets')
+        response_sets = obs.get('ResponseSets')
 
         # Search for slope distance.
         for response in response_sets:
@@ -104,11 +103,11 @@ class DistanceCorrector(prototype.Prototype):
             except KeyError:
                 logger.warning('Data missing in response set of '
                                'observation "{}"'
-                               .format(obs_data.get('Name')))
+                               .format(obs.get('Name')))
 
         if not dist:
             logger.warning('No slope distance found for reduction')
-            return obs_data
+            return obs
 
         d_dist_1 = 0
         d_dist_2 = 0
@@ -162,7 +161,7 @@ class DistanceCorrector(prototype.Prototype):
                                                        round(r_dist, 5))
             response_sets.append(response_r_dist)
 
-        return obs_data
+        return obs
 
     def get_ppm(self):
         """Calculates the atmospheric correction value in parts per million
@@ -184,10 +183,10 @@ class DistanceCorrector(prototype.Prototype):
 
         return ppm
 
-    def _update_meteorological_data(self, obs_data):
+    def _update_meteorological_data(self, obs):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        response_sets = obs_data.get('ResponseSets')
+        response_sets = obs.get('ResponseSets')
 
         for response in response_sets:
             try:
@@ -216,7 +215,7 @@ class DistanceCorrector(prototype.Prototype):
             except KeyError:
                 logger.warning('Data missing in response set of '
                                'observation "{}"'
-                               .format(obs_data.get('Name')))
+                               .format(obs.get('Name')))
 
 
     def _get_response_set(self, d, t, u, v):
@@ -302,8 +301,8 @@ class HelmertTransformer(prototype.Prototype):
         prototype.Prototype.__init__(self, name, config_manager)
         config = self._config_manager.config[self._name]
 
-    def action(self, obs_data):
-        return obs_data
+    def action(self, obs):
+        return obs
 
     def destroy(self, *args):
         pass
@@ -338,15 +337,15 @@ class PolarTransformer(prototype.Prototype):
         self._azimuth_y = config['AzimuthPosition']['East']
         self._azimuth_x = config['AzimuthPosition']['North']
 
-    def action(self, obs_data):
+    def action(self, obs):
         # Check the configuration for the given sensor port.
-        port_name = obs_data.get('PortName')
-        sensor_type = obs_data.get('SensorType').lower()
-        response_sets = obs_data.get('ResponseSets')
+        port_name = obs.get('PortName')
+        sensor_type = obs.get('SensorType').lower()
+        response_sets = obs.get('ResponseSets')
 
         if not sensor_type in self._valid_types:
             logger.error('Sensor is not of type "total station"')
-            return obs_data
+            return obs
 
         hz = None
         v = None
@@ -378,12 +377,12 @@ class PolarTransformer(prototype.Prototype):
             except KeyError:
                 logger.warning('Data missing in response set of '
                                'observation "{}"'
-                               .format(obs_data.get('Name')))
+                               .format(obs.get('Name')))
 
         if not hz or not v or not dist:
             logger.error('Observation is incomplete '
                          '(Hz, V, or distance is missing)')
-            return obs_data
+            return obs
 
         # Override slope distance with reduced distance.
         if not r_dist:
@@ -397,7 +396,7 @@ class PolarTransformer(prototype.Prototype):
 
         logger.debug('Starting polar transformation of target "{}" with '
                      '[Hz = {:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m]'
-                     .format(obs_data.get('ID'),
+                     .format(obs.get('ID'),
                              hz_grad,
                              v_grad,
                              dist))
@@ -412,7 +411,7 @@ class PolarTransformer(prototype.Prototype):
                                    dist)
 
         logger.info('Transformed target "{}" to [Y = {:3.4f}, '
-                    'X = {:3.4f}, Z = {:3.4f}]'.format(obs_data.get('ID'),
+                    'X = {:3.4f}, Z = {:3.4f}]'.format(obs.get('ID'),
                                                        y,
                                                        x,
                                                        z))
@@ -427,7 +426,7 @@ class PolarTransformer(prototype.Prototype):
         response_sets.append(response_x)
         response_sets.append(response_z)
 
-        return obs_data
+        return obs
 
     def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
                   v, dist):

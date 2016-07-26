@@ -25,7 +25,7 @@ import logging
 logger = logging.getLogger('openadms')
 
 
-class ObservationData(object):
+class Observation(object):
     """
     Stores all information regarding a request to and a response by a sensor in
     a dictionary. Filled with initial information from the configuration file

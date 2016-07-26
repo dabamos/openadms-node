@@ -47,12 +47,12 @@ class Sensor(object):
 
             # Add all commands of the observations set to the list.
             for observation in observations:
-                obs_data = self.get_observation_data(observation)
+                obs = self.get_observation_data(observation)
 
-                local_set.append(obs_data)
+                local_set.append(obs)
                 # logger.debug('Added observation "{}" to observation '
                 #             'set "{}" of sensor {}'
-                #             .format(obs_data.get('Name'), set_name, name))
+                #             .format(obs.get('Name'), set_name, name))
 
             if len(local_set) > 0:
                 self._observation_sets[set_name] = local_set
@@ -70,7 +70,7 @@ class Sensor(object):
         # Character '\' is escaped in JSON file.
         data['ResponsePattern'] = data['ResponsePattern'].replace('\\\\', '\\')
 
-        return observation.ObservationData(data)
+        return observation.Observation(data)
 
     @property
     def name(self):

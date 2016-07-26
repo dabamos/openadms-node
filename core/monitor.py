@@ -51,22 +51,22 @@ class Monitor(threading.Thread):
         self._config_manager.load(config_file)
 
         # Create the modules manager.
-        self._modules_manager = manager.ModulesManager(self._config_manager)
-        modules_config = self._config_manager.config['Modules']
+        self._module_manager = manager.ModuleManager(self._config_manager)
+        module_config = self._config_manager.config['Modules']
 
         # Create the sensors manager.
-        self._sensors_manager = manager.SensorsManager(self._config_manager)
-        sensors_config = self._config_manager.config['Sensors']
+        self._sensor_manager = manager.SensorManager(self._config_manager)
+        sensor_config = self._config_manager.config['Sensors']
 
         # Load modules using the modules manager.
-        for module_name, class_path in modules_config.items():
-            self._modules_manager.add(module_name, class_path, self._queue)
+        for module_name, class_path in module_config.items():
+            self._module_manager.add(module_name, class_path, self._queue)
 
         # Create sensor objects.
-        for sensor_name, sensor_config in sensors_config.items():
+        for sensor_name, sensor_config in sensor_config.items():
             logger.info('Created sensor {}'.format(sensor_name))
             sensor_inst = sensor.Sensor(sensor_name, self._config_manager)
-            self._sensors_manager.add(sensor_name, sensor_inst)
+            self._sensor_manager.add(sensor_name, sensor_inst)
 
         self._init_schedulers()
 
@@ -97,7 +97,7 @@ class Monitor(threading.Thread):
                     # Create new job.
                     job = schedule.Job(job_name,
                                        port_name,
-                                       self._sensors_manager.get(sensor_name),
+                                       self._sensor_manager.get(sensor_name),
                                        port_schedule['Enabled'],
                                        port_schedule['StartDate'],
                                        port_schedule['EndDate'],
@@ -117,53 +117,53 @@ class Monitor(threading.Thread):
                 time.sleep(sleep_time)
                 continue
 
-            obs_data = self._queue.get()
+            obs = self._queue.get()
 
             # No receivers definied.
-            if len(obs_data.get('Receivers')) == 0:
+            if len(obs.get('Receivers')) == 0:
                 logging.debug('No receivers defined for observation "{}"'
-                              .format(obs_data.get('Name')))
+                              .format(obs.get('Name')))
                 continue
 
             # Index of the receivers list.
-            index = obs_data.get('NextReceiver')
+            index = obs.get('NextReceiver')
 
             # No index definied.
             if (index is None) or (index < 0):
                 logger.warning('Next receiver of observation "{}" not '
-                               'defined'.format(obs_data.get('Name')))
+                               'defined'.format(obs.get('Name')))
                 continue
 
             # Receivers list has been processed.
-            if index >= len(obs_data.get('Receivers')):
+            if index >= len(obs.get('Receivers')):
                 logger.info('Observation "{}" has been finished'
-                            .format(obs_data.get('Name')))
+                            .format(obs.get('Name')))
                 continue
 
             # Get the name of the next receiver.
-            next_receiver = obs_data.get('Receivers')[index]
+            next_receiver = obs.get('Receivers')[index]
 
             # Set the index to the subsequent receiver.
             index = index + 1
-            obs_data.set('NextReceiver', index)
+            obs.set('NextReceiver', index)
 
-            if next_receiver not in self._modules_manager.workers:
+            if next_receiver not in self._module_manager.workers:
                 logger.error('Module "{}" not found, discarding '
                              'observation "{}"'
-                             .format(next_receiver, obs_data.get('Name')))
+                             .format(next_receiver, obs.get('Name')))
                 continue
 
             # Fire and forget.
-            self._modules_manager.workers[next_receiver].put(obs_data)
+            self._module_manager.workers[next_receiver].put(obs)
 
     @property
     def config_manager(self):
         return self._config_manager
 
     @property
-    def modules_manager(self):
-        return self._modules_manager
+    def module_manager(self):
+        return self._module_manager
 
     @property
-    def sensors_manager(self):
-        return self._sensors_manager
+    def sensor_manager(self):
+        return self._sensor_manager

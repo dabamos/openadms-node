@@ -152,25 +152,25 @@ class Job(object):
                                            self._sensor.name,
                                            self._port_name))
 
-        for obs_data in observation_set:
+        for obs in observation_set:
             # Continue if observation is disabled.
-            if not obs_data.get('Enabled'):
+            if not obs.get('Enabled'):
                 continue
 
             # Disable the observation if it should run one time only (for
             # instance, for initialization purposes).
-            if obs_data.get('Onetime'):
-                obs_data.set('Enabled', False)
+            if obs.get('Onetime'):
+                obs.set('Enabled', False)
 
             # Make a deep copy since we don't want to do any changes to the
-            # observation data in our set.
-            obs_data_copy = copy.deepcopy(obs_data)
-            obs_data_copy.data['Receivers'].insert(0, self._port_name)
+            # observation in our set.
+            obs_copy = copy.deepcopy(obs)
+            obs_copy.data['Receivers'].insert(0, self._port_name)
 
-            sleep_time = obs_data_copy.get('SleepTime')
+            sleep_time = obs_copy.get('SleepTime')
 
-            # Put the observation data into the output queue (fire and forget).
-            output_queue.put(obs_data_copy)
+            # Put the observation into the output queue (fire and forget).
+            output_queue.put(obs_copy)
 
             time.sleep(sleep_time)
 
