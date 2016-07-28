@@ -57,6 +57,9 @@ class ConfigurationManager:
     def config(self):
         return self._config
 
+    def get(self, key):
+        return self._config.get(key)
+
     @config.setter
     def config(self, config):
         self._config = config
@@ -117,6 +120,30 @@ class ModuleManager(object):
         return self._workers
 
 
+class SchedulerManager(object):
+
+    """
+    SchedulerManager stores scheduler objects.
+    """
+
+    def __init__(self, config_manager):
+        self._schedulers = {}
+        self._config_manager = config_manager
+
+    def add(self, name, scheduler):
+        self._schedulers[name] = scheduler
+
+    def delete(self, name):
+        self._schedulers[name] = None
+
+    def get(self, name):
+        return self._schedulers[name]
+
+    @property
+    def schedulers(self):
+        return self._schedulers
+
+
 class SensorManager(object):
 
     """
@@ -127,11 +154,11 @@ class SensorManager(object):
         self._sensors = {}
         self._config_manager = config_manager
 
-    def add(self, sensor_name, sensor):
-        self._sensors[sensor_name] = sensor
+    def add(self, name, sensor):
+        self._sensors[name] = sensor
 
-    def delete(self, sensor_name):
-        self._sensors[sensor_name] = None
+    def delete(self, name):
+        self._sensors[name] = None
 
     def get(self, name):
         return self._sensors[name]

@@ -19,11 +19,13 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+import hashlib
 import logging
 import math
 import re
 import time
 
+from core.sensor import SensorType
 from modules import prototype
 
 """Module for data processing (pre-precessing, atmospheric corrections,
@@ -34,17 +36,14 @@ logger = logging.getLogger('openadms')
 
 class DistanceCorrector(prototype.Prototype):
 
+    """Corrects the slope distance for EDM measurements using atmospheric
+    data."""
+
     def __init__(self, name, config_manager):
         prototype.Prototype.__init__(self, name, config_manager)
         self._config_manager = config_manager
-        config = self._config_manager.config[self._name]
+        config = self._config_manager.config.get(self._name)
 
-        # Valid weather station types.
-        self._ws_types = ['meteo', 'meteorological', 'meteorological station',
-                          'weather', 'weather station', 'weatherstation']
-        # Valid total station types.
-        self._ts_types = ['rts', 'tachymeter', 'total station',
-                          'totalstation', 'tps', 'tst']
         # Maximum age of atmospheric data.
         self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
@@ -65,15 +64,14 @@ class DistanceCorrector(prototype.Prototype):
     def action(self, obs):
         sensor_type = obs.get('SensorType').lower()
 
-        # Check sensor type.
-        if (sensor_type not in self._ws_types) and \
-                (sensor_type not in self._ts_types):
-            logger.warning('Wrong sensor type ("{}")'.format(sensor_type))
+        # Update atmospheric data if sensor is a weather station.
+        if SensorType.is_weather_station(sensor_type):
+            self._update_meteorological_data(obs)
             return obs
 
-        # Update atmospheric data if sensor is a weather station.
-        if sensor_type in self._ws_types:
-            self._update_meteorological_data(obs)
+        # Check if sensor is of type "total station".
+        if not SensorType.is_total_station(sensor_type):
+            logger.warning('Sensor type "{}" not supported'.format(sensor_type))
             return obs
 
         # Check if atmospheric data has been set.
@@ -88,44 +86,40 @@ class DistanceCorrector(prototype.Prototype):
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
+        dists = obs.find('ResponseSets', 'Description', 'SlopeDist')
         dist = None
-        response_sets = obs.get('ResponseSets')
 
-        # Search for slope distance.
-        for response in response_sets:
-            try:
-                d = response['Description'].lower()
-                v = response['Value']
-
-                if d in ['dist', 'slopedist']:
-                    dist = v
-                    break
-            except KeyError:
-                logger.warning('Data missing in response set of '
-                               'observation "{}"'
-                               .format(obs.get('Name')))
+        if len(dists) > 0:
+            dist = dists[0].get('Value')
+        else:
+            logger.warning('SlopeDist is missing in observation "{}"'
+                           .format(obs.get('Name')))
+            return obs
 
         if not dist:
-            logger.warning('No slope distance found for reduction')
+            logger.warning('SlopeDist value is missing in observation "{}"'
+                           .format(obs.get('Name')))
             return obs
 
         d_dist_1 = 0
         d_dist_2 = 0
+
+        response_sets = obs.get('ResponseSets')
 
         # Calculate the atmospheric reduction of the distance.
         if self._is_atmospheric_correction:
             ppm = self.get_ppm()
             d_dist_1 = dist * ppm * math.pow(10, -6)
 
-            logger.debug('Reduced distance to atmosphere from {} m to '
-                         '{} m ({} ppm)'.format(round(dist, 5),
-                                                round(dist + d_dist_1, 5),
-                                                round(ppm, 2)))
+            logger.debug('Reduced distance from {} m to {} m ({} ppm)'
+                         .format(round(dist, 5),
+                                 round(dist + d_dist_1, 5),
+                                 round(ppm, 2)))
 
             response_ppm = self._get_response_set('PPM',
-                                                    'Float',
-                                                    'none',
-                                                    round(ppm, 5))
+                                                  'Float',
+                                                  'none',
+                                                  round(ppm, 5))
             response_sets.append(response_ppm)
 
         # Calculate the sealevel reduction of the distance.
@@ -156,9 +150,9 @@ class DistanceCorrector(prototype.Prototype):
                                 round(d_dist_2 + d_dist_2, 5)))
 
             response_r_dist = self._get_response_set('ReducedDist',
-                                                       'Float',
-                                                       'm',
-                                                       round(r_dist, 5))
+                                                     'Float',
+                                                     'm',
+                                                     round(r_dist, 5))
             response_sets.append(response_r_dist)
 
         return obs
@@ -186,47 +180,31 @@ class DistanceCorrector(prototype.Prototype):
     def _update_meteorological_data(self, obs):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        response_sets = obs.get('ResponseSets')
+        temperatures = obs.find('ResponseSets', 'Description', 'Temperature')
+        pressures = obs.find('ResponseSets', 'Description', 'Pressure')
+        humidities = obs.find('ResponseSets', 'Description', 'Humidity')
 
-        for response in response_sets:
-            try:
-                d = response['Description'].lower()
-                u = response['Unit']
-                v = response['Value']
+        if len(temperatures) > 0:
+            self.temperature = temperatures[0].get('Value')
 
-                # Temperature.
-                if d in ['temp', 'temperature']:
-                    self.temperature = v
-                    continue
+        if len(pressures) > 0:
+            self.pressure = pressures[0].get('Value')
 
-                # Air pressure.
-                if d in ['airpressure', 'press', 'pressure']:
-                    self.pressure = v
-                    continue
-
-                # Humidity.
-                if d in ['humidity', 'moisture']:
-                    if u == '%':
-                        # Unit is percent (e.g., 75 %).
-                        self.humidity = v / 100
-                    else:
-                        # No unit (e.g., 0.75).
-                        self.humidity = v
-            except KeyError:
-                logger.warning('Data missing in response set of '
-                               'observation "{}"'
-                               .format(obs.get('Name')))
-
+        if len(humidities) > 0:
+            if humidities[0].get('Unit') == '%':
+                self.humidity = humidities[0].get('Value') / 100
+            else:
+                self.humidity = humidities[0].get('Value')
 
     def _get_response_set(self, d, t, u, v):
-        response = {}
+        r = {}
 
-        response['Description'] = d
-        response['Type'] = t
-        response['Unit'] = u
-        response['Value'] = v
+        r['Description'] = d
+        r['Type'] = t
+        r['Unit'] = u
+        r['Value'] = v
 
-        return response
+        return r
 
     @property
     def temperature(self):
@@ -290,6 +268,122 @@ class DistanceCorrector(prototype.Prototype):
         pass
 
 
+class SerialMeasurementProcessor(prototype.Prototype):
+
+    def __init__(self, name, config_manager):
+        prototype.Prototype.__init__(self, name, config_manager)
+        config = self._config_manager.config[self._name]
+
+        self._max_faces = config['MaximumFaces']
+        self._prior_observations = {}
+
+    def _add(self, obs):
+        md5 = self._get_md5(obs)
+        self._first_faces[md5] = obs
+
+    def _average_vertical_angles(self, obs_1, obs_2):
+        response_sets1 = obs_1.get('ResponseSets')
+        response_sets2 = obs_2.get('ResponseSets')
+
+        v1 = None
+        v2 = None
+
+        dist1 = None
+        dist2 = None
+
+        for response1, response2 in zip(response_sets1, response_sets2):
+            desc1 = r1.get('Description').lower()
+            desc2 = r2.get('Description').lower()
+
+            value1 = r1.get('Value')
+            value2 = r2.get('Value')
+
+
+            if set([desc1, desc2]).issubset(['v', 'vertical']):
+                v1 = value1
+                v2 = value2
+
+            if set([desc1, desc2]).issubset(['dist', 'slopedist']):
+                dist1 = value1
+                dist2 = value2
+
+            if set([desc1, desc2]).issubset(['reduceddist', 'reduceddistance']):
+                dist1 = value1
+                dist2 = value2
+
+        if not (v1 and v2 and dist1 and dist2):
+             logger.error('Observation "{}" is incomplete'
+                          .format(obs.get('Name')))
+             return
+
+        k = (2 * math.pi - (v1 + v2)) / 2
+
+        accurate_v1 = v1 + k
+        accurate_v2 = v2 + k
+
+        accurate_dist = (dist1 + dist2) / 2
+
+        return accurate_v1, accurate_v2, accurate_dist
+
+
+    def _get_first(self, obs):
+        md5 = self._get_md5(obs)
+        first = self._first_faces.get(md5)
+        return first
+
+    def _get_md5(self, obs):
+        s1 = obs.get('PortName')
+        s2 = obs.get('SensorName')
+        s3 = obs.get('ID')
+
+        value = ''.join([s1, s2, s3])
+        md5 = hashlib.md5(value.encode('utf-8')).hexdigest()
+        return md5
+
+    def _is_valid(self, obs):
+        sensor_type = obs.get('SensorType')
+        face = obs.get('Face')
+
+        if not SensorType.is_total_station(sensor_type):
+            logger.warning('Sensor type "{}" is not supported'
+                           .format(sensor_type))
+            return False
+
+        if not face:
+            logger.error('Observation "{}" has no face'
+                         .format(obs.get('Name')))
+            return False
+
+        if face not in [1, 2]:
+            logger.error('Face "{}" is not valid'.format(face))
+            return False
+
+        return True
+
+    def action(self, obs):
+        if not self._is_valid(obs):
+            return obs
+
+        face = obs.get('Face')
+
+        if face == 1:
+            self._add(obs)
+
+        if face == 2:
+            first = self._get_first(obs)
+
+            if not first:
+                logger.error('First face of observation "{}" not found'
+                             .format(obs.get('Name')))
+                return obs
+
+        return obs
+
+
+    def destroy(self, *args):
+        pass
+
+
 class HelmertTransformer(prototype.Prototype):
 
     """
@@ -322,73 +416,42 @@ class PolarTransformer(prototype.Prototype):
         prototype.Prototype.__init__(self, name, config_manager)
         config = self._config_manager.config[self._name]
 
-        # Acronyms of valid sensor types:
-        #
-        # RTS: Robotic Total Station
-        # TPS: Tachymeter-Positionierungssystem
-        # TST: Total Station Theodolite
-        self._valid_types = ['rts', 'tachymeter', 'total station',
-                             'totalstation', 'tps', 'tst']
+        self._sensor_y = config.get('SensorPosition').get('East')
+        self._sensor_x = config.get('SensorPosition').get('North')
+        self._sensor_z = config.get('SensorPosition').get('Height')
 
-        self._sensor_y = config['SensorPosition']['East']
-        self._sensor_x = config['SensorPosition']['North']
-        self._sensor_z = config['SensorPosition']['Height']
-
-        self._azimuth_y = config['AzimuthPosition']['East']
-        self._azimuth_x = config['AzimuthPosition']['North']
+        self._azimuth_y = config.get('AzimuthPosition').get('East')
+        self._azimuth_x = config.get('AzimuthPosition').get('North')
 
     def action(self, obs):
-        # Check the configuration for the given sensor port.
-        port_name = obs.get('PortName')
-        sensor_type = obs.get('SensorType').lower()
-        response_sets = obs.get('ResponseSets')
+        sensor_type = obs.get('SensorType')
 
-        if not sensor_type in self._valid_types:
-            logger.error('Sensor is not of type "total station"')
+        if not SensorType.is_total_station(sensor_type.lower()):
+            logger.error('Sensor type "{}" is not supported'
+                         .format(sensor_type))
             return obs
 
-        hz = None
-        v = None
-        dist = None
-        r_dist = None
+        hzs = obs.find('ResponseSets', 'Description', 'Hz')
+        vs = obs.find('ResponseSets', 'Description', 'V')
+        dists = obs.find('ResponseSets', 'Description', 'SlopeDist')
+        r_dists = obs.find('ResponseSets', 'Description', 'ReducedDist')
 
-        # Search for Hz, V, and reduced/slope distance from the observation
-        # data set.
-        for response in response_sets:
-            try:
-                description = response['Description'].lower()
-                value = response['Value']
+        hz = v = dist = None
 
-                # Horizontal direction.
-                if description in ['hz', 'horizontal']:
-                    hz = value
-
-                # Vertical angle.
-                if description in ['v', 'vertical']:
-                    v = value
-
-                # Slope distance if no reduced distance is set.
-                if description in ['dist', 'slopedist']:
-                    dist = value
-
-                # Reduced distance.
-                if description in ['reduceddist', 'reduceddistance']:
-                    r_dist = value
-            except KeyError:
-                logger.warning('Data missing in response set of '
-                               'observation "{}"'
-                               .format(obs.get('Name')))
-
-        if not hz or not v or not dist:
-            logger.error('Observation is incomplete '
-                         '(Hz, V, or distance is missing)')
-            return obs
-
-        # Override slope distance with reduced distance.
-        if not r_dist:
-            logger.warning('Distance has not been reduced')
+        # Set Hz, V, and distance.
+        if len(hzs) > 0 and len(vs) > 0 and len(dists) > 0:
+            hz = hzs[0].get('Value')        # Hz direction.
+            v = vs[0].get('Value')          # V angle.
+            dist = dists[0].get('Value')    # Slope distance.
         else:
-            dist = r_dist
+            logger.warning('Responses of observation "{}" are incomplete'
+                           .format(obs.get('Name')))
+
+        # Override distance with reduced distance.
+        if len(r_dists) > 0:
+            dist = r_dists[0]['Value']
+        else:
+            logger.warning('Distance has not been reduced')
 
         # Radiant to grad (gon).
         hz_grad = hz * 200 / math.pi
@@ -417,11 +480,12 @@ class PolarTransformer(prototype.Prototype):
                                                        z))
 
         # Create dictionaries (name, type, unit, value).
-        response_y = self._get_response_set('Y', 'Float', 'm', round(y, 5))
-        response_x = self._get_response_set('X', 'Float', 'm', round(x, 5))
-        response_z = self._get_response_set('Z', 'Float', 'm', round(z, 5))
+        response_y = self._create_response_set('Y', 'Float', 'm', round(y, 5))
+        response_x = self._create_response_set('X', 'Float', 'm', round(x, 5))
+        response_z = self._create_response_set('Z', 'Float', 'm', round(z, 5))
 
         # Add to observation data set.
+        response_sets = obs.get('ResponseSets')
         response_sets.append(response_y)
         response_sets.append(response_x)
         response_sets.append(response_z)
@@ -454,7 +518,7 @@ class PolarTransformer(prototype.Prototype):
 
         return (y, x, z)
 
-    def _get_response_set(self, d, t, u, v):
+    def _create_response_set(self, d, t, u, v):
         response = {}
 
         response['Description'] = d

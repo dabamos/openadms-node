@@ -65,6 +65,12 @@ class Observation(object):
         """
         self._data = data
 
+    def find(self, list_name, key, value):
+        return [x for x in self._data[list_name] if x[key] == value]
+
+    def find_any(self, list_name, key, values):
+        return [x for x in self._data[list_name] if x[key] in values]
+
     def get(self, key):
         """Returns the value to a given key.
 

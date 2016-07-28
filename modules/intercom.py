@@ -20,17 +20,5 @@ limitations under the Licence.
 """
 
 import logging
-import time
-
-from tinydb import TinyDB, Query
-
-from modules import prototype
-
-"""Module for database communication."""
 
 logger = logging.getLogger('openadms')
-
-
-class DBMS(prototype.Prototype):
-
-    def __init__():

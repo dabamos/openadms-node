@@ -75,3 +75,31 @@ class Sensor(object):
     @property
     def name(self):
         return self._name
+
+
+class SensorType(object):
+
+    # Acronyms of valid sensor types:
+    #
+    # RTS: Robotic Total Station
+    # TPS: Tachymeter-Positionierungssystem
+    # TST: Total Station Theodolite
+    total_stations = ['rts', 'tachymeter', 'total station', 'totalstation',
+                      'tps', 'tst']
+    weather_stations = ['meteo', 'meteorological', 'meteorological sensor',
+                        'meteorological station', 'weather', 'weather station',
+                        'weatherstation']
+
+    @staticmethod
+    def is_total_station(name):
+        if name in SensorType.total_stations:
+            return True
+
+        return False
+
+    @staticmethod
+    def is_weather_station(name):
+        if name in SensorType.weather_stations:
+            return True
+
+        return False

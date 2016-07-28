@@ -56,9 +56,8 @@ class SerialPort(prototype.Prototype):
         obs.set('PortName', self._name)
 
         # Send the request of the observation to the attached sensor.
-        logger.info('Sending observation "{}" ("{}") to sensor "{}" on port '
+        logger.info('Sending observation "{}" to sensor "{}" on port '
                     '"{}"'.format(obs.get('Name'),
-                                  self._sanitize(obs.get('Request')),
                                   obs.get('SensorName'),
                                   self._name))
         if self._serial == None:
@@ -81,10 +80,10 @@ class SerialPort(prototype.Prototype):
             response = self._read(obs.get('ResponseDelimiter'))
 
             if response != '':
-                logger.info('Received "{}" from sensor "{}" on port "{}"'
-                            .format(self._sanitize(response),
-                                    obs.get('SensorName'),
-                                    self._name))
+                logger.debug('Received response "{}" from sensor "{}" on '
+                             'port "{}"'.format(self._sanitize(response),
+                                                obs.get('SensorName'),
+                                                self._name))
                 break
 
             # Try next attempt if response is empty.
@@ -176,11 +175,10 @@ class SerialPort(prototype.Prototype):
 
     def _sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        san = s.replace('\n', '\\n')
-        san = san.replace('\r', '\\r')
-        san = san.replace('\t', '\\t')
-
-        return san.strip()
+        return s.replace('\n', '\\n') \
+                .replace('\r', '\\r') \
+                .replace('\t', '\\t') \
+                .strip()
 
     def _write(self, data):
         """Sends command to sensor."""

@@ -56,17 +56,17 @@ class PreProcessor(prototype.Prototype):
         parsed = pattern.search(response)
 
         if not parsed:
-            logger.error('Extraction pattern "{}" does not match response '
-                         '"{}" from sensor {} on {}'
-                         .format(response_pattern,
-                                 self._sanitize(response),
+            logger.error('Response "{}" of observation "{}" from sensor "{}" '
+                         'on port "{}" does not match extraction pattern'
+                         .format(self._sanitize(response),
+                                 obs.get('Name'),
                                  obs.get('SensorName'),
                                  obs.get('PortName')))
             return obs
 
         # The regular expression pattern needs a least one defined group
         # by using the braces "(" and ")". Otherwise, an extraction of the
-        # values is not possible, which leads to an error.
+        # values fails.
         #
         # Right: "(.*)"
         # Wrong: ".*"
@@ -74,21 +74,19 @@ class PreProcessor(prototype.Prototype):
         response_sets = obs.get('ResponseSets')
 
         if len(raw_responses) == 0:
-            logger.error('No group defined in regular expression pattern')
+            logger.error('No group(s) defined in regular expression pattern')
             return obs
 
         if len(raw_responses) != len(response_sets):
             logger.warning('Number of responses mismatch number of defined '
                            'response sets of observation "{}"'
                            .format(obs.get('Name')))
-
-            if len(raw_responses) > len(response_sets):
-                return
+            return obs
 
         # Convert the type of the parsed raw values from string to the actual
         # data type.
         for raw_response, response_set in zip(raw_responses, response_sets):
-            if not raw_response:
+            if not (raw_response and response_set):
                 logger.error('Extraction of raw response of observation "{}" '
                              'failed'.format(obs.get('Name')))
                 return obs
@@ -96,7 +94,7 @@ class PreProcessor(prototype.Prototype):
             logger.debug('Extracted "{}" from raw response of observation "{}"'
                          .format(raw_response, obs.get('Name')))
 
-            response_type = response_set['Type'].lower()
+            response_type = response_set.get('Type').lower()
             response_value = None
 
             # Convert raw value to float.
@@ -154,8 +152,8 @@ class PreProcessor(prototype.Prototype):
 
     def _sanitize(self, s):
         """Removes some non-printable characters from a string."""
-        sanitized = s.replace('\n', '\\n')\
-                     .replace('\r', '\\r')\
+        sanitized = s.replace('\n', '\\n') \
+                     .replace('\r', '\\r') \
                      .replace('\t', '\\t')
 
         return sanitized
@@ -173,30 +171,14 @@ class ReturnCodeInspector(prototype.Prototype):
         # config = self._config_manager.config[self._name]
 
     def action(self, obs):
-        response_sets = obs.get('ResponseSets')
+        return_codes = obs.find('ResponseSets', 'Description', 'ReturnCode')
         return_code = None
 
-        if len('ResponseSets') == 0:
-            logger.warning('Observation "{}" has no responses'
+        if len(return_codes) > 0:
+            return_code = return_codes[0].get('Value')
+        else:
+            logger.warning('ReturnCode is missing in observation "{}"'
                            .format(obs.get('Name')))
-            return obs
-
-        for response in response_sets:
-            try:
-                d = response['Description'].lower()
-                v = response['Value']
-
-                if d in ['returncode', 'errorcode']:
-                    return_code = v
-                    break
-            except KeyError:
-                logger.warning('Data missing in response set of '
-                               'observation "{}"'
-                               .format(obs.get('Name')))
-
-        if not return_code:
-            logger.debug('No return code found in observation "{}"'
-                         .format(obs.get('Name')))
             return obs
 
         if return_code == 0:
