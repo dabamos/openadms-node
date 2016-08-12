@@ -36,20 +36,17 @@ class Observation(object):
     def __init__(self, data=None):
         if not data:
             self._data = {}
-
-            # Initialize dictionary.
             self._data['Enabled'] = True
             self._data['ID'] = None
             self._data['Name']
             self._data['NextReceiver'] = 0
+            self._data['PortName'] = None
             self._data['Receivers'] = []
             self._data['ResponseSets'] = {}
+            self._data['Response'] = None
+            self._data['TimeStamp'] = None
         else:
             self._data = data
-
-        self._data['PortName'] = None
-        self._data['Response'] = None
-        self._data['TimeStamp'] = None
 
     @property
     def data(self):

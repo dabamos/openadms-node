@@ -16,7 +16,7 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the Licence is distributed on an "AS IS" basis,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the Licence for the specific language governing permissions and
-limitations under the Licence.      netadms
+limitations under the Licence.
 """
 
 import coloredlogs
@@ -52,7 +52,7 @@ def main(config_file):
 
     # Start the monitor.
     mon = monitor.Monitor(config_file)
-    mon.start()
+    # mon.start()
 
     # Run to infinity and beyond (probably not).
     stay_alive()
@@ -61,7 +61,6 @@ def main(config_file):
 def signal_handler(signal, frame):
     logger.info('Quitting ...')
     sys.exit(0)
-
 
 def stay_alive():
     while True:

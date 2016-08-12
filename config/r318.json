@@ -7,7 +7,9 @@
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
         "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
         "USB0": "modules.port.SerialPort",
-        "USB1": "modules.port.SerialPort"
+        "USB1": "modules.port.SerialPort",
+        "Scheduler0": "modules.schedule.Scheduler",
+        "Scheduler1": "modules.schedule.Scheduler"
     },
     "Project":
     {
@@ -250,10 +252,10 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Get the distance.",
+                        "Description": "Measure the distance..",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "get_distance",
+                        "Name": "measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -276,8 +278,9 @@
                         "AwaitTime": 0.5,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
+                        "Face": 1,
                         "ID": "P1",
-                        "Name": "get_complete_measurement",
+                        "Name": "do_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -367,10 +370,10 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Get the distance.",
+                        "Description": "Measure the distance..",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "get_distance",
+                        "Name": "measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -393,8 +396,9 @@
                         "AwaitTime": 0.5,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
+                        "Face": 1,
                         "ID": "P2",
-                        "Name": "get_complete_measurement",
+                        "Name": "do_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -484,10 +488,10 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Get the distance.",
+                        "Description": "Measure the distance..",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "get_distance",
+                        "Name": "measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -510,8 +514,9 @@
                         "AwaitTime": 0.5,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
+                        "Face": 1,
                         "ID": "P3",
-                        "Name": "get_complete_measurement",
+                        "Name": "do_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -601,10 +606,10 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Get the distance.",
+                        "Description": "Measure the distance..",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "get_distance",
+                        "Name": "measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -627,8 +632,9 @@
                         "AwaitTime": 0.5,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
+                        "Face": 1,
                         "ID": "P4",
-                        "Name": "get_complete_measurement",
+                        "Name": "do_complete_measurement",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -799,48 +805,53 @@
             }
         }
     },
-    "Connections":
+    "Schedulers":
     {
-        "USB0": "STS DTM",
-        "USB1": "Leica TM30"
-    },
-    "Scheduler":
-    {
-        "USB0":
-        [
-            {
-                "Enabled": true,
-                "StartDate": "2016-02-01",
-                "EndDate": "2017-07-30",
-                "Schedule": {},
-                "ObservationSets": ["Init", "Main"]
-            }
-        ],
-        "USB1":
-        [
-            {
-                "Enabled": true,
-                "StartDate": "2016-02-01",
-                "EndDate": "2017-07-30",
-                "Schedule":
+        "Scheduler0":
+        {
+            "Port": "USB0",
+            "Sensor": "STS DTM",
+            "Schedules":
+            [
                 {
-                    "Monday":
-                    [
-                        {
-                            "StartTime": "00:00:00",
-                            "EndTime": "23:59:59"
-                        }
-                    ],
-                    "Tuesday": [],
-                    "Wednesday": [],
-                    "Thursday": [],
-                    "Friday": [],
-                    "Saturday": [],
-                    "Sunday": []
-                },
-                "ObservationSets": ["Init", "P1", "P2", "P3", "P4"]
-            }
-        ]
+                    "Enabled": true,
+                    "StartDate": "2016-02-01",
+                    "EndDate": "2017-07-30",
+                    "Schedule": {},
+                    "ObservationSets": ["Init", "Main"]
+                }
+            ]
+        },
+        "Scheduler1":
+        {
+            "Port": "USB1",
+            "Sensor": "Leica TM30",
+            "Schedules":
+            [
+                {
+                    "Enabled": true,
+                    "StartDate": "2016-02-01",
+                    "EndDate": "2017-07-30",
+                    "Schedule":
+                    {
+                        "Monday":
+                        [
+                            {
+                                "StartTime": "00:00:00",
+                                "EndTime": "23:59:59"
+                            }
+                        ],
+                        "Tuesday": [],
+                        "Wednesday": [],
+                        "Thursday": [],
+                        "Friday": [],
+                        "Saturday": [],
+                        "Sunday": []
+                    },
+                    "ObservationSets": ["Init", "P1", "P2", "P3", "P4"]
+                }
+            ]
+        }
     },
     "DistanceCorrector":
     {
@@ -879,10 +890,5 @@
         "Paths": ["./data"],
         "Separator": ",",
         "DateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
-    },
-    "TinyDB":
-    {
-        "FileExtension": ".json",
-        "Path": "./"
     }
 }

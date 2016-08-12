@@ -35,16 +35,18 @@ class SerialPort(prototype.Prototype):
     I/O on serial port.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
 
         self._serial = None         # Pyserial object.
         self._serial_port_config = None
         self._max_attempts = 3
 
     def __del__(self):
-        if self._serial is not None:
-            self.close()
+        #if self._serial is not None:
+        #    self.close()
+        pass
 
     def action(self, obs):
         if not self._serial:
@@ -53,16 +55,16 @@ class SerialPort(prototype.Prototype):
         response = ''
 
         # Add the name of this serial port to the observation.
-        obs.set('PortName', self._name)
+        obs.set('PortName', self.name)
 
         # Send the request of the observation to the attached sensor.
         logger.info('Sending observation "{}" to sensor "{}" on port '
                     '"{}"'.format(obs.get('Name'),
                                   obs.get('SensorName'),
-                                  self._name))
+                                  self.name))
         if self._serial == None:
             logger.error('Could not write to port {} ({})'
-                         .format(self._name, self._serial_port_config.port))
+                         .format(self.name, self._serial_port_config.port))
             return
 
         for attempt in range(self._max_attempts):
@@ -83,12 +85,12 @@ class SerialPort(prototype.Prototype):
                 logger.debug('Received response "{}" from sensor "{}" on '
                              'port "{}"'.format(self._sanitize(response),
                                                 obs.get('SensorName'),
-                                                self._name))
+                                                self.name))
                 break
 
             # Try next attempt if response is empty.
             logger.error('No response from sensor "{}" on port "{}"'
-                         .format(obs.get("SensorName"), self._name))
+                         .format(obs.get("SensorName"), self.name))
 
         # Add a timestamp to the observation.
         obs.set('TimeStamp', time.time())
@@ -96,32 +98,30 @@ class SerialPort(prototype.Prototype):
         # Add the raw response of the sensor to the observation set.
         obs.set('Response', response)
 
-        return obs
+        self.publish(obs)
 
     def close(self):
         logger.info('Closing port {} ({})'
-                    .format(self._name, self._serial_port_config.port))
+                    .format(self.name, self._serial_port_config.port))
         self._serial.close()
 
-    def destroy(self, *args):
-        self.close()
-
     def _get_port_config(self):
-        try:
-            p = self._config_manager.config['Ports']['Serial'][self._name]
-        except KeyError:
-            logger.debug('No port {} in configuration'.format(self._name))
-            return
+        p = self._config_manager.config.get('Ports') \
+                                       .get('Serial') \
+                                       .get(self.name)
+
+        if not p:
+            logger.debug('No port {} in configuration'.format(self.name))
 
         return SerialPortConfiguration(
-            port=p['Port'],
-            baudrate=p['BaudRate'],
-            bytesize=p['ByteSize'],
-            stopbits=p['StopBits'],
-            parity=p['Parity'],
-            timeout=p['Timeout'],
-            xonxoff=p['SoftwareFlowControl'],
-            rtscts=p['HardwareFlowControl'])
+            port=p.get('Port'),
+            baudrate=p.get('BaudRate'),
+            bytesize=p.get('ByteSize'),
+            stopbits=p.get('StopBits'),
+            parity=p.get('Parity'),
+            timeout=p.get('Timeout'),
+            xonxoff=p.get('SoftwareFlowControl'),
+            rtscts=p.get('HardwareFlowControl'))
 
     def _open(self):
         """Opens a serial port."""
@@ -129,7 +129,7 @@ class SerialPort(prototype.Prototype):
             self._serial_port_config = self._get_port_config()
 
         logger.info('Opening port {} ({}) ...'
-                    .format(self._name, self._serial_port_config.port))
+                    .format(self.name, self._serial_port_config.port))
 
         try:
             self._serial = serial.Serial(
@@ -143,7 +143,7 @@ class SerialPort(prototype.Prototype):
                 rtscts=self._serial_port_config.rtscts)
         except serial.serialutil.SerialException:
             logger.error('Permission denied for port {} ({})'
-                         .format(self._name, self._serial_port_config.port))
+                         .format(self.name, self._serial_port_config.port))
 
     def _read(self, eol, timeout=10.0):
         """Reads from serial port."""
@@ -163,12 +163,12 @@ class SerialPort(prototype.Prototype):
                     break
             except UnicodeDecodeError:
                 logger.error('No sensor on port "{}" ({})'
-                             .format(self._name, self._serial_port_config.port))
+                             .format(self.name, self._serial_port_config.port))
                 break
 
             if time.time() - start_time > timeout:
                 logger.warning('Timeout on port "{}" after {} s'
-                               .format(self._name, timeout))
+                               .format(self.name, timeout))
                 break
 
         return response

@@ -51,12 +51,11 @@ class FileExporter(prototype.Prototype):
     Exports sensor data to a flat file in CSV format.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
 
-        self._config_manager = config_manager
         root = self._config_manager.config['FileExporter']
-
         self._file_extension = root['FileExtension']
         self._file_name = root['FileName']
         self._file_rotation = {
@@ -159,6 +158,3 @@ class FileExporter(prototype.Prototype):
                                           path + file_name))
 
         return obs
-
-    def destroy(self, *args):
-        pass

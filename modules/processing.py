@@ -38,8 +38,9 @@ class PreProcessor(prototype.Prototype):
     and converts them to the defined types.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
 
     def action(self, obs):
         """Extracts the values from the raw responses of the observation
@@ -131,9 +132,6 @@ class PreProcessor(prototype.Prototype):
 
         return obs
 
-    def destroy(self, *args):
-        pass
-
     def _is_int(self, value):
         """Returns whether a value is int or not."""
         try:
@@ -166,14 +164,15 @@ class ReturnCodeInspector(prototype.Prototype):
     Geosystems.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
-        # config = self._config_manager.config[self._name]
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
 
     def action(self, obs):
         return_codes = obs.find('ResponseSets', 'Description', 'ReturnCode')
         return_code = None
 
+        # Get first return code value.
         if len(return_codes) > 0:
             return_code = return_codes[0].get('Value')
         else:
@@ -181,6 +180,13 @@ class ReturnCodeInspector(prototype.Prototype):
                            .format(obs.get('Name')))
             return obs
 
+        # No return code.
+        if return_code is None:
+            logger.warning('ReturnCode value is missing in observation "{}"'
+                          .format(obs.get('Name')))
+            return obs
+
+        # Observation was successful.
         if return_code == 0:
             logger.info('Observation "{}" was successful (code "{}")'
                         .format(obs.get('Name'), return_code))
@@ -189,6 +195,3 @@ class ReturnCodeInspector(prototype.Prototype):
                            .format(obs.get('Name'), return_code))
 
         return obs
-
-    def destroy(self, *args):
-        pass

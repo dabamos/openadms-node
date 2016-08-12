@@ -92,14 +92,14 @@ class SensorType(object):
 
     @staticmethod
     def is_total_station(name):
-        if name in SensorType.total_stations:
+        if name.lower() in SensorType.total_stations:
             return True
 
         return False
 
     @staticmethod
     def is_weather_station(name):
-        if name in SensorType.weather_stations:
+        if name.lower() in SensorType.weather_stations:
             return True
 
         return False

@@ -39,30 +39,30 @@ class DistanceCorrector(prototype.Prototype):
     """Corrects the slope distance for EDM measurements using atmospheric
     data."""
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
-        self._config_manager = config_manager
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
+
         config = self._config_manager.config.get(self._name)
 
         # Maximum age of atmospheric data.
         self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
 
-        self._is_atmospheric_correction = config['AtmosphericCorrectionEnabled']
-        self._is_sealevel_correction = config['SealevelCorrectionEnabled']
+        self._is_atmospheric_correction = \
+            config.get('AtmosphericCorrectionEnabled')
+        self._is_sealevel_correction = \
+            config.get('SealevelCorrectionEnabled')
 
-        try:
-            self.temperature = config['Temperature']
-            self.pressure = config['Pressure']
-            self.humidity = config['Humidity']
-            self.sensor_height = config['SensorHeight']
+        self.temperature = config.get('Temperature')
+        self.pressure = config.get('Pressure')
+        self.humidity = config.get('Humidity')
+        self.sensor_height = config.get('SensorHeight')
 
-            self.last_update = time.time()
-        except KeyError:
-            debug.error('Configuration is invalid')
+        self.last_update = time.time()
 
     def action(self, obs):
-        sensor_type = obs.get('SensorType').lower()
+        sensor_type = obs.get('SensorType')
 
         # Update atmospheric data if sensor is a weather station.
         if SensorType.is_weather_station(sensor_type):
@@ -94,12 +94,12 @@ class DistanceCorrector(prototype.Prototype):
         else:
             logger.warning('SlopeDist is missing in observation "{}"'
                            .format(obs.get('Name')))
-            return obs
+            return
 
-        if not dist:
+        if dist is None:
             logger.warning('SlopeDist value is missing in observation "{}"'
                            .format(obs.get('Name')))
-            return obs
+            return
 
         d_dist_1 = 0
         d_dist_2 = 0
@@ -156,6 +156,7 @@ class DistanceCorrector(prototype.Prototype):
             response_sets.append(response_r_dist)
 
         return obs
+
 
     def get_ppm(self):
         """Calculates the atmospheric correction value in parts per million
@@ -264,14 +265,13 @@ class DistanceCorrector(prototype.Prototype):
     def sensor_height(self, sensor_height):
         self._sensor_height = sensor_height
 
-    def destroy(self, *args):
-        pass
-
 
 class SerialMeasurementProcessor(prototype.Prototype):
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
+
         config = self._config_manager.config[self._name]
 
         self._max_faces = config['MaximumFaces']
@@ -311,7 +311,7 @@ class SerialMeasurementProcessor(prototype.Prototype):
                 dist1 = value1
                 dist2 = value2
 
-        if not (v1 and v2 and dist1 and dist2):
+        if v1 is None or v2 is None or dist1 is None or dist2 is None:
              logger.error('Observation "{}" is incomplete'
                           .format(obs.get('Name')))
              return
@@ -349,7 +349,7 @@ class SerialMeasurementProcessor(prototype.Prototype):
                            .format(sensor_type))
             return False
 
-        if not face:
+        if face is None:
             logger.error('Observation "{}" has no face'
                          .format(obs.get('Name')))
             return False
@@ -372,16 +372,12 @@ class SerialMeasurementProcessor(prototype.Prototype):
         if face == 2:
             first = self._get_first(obs)
 
-            if not first:
+            if first is None:
                 logger.error('First face of observation "{}" not found'
                              .format(obs.get('Name')))
                 return obs
 
         return obs
-
-
-    def destroy(self, *args):
-        pass
 
 
 class HelmertTransformer(prototype.Prototype):
@@ -391,15 +387,13 @@ class HelmertTransformer(prototype.Prototype):
     transformation.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
         config = self._config_manager.config[self._name]
 
     def action(self, obs):
         return obs
-
-    def destroy(self, *args):
-        pass
 
 
 class PolarTransformer(prototype.Prototype):
@@ -412,8 +406,9 @@ class PolarTransformer(prototype.Prototype):
     set.
     """
 
-    def __init__(self, name, config_manager):
-        prototype.Prototype.__init__(self, name, config_manager)
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
         config = self._config_manager.config[self._name]
 
         self._sensor_y = config.get('SensorPosition').get('East')
@@ -452,6 +447,11 @@ class PolarTransformer(prototype.Prototype):
             dist = r_dists[0]['Value']
         else:
             logger.warning('Distance has not been reduced')
+
+        if hz is None or v is None or dist is None:
+            logger.error('Responses of observation "{}" are incomplete'
+                         .format(obs.get('Name')))
+            return obs
 
         # Radiant to grad (gon).
         hz_grad = hz * 200 / math.pi
@@ -527,6 +527,3 @@ class PolarTransformer(prototype.Prototype):
         response['Value'] = v
 
         return response
-
-    def destroy(self, *args):
-        pass

@@ -25,16 +25,48 @@ import logging
 import threading
 import time
 
+from modules import prototype
+
 logger = logging.getLogger('openadms')
 
 
-class Scheduler(threading.Thread):
+class Scheduler(prototype.Prototype):
 
-    def __init__(self, output_queue):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self._output_queue = output_queue
+    def __init__(self, name, config_manager, sensor_manager):
+        prototype.Prototype.__init__(self, name, config_manager,
+                                     sensor_manager)
         self._jobs = []
+        self.load_jobs()
+
+        t = threading.Thread(target=self.run)
+        t.daemon = True
+        t.start()
+
+    def load_jobs(self):
+        config = self._config_manager.config.get('Schedulers').get(self._name)
+        port = config.get('Port')
+        sensor = config.get('Sensor')
+        schedules = config.get('Schedules')
+
+        self._jobs = []
+
+        # Run through the port schedules and create jobs.
+        for schedule in schedules:
+            set_names = schedule['ObservationSets']
+
+            for set_name in set_names:
+                job = Job(set_name,
+                          port,
+                          self._sensor_manager.get(sensor),
+                          schedule['Enabled'],
+                          schedule['StartDate'],
+                          schedule['EndDate'],
+                          schedule['Schedule'],
+                          self.publish)
+                self.add(job)
+
+    def action(self, obs):
+        return obs
 
     def add(self, job):
         self._jobs.append(job)
@@ -62,7 +94,7 @@ class Scheduler(threading.Thread):
                         continue
 
                     if job.is_pending():
-                        job.run(self._output_queue)
+                        job.run()
 
             time.sleep(0.1)
 
@@ -70,7 +102,7 @@ class Scheduler(threading.Thread):
 class Job(object):
 
     def __init__(self, name, port_name, sensor, enabled, start_date, end_date,
-        schedule):
+        schedule, callback_func):
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
@@ -78,6 +110,7 @@ class Job(object):
         self._port_name = port_name
         self._sensor = sensor
         self._enabled = enabled
+        self._callback_func = callback_func
 
         # Convert date to date and time.
         self._start_date = self.get_datetime(start_date, self._date_fmt)
@@ -95,13 +128,12 @@ class Job(object):
 
     def has_expired(self):
         now = dt.datetime.now()
-        expired = False
 
         if now > self._end_date:
-            expired = True
             logger.debug('Job has expired')
+            return True
 
-        return expired
+        return False
 
     def is_pending(self):
         if not self._enabled:
@@ -144,7 +176,7 @@ class Job(object):
 
         return False
 
-    def run(self, output_queue):
+    def run(self):
         observation_set = self._sensor.get_observation_set(self._name)
 
         logger.debug('Job is running observation set "{}" of sensor "{}" '
@@ -170,7 +202,7 @@ class Job(object):
             sleep_time = obs_copy.get('SleepTime')
 
             # Put the observation into the output queue (fire and forget).
-            output_queue.put(obs_copy)
+            self._callback_func(obs_copy)
 
             time.sleep(sleep_time)
 
