@@ -19,13 +19,19 @@ $ python3 openadms.py
 Some additional modules have to be installed in order to use OpenADMS:
 
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT License)
+* [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public License)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 
 The installation can be done with `pip`:
 
 ```
-$ python3 -m pip install coloredlogs pyserial
+$ python3 -m pip install coloredlogs paho-mqtt pyserial
 ```
+## Message Broker
+The internal message exchange in OpenADMS is done by using the MQTT messaging
+protocol. An MQTT message broker, like
+[Eclipse Mosquitto](http://mosquitto.org/), has to be installed to use OpenADMS
+properly.
 
 ## Configuration
 The configuration of OpenADMS is done using a JSON-based text file, located in
@@ -45,7 +51,7 @@ used, which is part of Python 3:
 $ pyvenv-3.5 ~/virtual-environment
 $ bash
 $ source ~/virtual-environment/bin/activate
-$ python3 -m pip install coloredlogs pyserial
+$ python3 -m pip install coloredlogs paho-mqtt pyserial
 $ cd ~/virtual-environment
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
