@@ -110,10 +110,10 @@ class DistanceCorrector(prototype.Prototype):
             ppm = self.get_ppm()
             d_dist_1 = dist * ppm * math.pow(10, -6)
 
-            logger.debug('Reduced distance from {} m to {} m ({} ppm)'
-                         .format(round(dist, 5),
-                                 round(dist + d_dist_1, 5),
-                                 round(ppm, 2)))
+            logger.debug('Reduced distance from {:0.5f} m to {:0.5f} m '
+                         '({:0.5f} ppm)'.format(dist,
+                                                dist + d_dist_1,
+                                                ppm))
 
             response_ppm = self._get_response_set('PPM',
                                                   'Float',
@@ -124,29 +124,27 @@ class DistanceCorrector(prototype.Prototype):
         # Calculate the sealevel reduction of the distance.
         if self._is_sealevel_correction:
             earth_radius = 6.378 * math.pow(10, 6)
-
             # Delta distance: -(height / R) * 10^6
             d_dist_2 = -1 * (self.sensor_height / earth_radius)
 
-            logger.debug('Reduced distance to mean sea level from {} m to '
-                         '{} m ({} m)'.format(round(dist, 5),
-                                              round(dist + d_dist_2, 5),
-                                              round(d_dist_2, 5)))
+            logger.debug('Reduced distance to mean sea level from '
+                         '{:0.5f} m to {:0.5f} m ({:0.5f} m)'
+                         .format(dist, dist + d_dist_2, d_dist_2))
 
             response_sealevel = self._get_response_set('SealevelDelta',
-                                                         'Float',
-                                                         'm',
-                                                         round(d_dist_2, 5))
+                                                       'Float',
+                                                       'm',
+                                                       round(d_dist_2, 5))
             response_sets.append(response_sealevel)
 
         # Add reduced distance to the observation set.
         if d_dist_1 != 0 or d_dist_2 != 0:
             r_dist = dist + d_dist_1 + d_dist_2
 
-            logger.info('Reduced distance from {} m to {} m ({} m)'
-                        .format(round(dist, 5),
-                                round(r_dist, 5),
-                                round(d_dist_2 + d_dist_2, 5)))
+            logger.info('Reduced distance from {:0.5f} m to {:0.5f} m '
+                        '({:0.5f} m)'.format(dist,
+                                             r_dist,
+                                             d_dist_1 + d_dist_2))
 
             response_r_dist = self._get_response_set('ReducedDist',
                                                      'Float',
@@ -198,7 +196,6 @@ class DistanceCorrector(prototype.Prototype):
 
     def _get_response_set(self, d, t, u, v):
         r = {}
-
         r['Description'] = d
         r['Type'] = t
         r['Unit'] = u
@@ -521,7 +518,6 @@ class PolarTransformer(prototype.Prototype):
 
     def _create_response_set(self, d, t, u, v):
         response = {}
-
         response['Description'] = d
         response['Type'] = t
         response['Unit'] = u

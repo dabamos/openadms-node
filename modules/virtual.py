@@ -20,6 +20,7 @@ limitations under the Licence.
 """
 
 import logging
+import math
 import random
 import re
 import time
@@ -86,14 +87,14 @@ class VirtualLeicaTM30(VirtualSensor):
 
     def do_complete_measurement(self, request):
         return_code = '0'
-        hz = '0.972786557127719'
-        v = '1.590955490277326'
-        acc_angle = '0.000002354383469'
-        c = '-0.000050538441022'
-        l = '0.000010275949395'
-        acc_incl = '0.000002356194491'
-        slope_dist = '6.673799999999523'
-        dist_time = '47023703'
+        hz = '{:0.15f}'.format(random.uniform(0, 2 * math.pi))
+        v = '{:0.15f}'.format(random.uniform(1, 2))
+        acc_angle = '{:0.15f}'.format(random.uniform(-1, 1) * 10e-6)
+        c = '{:0.15f}'.format(random.uniform(-1, 1) * 10e-5)
+        l = '{:0.15f}'.format(random.uniform(-1, 1) * 10e-5)
+        acc_incl = '{:0.15f}'.format(random.uniform(-1, 1) * 10e-6)
+        slope_dist = '{:0.15f}'.format(random.uniform(1, 2000))
+        dist_time = '{:8.0f}'.format(random.uniform(4, 5) * 10e8)
 
         response = '%R1P,0,0:{},{},{},{},{},{},{},{},{}\r\n'.format(
             return_code,
@@ -133,11 +134,37 @@ class VirtualLeicaTM30(VirtualSensor):
         return response
 
 
-class VirtualSTSDTM(VirtualSensor):
+class VirtualDTM(VirtualSensor):
 
     def __init__(self, name, config_manager, sensor_manager):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-    def action(self, obs):
-        return obs
+        self.patterns['^A'] = self.power_on
+        self.patterns['CMDT 1'] = self.set_command_set
+        self.patterns['SAVE'] = self.save
+        self.patterns['PRES ?'] = self.get_pressure
+        self.patterns['TEMP ?'] = self.get_temperature
+
+    def get_pressure(self, request):
+        return '+{:06.1f}\r'.format(random.uniform(980, 1150))
+
+    def get_temperature(self, request):
+        t = random.uniform(-20, 40)
+
+        if (t < 0):
+            return '{:07.1f}\r'.format(t)
+        else:
+            return '+{:06.1f}\r'.format(t)
+
+    def get_pressure(self, request):
+        return '+{:06.1f}\r'.format(random.uniform(980, 1150))
+
+    def power_on(self, request):
+        return '#\r'
+
+    def save(self, request):
+        return '*\r'
+
+    def set_command_set(self, request):
+        return '*\r'
