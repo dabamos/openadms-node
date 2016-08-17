@@ -3,8 +3,8 @@
     {
         "Scheduler0": "modules.schedule.Scheduler",
         "Scheduler1": "modules.schedule.Scheduler",
-        "VirtualLeicaTM30": "modules.virtual.VirtualLeicaTM30",
         "VirtualDTM": "modules.virtual.VirtualDTM",
+        "VirtualLeicaTM30": "modules.virtual.VirtualLeicaTM30",
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
