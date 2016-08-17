@@ -22,6 +22,7 @@ limitations under the Licence.
 import json
 import logging
 import paho.mqtt.client as mqtt
+import queue
 import threading
 import time
 
@@ -30,24 +31,30 @@ from abc import ABCMeta, abstractmethod
 from core import observation
 from core import intercom
 
+"""Collects prototype classes which can be used as blueprints for other
+OpenADMS modules."""
+
 logger = logging.getLogger('openadms')
 
 
-class Prototype(object, metaclass=ABCMeta):
+class Prototype(threading.Thread):
 
     """
-    Used as a prototype for other modules.
+    Prototype is used as a blueprint for other modules.
     """
+
+    __metaclass__ = ABCMeta
 
     def __init__(self, name, config_manager, sensor_manager):
-        self._name = name
+        threading.Thread.__init__(self, name=name)
+
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
+        self._inbox = queue.Queue()
 
-        self._messenger = intercom.MQTTMessenger('localhost')
-        self._messenger.subscribe('openadms/{}'.format(self._name))
-        self._messenger.register(self.retrieve)
-        self._messenger.connect()
+        self._host = 'localhost'
+        self._port = 1883
+        self._messenger = intercom.MQTTMessenger(self._host, self._port)
 
     @abstractmethod
     def action(self, *args):
@@ -59,6 +66,12 @@ class Prototype(object, metaclass=ABCMeta):
         pass
 
     def publish(self, obs):
+        """Checks observation for the next receiver and sends it to the message
+        broker.
+
+        Args:
+            obs (Observation): Observation object.
+        """
         name = obs.get('Name')
         receivers = obs.get('Receivers')
         index = obs.get('NextReceiver')
@@ -75,27 +88,53 @@ class Prototype(object, metaclass=ABCMeta):
                            'defined'.format(name))
             return
 
-        # Receivers list has been processed.
+        # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
             logger.debug('Observation "{}" has been finished'.format(name))
             return
 
+        # Send the observation to the next module.
         receiver = receivers[index]
         index = index + 1
         obs.set('NextReceiver', index)
 
         target = 'openadms/{}'.format(receiver)
         payload = obs.to_json()
-
         self._messenger.publish(target, payload)
 
     def retrieve(self, msg):
+        """The callback function which is called by the intercom client every
+        time a new message has been received.
+
+        Args:
+            msg (str): Message received from the message broker.
+        """
         data = json.loads(msg)
         obs = observation.Observation(data)
-        obs = self.action(obs)
+        self._inbox.put(obs)
 
-        if obs is not None:
-            self.publish(obs)
+    def run(self):
+        """Checks the inbox on new messages and calls the `action()` for
+        further processing. Runs within a thread."""
+        self._messenger.subscribe('openadms/{}'.format(self._name))
+        self._messenger.register(self.retrieve)
+
+        logger.debug('Connecting module "{}" to {}:{} ...'.format(self._name,
+                                                                  self._host,
+                                                                  self._port))
+        self._messenger.connect()
+
+        while True:
+            if self._inbox.empty():
+                time.sleep(0.01)
+                continue
+
+            obs = self.action(self._inbox.get())
+
+            if obs is not None:
+                self.publish(obs)
+
+        self._messenger.disconnect()
 
     @property
     def name(self):

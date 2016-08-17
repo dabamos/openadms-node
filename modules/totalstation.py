@@ -28,7 +28,7 @@ import time
 from core.sensor import SensorType
 from modules import prototype
 
-"""Module for data processing (pre-precessing, atmospheric corrections,
+"""Module for data processing (pre-processing, atmospheric corrections,
 transformations)."""
 
 logger = logging.getLogger('openadms')
@@ -45,7 +45,7 @@ class DistanceCorrector(prototype.Prototype):
 
         config = self._config_manager.config.get(self._name)
 
-        # Maximum age of atmospheric data.
+        # Maximum age of atmospheric data, before a warning will be generated.
         self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
 
@@ -54,12 +54,11 @@ class DistanceCorrector(prototype.Prototype):
         self._is_sealevel_correction = \
             config.get('SealevelCorrectionEnabled')
 
-        self.temperature = config.get('Temperature')
-        self.pressure = config.get('Pressure')
-        self.humidity = config.get('Humidity')
-        self.sensor_height = config.get('SensorHeight')
-
-        self.last_update = time.time()
+        self._temperature = config.get('Temperature')
+        self._pressure = config.get('Pressure')
+        self._humidity = config.get('Humidity')
+        self._sensor_height = config.get('SensorHeight')
+        self._last_update = time.time()
 
     def action(self, obs):
         sensor_type = obs.get('SensorType')
@@ -259,10 +258,12 @@ class DistanceCorrector(prototype.Prototype):
 
     @last_update.setter
     def last_update(self, last_update):
+        """Sets the timestamp of the last update."""
         self._last_update = last_update
 
     @sensor_height.setter
     def sensor_height(self, sensor_height):
+        """Sets the height of the sensor."""
         self._sensor_height = sensor_height
 
 

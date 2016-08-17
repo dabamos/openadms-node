@@ -43,30 +43,26 @@ class Sensor(object):
         self._observation_sets = {}
 
         for set_name, observations in config['Observations'].items():
-            local_set = []
+            obs_set = []
 
-            # Add all commands of the observations set to the list.
+            # Add all observations of the observation set to the list.
             for observation in observations:
-                obs = self.get_observation_data(observation)
+                obs = self.get_observation(observation)
+                obs_set.append(obs)
 
-                local_set.append(obs)
-                # logger.debug('Added observation "{}" to observation '
-                #             'set "{}" of sensor {}'
-                #             .format(obs.get('Name'), set_name, name))
-
-            if len(local_set) > 0:
-                self._observation_sets[set_name] = local_set
+            if len(obs_set) > 0:
+                self._observation_sets[set_name] = obs_set
                 logger.debug('Loaded observation set "{}" of sensor "{}"'
                              .format(set_name, self._name))
 
     def get_observation_set(self, set_name):
+        """Return the observation set with the given name."""
         return self._observation_sets[set_name]
 
-    def get_observation_data(self, data):
-        """Creates an observation data object."""
+    def get_observation(self, data):
+        """Creates an observation object."""
         data['SensorName'] = self._name
         data['SensorType'] = self._type
-
         # Character '\' is escaped in JSON file.
         data['ResponsePattern'] = data['ResponsePattern'].replace('\\\\', '\\')
 

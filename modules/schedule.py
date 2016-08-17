@@ -32,61 +32,76 @@ logger = logging.getLogger('openadms')
 
 class Scheduler(prototype.Prototype):
 
+    """
+    Scheduler is used to manage the monitoring process by sending observations
+    to a sensor. Each observation set is represented by a single job. Jobs are
+    stored in a jobs list and will be executed at the given date/time. For each
+    sensor a separate scheduler is needed.
+    """
+
     def __init__(self, name, config_manager, sensor_manager):
         prototype.Prototype.__init__(self, name, config_manager,
                                      sensor_manager)
         self._jobs = []
         self.load_jobs()
 
-        t = threading.Thread(target=self.run)
-        t.daemon = True
-        t.start()
+        # Run the method self.run() within a thread.
+        self._thread = threading.Thread(target=self.run_jobs)
+        self._thread.daemon = True
+        self._thread.start()
 
     def load_jobs(self):
+        """Loads all observation sets from the configurations and creates jobs
+        to put into the jobs list."""
         config = self._config_manager.config.get('Schedulers').get(self._name)
-        port = config.get('Port')
-        sensor = config.get('Sensor')
+        port_name = config.get('Port')
+        sensor_name = config.get('Sensor')
         schedules = config.get('Schedules')
 
-        self._jobs = []
-
-        # Run through the port schedules and create jobs.
+        # Run through the schedules and create jobs.
         for schedule in schedules:
             set_names = schedule['ObservationSets']
 
             for set_name in set_names:
+                # Get all observations of the current observation set.
+                obs_set = self._sensor_manager.get(sensor_name) \
+                                              .get_observation_set(set_name)
+                # Create a new job.
                 job = Job(set_name,
-                          port,
-                          self._sensor_manager.get(sensor),
+                          port_name,
+                          obs_set,
                           schedule['Enabled'],
                           schedule['StartDate'],
                           schedule['EndDate'],
                           schedule['Schedule'],
                           self.publish)
+                # Add the job to the jobs list.
                 self.add(job)
 
     def action(self, obs):
+        """Simply returns the observation."""
         return obs
 
     def add(self, job):
+        """Appends a job to the jobs list."""
         self._jobs.append(job)
-        logger.debug('Added new job "{}" for sensor "{}" on port "{}" '
-                     'to jobs list'.format(job.name,
-                                           job.sensor.name,
-                                           job.port_name))
+        logger.debug('Added job "{}" to scheduler "{}"'.format(job.name,
+                                                               self._name))
 
     def cancel(self, job):
+        """Removes a job from the jobs list."""
         self._jobs.remove(job)
 
     def clear(self):
+        """Deletes all jobs in the jobs list."""
         del self._jobs[:]
 
-    def run(self):
+    def run_jobs(self):
+        """Threaded method to iterate through the list of jobs."""
         while True:
             if len(self._jobs) > 0:
                 for job in self._jobs:
                     if not job.enabled:
-                        # logger.debug('Skipping disabled job')
                         continue
 
                     if job.has_expired():
@@ -96,37 +111,40 @@ class Scheduler(prototype.Prototype):
                     if job.is_pending():
                         job.run()
 
-            time.sleep(0.1)
+            # Sleep to prevent the thread from taking to much CPU time.
+            time.sleep(0.01)
 
 
 class Job(object):
 
-    def __init__(self, name, port_name, sensor, enabled, start_date, end_date,
-        schedule, callback_func):
+    """
+    Job stores a observation set and sends single observations to callback
+    function if they are within a given time frame.
+    """
+
+    def __init__(self, name, port_name, observation_set, enabled, start_date,
+        end_date, schedule, target):
+        self._name = name                           # Name of the job.
+        self._port_name = port_name                 # Name of the port.
+        self._observation_set = observation_set     # List of observations.
+        self._enabled = enabled                     # Is enabled or not.
+        self._schedule = schedule                   # List of schedules.
+        self._target = target                       # Callback function.
+
+        # Used date and time formats.
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
-
-        self._name = name
-        self._port_name = port_name
-        self._sensor = sensor
-        self._enabled = enabled
-        self._callback_func = callback_func
 
         # Convert date to date and time.
         self._start_date = self.get_datetime(start_date, self._date_fmt)
         self._end_date = self.get_datetime(end_date, self._date_fmt)
-
-        self._schedule = schedule
-
-    @property
-    def enabled(self):
-        return self._enabled
 
     def get_datetime(self, dt_str, dt_fmt):
         """Converts a date string to a time stamp."""
         return dt.datetime.strptime(dt_str, dt_fmt)
 
     def has_expired(self):
+        """Checks if the job has expired."""
         now = dt.datetime.now()
 
         if now > self._end_date:
@@ -136,6 +154,8 @@ class Job(object):
         return False
 
     def is_pending(self):
+        """Checks whether or not the job is within the current time frame and
+        ready for processing."""
         if not self._enabled:
             return False
 
@@ -162,29 +182,23 @@ class Job(object):
 
                 # Check all time ranges of the current day.
                 if len(periods) > 0:
-                    for p in periods:
+                    for period in periods:
                         # Start and end time of the current day.
-                        start_time = self.get_datetime(p['StartTime'],
+                        start_time = self.get_datetime(period['StartTime'],
                                                        self._time_fmt).time()
-                        end_time = self.get_datetime(p['EndTime'],
+                        end_time = self.get_datetime(period['EndTime'],
                                                      self._time_fmt).time()
 
                         # Are we within the time range of the current day?
-                        if now.time() >= start_time and \
-                                now.time() < end_time:
+                        if now.time() >= start_time and now.time() < end_time:
                             return True
 
         return False
 
     def run(self):
-        observation_set = self._sensor.get_observation_set(self._name)
-
-        logger.debug('Job is running observation set "{}" of sensor "{}" '
-                     'on port "{}"'.format(self._name,
-                                           self._sensor.name,
-                                           self._port_name))
-
-        for obs in observation_set:
+        """Iterates trough the observation set and sends observations to a
+        external callback function."""
+        for obs in self._observation_set:
             # Continue if observation is disabled.
             if not obs.get('Enabled'):
                 continue
@@ -194,26 +208,24 @@ class Job(object):
             if obs.get('Onetime'):
                 obs.set('Enabled', False)
 
-            # Make a deep copy since we don't want to do any changes to the
-            # observation in our set.
+            # Make a deep copy, since we don't want to do any changes to the
+            # observation in our observation set.
             obs_copy = copy.deepcopy(obs)
+            # Insert the name of the port module at the beginning of the
+            # recevers list.
             obs_copy.data['Receivers'].insert(0, self._port_name)
-
+            # Sleep time is the time the job has to wait before to do the next
+            # observation.
             sleep_time = obs_copy.get('SleepTime')
-
-            # Put the observation into the output queue (fire and forget).
-            self._callback_func(obs_copy)
-
+            # Send the observation to the target (i.e., message broker).
+            self._target(obs_copy)
+            # Sleep until the next observation.
             time.sleep(sleep_time)
+
+    @property
+    def enabled(self):
+        return self._enabled
 
     @property
     def name(self):
         return self._name
-
-    @property
-    def port_name(self):
-        return self._port_name
-
-    @property
-    def sensor(self):
-        return self._sensor

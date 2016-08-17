@@ -34,8 +34,9 @@ logger = logging.getLogger('openadms')
 
 class PreProcessor(prototype.Prototype):
 
-    """Extracts values from the raw responses of a given observation set
-    and converts them to the defined types.
+    """
+    Extracts values from the raw responses of a given observation set and
+    converts them to the defined types.
     """
 
     def __init__(self, name, config_manager, sensor_manager):

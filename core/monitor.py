@@ -25,7 +25,6 @@ import threading
 import time
 
 from core import manager
-from core import sensor
 
 """Main monitoring module."""
 
@@ -39,10 +38,6 @@ class Monitor(object):
     """
 
     def __init__(self, config_file):
-        self._config_manager = None
-        self._module_manager = None
-        self._sensor_manager = None
-
         self._config_manager = manager.ConfigurationManager(config_file)
         self._sensor_manager = manager.SensorManager(self._config_manager)
         self._module_manager = manager.ModuleManager(self._config_manager,

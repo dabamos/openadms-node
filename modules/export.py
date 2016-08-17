@@ -88,7 +88,7 @@ class FileExporter(prototype.Prototype):
         """Append data to a flat file in CSV format.
 
         Args:
-            obs_date(Observation): The input observation object.
+            obs(Observation): The input observation object.
 
         Returns:
             obs(Observation): The output observation object.
@@ -110,7 +110,7 @@ class FileExporter(prototype.Prototype):
         file_name = file_name.replace('{date}', '{}'.format(date)
                                       if date else '')
         file_name = file_name.replace('{id}', '{}'.format(obs.get('ID'))
-                                      if obs.get('ID') else '')
+                                      if obs.get('ID') is not None else '')
         file_name += self._file_extension
 
         for path in self._paths:
@@ -133,7 +133,7 @@ class FileExporter(prototype.Prototype):
                 line = dt.strftime(self._date_time_format)
 
                 try:
-                    if obs.get('ID'):
+                    if obs.get('ID') is not None:
                         line += self._separator + obs.get('ID')
 
                     for response in obs.get('ResponseSets'):

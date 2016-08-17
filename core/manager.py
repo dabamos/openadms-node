@@ -29,10 +29,16 @@ import time
 
 from core import sensor
 
+"""Collection of manager classes."""
+
 logger = logging.getLogger('openadms')
 
 
 class ConfigurationManager:
+
+    """
+    ConfigutationManager loads and stores the configuration.
+    """
 
     def __init__(self, config_file):
         self._config = {}
@@ -41,8 +47,7 @@ class ConfigurationManager:
     def load(self, file_name):
         """Loads configuration from JSON file."""
         if not os.path.exists(file_name):
-            logger.error('Configuration file {} not found.'.format(file_name))
-            # TODO: raise Exception
+            logger.error('Configuration file "{}" not found.'.format(file_name))
             return
 
         with open(file_name) as config_file:
@@ -54,12 +59,12 @@ class ConfigurationManager:
         encoded = json.dumps(self._config, sort_keys=True, indent=4)
         print(encoded)
 
+    def get(self, key):
+        return self._config.get(key)
+
     @property
     def config(self):
         return self._config
-
-    def get(self, key):
-        return self._config.get(key)
 
     @config.setter
     def config(self, config):
@@ -69,15 +74,15 @@ class ConfigurationManager:
 class ModuleManager(object):
 
     """
-    ModulesManager loads and manages Python modules.
+    ModulesManager loads and manages OpenADMS modules.
     """
 
     def __init__(self, config_manager, sensor_manager):
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
-        config = self._config_manager.get('Modules')
 
-        self._modules= {}
+        config = self._config_manager.get('Modules')
+        self._modules = {}
 
         for module_name, class_path in config.items():
             self.add(module_name, class_path)
@@ -99,10 +104,13 @@ class ModuleManager(object):
                                          self._sensor_manager)
 
         self._modules[module_name] = class_inst
+        class_inst.daemon = True
+        class_inst.start()
+
         logger.debug('Loaded module "{}"'.format(module_name))
 
     def delete(self, module_name):
-        """Deletes thread and worker of a module class instance."""
+        """Removes the module from the modules storage."""
         self._modules[module_name] = None
 
     @property
@@ -122,6 +130,7 @@ class SensorManager(object):
         self.load()
 
     def load(self):
+        """Creates the sensors defined in the configuration."""
         sensors = self._config_manager.get('Sensors')
 
         # Create sensor objects.
@@ -131,12 +140,15 @@ class SensorManager(object):
             logger.info('Created sensor {}'.format(sensor_name))
 
     def add(self, name, sensor):
+        """Adds a sensor to the sensors dictionary."""
         self._sensors[name] = sensor
 
     def delete(self, name):
+        """Removes a sensor from the sensors dictionary."""
         self._sensors[name] = None
 
     def get(self, name):
+        """Returns the sensor object with the given name."""
         return self._sensors[name]
 
     @property
