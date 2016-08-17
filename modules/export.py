@@ -114,6 +114,10 @@ class FileExporter(prototype.Prototype):
         file_name += self._file_extension
 
         for path in self._paths:
+            if not os.path.isdir(path):
+                logger.error('Path "{}" does not exist'.format(path))
+                continue
+
             # Create a header if a new file has to be touched.
             header = None
 
