@@ -29,6 +29,26 @@ import time
 
 from core import monitor
 
+"""OpenADMS - Open Automatic Deformation Monitoring System
+
+OpenADMS is an open source automatic deformation monitoring system for
+surveillance measurements. It can be used to monitor buildings, terrain, and
+other objects with the help of geodetical or geotechnical sensors.
+
+Example:
+    At first, start an MQTT message broker like Eclipse Mosquitto. The message
+    broker is used for distributing the messages of the OpenADMS modules. On
+    Unix, Mosquitto can be started with:
+
+        $ sudo service mosquitto onestart
+
+    Then start OpenADMS with a valid configuration file:
+
+        $ python3 openadms.py --config ./config/my_config.json
+
+    The monitoring will begin automatically.
+"""
+
 logger = logging.getLogger('openadms')
 
 LOG_FILE = 'openadms.log'
@@ -52,11 +72,9 @@ def main(config_file):
 
     # Start the monitor.
     mon = monitor.Monitor(config_file)
-    # mon.start()
 
     # Run to infinity and beyond (probably not).
     stay_alive()
-
 
 def signal_handler(signal, frame):
     logger.info('Quitting ...')
