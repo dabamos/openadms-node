@@ -71,6 +71,7 @@ class SerialPort(prototype.Prototype):
             if attempt > 0:
                 logger.info('Attempt {} of {} ...'.format(attempt + 1,
                                                           self._max_attempts))
+                time.sleep(1)
 
             # Write to the serial port.
             self._write(obs.get('Request'))
@@ -89,8 +90,12 @@ class SerialPort(prototype.Prototype):
                 break
 
             # Try next attempt if response is empty.
-            logger.error('No response from sensor "{}" on port "{}"'
-                         .format(obs.get("SensorName"), self.name))
+            logger.warning('No response from sensor "{}" on port "{}" for '
+                           'observation "{}" with ID "{}"'
+                           .format(obs.get('SensorName'),
+                                   self.name,
+                                   obs.get('Name'),
+                                   obs.get('ID')))
 
         # Add a timestamp to the observation.
         obs.set('TimeStamp', time.time())

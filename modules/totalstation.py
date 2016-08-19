@@ -90,15 +90,12 @@ class DistanceCorrector(prototype.Prototype):
 
         if len(dists) > 0:
             dist = dists[0].get('Value')
-        else:
-            logger.warning('SlopeDist is missing in observation "{}"'
-                           .format(obs.get('Name')))
-            return
 
-        if dist is None:
-            logger.warning('SlopeDist value is missing in observation "{}"'
-                           .format(obs.get('Name')))
-            return
+        if not dist:
+            logger.warning('SlopeDist in observation "{}" with ID "{}" '
+                           'is "0" or missing'.format(obs.get('Name'),
+                                                      obs.get('ID')))
+            return obs
 
         d_dist_1 = 0
         d_dist_2 = 0
@@ -417,6 +414,7 @@ class PolarTransformer(prototype.Prototype):
         self._azimuth_x = config.get('AzimuthPosition').get('North')
 
     def action(self, obs):
+        target = obs.get('ID')
         sensor_type = obs.get('SensorType')
 
         if not SensorType.is_total_station(sensor_type.lower()):
@@ -437,18 +435,30 @@ class PolarTransformer(prototype.Prototype):
             v = vs[0].get('Value')          # V angle.
             dist = dists[0].get('Value')    # Slope distance.
         else:
-            logger.warning('Responses of observation "{}" are incomplete'
-                           .format(obs.get('Name')))
+            logger.warning('Responses of observation "{}" with ID "{}" '
+                           'are incomplete'.format(obs.get('Name'),
+                                                   obs.get('ID')))
 
         # Override distance with reduced distance.
         if len(r_dists) > 0:
             dist = r_dists[0]['Value']
         else:
-            logger.warning('Distance has not been reduced')
+            logger.info('Distance has not been reduced by '
+                        'athmospheric influence')
 
-        if hz is None or v is None or dist is None:
-            logger.error('Responses of observation "{}" are incomplete'
-                         .format(obs.get('Name')))
+        if hz is None:
+            logger.warning('Hz is missing in observation "{}" with ID "{}"'
+                           .format(obs.get('Name'), obs.get('ID')))
+            return obs
+
+        if v is None:
+            logger.warning('V is missing in observation "{}" with ID "{}"'
+                           .format(obs.get('Name'), obs.get('ID')))
+            return obs
+
+        if not dist:
+            logger.warning('Distance is missing in observation "{}" with '
+                           'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
             return obs
 
         # Radiant to grad (gon).

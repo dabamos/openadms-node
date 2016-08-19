@@ -28,7 +28,7 @@ logger = logging.getLogger('openadms')
 class MQTTMessenger(object):
 
     """
-    MQTTMessenger connects to a MQTT message broker and exchanges messages.
+    MQTTMessenger connects to an MQTT message broker and exchanges messages.
     """
 
     def __init__(self, host, port=1883, keepalive=60):

@@ -72,7 +72,6 @@ def main(config_file):
 
     # Start the monitor.
     mon = monitor.Monitor(config_file)
-
     # Run to infinity and beyond (probably not).
     stay_alive()
 
@@ -126,11 +125,6 @@ if __name__ == '__main__':
     date_fmt = '%Y-%m-%dT%H:%M:%S'
 
     formatter = logging.Formatter(fmt)
-    # Logging console handler.
-    ch = logging.StreamHandler(sys.stdout)
-    ch.setLevel(level)
-    ch.setFormatter(formatter)
-
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
                                               maxBytes=10485760,  # 10 MB
@@ -140,7 +134,6 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
 
     # Add handlers to logger.
-    # logger.addHandler(ch)
     logger.addHandler(fh)
 
     coloredlogs.install(level=level,

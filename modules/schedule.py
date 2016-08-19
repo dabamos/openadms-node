@@ -45,7 +45,7 @@ class Scheduler(prototype.Prototype):
         self._jobs = []
         self.load_jobs()
 
-        # Run the method self.run() within a thread.
+        # Run the method self.run_jobs() within a thread.
         self._thread = threading.Thread(target=self.run_jobs)
         self._thread.daemon = True
         self._thread.start()
@@ -109,7 +109,7 @@ class Scheduler(prototype.Prototype):
                         continue
 
                     if job.is_pending():
-                        job.run()
+                        obs = job.run()
 
             # Sleep to prevent the thread from taking to much CPU time.
             time.sleep(0.01)
@@ -123,19 +123,19 @@ class Job(object):
     """
 
     def __init__(self, name, port_name, observation_set, enabled, start_date,
-        end_date, schedule, target):
+        end_date, schedule, action):
         self._name = name                           # Name of the job.
         self._port_name = port_name                 # Name of the port.
         self._observation_set = observation_set     # List of observations.
         self._enabled = enabled                     # Is enabled or not.
         self._schedule = schedule                   # List of schedules.
-        self._target = target                       # Callback function.
+        self._action = action                       # Callback function.
 
         # Used date and time formats.
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
-        # Convert date to date and time.
+        # Convert date to date and time (00:00:00).
         self._start_date = self.get_datetime(start_date, self._date_fmt)
         self._end_date = self.get_datetime(end_date, self._date_fmt)
 
@@ -196,7 +196,7 @@ class Job(object):
         return False
 
     def run(self):
-        """Iterates trough the observation set and sends observations to a
+        """Iterates trough the observation set and sends observations to an
         external callback function."""
         for obs in self._observation_set:
             # Continue if observation is disabled.
@@ -211,14 +211,14 @@ class Job(object):
             # Make a deep copy, since we don't want to do any changes to the
             # observation in our observation set.
             obs_copy = copy.deepcopy(obs)
-            # Insert the name of the port module at the beginning of the
-            # recevers list.
+            # Insert the name of the port module or the virtual sensor at the
+            # beginning of the recevers list.
             obs_copy.data['Receivers'].insert(0, self._port_name)
             # Sleep time is the time the job has to wait before to do the next
             # observation.
             sleep_time = obs_copy.get('SleepTime')
             # Send the observation to the target (i.e., message broker).
-            self._target(obs_copy)
+            self._action(obs_copy)
             # Sleep until the next observation.
             time.sleep(sleep_time)
 

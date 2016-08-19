@@ -54,21 +54,19 @@ class FileExporter(prototype.Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         prototype.Prototype.__init__(self, name, config_manager,
                                      sensor_manager)
-
-        root = self._config_manager.config['FileExporter']
-        self._file_extension = root['FileExtension']
-        self._file_name = root['FileName']
+        config = self._config_manager.config['FileExporter']
+        self._file_extension = config['FileExtension']
+        self._file_name = config['FileName']
         self._file_rotation = {
             'none': FileRotation.NONE,
             'daily': FileRotation.DAILY,
             'monthly': FileRotation.MONTHLY,
-            'yearly': FileRotation.YEARLY}[root['FileRotation']]
-        self._date_time_format = root['DateTimeFormat']
-        self._separator = root['Separator']
+            'yearly': FileRotation.YEARLY}[config['FileRotation']]
+        self._date_time_format = config['DateTimeFormat']
+        self._separator = config['Separator']
+        self._paths = self._revise_paths(config['Paths'])
 
-        self._paths = self._check_paths(root['Paths'])
-
-    def _check_paths(self, paths):
+    def _revise_paths(self, paths):
         """Checks whether the paths in a given list end with ``\``. Adds the
         character if it is missing.
 
@@ -149,9 +147,11 @@ class FileExporter(prototype.Prototype):
                         line += self._separator + format(v)
                         line += self._separator + format(u)
                 except KeyError:
-                    logger.error('Observation set of sensor "{}" on port "{}" '
-                                 'is incomplete'.format(obs.get('SensorName'),
-                                                        obs.get('PortName')))
+                    logger.warning('Observation "{}" of sensor "{}" on '
+                                   'port "{}" is incomplete'
+                                   .format(obs.get('Name'),
+                                           obs.get('SensorName'),
+                                           obs.get('PortName')))
 
                 # Write line to file.
                 fh.write(line + '\n')

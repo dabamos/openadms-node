@@ -1,8 +1,9 @@
 {
     "Modules":
     {
-        "USB0": "modules.port.SerialPort",
-        "USB1": "modules.port.SerialPort",
+        "Alarm": "modules.notify.Alarm",
+        "COM1": "modules.port.SerialPort",
+        "COM2": "modules.port.SerialPort",
         "Scheduler0": "modules.schedule.Scheduler",
         "Scheduler1": "modules.schedule.Scheduler",
         "FileExporter": "modules.export.FileExporter",
@@ -13,7 +14,7 @@
     },
     "Project":
     {
-        "Name": "Development Project 1",
+        "Name": "Project 1",
         "ID": "598e2814-2f89-48e8-900e-5025c6e4a86e",
         "Description": "Project for testing only."
     },
@@ -21,9 +22,9 @@
     {
        "Serial":
        {
-           "USB0":
+           "COM1":
             {
-                "Port": "/dev/ttyU0",
+                "Port": "COM1",
                 "BaudRate": 4800,
                 "ByteSize": 8,
                 "StopBits": 1,
@@ -32,9 +33,9 @@
                 "SoftwareFlowControl": false,
                 "HardwareFlowControl": false
             },
-            "USB1":
+            "COM2":
             {
-                "Port": "/dev/ttyU1",
+                "Port": "COM2",
                 "BaudRate": 115200,
                 "ByteSize": 8,
                 "StopBits": 1,
@@ -185,7 +186,7 @@
                         "ID": null,
                         "Request": "%R1Q,5003:\r\n",
                         "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,(\\d+))?",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -211,7 +212,7 @@
                         "ID": null,
                         "Request": "%R1Q,5004:\r\n",
                         "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,\"([\\w\\d\\s\\.]+))?",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -228,7 +229,7 @@
                 ],
                 "P1": [
                     {
-                        "AwaitTime": 0.5,
+                        "AwaitTime": 2.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
                         "ID": null,
@@ -240,7 +241,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -253,7 +254,7 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Measure the distance..",
+                        "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
                         "Name": "measure_distance",
@@ -264,7 +265,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -276,7 +277,7 @@
                         "SleepTime": 2.0
                     },
                     {
-                        "AwaitTime": 0.5,
+                        "AwaitTime": 1.0,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "Face": 1,
@@ -292,7 +293,7 @@
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -349,7 +350,7 @@
                         "AwaitTime": 0.5,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P2",
                         "Name": "set_direction",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -358,7 +359,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -371,9 +372,9 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Measure the distance..",
+                        "Description": "Measure the distance.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P2",
                         "Name": "measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -382,7 +383,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -410,7 +411,7 @@
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -476,7 +477,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -489,7 +490,7 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Measure the distance..",
+                        "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
                         "Name": "measure_distance",
@@ -500,7 +501,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -528,7 +529,7 @@
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -594,7 +595,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -607,7 +608,7 @@
                     },
                     {
                         "AwaitTime": 2.0,
-                        "Description": "Measure the distance..",
+                        "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
                         "Name": "measure_distance",
@@ -618,7 +619,7 @@
                             "ReturnCodeInspector"
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -646,7 +647,7 @@
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r",
+                        "ResponseDelimiter": "\r\n",
                         "ResponseSets": [
                             {
                                 "Description": "ReturnCode",
@@ -810,7 +811,7 @@
     {
         "Scheduler0":
         {
-            "Port": "USB0",
+            "Port": "COM1",
             "Sensor": "STS DTM",
             "Schedules":
             [
@@ -825,7 +826,7 @@
         },
         "Scheduler1":
         {
-            "Port": "USB1",
+            "Port": "COM2",
             "Sensor": "Leica TM30",
             "Schedules":
             [
@@ -854,13 +855,29 @@
             ]
         }
     },
+    "Alarm":
+    {
+        "SMSHandlerEnabled": true,
+        "SMTPHandlerEnabled": false,
+        "Handlers":
+        {
+            "SMSHandler":
+            {
+                "LogLevel": "Error",
+                "Host": "10.59.0.40",
+                "Port": 1432,
+                "PhoneNumbers": ["+49176 12345678"],
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"{project}\": {asctime} - {level} - {msg}</cmgs>"
+            }
+        }
+    },
     "DistanceCorrector":
     {
         "Temperature": null,
         "Pressure": null,
         "Humidity": 0.6,
         "AtmosphericCorrectionEnabled": true,
-        "SealevelCorrectionEnabled": true,
+        "SealevelCorrectionEnabled": false,
         "SensorHeight": 100.0
     },
     "HelmertTransformer":

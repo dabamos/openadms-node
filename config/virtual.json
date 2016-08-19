@@ -1,6 +1,7 @@
 {
     "Modules":
     {
+        "AlarmBox": "modules.notify.AlarmBox",
         "Scheduler0": "modules.schedule.Scheduler",
         "Scheduler1": "modules.schedule.Scheduler",
         "VirtualDTM": "modules.virtual.VirtualDTM",
@@ -110,7 +111,7 @@
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             }
                         ]
                     },
@@ -698,32 +699,32 @@
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             }
                         ]
                     }
@@ -755,12 +756,12 @@
                             {
                                 "Description": "TempPress",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Temperature",
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             {
                                 "Description": "Pressure",

@@ -54,47 +54,53 @@ class PreProcessor(prototype.Prototype):
                            .format(obs.get('Name')))
             return obs
 
-        pattern = re.compile(response_pattern)
-        parsed = pattern.search(response)
+        parsed = re.match(response_pattern, response)
 
         if not parsed:
-            logger.error('Response "{}" of observation "{}" from sensor "{}" '
-                         'on port "{}" does not match extraction pattern'
-                         .format(self._sanitize(response),
-                                 obs.get('Name'),
-                                 obs.get('SensorName'),
-                                 obs.get('PortName')))
+            logger.error('Response "{}" of observation "{}" with ID "{}" from '
+                         'sensor "{}" on port "{}" does not match extraction '
+                         'pattern'.format(self.sanitize(response),
+                                          obs.get('Name'),
+                                          obs.get('SensorName'),
+                                          obs.get('PortName')))
             return obs
 
         # The regular expression pattern needs a least one defined group
-        # by using the braces "(" and ")". Otherwise, an extraction of the
+        # by using the braces "(" and ")". Otherwise, the extraction of the
         # values fails.
         #
         # Right: "(.*)"
         # Wrong: ".*"
-        raw_responses = parsed.groups()
+        raw_values = parsed.groups('')
         response_sets = obs.get('ResponseSets')
 
-        if len(raw_responses) == 0:
-            logger.error('No group(s) defined in regular expression pattern')
+        if len(raw_values) == 0:
+            logger.error('No group(s) defined in regular expression pattern of '
+                         'observation "{}" with ID "{}"'.format(obs.get('Name'),
+                                                                obs.get('ID')))
             return obs
 
-        if len(raw_responses) != len(response_sets):
+        if len(raw_values) != len(response_sets):
             logger.warning('Number of responses mismatch number of defined '
-                           'response sets of observation "{}"'
-                           .format(obs.get('Name')))
+                           'response sets of observation "{}" with ID "{}"'
+                           .format(obs.get('Name'), obs.get('ID')))
             return obs
 
         # Convert the type of the parsed raw values from string to the actual
         # data type.
-        for raw_response, response_set in zip(raw_responses, response_sets):
-            if not (raw_response and response_set):
-                logger.error('Extraction of raw response of observation "{}" '
-                             'failed'.format(obs.get('Name')))
+        for raw_value, response_set in zip(raw_values, response_sets):
+            if raw_value == '':
+                logger.warning('Raw value "{}" in observation "{}" '
+                               'with ID "{}" is missing'
+                               .format(response_set.get('Description'),
+                                       obs.get('Name'),
+                                       obs.get('ID')))
                 return obs
 
-            logger.debug('Extracted "{}" from raw response of observation "{}"'
-                         .format(raw_response, obs.get('Name')))
+            logger.debug('Extracted "{}" from raw response of observation "{}" '
+                         'with ID "{}"'.format(raw_value,
+                                               obs.get('Name'),
+                                               obs.get('ID')))
 
             response_type = response_set.get('Type').lower()
             response_value = None
@@ -102,38 +108,35 @@ class PreProcessor(prototype.Prototype):
             # Convert raw value to float.
             if response_type == 'float':
                 # Replace comma by dot.
-                dot_response = raw_response.replace(',', '.')
+                dot_value = raw_value.replace(',', '.')
 
-                if self._is_float(dot_response):
-                    response_value = float(dot_response)
-
+                if self.is_float(dot_value):
+                    response_value = float(dot_value)
                     logger.debug('Converted raw value "{}" to '
-                                 'float value "{}"'.format(raw_response,
+                                 'float value "{}"'.format(response_value,
                                                            response_value))
                 else:
                     logger.warning('Value "{}" could not be converted '
-                                   '(not float)'.format(raw_response))
+                                   '(not float)'.format(response_value))
             # Convert raw value to int.
             elif response_type == 'integer':
-                if self._is_int(raw_response):
-                    response_value = int(raw_response)
-
+                if self.is_int(raw_value):
+                    response_value = int(raw_value)
                     logger.debug('Converted raw value "{}" to integer '
-                                 'value "{}"'.format(raw_response,
+                                 'value "{}"'.format(raw_value,
                                                      response_value))
                 else:
                     logger.warning('Value "{}" couldn\'t be converted '
-                                   '(not integer)'.format(raw_response))
+                                   '(not integer)'.format(raw_value))
             # Convert raw value to string.
             else:
-                # Well, in this case (input == output) do nothing.
-                continue
+                response_value = raw_value
 
             response_set['Value'] = response_value
 
         return obs
 
-    def _is_int(self, value):
+    def is_int(self, value):
         """Returns whether a value is int or not."""
         try:
             int(value)
@@ -141,7 +144,7 @@ class PreProcessor(prototype.Prototype):
         except ValueError:
             return False
 
-    def _is_float(self, value):
+    def is_float(self, value):
         """Returns whether a value is float or not."""
         try:
             float(value)
@@ -149,7 +152,7 @@ class PreProcessor(prototype.Prototype):
         except ValueError:
             return False
 
-    def _sanitize(self, s):
+    def sanitize(self, s):
         """Removes some non-printable characters from a string."""
         sanitized = s.replace('\n', '\\n') \
                      .replace('\r', '\\r') \
@@ -168,31 +171,49 @@ class ReturnCodeInspector(prototype.Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         prototype.Prototype.__init__(self, name, config_manager,
                                      sensor_manager)
+        self.code_descriptions = {
+             514: [40, 'Several targets detected'],
+            1285: [40, 'Only angle measurement valid'],
+            1292: [40, 'Distance measurement not done (no aim, etc.)'],
+            8710: [40, 'No target detected']
+        }
 
     def action(self, obs):
         return_codes = obs.find('ResponseSets', 'Description', 'ReturnCode')
-        return_code = None
 
-        # Get first return code value.
-        if len(return_codes) > 0:
-            return_code = return_codes[0].get('Value')
-        else:
+        if len(return_codes) == 0:
             logger.warning('ReturnCode is missing in observation "{}"'
                            .format(obs.get('Name')))
             return obs
 
-        # No return code.
+        # Get first return code value.
+        return_code = return_codes[0].get('Value')
+
         if return_code is None:
-            logger.warning('ReturnCode value is missing in observation "{}"'
-                          .format(obs.get('Name')))
+            logger.warning('No ReturnCode value in observation "{}" with '
+                           'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
             return obs
 
-        # Observation was successful.
         if return_code == 0:
-            logger.info('Observation "{}" was successful (code "{}")'
-                        .format(obs.get('Name'), return_code))
+            logger.info('Observation "{}" with ID "{}" was successful '
+                        '(code "{}")'.format(obs.get('Name'),
+                                             obs.get('ID'),
+                                             return_code))
+            return obs
+
+        # Get level and error message of the return code.
+        lvl, msg = self.code_descriptions.get(return_code)
+
+        if lvl and msg:
+            # Return code related log message.
+            logger.log(lvl, 'Observation "{}" with ID "{}": {} (code "{}")'
+                            .format(obs.get('Name'),
+                                    obs.get('ID'),
+                                    msg,
+                                    return_code))
         else:
-            logger.warning('Error occured on observation "{}" (code "{}")'
-                           .format(obs.get('Name'), return_code))
+            # Generic log message.
+            logger.error('Error occured on observation "{}" (code "{}")'
+                         .format(obs.get('Name'), return_code))
 
         return obs

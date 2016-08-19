@@ -23,9 +23,6 @@ import importlib
 import json
 import logging
 import os
-import queue
-import threading
-import time
 
 from core import sensor
 
@@ -98,14 +95,14 @@ class ModuleManager(object):
                          .format(module_name, file_path))
             return
 
-        class_inst = getattr(importlib.import_module(module_path),
-                             class_name)(module_name,
-                                         self._config_manager,
-                                         self._sensor_manager)
+        module = getattr(importlib.import_module(module_path),
+                         class_name)(module_name,
+                                     self._config_manager,
+                                     self._sensor_manager)
 
-        self._modules[module_name] = class_inst
-        class_inst.daemon = True
-        class_inst.start()
+        self._modules[module_name] = module
+        module.daemon = True
+        module.start()
 
         logger.debug('Loaded module "{}"'.format(module_name))
 
@@ -135,8 +132,8 @@ class SensorManager(object):
 
         # Create sensor objects.
         for sensor_name, sensor_config in sensors.items():
-            class_inst = sensor.Sensor(sensor_name, self._config_manager)
-            self.add(sensor_name, class_inst)
+            sensor_obj = sensor.Sensor(sensor_name, self._config_manager)
+            self.add(sensor_name, sensor_obj)
             logger.info('Created sensor {}'.format(sensor_name))
 
     def add(self, name, sensor):
