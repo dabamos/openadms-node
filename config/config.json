@@ -857,17 +857,26 @@
     },
     "Alarm":
     {
-        "SMSHandlerEnabled": true,
-        "SMTPHandlerEnabled": false,
         "Handlers":
         {
-            "SMSHandler":
+            "ShortMessageAlarmHandler":
             {
-                "LogLevel": "Error",
+                "Enabled": true,
+                "LogLevels": ["Error", "Critical"],
                 "Host": "10.59.0.40",
                 "Port": 1432,
                 "PhoneNumbers": ["+49176 12345678"],
                 "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"{project}\": {asctime} - {level} - {msg}</cmgs>"
+            },
+            "MailAlarmHandler":
+            {
+                "Enabled": true,
+                "LogLevels": ["Warning", "Error", "Critical"],
+                "Recipients": ["engineer@example.com"],
+                "UserName": "monitoring@example.com",
+                "UserPassword": "1234512345",
+                "Host": "smtp.example.com",
+                "Port": 465
             }
         }
     },
@@ -882,8 +891,29 @@
     },
     "HelmertTransformer":
     {
-        "StationName": "P6",
-        "TiePoints": ["P1", "P2", "P3", "P4"],
+        "StationID": "P6",
+        "TiePoints": [
+            "P1":
+            {
+                "X": 1000.0000,
+                "Y": 2000.0000
+            },
+            "P2":
+            {
+                "X": 1000.0000,
+                "Y": 2000.0000
+            },
+            "P3":
+            {
+                "X": 1000.0000,
+                "Y": 2000.0000
+            },
+            "P4":
+            {
+                "X": 1000.0000,
+                "Y": 2000.0000
+            }
+        ],
         "MaximumStandardDeviation": 10.0
     },
     "PolarTransformer":

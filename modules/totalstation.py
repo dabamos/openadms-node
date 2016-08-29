@@ -375,7 +375,7 @@ class SerialMeasurementProcessor(prototype.Prototype):
         return obs
 
 
-class HelmertTransformer(prototype.Prototype):
+class ViewPointCalculator(prototype.Prototype):
 
     """
     Calculates a 3-dimensional coordinates of a view point using the Helmert
@@ -387,8 +387,120 @@ class HelmertTransformer(prototype.Prototype):
                                      sensor_manager)
         config = self._config_manager.config[self._name]
 
+        self._tie_points = config.get('TiePoints')
+        self._station_id = config.get('StationID')
+        self._station_x = 0
+        self._station_y = 0
+
+        # self._updates = {}
+
     def action(self, obs):
+        if obs.get('ID') in self._tie_points:
+            self._add_tie_point(obs)
+            self._calculate_view_point(obs)
+        else:
+            self._calculate_new_point(obs)
+
         return obs
+
+    def add_tie_point(obs):
+        if obs.get('ID') not in self._tie_point:
+            return
+
+        tie_point = self._tie_points.get(obs.get('ID'))
+        tie_hz = tie_point.get('Hz')
+        tie_dist = tie_point.get('HzDist')
+
+        if tie_hz and tie_dist:
+            return
+
+        hz = v = dist = r_dist = None
+
+        # Get horizontal direction, vertical angle, and slope distance.
+        try:
+            hz = obs.find('ResponseSets', 'Description', 'Hz')[0].get('Value')
+            v = obs.find('ResponseSets', 'Description', 'V')[0].get('Value')
+            dist = obs.find('ResponseSets', 'Description',
+                            'SlopeDist')[0].get('Value')
+        except IndexError:
+            logger.warning('Error')
+
+        if hz is None or v is None or dist is None:
+            logger.warning('Error')
+
+        # Get reduced slope distance, if available.
+        try:
+            r_dist = obs.find('ResponseSets', 'Description',
+                              'ReducedDist')[0].get('Value')
+            if r_dist is not None:
+                dist = r_dist
+        except IndexError:
+            logger.warning('bla')
+
+        # Calculate horizontal distance out of slope distance and
+        # vertical angle.
+        hz_dist = math.sin(v) * dist
+
+        # Set calculates values.
+        tie_point['Hz'] = hz
+        tie_point['HzDist'] = hz_dist
+
+    def calculate_view_point(self, obs):
+        for tie_point in self._tie_points:
+            y = tie_point.get('y')
+            x = tie_point.get('x')
+
+            if y is None or x is None:
+                return
+
+        tie_point = self._tie_points.get(obs.get('ID'))
+        tie_hz = tie_point.get('Hz')
+        tie_dist = tie_point.get('Dist')
+
+        # Calculate polar coordinates.
+        tie_point['y'] = tie_dist * math.sin(tie_hz)
+        tie_point['x'] = tie_dist * math.cos(tie_hz)
+
+        sum_y = 0
+        sum_x = 0
+        sum_Y = 0
+        sum_X = 0
+
+        num_tie_points = len(self._tie_points)
+        is_complete = True
+
+        for tie_point in self._tie_points:
+            y = tie_point.get('y')
+            x = tie_point.get('x')
+            Y = tie_point.get('Y')
+            X = tie_point.get('X')
+
+            if y is None or x is None or Y is None or X is None:
+                is_complete = False
+                break
+
+            sum_y = sum_y + y
+            sum_x = sum_x + x
+            sum_Y = sum_Y + Y
+            sum_X = sum_X + X
+
+        if not is_complete:
+            return
+
+        cntrd_y = sum_y / num_tie_points
+        cntrd_x = sum_x / num_tie_points
+        cntrd_Y = sum_Y / num_tie_points
+        cntrd_X = sum_X / num_tie_points
+
+        r_cntrd_y = 
+        r_cntrd_x
+        r_cntrd_Y
+        r_cntrd_X
+
+
+
+    def calculate_new_point(self, obs):
+        pass
 
 
 class PolarTransformer(prototype.Prototype):

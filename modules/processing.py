@@ -128,7 +128,7 @@ class PreProcessor(prototype.Prototype):
                 else:
                     logger.warning('Value "{}" couldn\'t be converted '
                                    '(not integer)'.format(raw_value))
-            # Convert raw value to string.
+            # "Convert" raw value to string.
             else:
                 response_value = raw_value
 
@@ -164,18 +164,38 @@ class PreProcessor(prototype.Prototype):
 class ReturnCodeInspector(prototype.Prototype):
 
     """
-    Inspects the return code in observation sent by sensors of Leica
-    Geosystems.
+    Inspects the return code in an observation sent by sensors of Leica
+    Geosystems and creates an approriate log message.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
         prototype.Prototype.__init__(self, name, config_manager,
                                      sensor_manager)
+        """
+        The dictionary has the following format:
+
+            {
+                return code number: [ log level, log message ]
+            }
+
+        The return code numbers and messages are take from the GeoCOM reference
+        manual of the Leica TPS 1200, TS 30, and TM 30 totalstations. The log
+        level can be set to these values:
+
+            5: CRITIAL,
+            4: ERROR,
+            3: WARNING,
+            2: INFO,
+            1: DEBUG,
+            0: NONE.
+
+        Please choose a proper value for each return code.
+        """
         self.code_descriptions = {
-             514: [40, 'Several targets detected'],
-            1285: [40, 'Only angle measurement valid'],
-            1292: [40, 'Distance measurement not done (no aim, etc.)'],
-            8710: [40, 'No target detected']
+             514: [4, 'Several targets detected'],
+            1285: [4, 'Only angle measurement valid'],
+            1292: [4, 'Distance measurement not done (no aim, etc.)'],
+            8710: [4, 'No target detected']
         }
 
     def action(self, obs):
@@ -206,11 +226,11 @@ class ReturnCodeInspector(prototype.Prototype):
 
         if lvl and msg:
             # Return code related log message.
-            logger.log(lvl, 'Observation "{}" with ID "{}": {} (code "{}")'
-                            .format(obs.get('Name'),
-                                    obs.get('ID'),
-                                    msg,
-                                    return_code))
+            logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
+                                 '(code "{}")'.format(obs.get('Name'),
+                                                      obs.get('ID'),
+                                                      msg,
+                                                      return_code))
         else:
             # Generic log message.
             logger.error('Error occured on observation "{}" (code "{}")'

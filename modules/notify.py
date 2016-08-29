@@ -29,7 +29,7 @@ from abc import ABCMeta, abstractmethod
 
 from modules import prototype
 
-"""Module for virtual sensors."""
+"""Module for alarming."""
 
 logger = logging.getLogger('openadms')
 
@@ -39,39 +39,38 @@ class Alarm(prototype.Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         prototype.Prototype.__init__(self, name, config_manager,
                                      sensor_manager)
-        config = config_manager.config.get('Alarm')
+        config = config_manager.config.get(self._name)
 
         self._queue = queue.Queue(-1)
-        qh = logging.handlers.QueueHandler(self._queue)
-        qh.setLevel(logging.WARNING)
-        logger.addHandler(qh)
-
         self._alarm_handlers = []
 
-        project_name = config_manager.config.get('Project').get('Name')
-        is_sms_handler_enabled = config.get('SMSHandlerEnabled')
-        handlers_config = config.get('Handlers')
+        # Add logging handler to the logger.
+        qh = logging.handlers.QueueHandler(self._queue)
+        qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
+        logger.addHandler(qh)
 
-        if is_sms_handler_enabled:
-            sh_config = handlers_config.get('SMSHandler')
-            log_level = sh_config.get('LogLevel')
-            host = sh_config.get('Host')
-            port = sh_config.get('Port')
-            phone_numbers = sh_config.get('PhoneNumbers')
-            template = sh_config.get('Template')
+        # Add the alarm handlers to the alarm handlers list.
+        handlers = self._config.get('Handlers')
 
-            sms = SMSHandler(log_level, host, port, phone_numbers, template)
-            sms.add_var('project', project_name)
-            self._alarm_handlers.append(sms)
+        for handler in handlers:
+            h_class = vars().get(handler)
 
-        self._thread = threading.Thread(target=self._process)
+            if h_class:
+                h = h_class(handlers.get(handler))
+                self._alarm_handlers.append(h)
+            else:
+                logger.warning('Alarm handler "{}" not found'.format(handler))
+
+        # Check the logging queue continuously for messages and proceed them to
+        # the alarm handlers.
+        self._thread = threading.Thread(target=self.process)
         self._thread.daemon = True
         self._thread.start()
 
     def action(self, obs):
         return obs
 
-    def _process(self):
+    def process(self):
         while True:
             if not self._queue.empty():
                 record = self._queue.get()
@@ -85,7 +84,8 @@ class AlarmHandler(object):
 
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, config):
+        self._config = config
         self._msg_vars = {}
 
     def add_var(self, key, value):
@@ -96,18 +96,24 @@ class AlarmHandler(object):
         pass
 
 
-class SMSHandler(AlarmHandler):
+class ShortMessageAlarmHandler(AlarmHandler):
 
-    def __init__(self, log_level, host, port, phone_numbers, template):
-        AlarmHandler.__init__(self)
-        self._log_level = log_level
-        self._host = host
-        self._port = port
-        self._phone_numbers = phone_numbers
-        self._template = template
+    def __init__(self, config):
+        AlarmHandler.__init__(self, config)
+        self._config = config
+
+        self._log_levels = config.get('LogLevels')
+        self._host = config.get('Host')
+        self._port = config.get('Port')
+        self._phone_numbers = config.get('PhoneNumbers')
+        self._template = config.get('Template')
+
+        # Add the current project name to the dict of message variables.
+        project_name = self._config_manager.get('Project').get('Name')
+        self.add_var('project', project_name)
 
     def handle(self, record):
-        if record.levelname != self._log_level.upper():
+        if record.levelname is not in self._log_levels.upper():
             return
 
         self.add_var('asctime', record.asctime)
@@ -126,3 +132,10 @@ class SMSHandler(AlarmHandler):
 
                 sock.send(text.encode())
                 time.sleep(1.0)
+
+
+class MailAlarmHandler(AlarmHandler):
+
+    def __init__(self, config_manager):
+        AlarmHandler.__init__(self, config_manager)
+        config = config_manager.config.get('Alarm').get('SocketAlarmHandler')
