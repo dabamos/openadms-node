@@ -63,14 +63,14 @@ class Alarm(prototype.Prototype):
 
         # Check the logging queue continuously for messages and proceed them to
         # the alarm handlers.
-        self._thread = threading.Thread(target=self.process)
+        self._thread = threading.Thread(target=self._process)
         self._thread.daemon = True
         self._thread.start()
 
     def action(self, obs):
         return obs
 
-    def process(self):
+    def _process(self):
         while True:
             if not self._queue.empty():
                 record = self._queue.get()
@@ -113,7 +113,7 @@ class ShortMessageAlarmHandler(AlarmHandler):
         self.add_var('project', project_name)
 
     def handle(self, record):
-        if record.levelname is not in self._log_levels.upper():
+        if record.levelname not in self._log_levels.upper():
             return
 
         self.add_var('asctime', record.asctime)

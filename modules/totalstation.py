@@ -396,110 +396,115 @@ class ViewPointCalculator(prototype.Prototype):
 
     def action(self, obs):
         if obs.get('ID') in self._tie_points:
-            self._add_tie_point(obs)
+            tie_point = self._tie_points.get(obs.get('ID'))
+            hz = tie_point.get('Hz')
+            dist = tie_point.get('HzDist')
+
+            if hz is not None and dist is not None:
+                self._add_tie_point(obs)
+
             self._calculate_view_point(obs)
         else:
             self._calculate_new_point(obs)
 
         return obs
 
-    def add_tie_point(obs):
-        if obs.get('ID') not in self._tie_point:
-            return
-
-        tie_point = self._tie_points.get(obs.get('ID'))
-        tie_hz = tie_point.get('Hz')
-        tie_dist = tie_point.get('HzDist')
-
-        if tie_hz and tie_dist:
-            return
-
+    def _add_tie_point(obs):
+        """Extracts horizontal direction, vertical angle, and slope distance
+        from observation and calculates the polar coordinates to Cartesian
+        coordinates."""
         hz = v = dist = r_dist = None
 
-        # Get horizontal direction, vertical angle, and slope distance.
         try:
             hz = obs.find('ResponseSets', 'Description', 'Hz')[0].get('Value')
             v = obs.find('ResponseSets', 'Description', 'V')[0].get('Value')
             dist = obs.find('ResponseSets', 'Description',
                             'SlopeDist')[0].get('Value')
         except IndexError:
-            logger.warning('Error')
+            logger.warning('Hz, V, or SlopeDist values are missing.')
+            return
 
         if hz is None or v is None or dist is None:
-            logger.warning('Error')
+            logger.warning('Hz, V, or SlopeDist not set.')
+            return
 
-        # Get reduced slope distance, if available.
+        # Extract reduced slope distance, if available.
         try:
             r_dist = obs.find('ResponseSets', 'Description',
                               'ReducedDist')[0].get('Value')
             if r_dist is not None:
                 dist = r_dist
         except IndexError:
-            logger.warning('bla')
+            logger.warning('No reduced distance set.')
 
         # Calculate horizontal distance out of slope distance and
         # vertical angle.
-        hz_dist = math.sin(v) * dist
+        hz_dist =  dist * math.sin(v)
 
-        # Set calculates values.
+        # Set the calculated values.
+        tie_point['Dist'] = dist
         tie_point['Hz'] = hz
         tie_point['HzDist'] = hz_dist
 
-    def calculate_view_point(self, obs):
-        for tie_point in self._tie_points:
-            y = tie_point.get('y')
-            x = tie_point.get('x')
-
-            if y is None or x is None:
-                return
-
-        tie_point = self._tie_points.get(obs.get('ID'))
-        tie_hz = tie_point.get('Hz')
-        tie_dist = tie_point.get('Dist')
-
-        # Calculate polar coordinates.
-        tie_point['y'] = tie_dist * math.sin(tie_hz)
-        tie_point['x'] = tie_dist * math.cos(tie_hz)
-
-        sum_y = 0
-        sum_x = 0
-        sum_Y = 0
-        sum_X = 0
-
+    def _calculate_view_point(self, obs):
+        sum_local_y = sum_local_x = 0
+        sum_global_y = sum_global_x = 0
         num_tie_points = len(self._tie_points)
-        is_complete = True
+
+        # Calculate the centroid coordinates of the view point.
+        for tie_point in self._tie_points:
+            hz = tie_point.get('Hz')
+            hz_dist = tie_point.get('HzDist')
+
+            local_y = hz_dist * math.sin(hz)
+            local_x = hz_dist * math.cos(hz)
+
+            global_y = tie_point.get('Y')
+            global_x = tie_point.get('X')
+
+            sum_local_y = sum_local_y + local_y
+            sum_local_x = sum_local_x + local_x
+            sum_global_y = sum_global_y + global_y
+            sum_global_x = sum_global_x + global_x
+
+        local_centroid_y = sum_local_y / num_tie_points
+        local_centroid_x = sum_local_x / num_tie_points
+        global_centroid_y = sum_global_y / num_tie_points
+        global_centroid_x = sum_global_x / num_tie_points
+
+        o_1 = o_2 = 0
+        a_1 = a_2 = 0
 
         for tie_point in self._tie_points:
-            y = tie_point.get('y')
-            x = tie_point.get('x')
-            Y = tie_point.get('Y')
-            X = tie_point.get('X')
+            local_y = tie_point.get('LocalY')
+            local_x = tie_point.get('LocalX')
+            global_y = tie_point.get('Y')
+            global_x = tie_point.get('X')
 
-            if y is None or x is None or Y is None or X is None:
-                is_complete = False
-                break
+            r_local_centroid_y = local_y - local_centroid_y
+            r_local_centroid_x = local_x - local_centroid_x
+            r_global_centroid_y = global_y - global_centroid_y
+            r_global_centroid_x = global_x - global_centroid_x
 
-            sum_y = sum_y + y
-            sum_x = sum_x + x
-            sum_Y = sum_Y + Y
-            sum_X = sum_X + X
+            # o = [ x_i * Y_i - y_i * X_i ] * [ x_i^2 + y_i^2 ]^-1
+            o_1 = o_1 + ((r_local_centroid_x * r_global_centroid_y) - \
+                         (r_local_centroid_y * r_global_centroid_x))
+            o_2 = o_2 + math.pow(r_local_centroid_x, 2) + \
+                        math.pow(r_local_centroid_y, 2)
 
-        if not is_complete:
-            return
+            # a = [ x_i * X_i + y_i * Y_i ] * [ x_i^2 + y_i^2 ]^-1
+            a_1 = a_1 + ((r_local_centroid_x * r_global_centroid_x) + \
+                         (r_local_centroid_y * r_global_centroid_y))
+            a_2 = a_2 + math.pow(r_local_centroid_x, 2) + \
+                        math.pow(r_local_centroid_y, 2)
 
-        cntrd_y = sum_y / num_tie_points
-        cntrd_x = sum_x / num_tie_points
-        cntrd_Y = sum_Y / num_tie_points
-        cntrd_X = sum_X / num_tie_points
+        o = o_1 / o_2
+        a = a_1 / a_2
 
-        r_cntrd_y = 
-        r_cntrd_x
-        r_cntrd_Y
-        r_cntrd_X
-
+        # Calculate the coordinates of the view point.
 
 
-    def calculate_new_point(self, obs):
+    def _calculate_new_point(self, obs):
         pass
 
 

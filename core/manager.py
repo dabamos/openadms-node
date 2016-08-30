@@ -91,14 +91,17 @@ class ModuleManager(object):
         file_path = module_path.replace('.', '/') + '.py'
 
         if not os.path.isfile(file_path):
-            logger.error('Can\'t load module "{}": file "{}" not found'
-                         .format(module_name, file_path))
+            logger.error('File "{}" not found'.format(file_path))
             return
 
-        module = getattr(importlib.import_module(module_path),
-                         class_name)(module_name,
-                                     self._config_manager,
-                                     self._sensor_manager)
+        try:
+            module = getattr(importlib.import_module(module_path),
+                             class_name)(module_name,
+                                         self._config_manager,
+                                         self._sensor_manager)
+        except AttributeError:
+            logger.error('Module "{}" not found'.format(class_path))
+            return
 
         self._modules[module_name] = module
         module.daemon = True
