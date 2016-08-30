@@ -1,7 +1,6 @@
 {
     "Modules":
     {
-        "AlarmBox": "modules.notify.AlarmBox",
         "Scheduler0": "modules.schedule.Scheduler",
         "Scheduler1": "modules.schedule.Scheduler",
         "VirtualDTM": "modules.virtual.VirtualDTM",
@@ -10,7 +9,8 @@
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
-        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector"
+        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
+        "Alarm": "modules.notify.Alarm"
     },
     "Project":
     {
@@ -840,6 +840,31 @@
                     "ObservationSets": ["Init", "Main"]
                 }
             ]
+        }
+    },
+    "Alarm":
+    {
+        "Handlers":
+        {
+            "ShortMessageAlarmHandler":
+            {
+                "Enabled": true,
+                "LogLevels": ["Error", "Critical"],
+                "Host": "10.59.0.40",
+                "Port": 1432,
+                "PhoneNumbers": ["+49176 12345678"],
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"{project}\": {asctime} - {level} - {msg}</cmgs>"
+            },
+            "MailAlarmHandler":
+            {
+                "Enabled": true,
+                "LogLevels": ["Warning", "Error", "Critical"],
+                "Recipients": ["engineer@example.com"],
+                "UserName": "monitoring@example.com",
+                "UserPassword": "1234512345",
+                "Host": "smtp.example.com",
+                "Port": 465
+            }
         }
     },
     "DistanceCorrector":
