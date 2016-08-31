@@ -22,11 +22,11 @@ limitations under the Licence.
 import hashlib
 import logging
 import math
-import re
 import time
 
+from core.observation import Observation
 from core.sensor import SensorType
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for data processing (pre-processing, atmospheric corrections,
 transformations)."""
@@ -34,15 +34,13 @@ transformations)."""
 logger = logging.getLogger('openadms')
 
 
-class DistanceCorrector(prototype.Prototype):
+class DistanceCorrector(Prototype):
 
     """Corrects the slope distance for EDM measurements using atmospheric
     data."""
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
-
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
         # Maximum age of atmospheric data, before a warning will be generated.
@@ -75,26 +73,22 @@ class DistanceCorrector(prototype.Prototype):
 
         # Check if atmospheric data has been set.
         if not self.temperature or not self.pressure or not self.humidity:
-            logger.warning('Temperature, air pressure, or humidity missing')
+            logger.warning('No temperature, air pressure, or humidity set')
             return obs
 
         # Check the age of the atmospheric data.
         if self.last_update - time.time() > self._max_age:
             logger.warning('Atmospheric data is older than {} hour(s)'
-                           .format(int(max_age / 3600)))
+                           .format(int(self._max_age / 3600)))
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        dists = obs.find('ResponseSets', 'Description', 'SlopeDist')
-        dist = None
+        dist = obs.get('ResponseSets').get('SlopeDist').get('Value')
 
-        if len(dists) > 0:
-            dist = dists[0].get('Value')
-
-        if not dist:
-            logger.warning('SlopeDist in observation "{}" with ID "{}" '
-                           'is "0" or missing'.format(obs.get('Name'),
-                                                      obs.get('ID')))
+        if dist is None:
+            logger.warning('No SlopeDist in observation "{}" with ID "{}"'
+                           .format(obs.get('Name'),
+                                   obs.get('ID')))
             return obs
 
         d_dist_1 = 0
@@ -107,16 +101,10 @@ class DistanceCorrector(prototype.Prototype):
             ppm = self.get_ppm()
             d_dist_1 = dist * ppm * math.pow(10, -6)
 
-            logger.debug('Reduced distance from {:0.5f} m to {:0.5f} m '
-                         '({:0.5f} ppm)'.format(dist,
-                                                dist + d_dist_1,
-                                                ppm))
-
-            response_ppm = self._get_response_set('PPM',
-                                                  'Float',
-                                                  'none',
-                                                  round(ppm, 5))
-            response_sets.append(response_ppm)
+            response_set = self.get_response_set('Float',
+                                                 'none',
+                                                 round(ppm, 5))
+            response_sets['AtmosphericPPM'] = response_set
 
         # Calculate the sealevel reduction of the distance.
         if self._is_sealevel_correction:
@@ -124,15 +112,10 @@ class DistanceCorrector(prototype.Prototype):
             # Delta distance: -(height / R) * 10^6
             d_dist_2 = -1 * (self.sensor_height / earth_radius)
 
-            logger.debug('Reduced distance to mean sea level from '
-                         '{:0.5f} m to {:0.5f} m ({:0.5f} m)'
-                         .format(dist, dist + d_dist_2, d_dist_2))
-
-            response_sealevel = self._get_response_set('SealevelDelta',
-                                                       'Float',
-                                                       'm',
-                                                       round(d_dist_2, 5))
-            response_sets.append(response_sealevel)
+            response_set = self.get_response_set('Float',
+                                                 'm',
+                                                 round(d_dist_2, 5))
+            response_sets['SealevelDelta'] = response_set
 
         # Add reduced distance to the observation set.
         if d_dist_1 != 0 or d_dist_2 != 0:
@@ -143,14 +126,12 @@ class DistanceCorrector(prototype.Prototype):
                                              r_dist,
                                              d_dist_1 + d_dist_2))
 
-            response_r_dist = self._get_response_set('ReducedDist',
-                                                     'Float',
-                                                     'm',
-                                                     round(r_dist, 5))
-            response_sets.append(response_r_dist)
+            response_set = self.get_response_set('Float',
+                                                 'm',
+                                                 round(r_dist, 5))
+            response_sets['ReducedDist'] = response_set
 
         return obs
-
 
     def get_ppm(self):
         """Calculates the atmospheric correction value in parts per million
@@ -175,30 +156,26 @@ class DistanceCorrector(prototype.Prototype):
     def _update_meteorological_data(self, obs):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        temperatures = obs.find('ResponseSets', 'Description', 'Temperature')
-        pressures = obs.find('ResponseSets', 'Description', 'Pressure')
-        humidities = obs.find('ResponseSets', 'Description', 'Humidity')
+        try:
+            t = obs.get('ResponseSets').get('Temperature')
+            self.temperature = t.get('Value') if t is not None \
+                else self.temperature
 
-        if len(temperatures) > 0:
-            self.temperature = temperatures[0].get('Value')
+            p = obs.get('ResponseSets').get('Pressure')
+            self.pressure = p.get('Value') if p is not None else self.pressure
 
-        if len(pressures) > 0:
-            self.pressure = pressures[0].get('Value')
+            h = obs.get('ResponseSets').get('Humidity')
 
-        if len(humidities) > 0:
-            if humidities[0].get('Unit') == '%':
-                self.humidity = humidities[0].get('Value') / 100
-            else:
-                self.humidity = humidities[0].get('Value')
+            if h:
+                self.humidity = h.get('Value') / 100 if h.get('Unit') == '%' \
+                    else h.get('Value')
+        except AttributeError:
+            logger.warning('No "Temperature", "Pressure", or "Humidity" in '
+                           'observation "{}" with ID "{}"'
+                           .format(obs.get('Name'), obs.get('ID')))
 
-    def _get_response_set(self, d, t, u, v):
-        r = {}
-        r['Description'] = d
-        r['Type'] = t
-        r['Unit'] = u
-        r['Value'] = v
-
-        return r
+    def get_response_set(self, t, u, v):
+        return {'Type': t, 'Unit': u, 'Value': v}
 
     @property
     def temperature(self):
@@ -261,11 +238,10 @@ class DistanceCorrector(prototype.Prototype):
         self._sensor_height = sensor_height
 
 
-class SerialMeasurementProcessor(prototype.Prototype):
+class SerialMeasurementProcessor(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
 
         config = self._config_manager.config[self._name]
 
@@ -286,30 +262,30 @@ class SerialMeasurementProcessor(prototype.Prototype):
         dist1 = None
         dist2 = None
 
-        for response1, response2 in zip(response_sets1, response_sets2):
-            desc1 = r1.get('Description').lower()
-            desc2 = r2.get('Description').lower()
+        #for response1, response2 in zip(response_sets1, response_sets2):
+            #desc1 = r1.get('Description').lower()
+            #desc2 = r2.get('Description').lower()
 
-            value1 = r1.get('Value')
-            value2 = r2.get('Value')
+            #value1 = r1.get('Value')
+            #value2 = r2.get('Value')
 
 
-            if set([desc1, desc2]).issubset(['v', 'vertical']):
-                v1 = value1
-                v2 = value2
+            # if set([desc1, desc2]).issubset(['v', 'vertical']):
+            #     v1 = value1
+            #     v2 = value2
+            #
+            # if set([desc1, desc2]).issubset(['dist', 'slopedist']):
+            #     dist1 = value1
+            #     dist2 = value2
+            #
+            # if set([desc1, desc2]).issubset(['reduceddist', 'reduceddistance']):
+            #     dist1 = value1
+            #     dist2 = value2
 
-            if set([desc1, desc2]).issubset(['dist', 'slopedist']):
-                dist1 = value1
-                dist2 = value2
-
-            if set([desc1, desc2]).issubset(['reduceddist', 'reduceddistance']):
-                dist1 = value1
-                dist2 = value2
-
-        if v1 is None or v2 is None or dist1 is None or dist2 is None:
-             logger.error('Observation "{}" is incomplete'
-                          .format(obs.get('Name')))
-             return
+        # if v1 is None or v2 is None or dist1 is None or dist2 is None:
+        #      logger.error('Observation "{}" is incomplete'
+        #                   .format(obs.get('Name')))
+        #      return
 
         k = (2 * math.pi - (v1 + v2)) / 2
 
@@ -319,7 +295,6 @@ class SerialMeasurementProcessor(prototype.Prototype):
         accurate_dist = (dist1 + dist2) / 2
 
         return accurate_v1, accurate_v2, accurate_dist
-
 
     def _get_first(self, obs):
         md5 = self._get_md5(obs)
@@ -375,7 +350,7 @@ class SerialMeasurementProcessor(prototype.Prototype):
         return obs
 
 
-class ViewPointCalculator(prototype.Prototype):
+class ViewPointCalculator(Prototype):
 
     """
     Calculates a 3-dimensional coordinates of a view point using the Helmert
@@ -383,132 +358,295 @@ class ViewPointCalculator(prototype.Prototype):
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
-        config = self._config_manager.config[self._name]
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
 
+        self._receivers = config.get('Receivers')
         self._tie_points = config.get('TiePoints')
-        self._station_id = config.get('StationID')
-        self._station_x = 0
-        self._station_y = 0
+        self._view_point_id = config.get('ViewPointID')
 
-        # self._updates = {}
+        self._view_point_x = 0
+        self._view_point_y = 0
+        self._view_point_z = 0
 
     def action(self, obs):
-        if obs.get('ID') in self._tie_points:
-            tie_point = self._tie_points.get(obs.get('ID'))
-            hz = tie_point.get('Hz')
-            dist = tie_point.get('HzDist')
+        # Check whether the given observation equals one of the tie points.
+        is_tie_point = False
 
-            if hz is not None and dist is not None:
-                self._add_tie_point(obs)
+        if self._tie_points.get(obs.get('ID')):
+            is_tie_point = True
 
-            self._calculate_view_point(obs)
-        else:
-            self._calculate_new_point(obs)
+        # Update the tie point data.
+        if is_tie_point:
+            self._update_tie_point(obs)
+
+        # Only calculate the view point's coordinates if all tie points have
+        # been measured at least once.
+        is_ready = True
+
+        for name, tie_point in self._tie_points.items():
+            if tie_point.get('LastUpdate') is None:
+                is_ready = False    # Tie point not measured yet.
+
+        if is_ready:
+            if is_tie_point:
+                # Calculate the coordinates of the view point by using the
+                # Helmert transformation.
+                view_point = self._calculate_view_point(obs)
+                # Send the view point observation to the next receiver.
+                self.publish(view_point)
+            else:
+                # Calculate the coordinates of the target point.
+                obs = self._calculate_target_point(obs)
 
         return obs
 
-    def _add_tie_point(obs):
-        """Extracts horizontal direction, vertical angle, and slope distance
-        from observation and calculates the polar coordinates to Cartesian
-        coordinates."""
+    def _update_tie_point(self, obs):
+        """Adds horizontal direction, vertical angle, and slope distance
+        of the observation to a tie point."""
         hz = v = dist = r_dist = None
 
         try:
-            hz = obs.find('ResponseSets', 'Description', 'Hz')[0].get('Value')
-            v = obs.find('ResponseSets', 'Description', 'V')[0].get('Value')
-            dist = obs.find('ResponseSets', 'Description',
-                            'SlopeDist')[0].get('Value')
-        except IndexError:
-            logger.warning('Hz, V, or SlopeDist values are missing.')
+            hz = obs.get('ResponseSets').get('Hz').get('Value')
+            v = obs.get('ResponseSets').get('V').get('Value')
+            dist = obs.get('ResponseSets').get('Dist').get('Value')
+        except AttributeError:
+            pass
+
+        if not hz:
+            logger.warning('No "Hz" in observation "{}" with ID "{} '
+                           .format(obs.get('Name'), obs.get('ID')))
             return
 
-        if hz is None or v is None or dist is None:
-            logger.warning('Hz, V, or SlopeDist not set.')
+        if not v:
+            logger.warning('No "V" in observation "{}" with ID "{} '
+                           .format(obs.get('Name'), obs.get('ID')))
             return
 
-        # Extract reduced slope distance, if available.
+        if not hz:
+            logger.warning('No "SlopeDist" in observation "{}" with ID "{} '
+                           .format(obs.get('Name'), obs.get('ID')))
+            return
+
         try:
-            r_dist = obs.find('ResponseSets', 'Description',
-                              'ReducedDist')[0].get('Value')
-            if r_dist is not None:
-                dist = r_dist
-        except IndexError:
-            logger.warning('No reduced distance set.')
+            r_dist = obs.get('ResponseSets').get('ReducedDist').get('Value')
+        except AttributeError:
+            pass
 
-        # Calculate horizontal distance out of slope distance and
-        # vertical angle.
-        hz_dist =  dist * math.sin(v)
+        if not r_dist:
+            logger.info('Measured distance of observation "{}" with ID "{}" '
+                        'has not been reduced'.format(obs.get('Name'),
+                                                      obs.get('ID')))
+        else:
+            dist = r_dist
 
-        # Set the calculated values.
-        tie_point['Dist'] = dist
+        # Set the values.
+        tie_point = self._tie_points.get(obs.get('ID'))
+
         tie_point['Hz'] = hz
-        tie_point['HzDist'] = hz_dist
+        tie_point['V'] = v
+        tie_point['Dist'] = dist
+        tie_point['LastUpdate'] = time.time()
 
     def _calculate_view_point(self, obs):
-        sum_local_y = sum_local_x = 0
-        sum_global_y = sum_global_x = 0
-        num_tie_points = len(self._tie_points)
+        sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
+        sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
+        num_tie_points = len(self._tie_points)          # n.
 
         # Calculate the centroid coordinates of the view point.
-        for tie_point in self._tie_points:
-            hz = tie_point.get('Hz')
-            hz_dist = tie_point.get('HzDist')
+        for name, tie_point in self._tie_points.items():
+            hz = tie_point.get('Hz')            # Horizontal direction.
+            v = tie_point.get('V')              # Vertical angle.
+            dist = tie_point.get('Dist')        # Distance (slope or reduced).
 
-            local_y = hz_dist * math.sin(hz)
+            if hz is None or v is None or dist is None:
+                logger.warning('No "Hz", "V", or "Dist" in tie point "{}"'
+                               .format(name))
+                return
+
+            # Calculate horizontal distance out of slope distance and
+            # vertical angle.
+            hz_dist = dist * math.sin(v)
+
+            # Coordinates in the local system (x, y, z).
             local_x = hz_dist * math.cos(hz)
+            local_y = hz_dist * math.sin(hz)
+            local_z = dist * math.cos(v)        # Or hz_dist * cot(v).
 
-            global_y = tie_point.get('Y')
+            # Store local coordinates in the tie point dictionary.
+            tie_point['x'] = local_x
+            tie_point['y'] = local_y
+            tie_point['z'] = local_z
+
+            # Coordinates in the global system (X, Y, Z).
             global_x = tie_point.get('X')
+            global_y = tie_point.get('Y')
+            global_z = tie_point.get('Z')
 
-            sum_local_y = sum_local_y + local_y
-            sum_local_x = sum_local_x + local_x
-            sum_global_y = sum_global_y + global_y
-            sum_global_x = sum_global_x + global_x
+            # Sums of the coordinates.
+            sum_local_x += local_x
+            sum_local_y += local_y
+            sum_local_z += local_z
 
-        local_centroid_y = sum_local_y / num_tie_points
-        local_centroid_x = sum_local_x / num_tie_points
-        global_centroid_y = sum_global_y / num_tie_points
-        global_centroid_x = sum_global_x / num_tie_points
+            sum_global_x += global_x
+            sum_global_y += global_y
+            sum_global_z += global_z
 
+        # Coordinates of the centroids.
+        local_centroid_x = sum_local_x / num_tie_points     # x_s.
+        local_centroid_y = sum_local_y / num_tie_points     # y_s.
+
+        global_centroid_x = sum_global_x / num_tie_points   # X_s.
+        global_centroid_y = sum_global_y / num_tie_points   # Y_s.
+
+        # Calculate transformation parameters.
         o_1 = o_2 = 0
         a_1 = a_2 = 0
 
-        for tie_point in self._tie_points:
-            local_y = tie_point.get('LocalY')
-            local_x = tie_point.get('LocalX')
-            global_y = tie_point.get('Y')
+        for name, tie_point in self._tie_points.items():
+            local_x = tie_point.get('x')
+            local_y = tie_point.get('y')
             global_x = tie_point.get('X')
+            global_y = tie_point.get('Y')
 
-            r_local_centroid_y = local_y - local_centroid_y
+            # Reduced coordinates of the centroids.
             r_local_centroid_x = local_x - local_centroid_x
-            r_global_centroid_y = global_y - global_centroid_y
+            r_local_centroid_y = local_y - local_centroid_y
             r_global_centroid_x = global_x - global_centroid_x
+            r_global_centroid_y = global_y - global_centroid_y
 
             # o = [ x_i * Y_i - y_i * X_i ] * [ x_i^2 + y_i^2 ]^-1
-            o_1 = o_1 + ((r_local_centroid_x * r_global_centroid_y) - \
-                         (r_local_centroid_y * r_global_centroid_x))
-            o_2 = o_2 + math.pow(r_local_centroid_x, 2) + \
-                        math.pow(r_local_centroid_y, 2)
+            o_1 += (r_local_centroid_x * r_global_centroid_y) - \
+                   (r_local_centroid_y * r_global_centroid_x)
+            o_2 += math.pow(r_local_centroid_x, 2) + \
+                   math.pow(r_local_centroid_y, 2)
 
             # a = [ x_i * X_i + y_i * Y_i ] * [ x_i^2 + y_i^2 ]^-1
-            a_1 = a_1 + ((r_local_centroid_x * r_global_centroid_x) + \
-                         (r_local_centroid_y * r_global_centroid_y))
-            a_2 = a_2 + math.pow(r_local_centroid_x, 2) + \
-                        math.pow(r_local_centroid_y, 2)
+            a_1 += (r_local_centroid_x * r_global_centroid_x) + \
+                   (r_local_centroid_y * r_global_centroid_y)
+            a_2 += math.pow(r_local_centroid_x, 2) + \
+                   math.pow(r_local_centroid_y, 2)
 
-        o = o_1 / o_2
-        a = a_1 / a_2
+        self._o = o_1 / o_2   # Parameter o.
+        self._a = a_1 / a_2   # Parameter a.
 
-        # Calculate the coordinates of the view point.
+        # Calculate the coordinates of the view point:
+        # Y_0 = Y_s - a * y_s - o * x_s
+        # X_0 = X_s - a * x_s + o * y_s
+        self._view_point_x = global_centroid_x - (self._a * local_centroid_x) +\
+                             (self._o * local_centroid_y)
+        self._view_point_y = global_centroid_y - (self._a * local_centroid_y) -\
+                             (self._o * local_centroid_x)
+        self._view_point_z = (sum_global_z - sum_local_z) / num_tie_points
+
+        logger.info('Calculated view point coordinates (X = {}, Y = {}, Z = {})'
+                    .format(round(self._view_point_x, 5),
+                            round(self._view_point_y, 5),
+                            round(self._view_point_z, 5)))
+
+        # Calculate the standard deviations.
+        sum_wx = sum_wy = 0                     # [W_x], [W_y].
+        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0   # [W_x^2], [W_y^2], [W_z^2].
+
+        for name, tie_point in self._tie_points.items():
+            local_x = tie_point.get('x')
+            local_y = tie_point.get('y')
+            local_z = tie_point.get('z')
+            global_x = tie_point.get('X')
+            global_y = tie_point.get('Y')
+            global_z = tie_point.get('Z')
+
+            wx_i = (-1 * self._view_point_x) - (self._a * local_x) + \
+                   (self._o * local_y) + global_x
+            wy_i = (-1 * self._view_point_y) - (self._a * local_y) - \
+                   (self._o * local_x) + global_y
+
+            sum_wx += wx_i
+            sum_wy += wy_i
+
+            sum_wx_wx += wx_i * wx_i
+            sum_wy_wy += wy_i * wy_i
+
+            sum_wz_wz += math.pow(self._view_point_z - (global_z - local_z), 2)
+
+        # Sum of discrepancies should be 0, i.e. [W_x] = [W_y] = 0.
+        r_sum_wx = abs(round(sum_wx, 5))
+        r_sum_wy = abs(round(sum_wy, 5))
+
+        if r_sum_wx != r_sum_wy:
+            logger.warning('Coordinates of view point "{}" are inaccurate '
+                           '([W_x] = {}, [W_y] = {})'
+                           .format(self._view_point_id,
+                                   r_sum_wx,
+                                   r_sum_wy))
+
+        # Standard deviations.
+        sx = math.sqrt((sum_wx_wx + sum_wy_wy) / ((2 * num_tie_points) - 4))
+        sy = sx
+        sz = math.sqrt(sum_wz_wz / (num_tie_points - 1))
+
+        logger.debug('Calculated standard deviations '
+                     '(s_x = {} m, s_y = {} m, s_z = {} m)'
+                     .format(round(sx, 5),
+                             round(sy, 5),
+                             round(sz, 5)))
+
+        # Scale factor.
+        m = math.sqrt((self._a * self._a) + (self._o * self._o))
+        logger.debug('Calculated scale factor (m = {})'.format(round(m, 5)))
+
+        # Create observation instance of the view point.
+        view_point = Observation()
+
+        # Create response sets for the observation.
+        response_sets = {
+            'X': self.get_response_set('Float', 'm', self._view_point_x),
+            'Y': self.get_response_set('Float', 'm', self._view_point_y),
+            'Z': self.get_response_set('Float', 'm', self._view_point_z),
+            'StdDevX': self.get_response_set('Float', 'm', sx),
+            'StdDevY': self.get_response_set('Float', 'm', sy),
+            'StdDevZ': self.get_response_set('Float', 'm', sz),
+            'ScaleFactor': self.get_response_set('Float', 'm', m)
+        }
+
+        # Set values of the observation.
+        view_point.set('ID', self._view_point_id)
+        view_point.set('Name', 'get_view_point')
+        view_point.set('PortName', obs.get('PortName'))
+        view_point.set('Receivers', self._receivers)
+        view_point.set('ResponseSets', response_sets)
+        view_point.set('TimeStamp', time.time())
+
+        # Return the observation of the view point.
+        return view_point
+
+    def get_response_set(self, t, u, v):
+        return {'Type': t, 'Unit': u, 'Value': v}
+
+    def _calculate_target_point(self, obs):
+        hz = obs.get('ResponseSets').get('Hz').get('Value')
+        v = obs.get('ResponseSets').get('V').get('Value')
+        dist = obs.get('ResponseSets').get('Dist').get('Value')
+
+        if not hz:
+            logger.warning('No "Hz" in observation "{}" with ID "{}'
+                           .format(obs.get('Name'), obs.get('ID')))
+            return
+
+        if not v:
+            logger.warning('No "V" in observation "{}" with ID "{}'
+                           .format(obs.get('Name'), obs.get('ID')))
+            return
+
+        if not dist:
+            logger.warning('No "Dist" in observation "{}" with ID "{}'
+                           .format(obs.get('Name'), obs.get('ID')))
+            return
+
+        return obs
 
 
-    def _calculate_new_point(self, obs):
-        pass
-
-
-class PolarTransformer(prototype.Prototype):
+class PolarTransformer(Prototype):
 
     """
     Calculates 3-dimensional coordinates of a target using the sensor position,
@@ -519,19 +657,17 @@ class PolarTransformer(prototype.Prototype):
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config[self._name]
 
-        self._sensor_y = config.get('SensorPosition').get('East')
-        self._sensor_x = config.get('SensorPosition').get('North')
-        self._sensor_z = config.get('SensorPosition').get('Height')
+        self._sensor_x = config.get('SensorPosition').get('X')
+        self._sensor_y = config.get('SensorPosition').get('Y')
+        self._sensor_z = config.get('SensorPosition').get('Z')
 
-        self._azimuth_y = config.get('AzimuthPosition').get('East')
-        self._azimuth_x = config.get('AzimuthPosition').get('North')
+        self._azimuth_x = config.get('AzimuthPosition').get('X')
+        self._azimuth_y = config.get('AzimuthPosition').get('Y')
 
     def action(self, obs):
-        target = obs.get('ID')
         sensor_type = obs.get('SensorType')
 
         if not SensorType.is_total_station(sensor_type.lower()):
@@ -539,51 +675,36 @@ class PolarTransformer(prototype.Prototype):
                          .format(sensor_type))
             return obs
 
-        hzs = obs.find('ResponseSets', 'Description', 'Hz')
-        vs = obs.find('ResponseSets', 'Description', 'V')
-        dists = obs.find('ResponseSets', 'Description', 'SlopeDist')
-        r_dists = obs.find('ResponseSets', 'Description', 'ReducedDist')
+        hz = v = dist = r_dist = None
 
-        hz = v = dist = None
+        try:
+            hz = obs.get('ResponseSets').get('Hz').get('Value')
+            v = obs.get('ResponseSets').get('V').get('Value')
+            dist = obs.get('ResponseSets').get('SlopeDist').get('Value')
+        except AttributeError:
+            pass
 
-        # Set Hz, V, and distance.
-        if len(hzs) > 0 and len(vs) > 0 and len(dists) > 0:
-            hz = hzs[0].get('Value')        # Hz direction.
-            v = vs[0].get('Value')          # V angle.
-            dist = dists[0].get('Value')    # Slope distance.
-        else:
-            logger.warning('Responses of observation "{}" with ID "{}" '
-                           'are incomplete'.format(obs.get('Name'),
-                                                   obs.get('ID')))
-
-        # Override distance with reduced distance.
-        if len(r_dists) > 0:
-            dist = r_dists[0]['Value']
-        else:
-            logger.info('Distance has not been reduced by '
-                        'athmospheric influence')
-
-        if hz is None:
-            logger.warning('Hz is missing in observation "{}" with ID "{}"'
-                           .format(obs.get('Name'), obs.get('ID')))
+        if hz is None or v is None or dist is None:
+            logger.warning('No "Hz", "V", or "SlopeDist" in observation "{}" '
+                           'with ID "{}"'.format(obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
-        if v is None:
-            logger.warning('V is missing in observation "{}" with ID "{}"'
-                           .format(obs.get('Name'), obs.get('ID')))
-            return obs
+        try:
+            r_dist = obs.get('ResponseSets').get('ReducedDist').get('Value')
 
-        if not dist:
-            logger.warning('Distance is missing in observation "{}" with '
-                           'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
-            return obs
+            if r_dist is not None:
+                dist = r_dist
+        except AttributeError:
+            logger.info('Distance of observation "{}" with ID "{}" has not '
+                        'been reduced'.format(obs.get('Name'), obs.get('ID')))
 
         # Radiant to grad (gon).
         hz_grad = hz * 200 / math.pi
         v_grad = v * 200 / math.pi
 
         logger.debug('Starting polar transformation of target "{}" with '
-                     '[Hz = {:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m]'
+                     '(Hz = {:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m)'
                      .format(obs.get('ID'),
                              hz_grad,
                              v_grad,
@@ -598,22 +719,17 @@ class PolarTransformer(prototype.Prototype):
                                    v,
                                    dist)
 
-        logger.info('Transformed target "{}" to [Y = {:3.4f}, '
-                    'X = {:3.4f}, Z = {:3.4f}]'.format(obs.get('ID'),
-                                                       y,
-                                                       x,
-                                                       z))
-
-        # Create dictionaries (name, type, unit, value).
-        response_y = self._create_response_set('Y', 'Float', 'm', round(y, 5))
-        response_x = self._create_response_set('X', 'Float', 'm', round(x, 5))
-        response_z = self._create_response_set('Z', 'Float', 'm', round(z, 5))
+        logger.info('Transformed target "{}" (X = {:3.4f}, Y = {:3.4f}, '
+                    'Z = {:3.4f})'.format(obs.get('ID'),
+                                          x,
+                                          y,
+                                          z))
 
         # Add to observation data set.
         response_sets = obs.get('ResponseSets')
-        response_sets.append(response_y)
-        response_sets.append(response_x)
-        response_sets.append(response_z)
+        response_sets['X'] = self.get_response_set('Float', 'm', round(x, 5))
+        response_sets['Y'] = self.get_response_set('Float', 'm', round(y, 5))
+        response_sets['Z'] = self.get_response_set('Float', 'm', round(z, 5))
 
         return obs
 
@@ -643,11 +759,5 @@ class PolarTransformer(prototype.Prototype):
 
         return (y, x, z)
 
-    def _create_response_set(self, d, t, u, v):
-        response = {}
-        response['Description'] = d
-        response['Type'] = t
-        response['Unit'] = u
-        response['Value'] = v
-
-        return response
+    def get_response_set(self, t, u, v):
+        return {'Type': t, 'Unit': u, 'Value': v}

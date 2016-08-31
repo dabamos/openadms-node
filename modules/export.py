@@ -26,7 +26,7 @@ import time
 from datetime import datetime
 from enum import Enum
 
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for the export of sensor data to files and databases."""
 
@@ -45,16 +45,16 @@ class FileRotation(Enum):
     YEARLY = 3
 
 
-class FileExporter(prototype.Prototype):
+class FileExporter(Prototype):
 
     """
     Exports sensor data to a flat file in CSV format.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config['FileExporter']
+
         self._file_extension = config['FileExtension']
         self._file_name = config['FileName']
         self._file_rotation = {
@@ -134,24 +134,19 @@ class FileExporter(prototype.Prototype):
                 dt = datetime.fromtimestamp(obs.get('TimeStamp'))
                 line = dt.strftime(self._date_time_format)
 
-                try:
-                    if obs.get('ID') is not None:
-                        line += self._separator + obs.get('ID')
+                if obs.get('ID') is not None:
+                    line += self._separator + obs.get('ID')
 
-                    for response in obs.get('ResponseSets'):
-                        d = response['Description']
-                        v = response['Value']
-                        u = response['Unit']
+                response_sets = obs.get('ResponseSets')
 
-                        line += self._separator + format(d)
-                        line += self._separator + format(v)
-                        line += self._separator + format(u)
-                except KeyError:
-                    logger.warning('Observation "{}" of sensor "{}" on '
-                                   'port "{}" is incomplete'
-                                   .format(obs.get('Name'),
-                                           obs.get('SensorName'),
-                                           obs.get('PortName')))
+                for response_name, response_set in response_sets.items():
+                    d = response_name
+                    v = response_set.get('Value')
+                    u = response_set.get('Unit')
+
+                    line += self._separator + format(d)
+                    line += self._separator + format(v)
+                    line += self._separator + format(u)
 
                 # Write line to file.
                 fh.write(line + '\n')

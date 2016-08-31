@@ -25,12 +25,12 @@ import logging
 import threading
 import time
 
-from modules import prototype
+from modules.prototype import Prototype
 
 logger = logging.getLogger('openadms')
 
 
-class Scheduler(prototype.Prototype):
+class Scheduler(Prototype):
 
     """
     Scheduler is used to manage the monitoring process by sending observations
@@ -40,8 +40,7 @@ class Scheduler(prototype.Prototype):
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         self._jobs = []
         self.load_jobs()
 
@@ -123,7 +122,7 @@ class Job(object):
     """
 
     def __init__(self, name, port_name, observation_set, enabled, start_date,
-        end_date, schedule, action):
+                 end_date, schedule, action):
         self._name = name                           # Name of the job.
         self._port_name = port_name                 # Name of the port.
         self._observation_set = observation_set     # List of observations.
@@ -162,7 +161,7 @@ class Job(object):
         now = dt.datetime.now()
 
         # Are we within the date range of the job?
-        if now >= self._start_date and now < self._end_date:
+        if self._start_date <= now < self._end_date:
             # No days definied, go on.
             if len(self._schedule) == 0:
                 return True
@@ -212,7 +211,7 @@ class Job(object):
             # observation in our observation set.
             obs_copy = copy.deepcopy(obs)
             # Insert the name of the port module or the virtual sensor at the
-            # beginning of the recevers list.
+            # beginning of the receivers list.
             obs_copy.data['Receivers'].insert(0, self._port_name)
             # Sleep time is the time the job has to wait before to do the next
             # observation.

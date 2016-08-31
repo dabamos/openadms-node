@@ -23,23 +23,22 @@ import logging
 import serial
 import time
 
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for sensor communication."""
 
 logger = logging.getLogger('openadms')
 
 
-class SerialPort(prototype.Prototype):
+class SerialPort(Prototype):
     """
     I/O on serial port.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
 
-        self._serial = None         # Pyserial object.
+        self._serial = None     # Pyserial object.
         self._serial_port_config = None
         self._max_attempts = 3
 
@@ -62,7 +61,7 @@ class SerialPort(prototype.Prototype):
                     '"{}"'.format(obs.get('Name'),
                                   obs.get('SensorName'),
                                   self.name))
-        if self._serial == None:
+        if self._serial is None:
             logger.error('Could not write to port {} ({})'
                          .format(self.name, self._serial_port_config.port))
             return
@@ -76,11 +75,9 @@ class SerialPort(prototype.Prototype):
             # Write to the serial port.
             self._write(obs.get('Request'))
 
-            # Wait some time to let the sensor do its sensoring stuff.
-            time.sleep(obs.get('AwaitTime'))
-
             # Get the response of the sensor.
-            response = self._read(obs.get('ResponseDelimiter'))
+            response = self._read(obs.get('ResponseDelimiter'),
+                                  obs.get('Timeout'))
 
             if response != '':
                 logger.debug('Received response "{}" from sensor "{}" on '
@@ -103,7 +100,7 @@ class SerialPort(prototype.Prototype):
         # Add the raw response of the sensor to the observation set.
         obs.set('Response', response)
 
-        self.publish(obs)
+        return obs
 
     def close(self):
         logger.info('Closing port {} ({})'
@@ -150,7 +147,7 @@ class SerialPort(prototype.Prototype):
             logger.error('Permission denied for port {} ({})'
                          .format(self.name, self._serial_port_config.port))
 
-    def _read(self, eol, timeout=10.0):
+    def _read(self, eol, timeout=30.0):
         """Reads from serial port."""
         response = ''
         start_time = time.time()

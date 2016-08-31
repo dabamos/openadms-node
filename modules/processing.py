@@ -20,11 +20,9 @@ limitations under the Licence.
 """
 
 import logging
-import math
 import re
-import time
 
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for data processing (pre-precessing, atmospheric corrections,
 transformations)."""
@@ -32,7 +30,7 @@ transformations)."""
 logger = logging.getLogger('openadms')
 
 
-class PreProcessor(prototype.Prototype):
+class PreProcessor(Prototype):
 
     """
     Extracts values from the raw responses of a given observation set and
@@ -40,8 +38,7 @@ class PreProcessor(prototype.Prototype):
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
 
     def action(self, obs):
         """Extracts the values from the raw responses of the observation
@@ -54,9 +51,10 @@ class PreProcessor(prototype.Prototype):
                            .format(obs.get('Name')))
             return obs
 
-        parsed = re.match(response_pattern, response)
+        pattern = re.compile(response_pattern)
+        matches = pattern.match(response)
 
-        if not parsed:
+        if not matches:
             logger.error('Response "{}" of observation "{}" with ID "{}" from '
                          'sensor "{}" on port "{}" does not match extraction '
                          'pattern'.format(self.sanitize(response),
@@ -71,30 +69,33 @@ class PreProcessor(prototype.Prototype):
         #
         # Right: "(.*)"
         # Wrong: ".*"
-        raw_values = parsed.groups('')
         response_sets = obs.get('ResponseSets')
 
-        if len(raw_values) == 0:
+        if pattern.groups == 0:
             logger.error('No group(s) defined in regular expression pattern of '
                          'observation "{}" with ID "{}"'.format(obs.get('Name'),
                                                                 obs.get('ID')))
             return obs
 
-        if len(raw_values) != len(response_sets):
-            logger.warning('Number of responses mismatch number of defined '
-                           'response sets of observation "{}" with ID "{}"'
-                           .format(obs.get('Name'), obs.get('ID')))
+        if pattern.groups != len(response_sets):
+            logger.warning('Number of responses ({}) mismatch number of '
+                           'defined response sets ({}) of observation "{}" '
+                           'with ID "{}"'.format(pattern.groups,
+                                                 len(response_sets),
+                                                 obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
         # Convert the type of the parsed raw values from string to the actual
         # data type.
-        for raw_value, response_set in zip(raw_values, response_sets):
-            if raw_value == '':
-                logger.warning('Raw value "{}" in observation "{}" '
-                               'with ID "{}" is missing'
-                               .format(response_set.get('Description'),
-                                       obs.get('Name'),
-                                       obs.get('ID')))
+        for response_name, response_set in response_sets.items():
+            raw_value = matches.group(response_name)
+
+            if not raw_value:
+                logger.warning('No raw value "{}" in observation "{}" '
+                               'with ID "{}"'.format(response_name,
+                                                     obs.get('Name'),
+                                                     obs.get('ID')))
                 return obs
 
             logger.debug('Extracted "{}" from raw response of observation "{}" '
@@ -126,7 +127,7 @@ class PreProcessor(prototype.Prototype):
                                  'value "{}"'.format(raw_value,
                                                      response_value))
                 else:
-                    logger.warning('Value "{}" couldn\'t be converted '
+                    logger.warning('Value "{}" could not be converted '
                                    '(not integer)'.format(raw_value))
             # "Convert" raw value to string.
             else:
@@ -161,16 +162,15 @@ class PreProcessor(prototype.Prototype):
         return sanitized
 
 
-class ReturnCodeInspector(prototype.Prototype):
+class ReturnCodeInspector(Prototype):
 
     """
     Inspects the return code in an observation sent by sensors of Leica
-    Geosystems and creates an approriate log message.
+    Geosystems and creates an appropriate log message.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         """
         The dictionary has the following format:
 
@@ -179,10 +179,10 @@ class ReturnCodeInspector(prototype.Prototype):
             }
 
         The return code numbers and messages are take from the GeoCOM reference
-        manual of the Leica TPS 1200, TS 30, and TM 30 totalstations. The log
+        manual of the Leica TPS 1200, TS 30, and TM 30 total stations. The log
         level can be set to these values:
 
-            5: CRITIAL,
+            5: CRITICAL,
             4: ERROR,
             3: WARNING,
             2: INFO,
@@ -199,23 +199,16 @@ class ReturnCodeInspector(prototype.Prototype):
         }
 
     def action(self, obs):
-        return_codes = obs.find('ResponseSets', 'Description', 'ReturnCode')
-
-        if len(return_codes) == 0:
-            logger.warning('ReturnCode is missing in observation "{}"'
-                           .format(obs.get('Name')))
-            return obs
-
-        # Get first return code value.
-        return_code = return_codes[0].get('Value')
+        return_code = obs.get('ResponseSets').get('ReturnCode').get('Value')
 
         if return_code is None:
-            logger.warning('No ReturnCode value in observation "{}" with '
-                           'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
+            logger.warning('No return code in observation "{}" '
+                           'with ID "{}"'.format(obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
         if return_code == 0:
-            logger.info('Observation "{}" with ID "{}" was successful '
+            logger.debug('Observation "{}" with ID "{}" was successful '
                         '(code "{}")'.format(obs.get('Name'),
                                              obs.get('ID'),
                                              return_code))
@@ -233,7 +226,7 @@ class ReturnCodeInspector(prototype.Prototype):
                                                       return_code))
         else:
             # Generic log message.
-            logger.error('Error occured on observation "{}" (code "{}")'
+            logger.error('Error occurred on observation "{}" (code "{}")'
                          .format(obs.get('Name'), return_code))
 
         return obs

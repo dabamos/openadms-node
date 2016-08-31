@@ -36,16 +36,17 @@ class Observation(object):
 
     def __init__(self, data=None):
         if not data:
-            self._data = {}
-            self._data['Enabled'] = True
-            self._data['ID'] = None
-            self._data['Name']
-            self._data['NextReceiver'] = 0
-            self._data['PortName'] = None
-            self._data['Receivers'] = []
-            self._data['Response'] = None
-            self._data['ResponseSets'] = {}
-            self._data['TimeStamp'] = None
+            self._data = {
+                'Enabled': True,
+                'ID': None,
+                'Name': None,
+                'NextReceiver': 0,
+                'PortName': None,
+                'Receivers': [],
+                'Response': None,
+                'ResponseSets': {},
+                'TimeStamp': None
+            }
         else:
             self._data = data
 
@@ -62,33 +63,6 @@ class Observation(object):
             data (Dict): The data set dictionary.
         """
         self._data = data
-
-    def find(self, list_name, key, value):
-        """Returns the ``dict'' in ``data'' that contains the given key and
-        value.
-
-        Args:
-            list_name (str): The name of the list that contains the wanted dict.
-            key (str): The key of the value.
-            value (str): The corresponding value.
-
-        Returns:
-            Returns a ``dict'' containing the key and the value.
-        """
-        return [x for x in self._data[list_name] if x[key] == value]
-
-    def find_any(self, list_name, key, values):
-        """Returns the ``dict'' in ``data'' that contains the given key and
-        and one of the values.
-        Args:
-            list_name (str): The name of the list that contains the wanted dict.
-            key (str): The key of the value.
-            values (List(str)): The corresponding values.
-
-        Returns:
-            Returns a ``dict'' containing the key and one of the values.
-        """
-        return [x for x in self._data[list_name] if x[key] in values]
 
     def get(self, key):
         """Returns the value to a given key.

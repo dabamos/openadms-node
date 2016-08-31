@@ -10,7 +10,8 @@
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
-        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector"
+        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
+        "ViewPointCalculator": "modules.totalstation.ViewPointCalculator"
     },
     "Project":
     {
@@ -59,23 +60,24 @@
                     {
                         "Name": "power_on",
                         "Description": "Power on sensor.",
-                        "Receivers": ["PreProcessor"],
+                        "Receivers": [
+                            "PreProcessor"
+                        ],
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 1.0,
                         "ID": null,
                         "Request": "A\r",
-                        "ResponsePattern": "(#)",
+                        "ResponsePattern": "(?P<PowerOn>#)",
                         "ResponseDelimiter": "\r",
-                        "ResponseSets": [
-                            {
-                                "Description": "PowerOn",
+                        "ResponseSets": {
+                            "PowerOn": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        ]
+                        }
                     },
                     {
                         "Name": "set_command_set",
@@ -84,19 +86,18 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 1.0,
                         "ID": null,
                         "Request": "CMDT 1\r",
-                        "ResponsePattern": "(\\*)",
+                        "ResponsePattern": "(?P<SetCmd>\\*)",
                         "ResponseDelimiter": "\r",
-                        "ResponseSets": [
-                            {
-                                "Description": "SetCmd",
+                        "ResponseSets": {
+                            "SetCmd": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        ]
+                        }
                     },
                     {
                         "Name": "save",
@@ -105,19 +106,18 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 1.0,
                         "ID": null,
                         "Request": "SAVE\r",
-                        "ResponsePattern": "(\\*)",
+                        "ResponsePattern": "(?P<Save>\\*)",
                         "ResponseDelimiter": "\r",
-                        "ResponseSets": [
-                            {
-                                "Description": "Save",
+                        "ResponseSets": {
+                            "Save": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        ]
+                        }
                     }
                 ],
                 "Main":
@@ -129,19 +129,18 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": false,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 1.0,
                         "ID": "TEMP",
                         "Request": "TEMP ?\r",
-                        "ResponsePattern": "([+-]?\\d+\\.+\\d)",
+                        "ResponsePattern": "(?P<Temperature>[+-]?\\d+\\.+\\d)",
                         "ResponseDelimiter": "\r",
-                        "ResponseSets": [
-                            {
-                                "Description": "Temperature",
+                        "ResponseSets": {
+                            "Temperature": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             }
-                        ]
+                        }
                     },
                     {
                         "Name": "get_pressure",
@@ -150,19 +149,18 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": false,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 20.0,
                         "ID": "PRES",
                         "Request": "PRES ?\r",
-                        "ResponsePattern": "([+-]?\\d+\\.+\\d)",
+                        "ResponsePattern": "(?P<Pressure>[+-]?\\d+\\.+\\d)",
                         "ResponseDelimiter": "\r",
-                        "ResponseSets": [
-                            {
-                                "Description": "Pressure",
+                        "ResponseSets": {
+                            "Pressure": {
                                 "Type": "Float",
                                 "Unit": "mbar"
                             }
-                        ]
+                        }
                     }
                 ]
             }
@@ -181,24 +179,22 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "AwaitTime": 1.0,
+                        "Timeout": 15.0,
                         "SleepTime": 1.0,
                         "ID": null,
                         "Request": "%R1Q,5003:\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,(\\d+))?",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorID>\\d+))?",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "SensorID",
+                            "SensorID": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        ]
+                        }
                     },
                     {
                         "Name": "get_sensor_name",
@@ -207,29 +203,27 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "AwaitTime": 1.0,
-                        "SleepTime": 5.0,
+                        "Timeout": 15.0,
+                        "SleepTime": 1.0,
                         "ID": null,
                         "Request": "%R1Q,5004:\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)(?:,\"([\\w\\d\\s\\.]+))?",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,\"(?P<SensorName>[\\w\\d\\s\\.]+))?",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "SensorName",
+                            "SensorName": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        ]
+                        }
                     }
                 ],
                 "P1": [
                     {
-                        "AwaitTime": 2.0,
+                        "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
                         "ID": null,
@@ -242,22 +236,21 @@
                         ],
                         "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 3.0
                     },
                     {
-                        "AwaitTime": 2.0,
+                        "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "measure_distance",
+                        "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -266,18 +259,17 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 2.0
                     },
                     {
-                        "AwaitTime": 1.0,
+                        "Timeout": 15.0,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "Face": 1,
@@ -289,65 +281,58 @@
                             "PreProcessor",
                             "ReturnCodeInspector",
                             "DistanceCorrector",
+                            "ViewPointCalculator",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
+                        "ResponseSets":
+                        {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "Hz",
+                            "Hz": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "V",
+                            "V": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccAngle",
+                            "AccAngle": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "C",
+                            "C": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "L",
+                            "L": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccIncl",
+                            "AccIncl": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "SlopeDist",
+                            "SlopeDist": {
                                 "Type": "Float",
                                 "Unit": "m"
                             },
-                            {
-                                "Description": "DistTime",
+                            "DistTime": {
                                 "Type": "Integer",
                                 "Unit": "ns"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
+                        },
                         "SleepTime": 10.0
                     }
                 ],
                 "P2": [
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
                         "ID": "P2",
@@ -360,22 +345,21 @@
                         ],
                         "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 3.0
                     },
                     {
-                        "AwaitTime": 2.0,
+                        "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": "P2",
-                        "Name": "measure_distance",
+                        "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -384,18 +368,17 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 2.0
                     },
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "Face": 1,
@@ -407,65 +390,58 @@
                             "PreProcessor",
                             "ReturnCodeInspector",
                             "DistanceCorrector",
+                            "ViewPointCalculator",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
+                        "ResponseSets":
+                        {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "Hz",
+                            "Hz": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "V",
+                            "V": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccAngle",
+                            "AccAngle": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "C",
+                            "C": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "L",
+                            "L": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccIncl",
+                            "AccIncl": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "SlopeDist",
+                            "SlopeDist": {
                                 "Type": "Float",
                                 "Unit": "m"
                             },
-                            {
-                                "Description": "DistTime",
+                            "DistTime": {
                                 "Type": "Integer",
                                 "Unit": "ns"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
+                        },
                         "SleepTime": 10.0
                     }
                 ],
                 "P3": [
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
                         "ID": null,
@@ -478,22 +454,21 @@
                         ],
                         "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 3.0
                     },
                     {
-                        "AwaitTime": 2.0,
+                        "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "measure_distance",
+                        "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -502,18 +477,17 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 2.0
                     },
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "Face": 1,
@@ -525,65 +499,58 @@
                             "PreProcessor",
                             "ReturnCodeInspector",
                             "DistanceCorrector",
+                            "ViewPointCalculator",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
+                        "ResponseSets":
+                        {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "Hz",
+                            "Hz": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "V",
+                            "V": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccAngle",
+                            "AccAngle": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "C",
+                            "C": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "L",
+                            "L": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccIncl",
+                            "AccIncl": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "SlopeDist",
+                            "SlopeDist": {
                                 "Type": "Float",
                                 "Unit": "m"
                             },
-                            {
-                                "Description": "DistTime",
+                            "DistTime": {
                                 "Type": "Integer",
                                 "Unit": "ns"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
+                        },
                         "SleepTime": 10.0
                     }
                 ],
                 "P4": [
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
                         "ID": null,
@@ -596,22 +563,21 @@
                         ],
                         "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 3.0
                     },
                     {
-                        "AwaitTime": 2.0,
+                        "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
                         "ID": null,
-                        "Name": "measure_distance",
+                        "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
                         "Receivers": [
@@ -620,18 +586,17 @@
                         ],
                         "Request": "%R1Q,2008:1,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                        "ResponseSets": {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)(\\d+)",
+                        },
                         "SleepTime": 2.0
                     },
                     {
-                        "AwaitTime": 0.5,
+                        "Timeout": 15.0,
                         "Description": "Get a complete measurement.",
                         "Enabled": true,
                         "Face": 1,
@@ -643,59 +608,52 @@
                             "PreProcessor",
                             "ReturnCodeInspector",
                             "DistanceCorrector",
+                            "ViewPointCalculator",
                             "PolarTransformer",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
                         "ResponseDelimiter": "\r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "ReturnCode",
+                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
+                        "ResponseSets":
+                        {
+                            "ReturnCode": {
                                 "Type": "Integer",
                                 "Unit": "none"
                             },
-                            {
-                                "Description": "Hz",
+                            "Hz": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "V",
+                            "V": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccAngle",
+                            "AccAngle": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "C",
+                            "C": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "L",
+                            "L": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "AccIncl",
+                            "AccIncl": {
                                 "Type": "Float",
                                 "Unit": "rad"
                             },
-                            {
-                                "Description": "SlopeDist",
+                            "SlopeDist": {
                                 "Type": "Float",
                                 "Unit": "m"
                             },
-                            {
-                                "Description": "DistTime",
+                            "DistTime": {
                                 "Type": "Integer",
                                 "Unit": "ns"
                             }
-                        ],
-                        "ResponsePattern": "(?:%R1P,0,0:)([0-9]+)(?:,(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]+),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),(-?[0-9]*\\.?[0-9]*),([0-9]*\\.?[0-9]*),([0-9]*))?",
+                        },
                         "SleepTime": 10.0
                     }
                 ]
@@ -716,45 +674,39 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": false,
-                        "AwaitTime": 0.8,
+                        "Timeout": 1.0,
                         "SleepTime": 10.0,
                         "ID": "Pt100",
                         "Request": "#01\r",
-                        "ResponsePattern": ">[+-][\\d\\.]{6}[+-][\\d\\.]{6}[+-][\\d\\.]{6}[+-][\\d\\.]{6}([+-][\\d\\.]{6})([+-][\\d\\.]{6})",
+                        "ResponsePattern": ">(?P<Temperature1>[+-][\\d\\.]{6})(?P<Temperature2>[+-][\\d\\.]{6})(?P<Temperature3>[+-][\\d\\.]{6})(?P<Temperature4>[+-][\\d\\.]{6})(?P<Temperature5>[+-][\\d\\.]{6})(?P<Temperature6>[+-][\\d\\.]{6})",
                         "ResponseDelimiter": "\r",
                         "ResponseSets":
-                        [
-                            {
-                                "Description": "Temperature",
+                        {
+                            "Temperature1": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature2": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature3": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature4": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature5": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature6": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             }
-                        ]
+                        }
                     }
                 ]
             }
@@ -774,34 +726,31 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": false,
-                        "AwaitTime": 0.8,
+                        "Timeout": 0.8,
                         "SleepTime": 5.0,
                         "ID": "Meteo",
                         "Request": "?U\r\n",
-                        "ResponsePattern": "TD([\\d\\.]+), TE([\\d\\.]+), DR([\\d\\.]+), FE([\\d\\.]+),",
+                        "ResponsePattern": "TD(?P<TempPress>[\\d\\.]+), TE(?P<Temperature>[\\d\\.]+), DR(?P<Pressure>[\\d\\.]+), FE(?P<Humidity>[\\d\\.]+),",
                         "ResponseDelimiter": ", \r\n",
-                        "ResponseSets": [
-                            {
-                                "Description": "TempPress",
+                        "ResponseSets":
+                        {
+                            "TempPress": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Temperature",
+                            "Temperature": {
                                 "Type": "Float",
                                 "Unit": "°C"
                             },
-                            {
-                                "Description": "Pressure",
+                            "Pressure": {
                                 "Type": "Float",
                                 "Unit": "hPa"
                             },
-                            {
-                                "Description": "Humidity",
+                            "Humidity": {
                                 "Type": "Float",
                                 "Unit": "%"
                             }
-                        ]
+                        }
                     }
                 ]
             }
@@ -866,11 +815,11 @@
                 "Host": "10.59.0.40",
                 "Port": 1432,
                 "PhoneNumbers": ["+49176 12345678"],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"{project}\": {asctime} - {level} - {msg}</cmgs>"
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project 1\": {asctime} - {level} - {msg}</cmgs>"
             },
             "MailAlarmHandler":
             {
-                "Enabled": true,
+                "Enabled": false,
                 "LogLevels": ["Warning", "Error", "Critical"],
                 "Recipients": ["engineer@example.com"],
                 "UserName": "monitoring@example.com",
@@ -889,45 +838,46 @@
         "SealevelCorrectionEnabled": false,
         "SensorHeight": 100.0
     },
-    "HelmertTransformer":
+    "ViewPointCalculator":
     {
-        "StationID": "P6",
-        "TiePoints": [
-            "P1":
-            {
-                "X": 1000.0000,
-                "Y": 2000.0000
+        "ViewPointID": "P6",
+        "Receivers": ["FileExporter"],
+        "TiePoints":
+        {
+            "P1": {
+                "Y": 1000.0000,
+                "X": 2000.0000,
+                "Z": 100.0000
             },
-            "P2":
-            {
-                "X": 1000.0000,
-                "Y": 2000.0000
+            "P2": {
+                "Y": 1003.7680,
+                "X": 1995.4880,
+                "Z": 100.0080
             },
-            "P3":
-            {
-                "X": 1000.0000,
-                "Y": 2000.0000
+            "P3": {
+                "Y": 996.2600,
+                "X": 1994.4900,
+                "Z": 100.0210
             },
-            "P4":
-            {
-                "X": 1000.0000,
-                "Y": 2000.0000
+            "P4": {
+                "Y": 988.7710,
+                "X": 1994.4890,
+                "Z": 100.0220
             }
-        ],
-        "MaximumStandardDeviation": 10.0
+        }
     },
     "PolarTransformer":
     {
         "SensorPosition":
         {
-            "East": 1000.0000,
-            "North": 2000.0000,
-            "Height": 100.0000
+            "Y": 1000.0000,
+            "X": 2000.0000,
+            "Z": 100.0000
         },
         "AzimuthPosition":
         {
-            "East": 1007.4992,
-            "North": 2000.0000
+            "Y": 1007.4992,
+            "X": 2000.0000
         }
     },
     "FileExporter":

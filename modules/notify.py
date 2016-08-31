@@ -27,19 +27,18 @@ import time
 
 from abc import ABCMeta, abstractmethod
 
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for alarming."""
 
 logger = logging.getLogger('openadms')
 
 
-class Alarm(prototype.Prototype):
+class Alarm(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
-        config = config_manager.config.get(self._name)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
 
         self._queue = queue.Queue(-1)
         self._alarm_handlers = []
@@ -50,14 +49,20 @@ class Alarm(prototype.Prototype):
         logger.addHandler(qh)
 
         # Add the alarm handlers to the alarm handlers list.
-        handlers = self._config.get('Handlers')
+        handlers = config.get('Handlers')
 
         for handler in handlers:
-            h_class = vars().get(handler)
+            if handlers.get(handler).get('Enabled') is False:
+                continue
 
-            if h_class:
-                h = h_class(handlers.get(handler))
-                self._alarm_handlers.append(h)
+            # Add handler to the handlers list.
+            handler_class = globals().get(handler)
+
+            if handler_class:
+                config = handlers.get(handler)
+                handler_instance = handler_class(config)
+                self._alarm_handlers.append(handler_instance)
+                logger.debug('Loaded alarm handler "{}"'.format(handler))
             else:
                 logger.warning('Alarm handler "{}" not found'.format(handler))
 
@@ -100,28 +105,43 @@ class ShortMessageAlarmHandler(AlarmHandler):
 
     def __init__(self, config):
         AlarmHandler.__init__(self, config)
-        self._config = config
 
-        self._log_levels = config.get('LogLevels')
-        self._host = config.get('Host')
-        self._port = config.get('Port')
-        self._phone_numbers = config.get('PhoneNumbers')
-        self._template = config.get('Template')
-
-        # Add the current project name to the dict of message variables.
-        project_name = self._config_manager.get('Project').get('Name')
-        self.add_var('project', project_name)
+        self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
+        self._host = self._config.get('Host')
+        self._port = self._config.get('Port')
+        self._phone_numbers = self._config.get('PhoneNumbers')
+        self._template = self._config.get('Template')
+        self._last_message = ""
 
     def handle(self, record):
-        if record.levelname not in self._log_levels.upper():
+        if record.levelname not in self._log_levels:
             return
+
+        # Do not send message if it equals the last one.
+        if record.message == self._last_message:
+            logger.debug('Skipped sending alarm message (message equals '
+                         'last message)')
+            return
+
+        self._last_message = record.message
 
         self.add_var('asctime', record.asctime)
         self.add_var('level', record.levelname)
         self.add_var('msg', record.message)
 
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((self._host, self._port))
+            try:
+                sock.connect((self._host, self._port))
+                logger.debug('Established connection to "{}:{}"'
+                             .format(self._host, self._port))
+            except ConnectionRefusedError:
+                logger.error('Could not connect to "{}:{}" (connection refused)'
+                             .format(self._host, self._port))
+                return
+            except TimeoutError:
+                logger.error('Could not connect to "{}:{}" (timeout)'
+                             .format(self._host, self._port))
+                return
 
             for number in self._phone_numbers:
                 text = self._template
@@ -130,12 +150,18 @@ class ShortMessageAlarmHandler(AlarmHandler):
                 for key, value in self._msg_vars.items():
                     text = text.replace(key, value)
 
+                logger.debug('Sending SMS to "{}"  ...'.format(number))
                 sock.send(text.encode())
                 time.sleep(1.0)
+
+        logger.debug('Closed connection to "{}:{}"'
+                     .format(self._host, self._port))
 
 
 class MailAlarmHandler(AlarmHandler):
 
-    def __init__(self, config_manager):
-        AlarmHandler.__init__(self, config_manager)
-        config = config_manager.config.get('Alarm').get('SocketAlarmHandler')
+    def __init__(self, config):
+        AlarmHandler.__init__(self, config)
+
+    def handle(self, record):
+        pass

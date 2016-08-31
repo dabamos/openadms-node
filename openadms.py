@@ -120,10 +120,8 @@ if __name__ == '__main__':
     # Basic logging configuration.
     logger.setLevel(level)
 
-    # '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
-    date_fmt = '%Y-%m-%dT%H:%M:%S'
-
+    fmt = '%(asctime)s - %(levelname)7s - %(module)12s:%(lineno)-4s - ' \
+          '%(message)s'
     formatter = logging.Formatter(fmt)
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
@@ -136,6 +134,7 @@ if __name__ == '__main__':
     # Add handlers to logger.
     logger.addHandler(fh)
 
+    date_fmt = '%Y-%m-%dT%H:%M:%S'
     coloredlogs.install(level=level,
                         fmt=fmt,
                         datefmt=date_fmt)

@@ -25,18 +25,17 @@ import random
 import re
 import time
 
-from modules import prototype
+from modules.prototype import Prototype
 
 """Module for virtual sensors."""
 
 logger = logging.getLogger('openadms')
 
 
-class VirtualSensor(prototype.Prototype):
+class VirtualSensor(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
-        prototype.Prototype.__init__(self, name, config_manager,
-                                     sensor_manager)
+        Prototype.__init__(self, name, config_manager, sensor_manager)
         self.patterns = {}
 
     def action(self, obs):
@@ -152,7 +151,7 @@ class VirtualDTM(VirtualSensor):
     def get_temperature(self, request):
         t = random.uniform(-20, 40)
 
-        if (t < 0):
+        if t < 0:
             return '{:07.1f}\r'.format(t)
         else:
             return '+{:06.1f}\r'.format(t)

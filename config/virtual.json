@@ -7,10 +7,10 @@
         "VirtualLeicaTM30": "modules.virtual.VirtualLeicaTM30",
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
+        "Alarm": "modules.notify.Alarm",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
-        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
-        "Alarm": "modules.notify.Alarm"
+        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector"
     },
     "Project":
     {
@@ -853,7 +853,7 @@
                 "Host": "10.59.0.40",
                 "Port": 1432,
                 "PhoneNumbers": ["+49176 12345678"],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"{project}\": {asctime} - {level} - {msg}</cmgs>"
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project 1\": {asctime} - {level} - {msg}</cmgs>"
             },
             "MailAlarmHandler":
             {
