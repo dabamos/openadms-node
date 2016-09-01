@@ -200,12 +200,7 @@ class ReturnCodeInspector(Prototype):
         }
 
     def action(self, obs):
-        return_code = None
-
-        try:
-            return_code = obs.get('ResponseSets').get('ReturnCode').get('Value')
-        except AttributeError:
-            pass
+        return_code = obs.validate('ResponseSets', 'ReturnCode', 'Value')
 
         if return_code is None:
             logger.warning('No return code in observation "{}" '

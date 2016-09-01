@@ -91,3 +91,19 @@ class Observation(object):
             str: Data in JSON format.
         """
         return json.dumps(self._data)
+
+    def validate(self, *args):
+        ref = self.data
+
+        for x in args:
+            try:
+                ref = ref.get(x)
+            except AttributeError:
+                logger.info('No "{}" in observation "{}" with ID "{}"'
+                            .format('->'.join(args),
+                                    self.get('Name'),
+                                    self.get('ID')))
+                return None
+
+        return ref
+
