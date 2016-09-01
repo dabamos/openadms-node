@@ -129,7 +129,7 @@ class DistanceCorrector(Prototype):
             response_set = self.get_response_set('Float',
                                                  'm',
                                                  round(r_dist, 5))
-            response_sets['ReducedDist'] = response_set
+            response_sets['ReducedSlopeDist'] = response_set
 
         return obs
 
@@ -278,7 +278,7 @@ class SerialMeasurementProcessor(Prototype):
             #     dist1 = value1
             #     dist2 = value2
             #
-            # if set([desc1, desc2]).issubset(['reduceddist', 'reduceddistance']):
+            # if set([desc1, desc2]).issubset(['ReducedSlopeDist', 'ReducedSlopeDistance']):
             #     dist1 = value1
             #     dist2 = value2
 
@@ -350,7 +350,7 @@ class SerialMeasurementProcessor(Prototype):
         return obs
 
 
-class ViewPointCalculator(Prototype):
+class HelmertTransformer(Prototype):
 
     """
     Calculates a 3-dimensional coordinates of a view point using the Helmert
@@ -416,20 +416,20 @@ class ViewPointCalculator(Prototype):
         if not hz:
             logger.warning('No "Hz" in observation "{}" with ID "{} '
                            .format(obs.get('Name'), obs.get('ID')))
-            return
+            return obs
 
         if not v:
             logger.warning('No "V" in observation "{}" with ID "{} '
                            .format(obs.get('Name'), obs.get('ID')))
-            return
+            return obs
 
         if not hz:
             logger.warning('No "SlopeDist" in observation "{}" with ID "{} '
                            .format(obs.get('Name'), obs.get('ID')))
-            return
+            return obs
 
         try:
-            r_dist = obs.get('ResponseSets').get('ReducedDist').get('Value')
+            r_dist = obs.get('ResponseSets').get('ReducedSlopeDist').get('Value')
         except AttributeError:
             pass
 
@@ -447,6 +447,8 @@ class ViewPointCalculator(Prototype):
         tie_point['V'] = v
         tie_point['Dist'] = dist
         tie_point['LastUpdate'] = time.time()
+
+        logger.debug('Updated tie point "{}"'.format(obs.get('ID')))
 
     def _calculate_view_point(self, obs):
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
@@ -539,8 +541,10 @@ class ViewPointCalculator(Prototype):
                              (self._o * local_centroid_x)
         self._view_point_z = (sum_global_z - sum_local_z) / num_tie_points
 
-        logger.info('Calculated view point coordinates (X = {}, Y = {}, Z = {})'
-                    .format(round(self._view_point_x, 5),
+        logger.info('Calculated coordinates of view point "{}" '
+                    '(X = {}, Y = {}, Z = {})'
+                    .format(self._view_point_id,
+                            round(self._view_point_x, 5),
                             round(self._view_point_y, 5),
                             round(self._view_point_z, 5)))
 
@@ -624,9 +628,14 @@ class ViewPointCalculator(Prototype):
         return {'Type': t, 'Unit': u, 'Value': v}
 
     def _calculate_target_point(self, obs):
-        hz = obs.get('ResponseSets').get('Hz').get('Value')
-        v = obs.get('ResponseSets').get('V').get('Value')
-        dist = obs.get('ResponseSets').get('Dist').get('Value')
+        hz = v = dist = r_dist = None
+
+        try:
+            hz = obs.get('ResponseSets').get('Hz').get('Value')
+            v = obs.get('ResponseSets').get('V').get('Value')
+            dist = obs.get('ResponseSets').get('SlopeDist').get('Value')
+        except AttributeError:
+            pass
 
         if not hz:
             logger.warning('No "Hz" in observation "{}" with ID "{}'
@@ -642,6 +651,45 @@ class ViewPointCalculator(Prototype):
             logger.warning('No "Dist" in observation "{}" with ID "{}'
                            .format(obs.get('Name'), obs.get('ID')))
             return
+
+        try:
+            r_dist = obs.get('ResponseSets').get('ReducedSlopeDist').get('Value')
+
+            if r_dist is not None:
+                dist = r_dist
+        except AttributeError:
+            logger.info('Distance in observation "{}" with ID "{}" has not '
+                        'been reduced'.format(obs.get('Name'), obs.get('ID')))
+
+        hz_dist = dist * math.sin(v)
+
+        # Calculate Cartesian coordinates using Polar coordinates (x, y, z).
+        local_x = hz_dist * math.cos(hz)
+        local_y = hz_dist * math.sin(hz)
+        local_z = dist * math.cos(v)
+
+        # Calculate the coordinates in the global system (X, Y, Z).
+        global_x = self._view_point_x + (self._a * local_x) - \
+                   (self._o * local_y)
+        global_y = self._view_point_y + (self._a * local_y) + \
+                   (self._o * local_x)
+        global_z = self._view_point_z + local_z
+
+        logger.info('Calculated coordinates of target point "{}" '
+                    '(X = {}, Y = {}, Z = {})'.format(obs.get('ID'),
+                                                      global_x,
+                                                      global_y,
+                                                      global_z))
+
+        #
+        # TODO: Nachbarschaftstreue Einpassung (S. 89)
+        #
+
+        # Add response set.
+        response_sets = obs.get('ResponseSets')
+        response_sets['X'] = self.get_response_set('Float', 'm', global_x)
+        response_sets['Y'] = self.get_response_set('Float', 'm', global_y)
+        response_sets['Z'] = self.get_response_set('Float', 'm', global_z)
 
         return obs
 
@@ -691,7 +739,8 @@ class PolarTransformer(Prototype):
             return obs
 
         try:
-            r_dist = obs.get('ResponseSets').get('ReducedDist').get('Value')
+            r_dist = obs.get('ResponseSets').get('ReducedSlopeDist') \
+                                            .get('Value')
 
             if r_dist is not None:
                 dist = r_dist

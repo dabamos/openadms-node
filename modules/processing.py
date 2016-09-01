@@ -192,6 +192,7 @@ class ReturnCodeInspector(Prototype):
         Please choose a proper value for each return code.
         """
         self.code_descriptions = {
+               5: [4, 'GeoCOM command unknown'],
              514: [4, 'Several targets detected'],
             1285: [4, 'Only angle measurement valid'],
             1292: [4, 'Distance measurement not done (no aim, etc.)'],
@@ -199,7 +200,12 @@ class ReturnCodeInspector(Prototype):
         }
 
     def action(self, obs):
-        return_code = obs.get('ResponseSets').get('ReturnCode').get('Value')
+        return_code = None
+
+        try:
+            return_code = obs.get('ResponseSets').get('ReturnCode').get('Value')
+        except AttributeError:
+            pass
 
         if return_code is None:
             logger.warning('No return code in observation "{}" '
@@ -215,7 +221,10 @@ class ReturnCodeInspector(Prototype):
             return obs
 
         # Get level and error message of the return code.
-        lvl, msg = self.code_descriptions.get(return_code)
+        lvl = msg = None
+
+        if self.code_descriptions.get(return_code):
+            lvl, msg = self.code_descriptions.get(return_code)
 
         if lvl and msg:
             # Return code related log message.
