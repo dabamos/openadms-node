@@ -21,11 +21,14 @@ limitations under the Licence.
 
 import logging
 import queue
+import smtplib
 import socket
 import threading
 import time
 
 from abc import ABCMeta, abstractmethod
+from email.mime.text import MIMEText
+from email.utils import formatdate
 
 from modules.prototype import Prototype
 
@@ -78,11 +81,12 @@ class Alarm(Prototype):
     def _process(self):
         while True:
             if not self._queue.empty():
+                logger.info('Processing alarm message ...')
                 record = self._queue.get()
                 for alarm_handler in self._alarm_handlers:
                     alarm_handler.handle(record)
 
-            time.sleep(0.1)
+            time.sleep(1)
 
 
 class AlarmHandler(object):
@@ -91,29 +95,34 @@ class AlarmHandler(object):
 
     def __init__(self, config):
         self._config = config
-        self._msg_vars = {}
-
-    def add_var(self, key, value):
-        self._msg_vars['{' + key + '}'] = value
 
     @abstractmethod
     def handle(self, record):
         pass
 
 
-class ShortMessageAlarmHandler(AlarmHandler):
+class ShortMessageSocketAlarmHandler(AlarmHandler):
 
     def __init__(self, config):
         AlarmHandler.__init__(self, config)
 
+        self._enabled = self._config.get('Enabled')
         self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
         self._host = self._config.get('Host')
         self._port = self._config.get('Port')
         self._phone_numbers = self._config.get('PhoneNumbers')
         self._template = self._config.get('Template')
-        self._last_message = ""
+
+        self._msg_vars = {}
+        self._last_message = ''
+
+    def add_var(self, key, value):
+        self._msg_vars['{' + key + '}'] = value
 
     def handle(self, record):
+        if not self._enabled:
+            return
+
         if record.levelname not in self._log_levels:
             return
 
@@ -150,7 +159,7 @@ class ShortMessageAlarmHandler(AlarmHandler):
                 for key, value in self._msg_vars.items():
                     text = text.replace(key, value)
 
-                logger.debug('Sending SMS to "{}" ...'.format(number))
+                logger.info('Sending SMS to "{}" ...'.format(number))
                 sock.send(text.encode())
                 time.sleep(1.0)
 
@@ -163,5 +172,56 @@ class MailAlarmHandler(AlarmHandler):
     def __init__(self, config):
         AlarmHandler.__init__(self, config)
 
+        self._enabled = self._config.get('Enabled')
+        self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
+        self._recipients = self._config.get('Recipients')
+        self._user_name = self._config.get('UserName')
+        self._user_password = self._config.get('UserPassword')
+        self._host = self._config.get('Host')
+        self._port = self._config.get('Port')
+
+        tls = self._config.get('TLS')
+
+        if tls.lower() in ['no', 'tls', 'starttls']:
+            self._tls = tls.lower()
+
+        self._last_message = ''
+
     def handle(self, record):
-        pass
+        if not self._enabled:
+            return
+
+        if record.levelname not in self._log_levels:
+            return
+
+        # Do not send message if it equals the last one.
+        if record.message == self._last_message:
+            logger.debug('Skipped sending alarm message (message equals '
+                         'last message)')
+            return
+
+        self._last_message = record.message
+
+        text = ' - '.join([record.asctime, record.levelname, record.message])
+
+        msg = MIMEText(text)
+        msg['From'] = self._user_name
+        msg['To'] = ', '.join(self._recipients)
+        msg['Date'] = formatdate(localtime=True)
+        msg['X-Mailer'] = 'OpenADMS Mail Alarm Handler'
+        msg['Subject'] = 'OpenADMS: {}'.format(record.levelname)
+
+        try:
+            # smtplib.SMTP(host, port)
+            with smtplib.SMTP_SSL(self._host, self._port) as s:
+                s.set_debuglevel(False)
+                s.ehlo()
+                #server.starttls()
+                #server.ehlo()
+                s.login(self._user_name, self._user_password)
+                s.sendmail(self._user_name, self._recipients, msg.as_string())
+                s.close()
+                logger.info('E-mail has been send successfully to {}'
+                            .format(', '.join(self._recipients)))
+        except smtplib.SMTPException:
+            logger.warning('E-mail could not be sent')

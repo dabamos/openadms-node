@@ -39,7 +39,7 @@ class VirtualSensor(Prototype):
         self.patterns = {}
 
     def action(self, obs):
-        await_time = obs.get('AwaitTime')
+        timeout = obs.get('Timeout')
         request = obs.get('Request')
         response = ''
 
@@ -62,7 +62,7 @@ class VirtualSensor(Prototype):
         obs.set('Response', response)
         obs.set('TimeStamp', time.time())
 
-        time.sleep(0.25 * await_time)
+        time.sleep(0.15 * timeout)
 
         return obs
 
@@ -115,7 +115,7 @@ class VirtualLeicaTM30(VirtualSensor):
         return response
 
     def get_sensor_name(self, request):
-        return_code = '0'
+        return_code = '1285'
         response = '%R1P,0,0:{},"TM30 0.5"'.format(return_code)
 
         return response

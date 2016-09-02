@@ -155,21 +155,24 @@ class DistanceCorrector(Prototype):
     def _update_meteorological_data(self, obs):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        t = obs.validate('ResponseSets', 'Temperature', 'Value')
-
-        if t is not None:
+        try:
+            t = obs.get('ResponseSets').get('Temperature').get('Value')
             self.temperature = t
+        except AttributeError:
+            pass
 
-        p = obs.validate('ResponseSets', 'Pressure', 'Value')
-
-        if p is not None:
+        try:
+            p = obs.get('ResponseSets').get('Pressure').get('Value')
             self.pressure = p
+        except AttributeError:
+            pass
 
-        h = obs.validate('ResponseSets', 'Humidity', 'Value')
-        u = obs.validate('ResponseSets', 'Humidity', 'Unit')
-
-        if h is not None and u is not None:
+        try:
+            h = obs.get('ResponseSets').get('Humidity').get('Value')
+            u = obs.get('ResponseSets').get('Humidity').get('Unit')
             self.humidity = h / 100 if u == '%' else h
+        except AttributeError:
+            pass
 
     def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}
@@ -654,7 +657,7 @@ class HelmertTransformer(Prototype):
 
         logger.debug('Updated tie point "{}"'.format(obs.get('ID')))
 
-     def get_response_set(self, t, u, v):
+    def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}
 
 
