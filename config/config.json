@@ -951,27 +951,32 @@
         "SensorHeight": 100.0
     },
     "HelmertTransformer": {
-        "ViewPointID": "P6",
-        "Receivers": [
-            "FileExporter"
-        ],
+        "ViewPoint": {
+            "ID": "P6",
+            "Receivers": ["FileExporter"],
+            "SensorHeight": 0.0000
+        },
         "TiePoints": {
             "P1": {
+                "TargetHeight": 0.0000,
                 "Y": 1000.0000,
                 "X": 2000.0000,
                 "Z": 100.0000
             },
             "P2": {
+                "TargetHeight": 0.0000,
                 "Y": 1003.7680,
                 "X": 1995.4880,
                 "Z": 100.0080
             },
             "P3": {
+                "TargetHeight": 0.0000,
                 "Y": 996.2600,
                 "X": 1994.4900,
                 "Z": 100.0210
             },
             "P4": {
+                "TargetHeight": 0.0000,
                 "Y": 988.7710,
                 "X": 1994.4890,
                 "Z": 100.0220

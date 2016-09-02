@@ -35,8 +35,11 @@ logger = logging.getLogger('openadms')
 
 
 class DistanceCorrector(Prototype):
-    """Corrects the slope distance for EDM measurements using atmospheric
-    data."""
+
+    """
+    Corrects the slope distance for EDM measurements using atmospheric
+    data.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -82,12 +85,9 @@ class DistanceCorrector(Prototype):
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        dist = obs.get('ResponseSets').get('SlopeDist').get('Value')
+        dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
 
         if dist is None:
-            logger.warning('No SlopeDist in observation "{}" with ID "{}"'
-                           .format(obs.get('Name'),
-                                   obs.get('ID')))
             return obs
 
         d_dist_1 = 0
@@ -156,10 +156,14 @@ class DistanceCorrector(Prototype):
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
         t = obs.validate('ResponseSets', 'Temperature', 'Value')
-        self.temperature = t if t is not None else self.temperature
+
+        if t is not None:
+            self.temperature = t
 
         p = obs.validate('ResponseSets', 'Pressure', 'Value')
-        self.pressure = p if p is not None else self.pressure
+
+        if p is not None:
+            self.pressure = p
 
         h = obs.validate('ResponseSets', 'Humidity', 'Value')
         u = obs.validate('ResponseSets', 'Humidity', 'Unit')
@@ -232,9 +236,9 @@ class DistanceCorrector(Prototype):
 
 
 class SerialMeasurementProcessor(Prototype):
+
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-
         config = self._config_manager.config[self._name]
 
         self._max_faces = config['MaximumFaces']
@@ -343,6 +347,7 @@ class SerialMeasurementProcessor(Prototype):
 
 
 class HelmertTransformer(Prototype):
+
     """
     Calculates a 3-dimensional coordinates of a view point using the Helmert
     transformation.
@@ -352,22 +357,30 @@ class HelmertTransformer(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._receivers = config.get('Receivers')
         self._tie_points = config.get('TiePoints')
-        self._view_point_id = config.get('ViewPointID')
+        self._view_point = config.get('ViewPoint')
 
-        self._view_point_x = 0
-        self._view_point_y = 0
-        self._view_point_z = 0
+        self._view_point['X'] = 0
+        self._view_point['Y'] = 0
+        self._view_point['Z'] = 0
 
     def action(self, obs):
-        # Check whether the given observation equals one of the tie points.
+        """Calculates the coordinates of the view point and further target
+        points by using a Helmert transformation. The given observation can
+        either be of a tie point or of a target point.
+
+        Measured polar coordinates of the tie points are used to determine the
+        Cartesian coordinates of the view point and given target points.
+
+        An ``Observation'' object will be created for the view point and send
+        to the receivers defined in the configuration."""
+        # Check if the given observation equals one of the defined tie points.
         is_tie_point = False
 
         if self._tie_points.get(obs.get('ID')):
             is_tie_point = True
 
-        # Update the tie point data.
+        # Update the tie point data (Hz, V, slope distance).
         if is_tie_point:
             self._update_tie_point(obs)
 
@@ -375,26 +388,28 @@ class HelmertTransformer(Prototype):
         # been measured at least once.
         is_ready = True
 
-        for name, tie_point in self._tie_points.items():
+        for tie_point_id, tie_point in self._tie_points.items():
             if tie_point.get('LastUpdate') is None:
-                is_ready = False  # Tie point not measured yet.
+                # Tie point not measured yet.
+                is_ready = False
 
         if is_ready:
             if is_tie_point:
                 # Calculate the coordinates of the view point by using the
-                # Helmert transformation.
+                # Helmert transformation and create a new observation of the
+                # view point.
                 view_point = self._calculate_view_point(obs)
-                # Send the view point observation to the next receiver.
-                self.publish(view_point)
+
+                # Send the new view point observation to the next receiver.
+                if view_point:
+                    self.publish(view_point)
             else:
                 # Calculate the coordinates of the target point.
                 obs = self._calculate_target_point(obs)
 
         return obs
 
-    def _update_tie_point(self, obs):
-        """Adds horizontal direction, vertical angle, and slope distance
-        of the observation to a tie point."""
+    def _calculate_target_point(self, obs):
         hz = obs.validate('ResponseSets', 'Hz', 'Value')
         v = obs.validate('ResponseSets', 'V', 'Value')
         dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
@@ -406,15 +421,37 @@ class HelmertTransformer(Prototype):
         if r_dist is not None:
             dist = r_dist
 
-        # Set the values.
-        tie_point = self._tie_points.get(obs.get('ID'))
+        hz_dist = dist * math.sin(v)
 
-        tie_point['Hz'] = hz
-        tie_point['V'] = v
-        tie_point['Dist'] = dist
-        tie_point['LastUpdate'] = time.time()
+        # Calculate Cartesian coordinates using Polar coordinates (x, y, z).
+        local_x = hz_dist * math.cos(hz)
+        local_y = hz_dist * math.sin(hz)
+        local_z = dist * math.cos(v)
 
-        logger.debug('Updated tie point "{}"'.format(obs.get('ID')))
+        # Calculate the coordinates in the global system (X, Y, Z).
+        global_x = self._view_point.get('X') + (self._a * local_x) - \
+                   (self._o * local_y)
+        global_y = self._view_point.get('Y') + (self._a * local_y) + \
+                   (self._o * local_x)
+        global_z = self._view_point.get('Z') + local_z
+
+        logger.info('Calculated coordinates of target point "{}" '
+                    '(X = {}, Y = {}, Z = {})'.format(obs.get('ID'),
+                                                      round(global_x, 5),
+                                                      round(global_y, 5),
+                                                      round(global_z, 5)))
+
+        #
+        # TODO: Nachbarschaftstreue Einpassung (S. 89)
+        #
+
+        # Add response set.
+        response_sets = obs.get('ResponseSets')
+        response_sets['X'] = self.get_response_set('Float', 'm', global_x)
+        response_sets['Y'] = self.get_response_set('Float', 'm', global_y)
+        response_sets['Z'] = self.get_response_set('Float', 'm', global_z)
+
+        return obs
 
     def _calculate_view_point(self, obs):
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
@@ -461,11 +498,11 @@ class HelmertTransformer(Prototype):
             sum_global_z += global_z
 
         # Coordinates of the centroids.
-        local_centroid_x = sum_local_x / num_tie_points  # x_s.
-        local_centroid_y = sum_local_y / num_tie_points  # y_s.
+        local_centroid_x = sum_local_x / num_tie_points     # x_s.
+        local_centroid_y = sum_local_y / num_tie_points     # y_s.
 
-        global_centroid_x = sum_global_x / num_tie_points  # X_s.
-        global_centroid_y = sum_global_y / num_tie_points  # Y_s.
+        global_centroid_x = sum_global_x / num_tie_points   # X_s.
+        global_centroid_y = sum_global_y / num_tie_points   # Y_s.
 
         # Calculate transformation parameters.
         o_1 = o_2 = 0
@@ -474,12 +511,14 @@ class HelmertTransformer(Prototype):
         for name, tie_point in self._tie_points.items():
             local_x = tie_point.get('x')
             local_y = tie_point.get('y')
+
             global_x = tie_point.get('X')
             global_y = tie_point.get('Y')
 
             # Reduced coordinates of the centroids.
             r_local_centroid_x = local_x - local_centroid_x
             r_local_centroid_y = local_y - local_centroid_y
+
             r_global_centroid_x = global_x - global_centroid_x
             r_global_centroid_y = global_y - global_centroid_y
 
@@ -501,18 +540,18 @@ class HelmertTransformer(Prototype):
         # Calculate the coordinates of the view point:
         # Y_0 = Y_s - a * y_s - o * x_s
         # X_0 = X_s - a * x_s + o * y_s
-        self._view_point_x = global_centroid_x - (self._a * local_centroid_x) + \
-                             (self._o * local_centroid_y)
-        self._view_point_y = global_centroid_y - (self._a * local_centroid_y) - \
-                             (self._o * local_centroid_x)
-        self._view_point_z = (sum_global_z - sum_local_z) / num_tie_points
+        self._view_point['X'] = global_centroid_x - (self._a * \
+                                local_centroid_x) + (self._o * local_centroid_y)
+        self._view_point['Y'] = global_centroid_y - (self._a * \
+                                local_centroid_y) - (self._o * local_centroid_x)
+        self._view_point['Z'] = (sum_global_z - sum_local_z) / num_tie_points
 
         logger.info('Calculated coordinates of view point "{}" '
                     '(X = {}, Y = {}, Z = {})'
-                    .format(self._view_point_id,
-                            round(self._view_point_x, 5),
-                            round(self._view_point_y, 5),
-                            round(self._view_point_z, 5)))
+                    .format(self._view_point.get('ID'),
+                            round(self._view_point.get('X'), 5),
+                            round(self._view_point.get('Y'), 5),
+                            round(self._view_point.get('Z'), 5)))
 
         # Calculate the standard deviations.
         sum_wx = sum_wy = 0  # [W_x], [W_y].
@@ -522,13 +561,14 @@ class HelmertTransformer(Prototype):
             local_x = tie_point.get('x')
             local_y = tie_point.get('y')
             local_z = tie_point.get('z')
+
             global_x = tie_point.get('X')
             global_y = tie_point.get('Y')
             global_z = tie_point.get('Z')
 
-            wx_i = (-1 * self._view_point_x) - (self._a * local_x) + \
+            wx_i = (-1 * self._view_point.get('X')) - (self._a * local_x) + \
                    (self._o * local_y) + global_x
-            wy_i = (-1 * self._view_point_y) - (self._a * local_y) - \
+            wy_i = (-1 * self._view_point.get('Y')) - (self._a * local_y) - \
                    (self._o * local_x) + global_y
 
             sum_wx += wx_i
@@ -536,17 +576,17 @@ class HelmertTransformer(Prototype):
 
             sum_wx_wx += wx_i * wx_i
             sum_wy_wy += wy_i * wy_i
-
-            sum_wz_wz += math.pow(self._view_point_z - (global_z - local_z), 2)
+            sum_wz_wz += math.pow(self._view_point.get('Z') - \
+                                  (global_z - local_z), 2)
 
         # Sum of discrepancies should be 0, i.e. [W_x] = [W_y] = 0.
         r_sum_wx = abs(round(sum_wx, 5))
         r_sum_wy = abs(round(sum_wy, 5))
 
         if r_sum_wx != r_sum_wy:
-            logger.warning('Coordinates of view point "{}" are inaccurate '
-                           '([W_x] = {}, [W_y] = {})'
-                           .format(self._view_point_id,
+            logger.warning('Calculated coordinates of view point "{}" are '
+                           'inaccurate ([W_x] = {}, [W_y] = {})'
+                           .format(self._view_point.get('ID'),
                                    r_sum_wx,
                                    r_sum_wy))
 
@@ -570,9 +610,9 @@ class HelmertTransformer(Prototype):
 
         # Create response sets for the observation.
         response_sets = {
-            'X': self.get_response_set('Float', 'm', self._view_point_x),
-            'Y': self.get_response_set('Float', 'm', self._view_point_y),
-            'Z': self.get_response_set('Float', 'm', self._view_point_z),
+            'X': self.get_response_set('Float', 'm', self._view_point['X']),
+            'Y': self.get_response_set('Float', 'm', self._view_point['Y']),
+            'Z': self.get_response_set('Float', 'm', self._view_point['Z']),
             'StdDevX': self.get_response_set('Float', 'm', sx),
             'StdDevY': self.get_response_set('Float', 'm', sy),
             'StdDevZ': self.get_response_set('Float', 'm', sz),
@@ -580,20 +620,19 @@ class HelmertTransformer(Prototype):
         }
 
         # Set values of the observation.
-        view_point.set('ID', self._view_point_id)
+        view_point.set('ID', self._view_point.get('ID'))
         view_point.set('Name', 'get_view_point')
         view_point.set('PortName', obs.get('PortName'))
-        view_point.set('Receivers', self._receivers)
+        view_point.set('Receivers', self._view_point.get('Receivers'))
         view_point.set('ResponseSets', response_sets)
         view_point.set('TimeStamp', time.time())
 
         # Return the observation of the view point.
         return view_point
 
-    def get_response_set(self, t, u, v):
-        return {'Type': t, 'Unit': u, 'Value': v}
-
-    def _calculate_target_point(self, obs):
+    def _update_tie_point(self, obs):
+        """Adds horizontal direction, vertical angle, and slope distance
+        of the observation to a tie point."""
         hz = obs.validate('ResponseSets', 'Hz', 'Value')
         v = obs.validate('ResponseSets', 'V', 'Value')
         dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
@@ -605,40 +644,22 @@ class HelmertTransformer(Prototype):
         if r_dist is not None:
             dist = r_dist
 
-        hz_dist = dist * math.sin(v)
+        # Set the values.
+        tie_point = self._tie_points.get(obs.get('ID'))
 
-        # Calculate Cartesian coordinates using Polar coordinates (x, y, z).
-        local_x = hz_dist * math.cos(hz)
-        local_y = hz_dist * math.sin(hz)
-        local_z = dist * math.cos(v)
+        tie_point['Hz'] = hz
+        tie_point['V'] = v
+        tie_point['Dist'] = dist
+        tie_point['LastUpdate'] = time.time()
 
-        # Calculate the coordinates in the global system (X, Y, Z).
-        global_x = self._view_point_x + (self._a * local_x) - \
-                   (self._o * local_y)
-        global_y = self._view_point_y + (self._a * local_y) + \
-                   (self._o * local_x)
-        global_z = self._view_point_z + local_z
+        logger.debug('Updated tie point "{}"'.format(obs.get('ID')))
 
-        logger.info('Calculated coordinates of target point "{}" '
-                    '(X = {}, Y = {}, Z = {})'.format(obs.get('ID'),
-                                                      round(global_x, 5),
-                                                      round(global_y, 5),
-                                                      round(global_z, 5)))
-
-        #
-        # TODO: Nachbarschaftstreue Einpassung (S. 89)
-        #
-
-        # Add response set.
-        response_sets = obs.get('ResponseSets')
-        response_sets['X'] = self.get_response_set('Float', 'm', global_x)
-        response_sets['Y'] = self.get_response_set('Float', 'm', global_y)
-        response_sets['Z'] = self.get_response_set('Float', 'm', global_z)
-
-        return obs
+     def get_response_set(self, t, u, v):
+        return {'Type': t, 'Unit': u, 'Value': v}
 
 
 class PolarTransformer(Prototype):
+
     """
     Calculates 3-dimensional coordinates of a target using the sensor position,
     and the azimuth position from the configuration together with the
@@ -688,7 +709,7 @@ class PolarTransformer(Prototype):
                              v_grad,
                              dist))
 
-        (y, x, z) = self.transform(self._sensor_x,
+        (x, y, z) = self.transform(self._sensor_x,
                                    self._sensor_y,
                                    self._sensor_z,
                                    self._azimuth_x,
@@ -735,7 +756,7 @@ class PolarTransformer(Prototype):
         y = sensor_y + d_y
         z = sensor_z + d_z
 
-        return (y, x, z)
+        return (x, y, z)
 
     def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}

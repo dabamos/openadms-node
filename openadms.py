@@ -76,7 +76,7 @@ def main(config_file):
     stay_alive()
 
 def signal_handler(signal, frame):
-    logger.info('Quitting ...')
+    logger.info('Exiting ...')
     sys.exit(0)
 
 def stay_alive():

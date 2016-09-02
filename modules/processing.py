@@ -33,7 +33,7 @@ logger = logging.getLogger('openadms')
 class PreProcessor(Prototype):
 
     """
-    Extracts values from the raw responses of a given observation set and
+    Extracts values from the raw response of a given observation set and
     converts them to the defined types.
     """
 
@@ -192,7 +192,7 @@ class ReturnCodeInspector(Prototype):
         Please choose a proper value for each return code.
         """
         self.code_descriptions = {
-               5: [4, 'GeoCOM command unknown'],
+               5: [4, 'GeoCOM command unknown (not implemented yet)'],
              514: [4, 'Several targets detected'],
             1285: [4, 'Only angle measurement valid'],
             1292: [4, 'Distance measurement not done (no aim, etc.)'],
@@ -216,12 +216,11 @@ class ReturnCodeInspector(Prototype):
             return obs
 
         # Get level and error message of the return code.
-        lvl = msg = None
+        description = self.code_descriptions.get(return_code)
 
-        if self.code_descriptions.get(return_code):
-            lvl, msg = self.code_descriptions.get(return_code)
+        if description:
+            lvl, msg = description
 
-        if lvl and msg:
             # Return code related log message.
             logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
                                  '(code "{}")'.format(obs.get('Name'),

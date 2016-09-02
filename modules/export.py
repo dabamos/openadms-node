@@ -139,21 +139,22 @@ class FileExporter(Prototype):
 
                 response_sets = obs.get('ResponseSets')
 
-                for response_name, response_set in response_sets.items():
-                    d = response_name
+                for response_set_id, response_set in response_sets.items():
                     v = response_set.get('Value')
                     u = response_set.get('Unit')
 
-                    line += self._separator + format(d)
+                    line += self._separator + format(response_set_id)
                     line += self._separator + format(v)
                     line += self._separator + format(u)
 
                 # Write line to file.
                 fh.write(line + '\n')
 
-                logger.info('Saved observation "{}" from port "{}" to file '
-                            '"{}"'.format(obs.get('Name'),
-                                          obs.get('PortName'),
-                                          path + file_name))
+                logger.info('Saved observation "{}" with ID "{}" from '
+                            'port "{}" to file "{}"'
+                            .format(obs.get('Name'),
+                                    obs.get('ID'),
+                                    obs.get('PortName'),
+                                    path + file_name))
 
         return obs

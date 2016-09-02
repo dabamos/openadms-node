@@ -150,7 +150,7 @@ class ShortMessageAlarmHandler(AlarmHandler):
                 for key, value in self._msg_vars.items():
                     text = text.replace(key, value)
 
-                logger.debug('Sending SMS to "{}"  ...'.format(number))
+                logger.debug('Sending SMS to "{}" ...'.format(number))
                 sock.send(text.encode())
                 time.sleep(1.0)
 
