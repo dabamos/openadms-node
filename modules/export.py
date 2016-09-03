@@ -19,6 +19,7 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+import copy
 import logging
 import os
 import time
@@ -156,5 +157,23 @@ class FileExporter(Prototype):
                                     obs.get('ID'),
                                     obs.get('PortName'),
                                     path + file_name))
+
+        return obs
+
+
+class RealTimePublisher(Prototype):
+
+    """
+    Exports sensor data to a flat file in CSV format.
+    """
+
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        #config = self._config_manager.config['FileExporter']
+
+    def action(self, obs):
+        obs_copy = copy.deepcopy(obs)
+        # Add receivers.
+        self.publish(obs_copy)
 
         return obs

@@ -103,7 +103,7 @@ class Observation(object):
                             .format('->'.join(args),
                                     self.get('Name'),
                                     self.get('ID')))
-                return None
+                return
 
         return ref
 

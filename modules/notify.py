@@ -182,8 +182,10 @@ class MailAlarmHandler(AlarmHandler):
 
         tls = self._config.get('TLS')
 
-        if tls.lower() in ['no', 'tls', 'starttls']:
+        if tls.lower() in ['yes', 'no', 'starttls']:
             self._tls = tls.lower()
+
+        self._subject = self._config.get('Subject')
 
         self._last_message = ''
 
@@ -202,26 +204,36 @@ class MailAlarmHandler(AlarmHandler):
 
         self._last_message = record.message
 
-        text = ' - '.join([record.asctime, record.levelname, record.message])
+        text = 'The following incident(s) occured:\n\n'
+        text += ' - '.join([record.asctime, record.levelname, record.message])
+        text += '\n\nPlease do not reply as this e-mail was sent from an ' \
+                'automated alarming system.'
 
         msg = MIMEText(text)
         msg['From'] = self._user_name
         msg['To'] = ', '.join(self._recipients)
         msg['Date'] = formatdate(localtime=True)
         msg['X-Mailer'] = 'OpenADMS Mail Alarm Handler'
-        msg['Subject'] = 'OpenADMS: {}'.format(record.levelname)
+        msg['Subject'] = self._subject
 
         try:
-            # smtplib.SMTP(host, port)
-            with smtplib.SMTP_SSL(self._host, self._port) as s:
-                s.set_debuglevel(False)
-                s.ehlo()
-                #server.starttls()
-                #server.ehlo()
-                s.login(self._user_name, self._user_password)
-                s.sendmail(self._user_name, self._recipients, msg.as_string())
-                s.close()
-                logger.info('E-mail has been send successfully to {}'
-                            .format(', '.join(self._recipients)))
+            if self._tls == 'yes':
+                smtp = smtplib.SMTP_SSL(self._host, self._port)
+            else:
+                smtp = smtplib.SMTP(self._host, self._port)
+
+            smtp.set_debuglevel(False)
+            smtp.ehlo()
+
+            if self._tls == 'starttls':
+                smtp.starttls()
+                smtp.ehlo()
+
+            smtp.login(self._user_name, self._user_password)
+            smtp.sendmail(self._user_name, self._recipients, msg.as_string())
+            smtp.quit()
+
+            logger.info('E-mail has been send successfully to {}'
+                        .format(', '.join(self._recipients)))
         except smtplib.SMTPException:
             logger.warning('E-mail could not be sent')

@@ -98,10 +98,12 @@ class PreProcessor(Prototype):
                                                      obs.get('ID')))
                 return obs
 
-            logger.debug('Extracted "{}" from raw response of observation "{}" '
-                         'with ID "{}"'.format(raw_value,
-                                               obs.get('Name'),
-                                               obs.get('ID')))
+            logger.debug('Extracted "{}" ("{}") from raw response of '
+                         'observation "{}" with ID "{}"'
+                         .format(response_name,
+                                 raw_value,
+                                 obs.get('Name'),
+                                 obs.get('ID')))
 
             response_type = response_set.get('Type').lower()
             response_value = None
@@ -114,7 +116,7 @@ class PreProcessor(Prototype):
                 if self.is_float(dot_value):
                     response_value = float(dot_value)
                     logger.debug('Converted raw value "{}" to '
-                                 'float value "{}"'.format(response_value,
+                                 'float value "{}"'.format(raw_value,
                                                            response_value))
                 else:
                     logger.warning('Value "{}" could not be converted '

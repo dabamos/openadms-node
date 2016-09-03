@@ -115,7 +115,7 @@ class VirtualLeicaTM30(VirtualSensor):
         return response
 
     def get_sensor_name(self, request):
-        return_code = '1285'
+        return_code = '0'
         response = '%R1P,0,0:{},"TM30 0.5"'.format(return_code)
 
         return response
