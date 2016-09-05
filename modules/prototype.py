@@ -55,6 +55,7 @@ class Prototype(threading.Thread):
         self._host = 'localhost'
         self._port = 1883
         self._messenger = intercom.MQTTMessenger(self._host, self._port)
+        self._topic = 'OpenADMS'
 
     @abstractmethod
     def action(self, *args):
@@ -98,7 +99,7 @@ class Prototype(threading.Thread):
         index = index + 1
         obs.set('NextReceiver', index)
 
-        target = 'openadms/{}'.format(receiver)
+        target = '{}/{}'.format(self._topic, receiver)
         payload = obs.to_json()
         self._messenger.publish(target, payload)
 
@@ -116,7 +117,7 @@ class Prototype(threading.Thread):
     def run(self):
         """Checks the inbox on new messages and calls the `action()` for
         further processing. Runs within a thread."""
-        self._messenger.subscribe('openadms/{}'.format(self._name))
+        self._messenger.subscribe('{}/{}'.format(self._topic, self._name))
         self._messenger.register(self.retrieve)
 
         logger.debug('Connecting module "{}" to {}:{} ...'.format(self._name,

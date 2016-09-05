@@ -673,7 +673,7 @@ class PolarTransformer(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config[self._name]
+        config = self._config_manager.config.get(self._name)
 
         self._sensor_x = config.get('SensorPosition').get('X')
         self._sensor_y = config.get('SensorPosition').get('Y')

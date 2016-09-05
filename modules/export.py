@@ -54,7 +54,7 @@ class FileExporter(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config['FileExporter']
+        config = self._config_manager.config.get(self._name)
 
         self._file_extension = config['FileExtension']
         self._file_name = config['FileName']
@@ -164,16 +164,21 @@ class FileExporter(Prototype):
 class RealTimePublisher(Prototype):
 
     """
-    Exports sensor data to a flat file in CSV format.
+    Sends `Observation` copies to a list of receivers.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        #config = self._config_manager.config['FileExporter']
+        config = self._config_manager.config.get(self._name)
+        self._receivers = config.get('Receivers')
 
     def action(self, obs):
-        obs_copy = copy.deepcopy(obs)
-        # Add receivers.
-        self.publish(obs_copy)
+        for receiver in self._receivers:
+            obs_copy = copy.deepcopy(obs)
+
+            obs_copy.set('NextReceiver', 0)
+            obs_copy.set('Receivers', [receiver])
+
+            self.publish(obs_copy)
 
         return obs
