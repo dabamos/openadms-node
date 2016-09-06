@@ -363,9 +363,16 @@ class HelmertTransformer(Prototype):
         self._tie_points = config.get('TiePoints')
         self._view_point = config.get('ViewPoint')
 
+        # Initialize view point.
         self._view_point['X'] = 0
         self._view_point['Y'] = 0
         self._view_point['Z'] = 0
+
+        # Initialize target points.
+        self._target_points = {}
+
+        for target_point in config.get('TargetPoints'):
+            self._target_points[target_point] = {}
 
     def action(self, obs):
         """Calculates the coordinates of the view point and further target
@@ -444,9 +451,62 @@ class HelmertTransformer(Prototype):
                                                       round(global_y, 5),
                                                       round(global_z, 5)))
 
-        #
-        # TODO: Nachbarschaftstreue Einpassung (S. 89)
-        #
+        # Nachbarschaftstreue Einpassung.
+        self._target_points[obs.get('ID')] = {
+            "X": global_x,
+            "Y": global_y
+        }
+
+        is_complete = True
+        sum_target_point_x = 0
+        sum_target_point_y = 0
+
+        for target_point in self._target_points:
+            target_point_x = target_point.get('X')
+            target_point_y = target_point.get('Y')
+
+            if target_point_x is None or target_point_y is None:
+                is_complete = False
+                break
+
+            sum_target_point_x += target_point_x
+            sum_target_point_y += target_point_y
+
+        if is_complete:
+            mean_target_point_x = sum_target_point_x / len(self._target_points)
+            mean_target_point_y = sum_target_point_y / len(self._target_points)
+
+            sum_p = 0
+            sum_p_vx = 0
+            sum_p_vy = 0
+
+            for target_point in self._target_points:
+                if target_point == obs.get('ID'):
+                    continue
+
+                target_point_x = target_point.get('X')
+                target_point_y = target_point.get('Y')
+
+                a = math.pow(global_x - target_point_x, 2)
+                b = math.pow(global_y - target_point_y, 2)
+                s = math.sqrt(a + b)
+                p = 1 / s
+
+                vx = mean_target_point_x - target_point_x
+                vy = mean_target_point_y - target_point_y
+
+                sum_p_vx += p * vx
+                sum_p_vy += p * vy
+                sum_p += p
+
+            vx = sum_p_vx / sum_p
+            vy = sum_p_vy / sum_p
+
+            logger.debug('<<< vx = {} >>>'.format(vx))
+            logger.debug('<<< vy = {} >>>'.format(vy))
+
+            global_x += vx
+            global_y += vy
 
         # Add response set.
         response_sets = obs.get('ResponseSets')
@@ -543,6 +603,7 @@ class HelmertTransformer(Prototype):
         # Calculate the coordinates of the view point:
         # Y_0 = Y_s - a * y_s - o * x_s
         # X_0 = X_s - a * x_s + o * y_s
+        # Z_0 = ([Z] - [z]) / n
         self._view_point['X'] = global_centroid_x - (self._a * \
                                 local_centroid_x) + (self._o * local_centroid_y)
         self._view_point['Y'] = global_centroid_y - (self._a * \
@@ -608,9 +669,6 @@ class HelmertTransformer(Prototype):
         m = math.sqrt((self._a * self._a) + (self._o * self._o))
         logger.debug('Calculated scale factor (m = {})'.format(round(m, 5)))
 
-        # Create observation instance of the view point.
-        view_point = Observation()
-
         # Create response sets for the observation.
         response_sets = {
             'X': self.get_response_set('Float', 'm', self._view_point['X']),
@@ -622,7 +680,8 @@ class HelmertTransformer(Prototype):
             'ScaleFactor': self.get_response_set('Float', 'm', m)
         }
 
-        # Set values of the observation.
+        # Create observation instance of the view point.
+        view_point = Observation()
         view_point.set('ID', self._view_point.get('ID'))
         view_point.set('Name', 'get_view_point')
         view_point.set('PortName', obs.get('PortName'))
