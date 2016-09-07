@@ -59,6 +59,7 @@ class PreProcessor(Prototype):
                          'sensor "{}" on port "{}" does not match extraction '
                          'pattern'.format(self.sanitize(response),
                                           obs.get('Name'),
+                                          obs.get('ID'),
                                           obs.get('SensorName'),
                                           obs.get('PortName')))
             return obs

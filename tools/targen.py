@@ -31,7 +31,7 @@ import re
 import sys
 
 """
-Target generator for NetADMS. FOR TESTING ONLY. Reads a CSV file with targets
+Target generator for OpenADMS. FOR TESTING ONLY. Reads a CSV file with targets
 and a JSON file with observations/commands to merge them into a valid sensor
 configuration. This tool will be deprecated in near future, once the user
 interface has been finished.
@@ -64,15 +64,13 @@ def main(t_file, c_file, o_file):
 
     for target in targets:
         t_id, t_hz, t_v = target.strip('\n').split(',')
-        logger.debug('ID: {:>5}, Hz [gon]: {:>10}, V [gon]: {:>10}'.format(t_id,
-                                                                           t_hz,
-                                                                           t_v))
+        logger.debug('ID: {:>5}, Hz [gon]: {:>10}, V [gon]: {:>10}'
+                     .format(t_id, t_hz, t_v))
         hz_rad = str(round(grad2rad(float(t_hz)), 5))
         v_rad = str(round(grad2rad(float(t_v)), 5))
 
-        logger.debug('ID: {:>5}, Hz [rad]: {:>10}, V [rad]: {:>10}'.format(t_id,
-                                                                           hz_rad,
-                                                                           v_rad))
+        logger.debug('ID: {:>5}, Hz [rad]: {:>10}, V [rad]: {:>10}'
+                     .format(t_id, hz_rad, v_rad))
 
         result['Observations'][str(t_id)] = []
         index = 0
@@ -84,12 +82,17 @@ def main(t_file, c_file, o_file):
             if obs_data['ID'] != None:
                 obs_data['ID'] = obs_data['ID'].replace('[% id %]', t_id)
 
-            obs_data['Request'] = obs_data['Request'].replace('[% hz %]', hz_rad)
-            obs_data['Request'] = obs_data['Request'].replace('[% v %]', v_rad)
+            obs_data['Request'] = obs_data['Request'].replace('[% hz %]',
+                                                              hz_rad)
+            obs_data['Request'] = obs_data['Request'].replace('[% v %]',
+                                                              v_rad)
 
             index = index + 1
 
-    output = json.dumps(result, sort_keys=True, indent=4, separators=(',', ': '))
+    output = json.dumps(result,
+                        sort_keys=True,
+                        indent=4,
+                        separators=(',', ': '))
 
     with open(o_file, 'w') as f:
         f.write(output)

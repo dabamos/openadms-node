@@ -37,11 +37,17 @@ an installed Mosquitto MQTT message broker can be launched with:
 # service mosquitto onestart
 ```
 
+For testing only, the public sandbox broker of
+[Eclipse IoT](http://iot.eclipse.org/getting-started) can be used. The server
+supports MQTT and WebSockets, both plain and TLS secured. Access the server
+using the hostname `iot.eclipse.org` and port `1883`. For encryption, use port
+`8883`. MQTT over WebSockets runs on the ports `80` and `443`.
+
 ## Configuration
 The configuration of OpenADMS is done by using a JSON-based text file, located
-in the directory `./config`. Please define serial ports, sensors, and connections
-between them there. OpenADMS takes the file name of the configuration as an
-argument. Run:
+in the directory `./config`. Please define serial ports, sensors, and
+connections between them there. OpenADMS takes the file name of the
+configuration as an argument. Run:
 
 ```
 $ python3 openadms.py --config ./config/my_config.json

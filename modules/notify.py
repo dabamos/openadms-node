@@ -27,6 +27,8 @@ import threading
 import time
 
 from abc import ABCMeta, abstractmethod
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 
@@ -175,6 +177,9 @@ class MailAlarmHandler(AlarmHandler):
         self._enabled = self._config.get('Enabled')
         self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
         self._recipients = self._config.get('Recipients')
+        self._subject = self._config.get('Subject') or '[OpenADMS] Notification'
+        self._charset = self._config.get('Charset')
+
         self._user_name = self._config.get('UserName')
         self._user_password = self._config.get('UserPassword')
         self._host = self._config.get('Host')
@@ -184,8 +189,6 @@ class MailAlarmHandler(AlarmHandler):
 
         if tls.lower() in ['yes', 'no', 'starttls']:
             self._tls = tls.lower()
-
-        self._subject = self._config.get('Subject')
 
         self._last_message = ''
 
@@ -204,17 +207,24 @@ class MailAlarmHandler(AlarmHandler):
 
         self._last_message = record.message
 
-        text = 'The following incident(s) occured:\n\n'
+        text = 'The following incident(s) occurred:\n\n'
         text += ' - '.join([record.asctime, record.levelname, record.message])
         text += '\n\nPlease do not reply as this e-mail was sent from an ' \
                 'automated alarming system.'
 
-        msg = MIMEText(text)
+        msg = MIMEMultipart('alternative')
+
         msg['From'] = self._user_name
         msg['To'] = ', '.join(self._recipients)
         msg['Date'] = formatdate(localtime=True)
         msg['X-Mailer'] = 'OpenADMS Mail Alarm Handler'
-        msg['Subject'] = self._subject
+        msg['Subject'] = Header(self._subject, self._charset)
+
+        plain_text = MIMEText(text.encode(self._charset),
+                              'plain',
+                              self._charset)
+
+        msg.attach(plain_text)
 
         try:
             if self._tls == 'yes':
@@ -236,4 +246,6 @@ class MailAlarmHandler(AlarmHandler):
             logger.info('E-mail has been send successfully to {}'
                         .format(', '.join(self._recipients)))
         except smtplib.SMTPException:
-            logger.warning('E-mail could not be sent')
+            logger.warning('E-mail could not be sent (SMTP error)')
+        except TimeoutError:
+            logger.warning('E-mail could not be sent (timeout)')

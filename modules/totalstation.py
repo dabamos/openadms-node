@@ -368,21 +368,17 @@ class HelmertTransformer(Prototype):
         self._view_point['Y'] = 0
         self._view_point['Z'] = 0
 
-        # Initialize target points.
-        self._target_points = {}
-
-        for target_point in config.get('TargetPoints'):
-            self._target_points[target_point] = {}
+        self._is_residual = config.get('ResidualMismatchTransformationEnabled')
 
     def action(self, obs):
         """Calculates the coordinates of the view point and further target
-        points by using a Helmert transformation. The given observation can
+        points by using the Helmert transformation. The given observation can
         either be of a tie point or of a target point.
 
         Measured polar coordinates of the tie points are used to determine the
         Cartesian coordinates of the view point and given target points.
 
-        An ``Observation'' object will be created for the view point and send
+        An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
         # Check if the given observation equals one of the defined tie points.
         is_tie_point = False
@@ -419,6 +415,36 @@ class HelmertTransformer(Prototype):
 
         return obs
 
+    def _calculate_residual_mismatches(self, global_x, global_y):
+        sum_p = 0
+        sum_p_vx = 0
+        sum_p_vy = 0
+
+        # Calculate residual mismatches.
+        for tie_point_id, tie_point in self._tie_points.items():
+            a = math.pow(global_x - tie_point.get('X'), 2)
+            b = math.pow(global_y - tie_point.get('Y'), 2)
+            s = math.sqrt(a + b)
+            p = 1 / s
+
+            x = tie_point.get('Dist') * math.cos(tie_point.get('Hz'))
+            y = tie_point.get('Dist') * math.sin(tie_point.get('Hz'))
+
+            tx = self._view_point.get('X') + (self._a * x) - (self._o * y)
+            ty = self._view_point.get('Y') + (self._a * y) + (self._o * x)
+
+            vx = tie_point.get('X') - tx
+            vy = tie_point.get('Y') - ty
+
+            sum_p_vx += p * vx
+            sum_p_vy += p * vy
+            sum_p += p
+
+        vx = sum_p_vx / sum_p
+        vy = sum_p_vy / sum_p
+
+        return vx, vy
+
     def _calculate_target_point(self, obs):
         hz = obs.validate('ResponseSets', 'Hz', 'Value')
         v = obs.validate('ResponseSets', 'V', 'Value')
@@ -451,62 +477,22 @@ class HelmertTransformer(Prototype):
                                                       round(global_y, 5),
                                                       round(global_z, 5)))
 
-        # Nachbarschaftstreue Einpassung.
-        self._target_points[obs.get('ID')] = {
-            "X": global_x,
-            "Y": global_y
-        }
+        # Do residual mismatch transformation.
+        if self._is_residual:
+            vx, vy = self._calculate_residual_mismatches(global_x, global_y)
 
-        is_complete = True
-        sum_target_point_x = 0
-        sum_target_point_y = 0
-
-        for target_point in self._target_points:
-            target_point_x = target_point.get('X')
-            target_point_y = target_point.get('Y')
-
-            if target_point_x is None or target_point_y is None:
-                is_complete = False
-                break
-
-            sum_target_point_x += target_point_x
-            sum_target_point_y += target_point_y
-
-        if is_complete:
-            mean_target_point_x = sum_target_point_x / len(self._target_points)
-            mean_target_point_y = sum_target_point_y / len(self._target_points)
-
-            sum_p = 0
-            sum_p_vx = 0
-            sum_p_vy = 0
-
-            for target_point in self._target_points:
-                if target_point == obs.get('ID'):
-                    continue
-
-                target_point_x = target_point.get('X')
-                target_point_y = target_point.get('Y')
-
-                a = math.pow(global_x - target_point_x, 2)
-                b = math.pow(global_y - target_point_y, 2)
-                s = math.sqrt(a + b)
-                p = 1 / s
-
-                vx = mean_target_point_x - target_point_x
-                vy = mean_target_point_y - target_point_y
-
-                sum_p_vx += p * vx
-                sum_p_vy += p * vy
-                sum_p += p
-
-            vx = sum_p_vx / sum_p
-            vy = sum_p_vy / sum_p
-
-            logger.debug('<<< vx = {} >>>'.format(vx))
-            logger.debug('<<< vy = {} >>>'.format(vy))
+            logger.debug('Calculated improvements for target point "{}" '
+                         '(x = {} m, y = {} m)'.format(obs.get('ID'),
+                                                       round(vx, 5),
+                                                       round(vy, 5)))
 
             global_x += vx
             global_y += vy
+
+            logger.debug('Updated coordinates of target point "{}" '
+                         '(X = {}, Y = {})'.format(obs.get('ID'),
+                                                   round(global_x, 5),
+                                                   round(global_y, 5)))
 
         # Add response set.
         response_sets = obs.get('ResponseSets')
@@ -604,9 +590,9 @@ class HelmertTransformer(Prototype):
         # Y_0 = Y_s - a * y_s - o * x_s
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
-        self._view_point['X'] = global_centroid_x - (self._a * \
+        self._view_point['X'] = global_centroid_x - (self._a *
                                 local_centroid_x) + (self._o * local_centroid_y)
-        self._view_point['Y'] = global_centroid_y - (self._a * \
+        self._view_point['Y'] = global_centroid_y - (self._a *
                                 local_centroid_y) - (self._o * local_centroid_x)
         self._view_point['Z'] = (sum_global_z - sum_local_z) / num_tie_points
 
@@ -618,8 +604,8 @@ class HelmertTransformer(Prototype):
                             round(self._view_point.get('Z'), 5)))
 
         # Calculate the standard deviations.
-        sum_wx = sum_wy = 0  # [W_x], [W_y].
-        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0  # [W_x^2], [W_y^2], [W_z^2].
+        sum_wx = sum_wy = 0                     # [W_x], [W_y].
+        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0   # [W_x^2], [W_y^2], [W_z^2].
 
         for name, tie_point in self._tie_points.items():
             local_x = tie_point.get('x')
@@ -640,7 +626,7 @@ class HelmertTransformer(Prototype):
 
             sum_wx_wx += wx_i * wx_i
             sum_wy_wy += wy_i * wy_i
-            sum_wz_wz += math.pow(self._view_point.get('Z') - \
+            sum_wz_wz += math.pow(self._view_point.get('Z') -
                                   (global_z - local_z), 2)
 
         # Sum of discrepancies should be 0, i.e. [W_x] = [W_y] = 0.
@@ -706,15 +692,22 @@ class HelmertTransformer(Prototype):
         if r_dist is not None:
             dist = r_dist
 
+        now = time.time()
+
         # Set the values.
         tie_point = self._tie_points.get(obs.get('ID'))
-
         tie_point['Hz'] = hz
         tie_point['V'] = v
         tie_point['Dist'] = dist
-        tie_point['LastUpdate'] = time.time()
+        tie_point['LastUpdate'] = now
 
-        logger.debug('Updated tie point "{}"'.format(obs.get('ID')))
+        logger.debug('Updated tie point "{}" '
+                     '(Hz = {}, V = {}, Dist = {}, LastUpdate = {})'
+                     .format(obs.get('ID'),
+                             round(hz, 5),
+                             round(v, 5),
+                             round(dist, 5),
+                             now))
 
     def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}
@@ -799,7 +792,7 @@ class PolarTransformer(Prototype):
         """Calculates coordinates (Y, X, Z) out of horizontal direction,
         vertical angle, and slope distance to a target point by doing a
         3-dimensional polar transformation."""
-        # Calculate azimuth angle from coordinates.
+        # Calculate azimuth angle out of coordinates.
         if azimuth_x == sensor_x:
             # Because arctan(0) = 0.
             azimuth_angle = 0

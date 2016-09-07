@@ -140,7 +140,9 @@ class FileExporter(Prototype):
 
                 response_sets = obs.get('ResponseSets')
 
-                for response_set_id, response_set in response_sets.items():
+                for response_set_id in sorted(response_sets.keys()):
+                    response_set = response_sets.get(response_set_id)
+
                     v = response_set.get('Value')
                     u = response_set.get('Unit')
 

@@ -19,15 +19,15 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import coloredlogs
-import logging
 import logging.handlers
 import optparse
 import signal
 import sys
 import time
 
-from core import monitor
+import coloredlogs
+
+from core.monitor import Monitor
 
 """OpenADMS - Open Automatic Deformation Monitoring System
 
@@ -70,8 +70,8 @@ def main(config_file):
     logger.info('European Union Public Licence (EUPL) v.1.1')
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
-    # Start the monitor.
-    mon = monitor.Monitor(config_file)
+    # Start the monitoring.
+    m = Monitor(config_file)
     # Run to infinity and beyond (probably not).
     stay_alive()
 
@@ -125,22 +125,18 @@ if __name__ == '__main__':
     formatter = logging.Formatter(fmt)
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
-                                              maxBytes=10485760,  # 10 MB
+                                              maxBytes=10485760,  # 10 MB.
                                               backupCount=1,
                                               encoding='utf8')
     fh.setLevel(level)
     fh.setFormatter(formatter)
-
     # Add handlers to logger.
     logger.addHandler(fh)
 
     date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=level,
-                        fmt=fmt,
-                        datefmt=date_fmt)
+    coloredlogs.install(level=level, fmt=fmt, datefmt=date_fmt)
 
     # Use a signal handler to catch ^C and quit the program gracefully.
     signal.signal(signal.SIGINT, signal_handler)
-
     # Start the main program.
     main(options.config_file)

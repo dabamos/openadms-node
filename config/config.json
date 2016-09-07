@@ -10,12 +10,20 @@
         "PolarTransformer": "modules.totalstation.PolarTransformer",
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
         "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
-        "HelmertTransformer": "modules.totalstation.HelmertTransformer"
+        "HelmertTransformer": "modules.totalstation.HelmertTransformer",
+        "RealTimePublisher": "modules.export.RealTimePublisher"
     },
     "Project": {
-        "Name": "Project 1",
+        "Name": "Project X",
         "ID": "598e2814-2f89-48e8-900e-5025c6e4a86e",
         "Description": "Project for testing only."
+    },
+    "Intercom": {
+        "MQTT": {
+            "Host": "iot.eclipse.org",
+            "Port": 1883,
+            "Topic": "598e2814-2f89-48e8-900e-5025c6e4a86e/OpenADMS"
+        }
     },
     "Ports": {
         "Serial": {
@@ -58,7 +66,7 @@
                         "Onetime": true,
                         "Timeout": 0.8,
                         "SleepTime": 1.0,
-                        "ID": null,
+                        "ID": "PowerOn",
                         "Request": "A\r",
                         "ResponsePattern": "(?P<PowerOn>#)",
                         "ResponseDelimiter": "\r",
@@ -80,7 +88,7 @@
                         "Onetime": true,
                         "Timeout": 0.8,
                         "SleepTime": 1.0,
-                        "ID": null,
+                        "ID": "SetCmd",
                         "Request": "CMDT 1\r",
                         "ResponsePattern": "(?P<SetCmd>\\*)",
                         "ResponseDelimiter": "\r",
@@ -102,7 +110,7 @@
                         "Onetime": true,
                         "Timeout": 0.8,
                         "SleepTime": 1.0,
-                        "ID": null,
+                        "ID": "Save",
                         "Request": "SAVE\r",
                         "ResponsePattern": "(?P<Save>\\*)",
                         "ResponseDelimiter": "\r",
@@ -183,7 +191,7 @@
                         "Onetime": true,
                         "Timeout": 15.0,
                         "SleepTime": 1.0,
-                        "ID": null,
+                        "ID": "SensorID",
                         "Request": "%R1Q,5003:\r\n",
                         "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorID>\\d+))?",
                         "ResponseDelimiter": "\r\n",
@@ -210,7 +218,7 @@
                         "Onetime": true,
                         "Timeout": 15.0,
                         "SleepTime": 1.0,
-                        "ID": null,
+                        "ID": "SensorName",
                         "Request": "%R1Q,5004:\r\n",
                         "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,\"(?P<SensorName>[\\w\\d\\s\\.]+))?",
                         "ResponseDelimiter": "\r\n",
@@ -231,7 +239,7 @@
                         "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P1",
                         "Name": "set_direction",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -254,7 +262,7 @@
                         "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P1",
                         "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -330,7 +338,7 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 10.0
+                        "SleepTime": 2.0
                     }
                 ],
                 "P2": [
@@ -437,7 +445,7 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 10.0
+                        "SleepTime": 2.0
                     }
                 ],
                 "P3": [
@@ -445,7 +453,7 @@
                         "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P3",
                         "Name": "set_direction",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -468,7 +476,7 @@
                         "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P3",
                         "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -544,7 +552,7 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 10.0
+                        "SleepTime": 2.0
                     }
                 ],
                 "P4": [
@@ -552,7 +560,7 @@
                         "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P4",
                         "Name": "set_direction",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -575,7 +583,7 @@
                         "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P4",
                         "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -651,7 +659,7 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 10.0
+                        "SleepTime": 2.0
                     }
                 ],
                 "P5": [
@@ -659,7 +667,7 @@
                         "Timeout": 15.0,
                         "Description": "Set the horizontal and vertical direction.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P5",
                         "Name": "set_direction",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -682,7 +690,7 @@
                         "Timeout": 15.0,
                         "Description": "Measure the distance.",
                         "Enabled": true,
-                        "ID": null,
+                        "ID": "P5",
                         "Name": "do_measure_distance",
                         "NextReceiver": 0,
                         "Onetime": false,
@@ -715,6 +723,7 @@
                             "ReturnCodeInspector",
                             "DistanceCorrector",
                             "HelmertTransformer",
+                            "RealTimePublisher",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
@@ -758,7 +767,7 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 10.0
+                        "SleepTime": 2.0
                     }
                 ]
             }
@@ -912,33 +921,35 @@
     },
     "Alarm": {
         "Handlers": {
-            "ShortMessageAlarmHandler": {
+            "ShortMessageSocketAlarmHandler": {
+                "Enabled": false,
+                "LogLevels": [
+                    "Error",
+                    "Critical"
+                ],
+                "Host": "192.168.1.1",
+                "Port": 1432,
+                "PhoneNumbers": [
+                    "+49176 12345678"
+                ],
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project X\": {asctime} - {level} - {msg}</cmgs>"
+            },
+            "MailAlarmHandler": {
                 "Enabled": true,
                 "LogLevels": [
                     "Error",
                     "Critical"
                 ],
-                "Host": "10.59.0.40",
-                "Port": 1432,
-                "PhoneNumbers": [
-                    "+49176 12345678"
-                ],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project 1\": {asctime} - {level} - {msg}</cmgs>"
-            },
-            "MailAlarmHandler": {
-                "Enabled": false,
-                "LogLevels": [
-                    "Warning",
-                    "Error",
-                    "Critical"
-                ],
+                "Subject": "[OpenADMS] Alarm - Project X",
                 "Recipients": [
                     "engineer@example.com"
                 ],
+                "Charset": "utf-8",
                 "UserName": "monitoring@example.com",
-                "UserPassword": "1234512345",
-                "Host": "smtp.example.com",
-                "Port": 465
+                "UserPassword": "secret",
+                "Host": "mail.example.com",
+                "Port": 465,
+                "TLS": "Yes"
             }
         }
     },
@@ -951,6 +962,7 @@
         "SensorHeight": 100.0
     },
     "HelmertTransformer": {
+        "ResidualMismatchTransformationEnabled": true,
         "ViewPoint": {
             "ID": "P6",
             "Receivers": ["FileExporter"],
@@ -974,12 +986,6 @@
                 "Y": 996.2600,
                 "X": 1994.4900,
                 "Z": 100.0210
-            },
-            "P4": {
-                "TargetHeight": 0.0000,
-                "Y": 988.7710,
-                "X": 1994.4890,
-                "Z": 100.0220
             }
         }
     },
@@ -993,6 +999,9 @@
             "Y": 1007.4992,
             "X": 2000.0000
         }
+    },
+    "RealTimePublisher": {
+        "Receivers": ["OnlineViewer"]
     },
     "FileExporter": {
         "FileExtension": ".csv",

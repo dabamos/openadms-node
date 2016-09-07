@@ -28,8 +28,8 @@ import time
 
 from abc import ABCMeta, abstractmethod
 
-from core import observation
-from core import intercom
+from core.observation import Observation
+from core.intercom import MQTTMessenger
 
 """Collects prototype classes which can be used as blueprints for other
 OpenADMS modules."""
@@ -40,7 +40,7 @@ logger = logging.getLogger('openadms')
 class Prototype(threading.Thread):
 
     """
-    Prototype is used as a blueprint for other modules.
+    Prototype is used as a blueprint for OpenADMS modules.
     """
 
     __metaclass__ = ABCMeta
@@ -52,10 +52,13 @@ class Prototype(threading.Thread):
         self._sensor_manager = sensor_manager
         self._inbox = queue.Queue()
 
-        self._host = 'localhost'
-        self._port = 1883
-        self._messenger = intercom.MQTTMessenger(self._host, self._port)
-        self._topic = 'OpenADMS'
+        config = self._config_manager.get('Intercom').get('MQTT')
+
+        self._host = config.get('Host')
+        self._port = config.get('Port')
+        self._topic = config.get('Topic')
+
+        self._messenger = MQTTMessenger(self._host, self._port)
 
     @abstractmethod
     def action(self, *args):
@@ -73,30 +76,33 @@ class Prototype(threading.Thread):
         Args:
             obs (Observation): Observation object.
         """
-        name = obs.get('Name')
         receivers = obs.get('Receivers')
         index = obs.get('NextReceiver')
 
         # No receivers defined.
         if len(receivers) == 0:
-            logging.debug('No receivers defined in observation "{}"'
-                          .format(name))
+            logging.debug('No receivers defined in observation "{}" '
+                          'with ID "{}"'.format(obs.get('Name'),
+                                                obs.get('ID')))
             return
 
         # No index defined.
         if (index is None) or (index < 0):
-            logger.warning('Next receiver of observation "{}" not '
-                           'defined'.format(name))
+            logger.warning('Next receiver of observation "{}" with ID "{}" not '
+                           'defined'.format(obs.get('Name'),
+                                            obs.get('ID')))
             return
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            logger.debug('Observation "{}" has been finished'.format(name))
+            logger.debug('Observation "{}" with ID "{}" has been finished'
+                         .format(obs.get('Name'),
+                                 obs.get('ID')))
             return
 
         # Send the observation to the next module.
         receiver = receivers[index]
-        index = index + 1
+        index += 1
         obs.set('NextReceiver', index)
 
         target = '{}/{}'.format(self._topic, receiver)
@@ -111,11 +117,11 @@ class Prototype(threading.Thread):
             msg (str): Message received from the message broker.
         """
         data = json.loads(msg)
-        obs = observation.Observation(data)
+        obs = Observation(data)
         self._inbox.put(obs)
 
     def run(self):
-        """Checks the inbox on new messages and calls the `action()` for
+        """Checks the inbox for new messages and calls the `action()` for
         further processing. Runs within a thread."""
         self._messenger.subscribe('{}/{}'.format(self._topic, self._name))
         self._messenger.register(self.retrieve)
