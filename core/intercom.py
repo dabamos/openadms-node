@@ -62,7 +62,7 @@ class MQTTMessenger(object):
         established."""
         self._client.subscribe(self._topic)
 
-    def _on_disconnect(client, userdata, rc):
+    def _on_disconnect(self, client, userdata, rc):
         """Callback method is called after disconnection."""
         if rc != 0:
             logger.error('Unexpected disconnection')

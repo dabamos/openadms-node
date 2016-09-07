@@ -52,9 +52,9 @@ class PreProcessor(Prototype):
             return obs
 
         pattern = re.compile(response_pattern)
-        matches = pattern.match(response)
+        results = pattern.search(response)
 
-        if not matches:
+        if not results:
             logger.error('Response "{}" of observation "{}" with ID "{}" from '
                          'sensor "{}" on port "{}" does not match extraction '
                          'pattern'.format(self.sanitize(response),
@@ -90,7 +90,7 @@ class PreProcessor(Prototype):
         # Convert the type of the parsed raw values from string to the actual
         # data type.
         for response_name, response_set in response_sets.items():
-            raw_value = matches.group(response_name)
+            raw_value = results.group(response_name)
 
             if not raw_value:
                 logger.warning('No raw value "{}" in observation "{}" '
