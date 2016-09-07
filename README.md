@@ -18,8 +18,8 @@ $ python3 openadms.py
 ### Libraries
 Some additional modules have to be installed in order to use OpenADMS:
 
-* [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT License)
-* [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public License)
+* [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
+* [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 
 The installation can be done with `pip`:

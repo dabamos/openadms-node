@@ -170,7 +170,9 @@ class DistanceCorrector(Prototype):
         try:
             h = obs.get('ResponseSets').get('Humidity').get('Value')
             u = obs.get('ResponseSets').get('Humidity').get('Unit')
-            self.humidity = h / 100 if u == '%' else h
+
+            if h is not None and u is not None:
+                self.humidity = h / 100 if u == '%' else h
         except AttributeError:
             pass
 
