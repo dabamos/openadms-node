@@ -111,7 +111,7 @@ class Module(threading.Thread):
     def run(self):
         """Checks the inbox for new messages and calls the `action()` for
         further processing. Runs within a thread."""
-        logger.debug('Connection module "{}" to {}:{}'
+        logger.debug('Connecting module "{}" to {}:{} ...'
                      .format(self._worker.name,
                              self._messenger.host,
                              self._messenger.port))

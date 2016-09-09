@@ -41,7 +41,11 @@ class ConfigurationManager:
 
     def __init__(self, config_file):
         self._config = {}
-        self.load(config_file)
+
+        if config_file:
+            self.load(config_file)
+        else:
+            logger.warning('No configuration file set')
 
     def load(self, file_name):
         """Loads configuration from JSON file."""
