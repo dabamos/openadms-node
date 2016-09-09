@@ -24,8 +24,8 @@ import json
 import logging
 import os
 
-from core import sensor
 from core.intercom import MQTTMessenger
+from core.sensor import Sensor
 from modules.prototype import *
 
 """Collection of manager classes."""
@@ -36,7 +36,7 @@ logger = logging.getLogger('openadms')
 class ConfigurationManager:
 
     """
-    ConfigutationManager loads and stores the configuration.
+    ConfigurationManager loads and stores the configuration.
     """
 
     def __init__(self, config_file):
@@ -73,7 +73,7 @@ class ConfigurationManager:
 class ModuleManager(object):
 
     """
-    ModulesManager loads and manages OpenADMS modules.
+    ModuleManager loads and manages OpenADMS modules.
     """
 
     def __init__(self, config_manager, sensor_manager):
@@ -87,19 +87,22 @@ class ModuleManager(object):
             self.add(module_name, class_path)
 
     def add(self, module_name, class_path):
-        """Loads a class from a Python module and stores the instance in a
-        dictionary."""
-
+        """Instantiates a worker, instantiates a messenger, and bundles both
+        into a module. The module will be added to the modules dictionary."""
         worker = self._get_worker(module_name, class_path)
         messenger = MQTTMessenger(self._config_manager)
         module = Module(messenger, worker)
 
+        # Add the module to the modules dictionary.
+        # Start the module (as it is a thread).
         self._modules[module_name] = module
         module.start()
 
+        # Module has been started.
         logger.debug('Started module "{}"'.format(module_name))
 
     def _get_worker(self, module_name, class_path):
+        """Load a Python class from a given path and return the instance."""
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = module_path.replace('.', '/') + '.py'
 
@@ -119,7 +122,7 @@ class ModuleManager(object):
         return worker
 
     def delete(self, module_name):
-        """Removes the module from the modules storage."""
+        """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
 
     @property
@@ -130,7 +133,7 @@ class ModuleManager(object):
 class SensorManager(object):
 
     """
-    SensorManager stores sensor.Sensor objects.
+    SensorManager stores Sensor objects.
     """
 
     def __init__(self, config_manager):
@@ -144,7 +147,7 @@ class SensorManager(object):
 
         # Create sensor objects.
         for sensor_name, sensor_config in sensors.items():
-            sensor_obj = sensor.Sensor(sensor_name, self._config_manager)
+            sensor_obj = Sensor(sensor_name, self._config_manager)
             self.add(sensor_name, sensor_obj)
             logger.info('Created sensor {}'.format(sensor_name))
 

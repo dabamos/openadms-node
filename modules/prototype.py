@@ -38,22 +38,31 @@ logger = logging.getLogger('openadms')
 
 class Module(threading.Thread):
 
+    """
+    Module bundles a worker with a messenger and orchestrates the communication
+    between them.
+    """
+
     def __init__(self, messenger, worker):
         threading.Thread.__init__(self, name=worker.name)
         self.daemon = True
 
-        self._inbox = queue.Queue()
         self._messenger = messenger
         self._worker = worker
+
+        self._inbox = queue.Queue()
         self._topic = self._messenger.topic
 
+        # Set the callback functions of the messenger and the worker.
         self._messenger.uplink = self._retrieve
         self._worker.uplink = self._publish
 
+        # Subscribe to the worker's name.
         self._messenger.subscribe(self._topic + '/' + worker.name)
-        self._messenger.connect()
 
     def _publish(self, obs):
+        """Sends an `Observation` to the next receiver by using the
+        messenger."""
         if not self._messenger:
             logger.warning('No messenger defined for module "{}"'
                            .format(self._name))
@@ -94,12 +103,21 @@ class Module(threading.Thread):
         self._messenger.publish(target, payload)
 
     def _retrieve(self, data):
+        """Callback function for the messenger. New data from the message broker
+        lands here."""
         obs = Observation(data)
         self._inbox.put(obs)
 
     def run(self):
         """Checks the inbox for new messages and calls the `action()` for
         further processing. Runs within a thread."""
+        logger.debug('Connection module "{}" to {}:{}'
+                     .format(self._worker.name,
+                             self._messenger.host,
+                             self._messenger.port))
+
+        self._messenger.connect()
+
         while True:
             if self._inbox.empty():
                 time.sleep(0.01)

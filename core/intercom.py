@@ -52,21 +52,10 @@ class MQTTMessenger(object):
     def __del__(self):
         self.disconnect()
 
-    def connect(self):
-        """Connect to the message broker."""
-        self._client.connect_async(self._host, self._port, self._keepalive)
-        self._client.loop_start()
-
-    def disconnect(self):
-        """Disconnect from the message broker."""
-        if self._client:
-            self._client.loop_stop()
-            self._client.disconnect()
-
     def _on_connect(self, client, userdata, flags, rc):
         """Callback method is called after a connection has been
         established."""
-        logger.debug('Connected to {}:{}'.format(self._host, self._port))
+        # logger.debug('Connected to {}:{}'.format(self._host, self._port))
         self._client.subscribe(self._topic)
 
     def _on_disconnect(self, client, userdata, rc):
@@ -80,6 +69,17 @@ class MQTTMessenger(object):
         data = json.loads(str(msg.payload, encoding='UTF-8'))
         self._uplink(data)
 
+    def connect(self):
+        """Connect to the message broker."""
+        self._client.connect_async(self._host, self._port, self._keepalive)
+        self._client.loop_start()
+
+    def disconnect(self):
+        """Disconnect from the message broker."""
+        if self._client:
+            self._client.loop_stop()
+            self._client.disconnect()
+
     def publish(self, topic, message):
         """Send message to the message broker."""
         self._client.publish(topic, message)
@@ -92,6 +92,14 @@ class MQTTMessenger(object):
     @property
     def client(self):
         return self._client
+
+    @property
+    def host(self):
+        return self._host
+
+    @property
+    def port(self):
+        return self._port
 
     @property
     def topic(self):

@@ -14,15 +14,16 @@
         "RealTimePublisher": "modules.export.RealTimePublisher"
     },
     "Project": {
-        "Name": "Project X",
-        "ID": "598e2814-2f89-48e8-900e-5025c6e4a86e",
+        "Name": "Project 1",
+        "ID": "7b720202-f5af-4c68-bb98-641024ae6593",
         "Description": "Project for testing only."
     },
     "Intercom": {
         "MQTT": {
             "Host": "iot.eclipse.org",
             "Port": 1883,
-            "Topic": "598e2814-2f89-48e8-900e-5025c6e4a86e/OpenADMS"
+            "KeepAlive": 60,
+            "Topic": "7b720202-f5af-4c68-bb98-641024ae6593/OpenADMS"
         }
     },
     "Ports": {
@@ -295,6 +296,7 @@
                             "ReturnCodeInspector",
                             "DistanceCorrector",
                             "HelmertTransformer",
+                            "RealTimePublisher",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
@@ -338,7 +340,8 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 2.0
+                        "SleepTime": 2.0,
+                        "TargetHeight": 0.1100
                     }
                 ],
                 "P2": [
@@ -402,6 +405,7 @@
                             "ReturnCodeInspector",
                             "DistanceCorrector",
                             "HelmertTransformer",
+                            "RealTimePublisher",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
@@ -445,7 +449,8 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 2.0
+                        "SleepTime": 2.0,
+                        "TargetHeight": 0.1100
                     }
                 ],
                 "P3": [
@@ -509,6 +514,7 @@
                             "ReturnCodeInspector",
                             "DistanceCorrector",
                             "HelmertTransformer",
+                            "RealTimePublisher",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
@@ -552,7 +558,8 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 2.0
+                        "SleepTime": 2.0,
+                        "TargetHeight": 0.1100
                     }
                 ],
                 "P4": [
@@ -616,6 +623,7 @@
                             "ReturnCodeInspector",
                             "DistanceCorrector",
                             "HelmertTransformer",
+                            "RealTimePublisher",
                             "FileExporter"
                         ],
                         "Request": "%R1Q,2167:5000,1\r\n",
@@ -659,7 +667,8 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 2.0
+                        "SleepTime": 2.0,
+                        "TargetHeight": 0.1100
                     }
                 ],
                 "P5": [
@@ -767,7 +776,8 @@
                                 "Unit": "ns"
                             }
                         },
-                        "SleepTime": 2.0
+                        "SleepTime": 2.0,
+                        "TargetHeight": 0.1100
                     }
                 ]
             }
@@ -920,6 +930,7 @@
         }
     },
     "Alarm": {
+        "Enabled": false,
         "Handlers": {
             "ShortMessageSocketAlarmHandler": {
                 "Enabled": false,
@@ -927,27 +938,27 @@
                     "Error",
                     "Critical"
                 ],
-                "Host": "192.168.1.1",
+                "Host": "10.59.0.40",
                 "Port": 1432,
                 "PhoneNumbers": [
                     "+49176 12345678"
                 ],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project X\": {asctime} - {level} - {msg}</cmgs>"
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project 1\": {asctime} - {level} - {msg}</cmgs>"
             },
             "MailAlarmHandler": {
-                "Enabled": true,
+                "Enabled": false,
                 "LogLevels": [
                     "Error",
                     "Critical"
                 ],
-                "Subject": "[OpenADMS] Alarm - Project X",
+                "Subject": "[OpenADMS] Alarm Message - R318",
                 "Recipients": [
                     "engineer@example.com"
                 ],
                 "Charset": "utf-8",
                 "UserName": "monitoring@example.com",
                 "UserPassword": "secret",
-                "Host": "mail.example.com",
+                "Host": "smtp.example.com",
                 "Port": 465,
                 "TLS": "Yes"
             }
@@ -965,24 +976,24 @@
         "ResidualMismatchTransformationEnabled": true,
         "ViewPoint": {
             "ID": "P6",
-            "Receivers": ["FileExporter"],
-            "SensorHeight": 0.0000
+            "Receivers": ["OnlineViewer/P6"],
+            "SensorHeight": 0.1500
         },
         "TiePoints": {
             "P1": {
-                "TargetHeight": 0.0000,
+                "TargetHeight": 0.1100,
                 "Y": 1000.0000,
                 "X": 2000.0000,
                 "Z": 100.0000
             },
             "P2": {
-                "TargetHeight": 0.0000,
+                "TargetHeight": 0.1100,
                 "Y": 1003.7680,
                 "X": 1995.4880,
                 "Z": 100.0080
             },
             "P3": {
-                "TargetHeight": 0.0000,
+                "TargetHeight": 0.1100,
                 "Y": 996.2600,
                 "X": 1994.4900,
                 "Z": 100.0210

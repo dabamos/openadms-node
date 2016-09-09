@@ -34,7 +34,8 @@ logger = logging.getLogger('openadms')
 class Monitor(object):
 
     """
-    Monitor is used to manage the monitoring process.
+    Monitor is used to manage the monitoring process by creating a
+    configuration manager, a sensor manager, and a module manager.
     """
 
     def __init__(self, config_file):
