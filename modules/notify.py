@@ -45,6 +45,7 @@ class Alarm(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
+        self._enabled = config.get('Enabled')
         self._queue = queue.Queue(-1)
         self._alarm_handlers = []
 
@@ -81,14 +82,15 @@ class Alarm(Prototype):
         return obs
 
     def _process(self):
-        while True:
-            if not self._queue.empty():
-                logger.info('Processing alarm message ...')
-                record = self._queue.get()
-                for alarm_handler in self._alarm_handlers:
-                    alarm_handler.handle(record)
+        if self._enabled:
+            while True:
+                if not self._queue.empty():
+                    logger.info('Processing alarm message ...')
+                    record = self._queue.get()
+                    for alarm_handler in self._alarm_handlers:
+                        alarm_handler.handle(record)
 
-            time.sleep(1)
+                time.sleep(1)
 
 
 class AlarmHandler(object):

@@ -29,7 +29,6 @@ import time
 from abc import ABCMeta, abstractmethod
 
 from core.observation import Observation
-from core.intercom import MQTTMessenger
 
 """Collects prototype classes which can be used as blueprints for other
 OpenADMS modules."""
@@ -37,45 +36,29 @@ OpenADMS modules."""
 logger = logging.getLogger('openadms')
 
 
-class Prototype(threading.Thread):
+class Module(threading.Thread):
 
-    """
-    Prototype is used as a blueprint for OpenADMS modules.
-    """
+    def __init__(self, messenger, worker):
+        threading.Thread.__init__(self, name=worker.name)
+        self.daemon = True
 
-    __metaclass__ = ABCMeta
-
-    def __init__(self, name, config_manager, sensor_manager):
-        threading.Thread.__init__(self, name=name)
-
-        self._config_manager = config_manager
-        self._sensor_manager = sensor_manager
         self._inbox = queue.Queue()
+        self._messenger = messenger
+        self._worker = worker
+        self._topic = self._messenger.topic
 
-        config = self._config_manager.get('Intercom').get('MQTT')
+        self._messenger.uplink = self._retrieve
+        self._worker.uplink = self._publish
 
-        self._host = config.get('Host')
-        self._port = config.get('Port')
-        self._topic = config.get('Topic')
+        self._messenger.subscribe(self._topic + '/' + worker.name)
+        self._messenger.connect()
 
-        self._messenger = MQTTMessenger(self._host, self._port)
+    def _publish(self, obs):
+        if not self._messenger:
+            logger.warning('No messenger defined for module "{}"'
+                           .format(self._name))
+            return
 
-    @abstractmethod
-    def action(self, *args):
-        """Abstract function that does the action of a module.
-
-        Args:
-            *args: Variable length argument list.
-        """
-        pass
-
-    def publish(self, obs):
-        """Checks observation for the next receiver and sends it to the message
-        broker.
-
-        Args:
-            obs (Observation): Observation object.
-        """
         receivers = obs.get('Receivers')
         index = obs.get('NextReceiver')
 
@@ -107,41 +90,78 @@ class Prototype(threading.Thread):
 
         target = '{}/{}'.format(self._topic, receiver)
         payload = obs.to_json()
+
         self._messenger.publish(target, payload)
 
-    def retrieve(self, msg):
-        """The callback function which is called by the intercom client every
-        time a new message has been received.
-
-        Args:
-            msg (str): Message received from the message broker.
-        """
-        data = json.loads(msg)
+    def _retrieve(self, data):
         obs = Observation(data)
         self._inbox.put(obs)
 
     def run(self):
         """Checks the inbox for new messages and calls the `action()` for
         further processing. Runs within a thread."""
-        self._messenger.subscribe('{}/{}'.format(self._topic, self._name))
-        self._messenger.register(self.retrieve)
-
-        logger.debug('Connecting module "{}" to {}:{} ...'.format(self._name,
-                                                                  self._host,
-                                                                  self._port))
-        self._messenger.connect()
-
         while True:
             if self._inbox.empty():
                 time.sleep(0.01)
                 continue
 
-            obs = self.action(self._inbox.get())
+            obs = self._worker.action(self._inbox.get())
 
             if obs is not None:
-                self.publish(obs)
+                self._publish(obs)
 
         self._messenger.disconnect()
+
+    @property
+    def messenger(self):
+        return self._messenger
+
+    @property
+    def worker(self):
+        return self._worker
+
+    @messenger.setter
+    def messenger(self, messenger):
+        self._messenger = messenger
+
+    @worker.setter
+    def worker(self, worker):
+        self._worker = worker
+
+
+class Prototype():
+
+    """
+    Prototype is used as a blueprint for OpenADMS workers.
+    """
+
+    __metaclass__ = ABCMeta
+
+    def __init__(self, name, config_manager, sensor_manager):
+        threading.Thread.__init__(self, name=name)
+
+        self._config_manager = config_manager
+        self._sensor_manager = sensor_manager
+
+        self._uplink = None
+
+    @abstractmethod
+    def action(self, *args):
+        """Abstract function that does the action of a module.
+
+        Args:
+            *args: Variable length argument list.
+        """
+        pass
+
+    def publish(self, obs):
+        """Sends `Observation` to the callback function of the parent module.
+
+        Args:
+            obs (Observation): Observation object.
+        """
+        if self._uplink:
+            self._uplink(obs)
 
     @property
     def name(self):
@@ -154,3 +174,11 @@ class Prototype(threading.Thread):
     @property
     def sensor_manager(self):
         return self._sensor_manager
+
+    @property
+    def uplink(self):
+        return self._uplink
+
+    @uplink.setter
+    def uplink(self, uplink):
+        self._uplink = uplink

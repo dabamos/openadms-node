@@ -25,6 +25,8 @@ import logging
 import os
 
 from core import sensor
+from core.intercom import MQTTMessenger
+from modules.prototype import *
 
 """Collection of manager classes."""
 
@@ -87,6 +89,17 @@ class ModuleManager(object):
     def add(self, module_name, class_path):
         """Loads a class from a Python module and stores the instance in a
         dictionary."""
+
+        worker = self._get_worker(module_name, class_path)
+        messenger = MQTTMessenger(self._config_manager)
+        module = Module(messenger, worker)
+
+        self._modules[module_name] = module
+        module.start()
+
+        logger.debug('Started module "{}"'.format(module_name))
+
+    def _get_worker(self, module_name, class_path):
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = module_path.replace('.', '/') + '.py'
 
@@ -95,7 +108,7 @@ class ModuleManager(object):
             return
 
         try:
-            module = getattr(importlib.import_module(module_path),
+            worker = getattr(importlib.import_module(module_path),
                              class_name)(module_name,
                                          self._config_manager,
                                          self._sensor_manager)
@@ -103,11 +116,7 @@ class ModuleManager(object):
             logger.error('Module "{}" not found'.format(class_path))
             return
 
-        self._modules[module_name] = module
-        module.daemon = True
-        module.start()
-
-        logger.debug('Loaded module "{}"'.format(module_name))
+        return worker
 
     def delete(self, module_name):
         """Removes the module from the modules storage."""

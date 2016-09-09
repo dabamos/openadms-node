@@ -178,8 +178,13 @@ class RealTimePublisher(Prototype):
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
+            topic = receiver + '/' + obs_copy.get('ID')
+
             obs_copy.set('NextReceiver', 0)
-            obs_copy.set('Receivers', [receiver])
+            obs_copy.set('Receivers', [topic])
+
+            logger.debug('Publishing observation "{}" with ID "{}" to "{}" ...'
+                         .format(obs.get('Name'), obs.get('ID'), topic))
 
             self.publish(obs_copy)
 

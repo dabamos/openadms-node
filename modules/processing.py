@@ -31,7 +31,6 @@ logger = logging.getLogger('openadms')
 
 
 class PreProcessor(Prototype):
-
     """
     Extracts values from the raw response of a given observation set and
     converts them to the defined types.
@@ -159,14 +158,13 @@ class PreProcessor(Prototype):
     def sanitize(self, s):
         """Removes some non-printable characters from a string."""
         sanitized = s.replace('\n', '\\n') \
-                     .replace('\r', '\\r') \
-                     .replace('\t', '\\t')
+            .replace('\r', '\\r') \
+            .replace('\t', '\\t')
 
         return sanitized
 
 
 class ReturnCodeInspector(Prototype):
-
     """
     Inspects the return code in an observation sent by sensors of Leica
     Geosystems and creates an appropriate log message.
@@ -195,8 +193,9 @@ class ReturnCodeInspector(Prototype):
         Please choose a proper value for each return code.
         """
         self.code_descriptions = {
-               5: [4, 'GeoCOM command unknown (not implemented yet)'],
-             514: [4, 'Several targets detected'],
+            5:    [4, 'GeoCOM command unknown (not implemented yet)'],
+            514:  [4, 'Several targets detected'],
+            1284: [3, 'Accuracy can not be guaranteed'],
             1285: [4, 'Only angle measurement valid'],
             1292: [4, 'Distance measurement not done (no aim, etc.)'],
             8710: [4, 'No target detected']
@@ -213,9 +212,9 @@ class ReturnCodeInspector(Prototype):
 
         if return_code == 0:
             logger.debug('Observation "{}" with ID "{}" was successful '
-                        '(code "{}")'.format(obs.get('Name'),
-                                             obs.get('ID'),
-                                             return_code))
+                         '(code "{}")'.format(obs.get('Name'),
+                                              obs.get('ID'),
+                                              return_code))
             return obs
 
         # Get level and error message of the return code.
