@@ -57,7 +57,7 @@
             "Observations": {
                 "Init": [
                     {
-                        "Name": "power_on",
+                        "Name": "init",
                         "Description": "Power on sensor.",
                         "Receivers": [
                             "PreProcessor"
@@ -65,62 +65,49 @@
                         "NextReceiver": 0,
                         "Enabled": true,
                         "Onetime": true,
-                        "Timeout": 0.8,
-                        "SleepTime": 1.0,
-                        "ID": "PowerOn",
-                        "Request": "A\r",
-                        "ResponsePattern": "(?P<PowerOn>#)",
-                        "ResponseDelimiter": "\r",
+                        "ID": "init",
+                        "RequestSets": {
+                            "power_on": {
+                                "Request": "A\r",
+                                "Response": "",
+                                "ResponsePattern": "(?P<PowerOn>#)",
+                                "ResponseDelimiter": "\r",
+                                "SleepTime": "1.0",
+                                "Timeout": "1.0"
+                            },
+                            "set_command_set": {
+                                "Request": "CMDT 1\r",
+                                "Response": "",
+                                "ResponsePattern": "(?P<SetCmd>\\*)",
+                                "ResponseDelimiter": "\r",
+                                "SleepTime": "1.0",
+                                "Timeout": "1.0"
+                            },
+                            "save": {
+                                "Request": "SAVE\r",
+                                "Response": "",
+                                "ResponsePattern": "(?P<Save>\\*)",
+                                "ResponseDelimiter": "\r",
+                                "SleepTime": "1.0",
+                                "Timeout": "1.0"
+                            }
+                        },
+                        "RequestOrder": ["power_on", "set_command_set", "save"],
                         "ResponseSets": {
                             "PowerOn": {
                                 "Type": "String",
                                 "Unit": "none"
-                            }
-                        }
-                    },
-                    {
-                        "Name": "set_command_set",
-                        "Description": "Change command set.",
-                        "Receivers": [
-                            "PreProcessor"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": true,
-                        "Timeout": 0.8,
-                        "SleepTime": 1.0,
-                        "ID": "SetCmd",
-                        "Request": "CMDT 1\r",
-                        "ResponsePattern": "(?P<SetCmd>\\*)",
-                        "ResponseDelimiter": "\r",
-                        "ResponseSets": {
+                            },
                             "SetCmd": {
                                 "Type": "String",
                                 "Unit": "none"
-                            }
-                        }
-                    },
-                    {
-                        "Name": "save",
-                        "Description": "Save changes.",
-                        "Receivers": [
-                            "PreProcessor"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": true,
-                        "Timeout": 0.8,
-                        "SleepTime": 1.0,
-                        "ID": "Save",
-                        "Request": "SAVE\r",
-                        "ResponsePattern": "(?P<Save>\\*)",
-                        "ResponseDelimiter": "\r",
-                        "ResponseSets": {
-                            "Save": {
+                            },
+                             "Save": {
                                 "Type": "String",
                                 "Unit": "none"
                             }
-                        }
+                        },
+                        "SleepTime": 60.0
                     }
                 ],
                 "Main": [
@@ -144,7 +131,7 @@
                         "ResponseSets": {
                             "Temperature": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             }
                         }
                     },
@@ -806,27 +793,27 @@
                         "ResponseSets": {
                             "Temperature1": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature2": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature3": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature4": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature5": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature6": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             }
                         }
                     }
@@ -858,11 +845,11 @@
                         "ResponseSets": {
                             "TempPress": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Temperature": {
                                 "Type": "Float",
-                                "Unit": "°C"
+                                "Unit": "C"
                             },
                             "Pressure": {
                                 "Type": "Float",
@@ -1012,6 +999,7 @@
         }
     },
     "RealTimePublisher": {
+        "Enabled": true,
         "Receivers": ["OnlineViewer"]
     },
     "FileExporter": {

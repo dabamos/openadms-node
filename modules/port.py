@@ -40,7 +40,7 @@ class SerialPort(Prototype):
 
         self._serial = None     # Pyserial object.
         self._serial_port_config = None
-        self._max_attempts = 3
+        self._max_attempts = 3  # TODO: Move to configuration file.
 
     def __del__(self):
         #if self._serial is not None:
@@ -51,7 +51,6 @@ class SerialPort(Prototype):
         if not self._serial:
             self._open()
 
-        response = ''
 
         # Add the name of this serial port to the observation.
         obs.set('PortName', self.name)
@@ -66,39 +65,49 @@ class SerialPort(Prototype):
                          .format(self.name, self._serial_port_config.port))
             return
 
-        for attempt in range(self._max_attempts):
-            if attempt > 0:
-                logger.info('Attempt {} of {} ...'.format(attempt + 1,
-                                                          self._max_attempts))
-                time.sleep(1)
+        requests = obs.get('Requests')
 
-            # Write to the serial port.
-            self._write(obs.get('Request'))
+        # Send requests one by one to the sensor.
+        for i in range(len(obs.get('Requests'))):
+            request = obs.get('Requests')[i]
+            sleep_time = obs.get('SleepTimes')[i]
+            timeout = obs.get('Timeouts')[i]
+            response_delimiter = obs.get('ResponseDelimiters')[i]
+            response = ''
 
-            # Get the response of the sensor.
-            response = self._read(obs.get('ResponseDelimiter'),
-                                  obs.get('Timeout'))
+            for attempt in range(self._max_attempts):
+                if attempt > 0:
+                    logger.info('Attempt {} of {} ...'
+                                .format(attempt + 1, self._max_attempts))
+                    time.sleep(1)
 
-            if response != '':
-                logger.debug('Received response "{}" from sensor "{}" on '
-                             'port "{}"'.format(self._sanitize(response),
-                                                obs.get('SensorName'),
-                                                self.name))
-                break
+                # Write to the serial port.
+                self._write(request)
 
-            # Try next attempt if response is empty.
-            logger.warning('No response from sensor "{}" on port "{}" for '
-                           'observation "{}" with ID "{}"'
-                           .format(obs.get('SensorName'),
-                                   self.name,
-                                   obs.get('Name'),
-                                   obs.get('ID')))
+                # Get the response of the sensor.
+                response = self._read(obs.get('ResponseDelimiter'),
+                                      obs.get('Timeout'))
 
-        # Add a timestamp to the observation.
-        obs.set('TimeStamp', time.time())
+                if response != '':
+                    logger.debug('Received response "{}" from sensor "{}" on '
+                                 'port "{}"'.format(self._sanitize(response),
+                                                    obs.get('SensorName'),
+                                                    self.name))
+                    break
 
-        # Add the raw response of the sensor to the observation set.
-        obs.set('Response', response)
+                # Try next attempt if response is empty.
+                logger.warning('No response from sensor "{}" on port "{}" for '
+                               'observation "{}" with ID "{}"'
+                               .format(obs.get('SensorName'),
+                                       self.name,
+                                       obs.get('Name'),
+                                       obs.get('ID')))
+
+            # Add a timestamp to the observation.
+            obs.set('TimeStamp', time.time())
+
+            # Add the raw response of the sensor to the observation set.
+            obs.set('Response', response)
 
         return obs
 

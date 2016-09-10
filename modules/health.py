@@ -32,12 +32,17 @@ logger = logging.getLogger('openadms')
 
 class DeathExaminer(Prototype):
 
+    """
+    DeathExaminer checks for regular activity on serial ports in order to find
+    "dead" sensors.
+    """
+
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
         self._enabled = config.get('Enabled')
-        self._max_age = config.get('MaxAge')
+        self._maximum_age = config.get('MaximumAge')
         self._ports = {}
 
         self._thread = threading.Thread(target=self._check)
@@ -45,12 +50,14 @@ class DeathExaminer(Prototype):
         self._thread.start()
 
     def action(self, obs):
+        """Sets the time stamp of the last activity on a port."""
         port_name = obs.get('PortName')
         self._ports[port_name] = time.time()
 
         return obs
 
     def _check(self):
+        """Searches for dead ports."""
         if not self._enabled:
             return
 
@@ -60,11 +67,12 @@ class DeathExaminer(Prototype):
             now = time.time()
 
             for port_name, last_update in self._ports.items():
-                if now - last_update > self._max_age:
-                    m = round(self._max_age / 60)
+                if now - last_update > self._maximum_age:
+                    # Maximum age in minutes.
+                    m = round(self._maximum_age / 60)
 
                     if m == 0:
-                        t = '{} seconds'.format(self._max_age)
+                        t = '{} seconds'.format(self._maximum_age)
                     else:
                         t = '{} minutes'.format(m)
 
