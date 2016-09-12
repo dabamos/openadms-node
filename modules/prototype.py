@@ -119,11 +119,9 @@ class Module(threading.Thread):
         self._messenger.connect()
 
         while True:
-            if self._inbox.empty():
-                time.sleep(0.01)
-                continue
-
-            obs = self._worker.action(self._inbox.get())
+            # Blocking I/O.
+            obs = self._inbox.get()
+            obs = self._worker.action(obs)
 
             if obs is not None:
                 self._publish(obs)

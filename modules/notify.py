@@ -84,13 +84,12 @@ class Alarm(Prototype):
     def _process(self):
         if self._enabled:
             while True:
-                if not self._queue.empty():
-                    logger.info('Processing alarm message ...')
-                    record = self._queue.get()
-                    for alarm_handler in self._alarm_handlers:
-                        alarm_handler.handle(record)
+                # Blocking I/O.
+                record = self._queue.get()
+                logger.info('Processing alarm message ...')
 
-                time.sleep(1)
+                for alarm_handler in self._alarm_handlers:
+                    alarm_handler.handle(record)
 
 
 class AlarmHandler(object):

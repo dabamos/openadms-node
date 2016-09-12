@@ -31,6 +31,7 @@ logger = logging.getLogger('openadms')
 
 
 class PreProcessor(Prototype):
+
     """
     Extracts values from the raw response of a given observation set and
     converts them to the defined types.
@@ -165,6 +166,7 @@ class PreProcessor(Prototype):
 
 
 class ReturnCodeInspector(Prototype):
+
     """
     Inspects the return code in an observation sent by sensors of Leica
     Geosystems and creates an appropriate log message.

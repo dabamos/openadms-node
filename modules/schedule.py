@@ -22,6 +22,7 @@ limitations under the Licence.
 import copy
 import datetime as dt
 import logging
+import queue
 import threading
 import time
 
@@ -41,7 +42,7 @@ class Scheduler(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        self._jobs = []
+        self._jobs = queue.Queue()
         self.load_jobs()
 
         # Run the method self.run_jobs() within a thread.
@@ -83,35 +84,24 @@ class Scheduler(Prototype):
 
     def add(self, job):
         """Appends a job to the jobs list."""
-        self._jobs.append(job)
+        self._jobs.put(job)
         logger.debug('Added job "{}" to scheduler "{}"'.format(job.name,
                                                                self._name))
 
-    def cancel(self, job):
-        """Removes a job from the jobs list."""
-        self._jobs.remove(job)
-
-    def clear(self):
-        """Deletes all jobs in the jobs list."""
-        del self._jobs[:]
-
     def run_jobs(self):
-        """Threaded method to iterate through the list of jobs."""
+        """Threaded method to process the jobs queue."""
         while True:
-            if len(self._jobs) > 0:
-                for job in self._jobs:
-                    if not job.enabled:
-                        continue
+            # Blocking I/O.
+            job = self._jobs.get()
 
-                    if job.has_expired():
-                        self.cancel(job)
-                        continue
+            if not job.enabled:
+                continue
 
-                    if job.is_pending():
-                        obs = job.run()
+            if job.has_expired():
+                continue
 
-            # Sleep to prevent the thread from taking to much CPU time.
-            time.sleep(0.01)
+            if job.is_pending():
+                job.run()
 
 
 class Job(object):

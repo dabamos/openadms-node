@@ -57,17 +57,16 @@
             "Observations": {
                 "Init": [
                     {
-                        "Name": "init",
-                        "Description": "Power on sensor.",
-                        "Receivers": [
-                            "PreProcessor"
-                        ],
-                        "NextReceiver": 0,
+                        "Description": "Initialize the sensor.",
                         "Enabled": true,
+                        "ID": "INIT",
+                        "Name": "initialize_sensor",
+                        "NextReceiver": 0,
                         "Onetime": true,
-                        "ID": "init",
+                        "Receivers": ["PreProcessor"],
                         "RequestSets": {
                             "power_on": {
+                                "Enabled": true,
                                 "Request": "A\r",
                                 "Response": "",
                                 "ResponsePattern": "(?P<PowerOn>#)",
@@ -76,6 +75,7 @@
                                 "Timeout": "1.0"
                             },
                             "set_command_set": {
+                                "Enabled": true,
                                 "Request": "CMDT 1\r",
                                 "Response": "",
                                 "ResponsePattern": "(?P<SetCmd>\\*)",
@@ -84,6 +84,7 @@
                                 "Timeout": "1.0"
                             },
                             "save": {
+                                "Enabled": true,
                                 "Request": "SAVE\r",
                                 "Response": "",
                                 "ResponsePattern": "(?P<Save>\\*)",
@@ -112,8 +113,8 @@
                 ],
                 "Main": [
                     {
-                        "Name": "get_temperature",
-                        "Description": "Get temperature.",
+                        "Name": "get_values",
+                        "Description": "Get sensor values (temperature, pressure).",
                         "Receivers": [
                             "PreProcessor",
                             "DistanceCorrector",

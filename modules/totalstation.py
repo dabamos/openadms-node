@@ -35,6 +35,7 @@ logger = logging.getLogger('openadms')
 
 
 class DistanceCorrector(Prototype):
+
     """
     Corrects the slope distance for EDM measurements using atmospheric
     data.
@@ -240,6 +241,7 @@ class DistanceCorrector(Prototype):
 
 
 class SerialMeasurementProcessor(Prototype):
+
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config[self._name]
@@ -350,6 +352,7 @@ class SerialMeasurementProcessor(Prototype):
 
 
 class HelmertTransformer(Prototype):
+
     """
     Calculates a 3-dimensional coordinates of a view point using the Helmert
     transformation.
@@ -769,6 +772,7 @@ class HelmertTransformer(Prototype):
 
 
 class PolarTransformer(Prototype):
+
     """
     Calculates 3-dimensional coordinates of a target using the sensor position,
     and the azimuth position from the configuration together with the

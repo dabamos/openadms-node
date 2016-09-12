@@ -49,7 +49,7 @@ class FileRotation(Enum):
 class FileExporter(Prototype):
 
     """
-    Exports sensor data to a flat file in CSV format.
+    FileExporter writes sensor data to a flat file in CSV format.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -166,7 +166,8 @@ class FileExporter(Prototype):
 class RealTimePublisher(Prototype):
 
     """
-    Sends `Observation` copies to a list of receivers.
+    RealTimePublisher sends copies of `Observation` objects to a list of
+    receivers.
     """
 
     def __init__(self, name, config_manager, sensor_manager):

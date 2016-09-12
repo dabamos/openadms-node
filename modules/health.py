@@ -30,11 +30,16 @@ from modules.prototype import Prototype
 logger = logging.getLogger('openadms')
 
 
-class DeathExaminer(Prototype):
+class ObservationTracker(Prototype):
 
     """
-    DeathExaminer checks for regular activity on serial ports in order to find
-    "dead" sensors.
+    ObservationTracker checks if sensors are still active and observations are
+    processed by all defined OpenADMS modules. It stores a time stamp of the
+    last arrival of an `Observation` object from a specific port. Within a given
+    time range the next `Observation` must arrive. Sensors that stopped working
+    or blocking modules will exceed the deadline and a log message is created
+    automatically. Be aware that this approach is rather simple and doesn't
+    catch all possible failures.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
