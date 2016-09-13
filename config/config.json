@@ -54,114 +54,108 @@
         "STS DTM": {
             "Description": "STS DTM meteorology sensor",
             "Type": "Weather Station",
-            "Observations": {
-                "Init": [
-                    {
-                        "Description": "Initialize the sensor.",
-                        "Enabled": true,
-                        "ID": "INIT",
-                        "Name": "initialize_sensor",
-                        "NextReceiver": 0,
-                        "Onetime": true,
-                        "Receivers": ["PreProcessor"],
-                        "RequestSets": {
-                            "power_on": {
-                                "Enabled": true,
-                                "Request": "A\r",
-                                "Response": "",
-                                "ResponsePattern": "(?P<PowerOn>#)",
-                                "ResponseDelimiter": "\r",
-                                "SleepTime": "1.0",
-                                "Timeout": "1.0"
-                            },
-                            "set_command_set": {
-                                "Enabled": true,
-                                "Request": "CMDT 1\r",
-                                "Response": "",
-                                "ResponsePattern": "(?P<SetCmd>\\*)",
-                                "ResponseDelimiter": "\r",
-                                "SleepTime": "1.0",
-                                "Timeout": "1.0"
-                            },
-                            "save": {
-                                "Enabled": true,
-                                "Request": "SAVE\r",
-                                "Response": "",
-                                "ResponsePattern": "(?P<Save>\\*)",
-                                "ResponseDelimiter": "\r",
-                                "SleepTime": "1.0",
-                                "Timeout": "1.0"
-                            }
+            "Observations": [
+                {
+                    "Description": "Initialize the sensor.",
+                    "Enabled": true,
+                    "ID": null,
+                    "Name": "initialize_sensor",
+                    "NextReceiver": 0,
+                    "Onetime": true,
+                    "Receivers": ["PreProcessor"],
+                    "RequestSets": {
+                        "power_on": {
+                            "Enabled": true,
+                            "Request": "A\r",
+                            "Response": "",
+                            "ResponsePattern": "(?P<PowerOn>#)",
+                            "ResponseDelimiter": "\r",
+                            "SleepTime": "1.0",
+                            "Timeout": "1.0"
                         },
-                        "RequestOrder": ["power_on", "set_command_set", "save"],
-                        "ResponseSets": {
-                            "PowerOn": {
-                                "Type": "String",
-                                "Unit": "none"
-                            },
-                            "SetCmd": {
-                                "Type": "String",
-                                "Unit": "none"
-                            },
-                             "Save": {
-                                "Type": "String",
-                                "Unit": "none"
-                            }
+                        "set_command_set": {
+                            "Enabled": true,
+                            "Request": "CMDT 1\r",
+                            "Response": "",
+                            "ResponsePattern": "(?P<SetCmd>\\*)",
+                            "ResponseDelimiter": "\r",
+                            "SleepTime": "1.0",
+                            "Timeout": "1.0"
                         },
-                        "SleepTime": 60.0
-                    }
-                ],
-                "Main": [
-                    {
-                        "Name": "get_values",
-                        "Description": "Get sensor values (temperature, pressure).",
-                        "Receivers": [
-                            "PreProcessor",
-                            "DistanceCorrector",
-                            "FileExporter"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": false,
-                        "Timeout": 0.8,
-                        "SleepTime": 1.0,
-                        "ID": "TEMP",
-                        "Request": "TEMP ?\r",
-                        "ResponsePattern": "(?P<Temperature>[+-]?\\d+\\.+\\d)",
-                        "ResponseDelimiter": "\r",
-                        "ResponseSets": {
-                            "Temperature": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            }
+                        "save": {
+                            "Enabled": true,
+                            "Request": "SAVE\r",
+                            "Response": "",
+                            "ResponsePattern": "(?P<Save>\\*)",
+                            "ResponseDelimiter": "\r",
+                            "SleepTime": "1.0",
+                            "Timeout": "1.0"
                         }
                     },
-                    {
-                        "Name": "get_pressure",
-                        "Description": "Get air pressure..",
-                        "Receivers": [
-                            "PreProcessor",
-                            "DistanceCorrector",
-                            "FileExporter"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": false,
-                        "Timeout": 0.8,
-                        "SleepTime": 20.0,
-                        "ID": "PRES",
-                        "Request": "PRES ?\r",
-                        "ResponsePattern": "(?P<Pressure>[+-]?\\d+\\.+\\d)",
-                        "ResponseDelimiter": "\r",
-                        "ResponseSets": {
-                            "Pressure": {
-                                "Type": "Float",
-                                "Unit": "mbar"
-                            }
+                    "RequestOrder": ["power_on", "set_command_set", "save"],
+                    "ResponseSets": {
+                        "PowerOn": {
+                            "Type": "String",
+                            "Unit": "none"
+                        },
+                        "SetCmd": {
+                            "Type": "String",
+                            "Unit": "none"
+                        },
+                         "Save": {
+                            "Type": "String",
+                            "Unit": "none"
                         }
-                    }
-                ]
-            }
+                    },
+                    "SleepTime": 60.0
+                },
+                {
+                    "Name": "get_values",
+                    "Description": "Get sensor values (temperature, pressure).",
+                    "Receivers": [
+                        "PreProcessor",
+                        "DistanceCorrector",
+                        "FileExporter"
+                    ],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": false,
+                    "ID": "TEMP-PRESS",
+                    "RequestOrder": ["get_temperature", "get_pressure"],
+                    "RequestSets": {
+                        "get_temperature": {
+                            "Enabled": true,
+                            "Request": "TEMP ?\r",
+                            "Response": "",
+                            "ResponseDelimiter": "\r",
+                            "ResponsePattern": "(?P<Temperature>[+-]?\\d+\\.+\\d)",
+                            "SleepTime": "1.0",
+                            "Timeout": "1.0"
+                        },
+                        "get_pressure": {
+                            "Enabled": true,
+                            "Request": "PRES ?\r",
+                            "Response": "",
+                            "ResponseDelimiter": "\r",
+                            "ResponsePattern": "(?P<Pressure>[+-]?\\d+\\.+\\d)",
+                            "SleepTime": "1.0",
+                            "Timeout": "1.0"
+                        }
+                    },
+                    "ResponseSets": {
+                        "Temperature": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Pressure": {
+                            "Type": "Float",
+                            "Unit": "mbar"
+                        }
+                    },
+                    "Timeout": 0.8,
+                    "SleepTime": 20.0
+                }
+            ]
         },
         "Leica TM30": {
             "Description": "Leica TM30 total station",

@@ -21,7 +21,7 @@ limitations under the Licence.
 
 import logging
 
-from core import observation
+from core.observation import Observation
 
 logger = logging.getLogger('openadms')
 
@@ -36,37 +36,31 @@ class Sensor(object):
         self._name = name
         self._config_manager = config_manager
 
-        config = self._config_manager.config['Sensors'][self._name]
-        self._type = config['Type']
+        config = self._config_manager.config.get('Sensors').get(self._name)
+        self._type = config.get('Type')
+        self._observations = {}
 
-        # Create a dictionary of observation data.
-        self._observation_sets = {}
+        for data in config.get('Observerations'):
+            obs = get_observation(data)
+            self._observations[obs.get('Name')] = obs
+            logger.debug('Loaded observation "{}" of sensor "{}"'
+                         .format(obs.get('Name'), self._name))
 
-        for set_name, observations in config['Observations'].items():
-            obs_set = []
-
-            # Add all observations of the observation set to the list.
-            for observation in observations:
-                obs = self.get_observation(observation)
-                obs_set.append(obs)
-
-            if len(obs_set) > 0:
-                self._observation_sets[set_name] = obs_set
-                logger.debug('Loaded observation set "{}" of sensor "{}"'
-                             .format(set_name, self._name))
-
-    def get_observation_set(self, set_name):
+    def get_observations(self):
         """Return the observation set with the given name."""
-        return self._observation_sets[set_name]
+        return self._observations
 
     def get_observation(self, data):
         """Creates an observation object."""
         data['SensorName'] = self._name
         data['SensorType'] = self._type
-        # Character '\' is escaped in JSON file.
-        data['ResponsePattern'] = data['ResponsePattern'].replace('\\\\', '\\')
 
-        return observation.Observation(data)
+        # Character '\' is escaped in the JSON configuration file.
+        for set_name, request_set in data.get('RequestSets').items():
+            request_set['ResponsePattern'] = (request_set['ResponsePattern']
+                .replace('\\\\', '\\'))
+
+        return Observation(data)
 
     @property
     def name(self):

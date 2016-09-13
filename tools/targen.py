@@ -77,17 +77,18 @@ def main(t_file, c_file, o_file):
 
         for c in commands:
             result['Observations'][str(t_id)].append(copy.deepcopy(c))
-            obs_data = result['Observations'][str(t_id)][index]
+            obs_data = result.get('Observations').get(str(t_id))[index]
 
-            if obs_data['ID'] != None:
+            if obs_data.get('ID') is not None:
                 obs_data['ID'] = obs_data['ID'].replace('[% id %]', t_id)
 
-            obs_data['Request'] = obs_data['Request'].replace('[% hz %]',
-                                                              hz_rad)
-            obs_data['Request'] = obs_data['Request'].replace('[% v %]',
-                                                              v_rad)
+            request_sets = obs_data['RequestSets']
 
-            index = index + 1
+            for set_name, request_set in request_sets.items():
+                request_set['Request'] = request_set.get('Request').replace('[% hz %]', hz_rad)
+                request_set['Request'] = request_set.get('Request').replace('[% v %]', v_rad)
+
+            index += 1
 
     output = json.dumps(result,
                         sort_keys=True,

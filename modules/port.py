@@ -65,15 +65,17 @@ class SerialPort(Prototype):
                          .format(self.name, self._serial_port_config.port))
             return
 
-        requests = obs.get('Requests')
+        requests_order = obs.get('RequestsOrder')
 
         # Send requests one by one to the sensor.
-        for i in range(len(obs.get('Requests'))):
-            request = obs.get('Requests')[i]
-            sleep_time = obs.get('SleepTimes')[i]
-            timeout = obs.get('Timeouts')[i]
-            response_delimiter = obs.get('ResponseDelimiters')[i]
+        for request_name in requests_order:
+            request_set = obs.get('RequestSets').get(request_name)
+
+            request = request_set.get('Request')
             response = ''
+            response_delimiter = request_set.get('ResponseDelimiter')
+            sleep_time = request_set.get('SleepTime')
+            timeout = request_set.get('Timeout')
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
@@ -103,11 +105,14 @@ class SerialPort(Prototype):
                                        obs.get('Name'),
                                        obs.get('ID')))
 
-            # Add a timestamp to the observation.
+            # Add the raw response of the sensor to the observation set.
+            request_set['Response'] = response
+
+            # Add the timestamp to the observation.
             obs.set('TimeStamp', time.time())
 
-            # Add the raw response of the sensor to the observation set.
-            obs.set('Response', response)
+            # Sleep until the next request.
+            time.sleep(sleep_time)
 
         return obs
 
