@@ -34,12 +34,12 @@ from email.utils import formatdate
 
 from modules.prototype import Prototype
 
-"""Module for alarming."""
+"""Module for alerting."""
 
 logger = logging.getLogger('openadms')
 
 
-class Alarm(Prototype):
+class Alert(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -47,14 +47,14 @@ class Alarm(Prototype):
 
         self._enabled = config.get('Enabled')
         self._queue = queue.Queue(-1)
-        self._alarm_handlers = []
+        self._alert_handlers = []
 
         # Add logging handler to the logger.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
         logger.addHandler(qh)
 
-        # Add the alarm handlers to the alarm handlers list.
+        # Add the alert handlers to the alert handlers list.
         handlers = config.get('Handlers')
 
         for handler in handlers:
@@ -67,13 +67,13 @@ class Alarm(Prototype):
             if handler_class:
                 config = handlers.get(handler)
                 handler_instance = handler_class(config)
-                self._alarm_handlers.append(handler_instance)
-                logger.debug('Loaded alarm handler "{}"'.format(handler))
+                self._alert_handlers.append(handler_instance)
+                logger.debug('Loaded alert handler "{}"'.format(handler))
             else:
-                logger.warning('Alarm handler "{}" not found'.format(handler))
+                logger.warning('Alert handler "{}" not found'.format(handler))
 
         # Check the logging queue continuously for messages and proceed them to
-        # the alarm handlers.
+        # the alert handlers.
         self._thread = threading.Thread(target=self._process)
         self._thread.daemon = True
         self._thread.start()
@@ -86,13 +86,13 @@ class Alarm(Prototype):
             while True:
                 # Blocking I/O.
                 record = self._queue.get()
-                logger.info('Processing alarm message ...')
+                logger.info('Processing alert message ...')
 
-                for alarm_handler in self._alarm_handlers:
-                    alarm_handler.handle(record)
+                for alert_handler in self._alert_handlers:
+                    alert_handler.handle(record)
 
 
-class AlarmHandler(object):
+class AlertHandler(object):
 
     __metaclass__ = ABCMeta
 
@@ -104,10 +104,10 @@ class AlarmHandler(object):
         pass
 
 
-class ShortMessageSocketAlarmHandler(AlarmHandler):
+class ShortMessageSocketAlertHandler(AlertHandler):
 
     def __init__(self, config):
-        AlarmHandler.__init__(self, config)
+        AlertHandler.__init__(self, config)
 
         self._enabled = self._config.get('Enabled')
         self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
@@ -131,7 +131,7 @@ class ShortMessageSocketAlarmHandler(AlarmHandler):
 
         # Do not send message if it equals the last one.
         if record.message == self._last_message:
-            logger.debug('Skipped sending alarm message (message equals '
+            logger.debug('Skipped sending alert message (message equals '
                          'last message)')
             return
 
@@ -170,10 +170,10 @@ class ShortMessageSocketAlarmHandler(AlarmHandler):
                      .format(self._host, self._port))
 
 
-class MailAlarmHandler(AlarmHandler):
+class MailAlertHandler(AlertHandler):
 
     def __init__(self, config):
-        AlarmHandler.__init__(self, config)
+        AlertHandler.__init__(self, config)
 
         self._enabled = self._config.get('Enabled')
         self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
@@ -202,7 +202,7 @@ class MailAlarmHandler(AlarmHandler):
 
         # Do not send message if it equals the last one.
         if record.message == self._last_message:
-            logger.debug('Skipped sending alarm message (message equals '
+            logger.debug('Skipped sending alert message (message equals '
                          'last message)')
             return
 
@@ -211,14 +211,14 @@ class MailAlarmHandler(AlarmHandler):
         text = 'The following incident(s) occurred:\n\n'
         text += ' - '.join([record.asctime, record.levelname, record.message])
         text += '\n\nPlease do not reply as this e-mail was sent from an ' \
-                'automated alarming system.'
+                'automated alerting system.'
 
         msg = MIMEMultipart('alternative')
 
         msg['From'] = self._user_name
         msg['To'] = ', '.join(self._recipients)
         msg['Date'] = formatdate(localtime=True)
-        msg['X-Mailer'] = 'OpenADMS Mail Alarm Handler'
+        msg['X-Mailer'] = 'OpenADMS Mail Alert Handler'
         msg['Subject'] = Header(self._subject, self._charset)
 
         plain_text = MIMEText(text.encode(self._charset),

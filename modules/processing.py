@@ -43,102 +43,104 @@ class PreProcessor(Prototype):
     def action(self, obs):
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
-        response = obs.get('Response')
-        response_pattern = obs.get('ResponsePattern')
+        for set_name, request_set in obs.get('RequestSets').items():
+            response = request_set.get('Response')
+            response_pattern = request_set.get('ResponsePattern')
 
-        if not response or response == '':
-            logger.warning('No response in observation "{}"'
-                           .format(obs.get('Name')))
-            return obs
-
-        pattern = re.compile(response_pattern)
-        results = pattern.search(response)
-
-        if not results:
-            logger.error('Response "{}" of observation "{}" with ID "{}" from '
-                         'sensor "{}" on port "{}" does not match extraction '
-                         'pattern'.format(self.sanitize(response),
-                                          obs.get('Name'),
-                                          obs.get('ID'),
-                                          obs.get('SensorName'),
-                                          obs.get('PortName')))
-            return obs
-
-        # The regular expression pattern needs a least one defined group
-        # by using the braces "(" and ")". Otherwise, the extraction of the
-        # values fails.
-        #
-        # Right: "(.*)"
-        # Wrong: ".*"
-        response_sets = obs.get('ResponseSets')
-
-        if pattern.groups == 0:
-            logger.error('No group(s) defined in regular expression pattern of '
-                         'observation "{}" with ID "{}"'.format(obs.get('Name'),
-                                                                obs.get('ID')))
-            return obs
-
-        if pattern.groups != len(response_sets):
-            logger.warning('Number of responses ({}) mismatch number of '
-                           'defined response sets ({}) of observation "{}" '
-                           'with ID "{}"'.format(pattern.groups,
-                                                 len(response_sets),
-                                                 obs.get('Name'),
-                                                 obs.get('ID')))
-            return obs
-
-        # Convert the type of the parsed raw values from string to the actual
-        # data type.
-        for response_name, response_set in response_sets.items():
-            raw_value = results.group(response_name)
-
-            if not raw_value:
-                logger.warning('No raw value "{}" in observation "{}" '
-                               'with ID "{}"'.format(response_name,
-                                                     obs.get('Name'),
-                                                     obs.get('ID')))
+            if response is None or response == '':
+                logger.warning('No response in observation "{}"'
+                               .format(obs.get('Name')))
                 return obs
 
-            logger.debug('Extracted "{}" ("{}") from raw response of '
-                         'observation "{}" with ID "{}"'
-                         .format(response_name,
-                                 raw_value,
-                                 obs.get('Name'),
-                                 obs.get('ID')))
+            pattern = re.compile(response_pattern)
+            match = pattern.search(response)
 
-            response_type = response_set.get('Type').lower()
-            response_value = None
+            if not match:
+                logger.error('Response "{}" of observation "{}" with ID "{}" '
+                             'from sensor "{}" on port "{}" does not match '
+                             'extraction pattern'
+                             .format(self.sanitize(response),
+                                     obs.get('Name'),
+                                     obs.get('ID'),
+                                     obs.get('SensorName'),
+                                     obs.get('PortName')))
+                return obs
 
-            # Convert raw value to float.
-            if response_type == 'float':
-                # Replace comma by dot.
-                dot_value = raw_value.replace(',', '.')
+            # The regular expression pattern needs a least one defined group
+            # by using the braces "(" and ")". Otherwise, the extraction of the
+            # values fails.
+            #
+            # Right: "(.*)"
+            # Wrong: ".*"
+            if pattern.groups == 0:
+                logger.error('No group(s) defined in regular expression '
+                             'pattern of observation "{}" with ID "{}"'
+                             .format(obs.get('Name'), obs.get('ID')))
+                return obs
 
-                if self.is_float(dot_value):
-                    response_value = float(dot_value)
-                    logger.debug('Converted raw value "{}" to '
-                                 'float value "{}"'.format(raw_value,
-                                                           response_value))
+            # Convert the type of the parsed raw values from string to the
+            # actual data type.
+            response_sets = obs.get('ResponseSets')
+
+            for group_name, raw_value in match.groupdict().items():
+                response_set = response_sets.get(group_name)
+
+                if not response_set:
+                    logger.error('Response set "{}" of observation "{}" with '
+                                 'ID "{}" not defined'.format(group_name,
+                                                              obs.get('Name'),
+                                                              obs.get('ID')))
+                    continue
+
+                response_type = response_set.get('Type').lower()
+
+                # Convert raw value to float.
+                if response_type == 'float':
+                    # Replace comma by dot.
+                    response_value = self.to_float(raw_value)
+                # Convert raw value to int.
+                elif response_type == 'integer':
+                    response_value = self.to_int(raw_value)
+                # "Convert" raw value to string.
                 else:
-                    logger.warning('Value "{}" could not be converted '
-                                   '(not float)'.format(response_value))
-            # Convert raw value to int.
-            elif response_type == 'integer':
-                if self.is_int(raw_value):
-                    response_value = int(raw_value)
-                    logger.debug('Converted raw value "{}" to integer '
-                                 'value "{}"'.format(raw_value,
-                                                     response_value))
-                else:
-                    logger.warning('Value "{}" could not be converted '
-                                   '(not integer)'.format(raw_value))
-            # "Convert" raw value to string.
-            else:
-                response_value = raw_value
+                    response_value = raw_value
 
-            response_set['Value'] = response_value
+                if response_value is not None:
+                    #logger.debug('Extracted "{}" from raw response "{}" of '
+                    #             'observation "{}" with ID "{}"'
+                    #             .format(response_value,
+                    #                     raw_value,
+                    #                     obs.get('Name'),
+                    #                     obs.get('ID')))
+                    response_set['Value'] = response_value
 
         return obs
+
+    def to_float(self, raw_value):
+        dot_value = raw_value.replace(',', '.')
+
+        if self.is_float(dot_value):
+            response_value = float(dot_value)
+            #logger.debug('Converted raw value "{}" to '
+            #             'float value "{}"'.format(raw_value,
+            #                                       response_value))
+            return response_value
+        else:
+            logger.warning('Value "{}" could not be converted '
+                           '(not float)'.format(raw_value))
+            return None
+
+    def to_int(self, raw_value):
+        if self.is_int(raw_value):
+            response_value = int(raw_value)
+            #logger.debug('Converted raw value "{}" to integer '
+            #             'value "{}"'.format(raw_value,
+            #                                 response_value))
+            return response_value
+        else:
+            logger.warning('Value "{}" could not be converted '
+                           '(not integer)'.format(raw_value))
+            return None
 
     def is_int(self, value):
         """Returns whether a value is int or not."""

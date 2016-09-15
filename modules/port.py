@@ -51,31 +51,34 @@ class SerialPort(Prototype):
         if not self._serial:
             self._open()
 
-
         # Add the name of this serial port to the observation.
         obs.set('PortName', self.name)
 
-        # Send the request of the observation to the attached sensor.
-        logger.info('Sending observation "{}" to sensor "{}" on port '
-                    '"{}"'.format(obs.get('Name'),
-                                  obs.get('SensorName'),
-                                  self.name))
         if self._serial is None:
             logger.error('Could not write to port {} ({})'
                          .format(self.name, self._serial_port_config.port))
             return
 
         requests_order = obs.get('RequestsOrder')
+        request_sets = obs.get('RequestSets')
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
-            request_set = obs.get('RequestSets').get(request_name)
+            request_set = request_sets.get(request_name)
 
-            request = request_set.get('Request')
+            # The response of the sensor.
             response = ''
             response_delimiter = request_set.get('ResponseDelimiter')
+
+            request = request_set.get('Request')
             sleep_time = request_set.get('SleepTime')
             timeout = request_set.get('Timeout')
+
+            # Send the request of the observation to the attached sensor.
+            logger.info('Sending request "{}" to sensor "{}" on port '
+                        '"{}"'.format(request_name,
+                                      obs.get('SensorName'),
+                                      self.name))
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
@@ -87,14 +90,13 @@ class SerialPort(Prototype):
                 self._write(request)
 
                 # Get the response of the sensor.
-                response = self._read(obs.get('ResponseDelimiter'),
-                                      obs.get('Timeout'))
+                response = self._read(response_delimiter, timeout)
 
                 if response != '':
-                    logger.debug('Received response "{}" from sensor "{}" on '
-                                 'port "{}"'.format(self._sanitize(response),
-                                                    obs.get('SensorName'),
-                                                    self.name))
+                    logger.info('Received response "{}" from sensor "{}" on '
+                                'port "{}"'.format(self._sanitize(response),
+                                                   obs.get('SensorName'),
+                                                   self.name))
                     break
 
                 # Try next attempt if response is empty.

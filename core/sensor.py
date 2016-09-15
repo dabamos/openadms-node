@@ -40,17 +40,21 @@ class Sensor(object):
         self._type = config.get('Type')
         self._observations = {}
 
-        for data in config.get('Observerations'):
-            obs = get_observation(data)
+        for data in config.get('Observations'):
+            obs = self._create_observation(data)
             self._observations[obs.get('Name')] = obs
             logger.debug('Loaded observation "{}" of sensor "{}"'
                          .format(obs.get('Name'), self._name))
 
+    def get_observation(self, name):
+        """Returns a single observation."""
+        return self._observations.get(name)
+
     def get_observations(self):
-        """Return the observation set with the given name."""
+        """Returns all observations."""
         return self._observations
 
-    def get_observation(self, data):
+    def _create_observation(self, data):
         """Creates an observation object."""
         data['SensorName'] = self._name
         data['SensorType'] = self._type

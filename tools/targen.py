@@ -60,7 +60,7 @@ def main(t_file, c_file, o_file):
 
     logger.debug('Opened commands file {}'.format(t_file))
 
-    result = { 'Observations': {} }
+    result = { 'Observations': [] }
 
     for target in targets:
         t_id, t_hz, t_v = target.strip('\n').split(',')
@@ -72,23 +72,19 @@ def main(t_file, c_file, o_file):
         logger.debug('ID: {:>5}, Hz [rad]: {:>10}, V [rad]: {:>10}'
                      .format(t_id, hz_rad, v_rad))
 
-        result['Observations'][str(t_id)] = []
-        index = 0
-
-        for c in commands:
-            result['Observations'][str(t_id)].append(copy.deepcopy(c))
-            obs_data = result.get('Observations').get(str(t_id))[index]
+        for command in commands:
+            result['Observations'].append(copy.deepcopy(command))
+            l = len(result.get('Observations'))
+            obs_data = result.get('Observations')[l - 1]
 
             if obs_data.get('ID') is not None:
-                obs_data['ID'] = obs_data['ID'].replace('[% id %]', t_id)
+                obs_data['ID'] = obs_data.get('ID').replace('[% id %]', t_id)
 
             request_sets = obs_data['RequestSets']
 
             for set_name, request_set in request_sets.items():
                 request_set['Request'] = request_set.get('Request').replace('[% hz %]', hz_rad)
                 request_set['Request'] = request_set.get('Request').replace('[% v %]', v_rad)
-
-            index += 1
 
     output = json.dumps(result,
                         sort_keys=True,

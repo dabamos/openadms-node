@@ -1,10 +1,10 @@
 {
     "Modules": {
-        "Alarm": "modules.notify.Alarm",
+        "Alert": "modules.notify.Alert",
         "COM1": "modules.port.SerialPort",
         "COM2": "modules.port.SerialPort",
-        "Scheduler0": "modules.schedule.Scheduler",
         "Scheduler1": "modules.schedule.Scheduler",
+        "Scheduler2": "modules.schedule.Scheduler",
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
@@ -14,7 +14,7 @@
         "RealTimePublisher": "modules.export.RealTimePublisher"
     },
     "Project": {
-        "Name": "Project 1",
+        "Name": "Project X",
         "ID": "7b720202-f5af-4c68-bb98-641024ae6593",
         "Description": "Project for testing only."
     },
@@ -59,10 +59,12 @@
                     "Description": "Initialize the sensor.",
                     "Enabled": true,
                     "ID": null,
-                    "Name": "initialize_sensor",
+                    "Name": "initialize",
                     "NextReceiver": 0,
                     "Onetime": true,
-                    "Receivers": ["PreProcessor"],
+                    "Receivers": [
+                        "PreProcessor"
+                    ],
                     "RequestSets": {
                         "power_on": {
                             "Enabled": true,
@@ -70,8 +72,8 @@
                             "Response": "",
                             "ResponsePattern": "(?P<PowerOn>#)",
                             "ResponseDelimiter": "\r",
-                            "SleepTime": "1.0",
-                            "Timeout": "1.0"
+                            "SleepTime": 1.0,
+                            "Timeout": 1.0
                         },
                         "set_command_set": {
                             "Enabled": true,
@@ -79,8 +81,8 @@
                             "Response": "",
                             "ResponsePattern": "(?P<SetCmd>\\*)",
                             "ResponseDelimiter": "\r",
-                            "SleepTime": "1.0",
-                            "Timeout": "1.0"
+                            "SleepTime": 1.0,
+                            "Timeout": 1.0
                         },
                         "save": {
                             "Enabled": true,
@@ -88,11 +90,15 @@
                             "Response": "",
                             "ResponsePattern": "(?P<Save>\\*)",
                             "ResponseDelimiter": "\r",
-                            "SleepTime": "1.0",
-                            "Timeout": "1.0"
+                            "SleepTime": 1.0,
+                            "Timeout": 1.0
                         }
                     },
-                    "RequestOrder": ["power_on", "set_command_set", "save"],
+                    "RequestsOrder": [
+                        "power_on",
+                        "set_command_set",
+                        "save"
+                    ],
                     "ResponseSets": {
                         "PowerOn": {
                             "Type": "String",
@@ -102,12 +108,12 @@
                             "Type": "String",
                             "Unit": "none"
                         },
-                         "Save": {
+                        "Save": {
                             "Type": "String",
                             "Unit": "none"
                         }
                     },
-                    "SleepTime": 60.0
+                    "SleepTime": 1.0
                 },
                 {
                     "Name": "get_values",
@@ -120,8 +126,11 @@
                     "NextReceiver": 0,
                     "Enabled": true,
                     "Onetime": false,
-                    "ID": "TEMP-PRESS",
-                    "RequestOrder": ["get_temperature", "get_pressure"],
+                    "ID": "TP",
+                    "RequestsOrder": [
+                        "get_temperature",
+                        "get_pressure"
+                    ],
                     "RequestSets": {
                         "get_temperature": {
                             "Enabled": true,
@@ -129,8 +138,8 @@
                             "Response": "",
                             "ResponseDelimiter": "\r",
                             "ResponsePattern": "(?P<Temperature>[+-]?\\d+\\.+\\d)",
-                            "SleepTime": "1.0",
-                            "Timeout": "1.0"
+                            "SleepTime": 1.0,
+                            "Timeout": 1.0
                         },
                         "get_pressure": {
                             "Enabled": true,
@@ -138,8 +147,8 @@
                             "Response": "",
                             "ResponseDelimiter": "\r",
                             "ResponsePattern": "(?P<Pressure>[+-]?\\d+\\.+\\d)",
-                            "SleepTime": "1.0",
-                            "Timeout": "1.0"
+                            "SleepTime": 1.0,
+                            "Timeout": 1.0
                         }
                     },
                     "ResponseSets": {
@@ -152,7 +161,6 @@
                             "Unit": "mbar"
                         }
                     },
-                    "Timeout": 0.8,
                     "SleepTime": 20.0
                 }
             ]
@@ -160,708 +168,513 @@
         "Leica TM30": {
             "Description": "Leica TM30 total station",
             "Type": "Total Station",
-            "Observations": {
-                "Init": [
-                    {
-                        "Name": "get_sensor_id",
-                        "Description": "Get instrument identification code.",
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": true,
-                        "Timeout": 15.0,
-                        "SleepTime": 1.0,
-                        "ID": "SensorID",
-                        "Request": "%R1Q,5003:\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorID>\\d+))?",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "SensorID": {
-                                "Type": "String",
-                                "Unit": "none"
-                            }
+            "Observations": [
+                {
+                    "Name": "initialize",
+                    "Description": "Get instrument identification code.",
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector"
+                    ],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": true,
+                    "SleepTime": 5.0,
+                    "ID": null,
+                    "RequestSets": {
+                        "get_sensor_id": {
+                            "Enabled": true,
+                            "Request": "%R1Q,5003:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(\\d+))?",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 1.0,
+                            "Timeout": 15.0
+                        },
+                        "get_sensor_name": {
+                            "Enabled": true,
+                            "Request": "%R1Q,5004:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,\"([\\w\\d\\s\\.]+))?",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
                         }
                     },
-                    {
-                        "Name": "get_sensor_name",
-                        "Description": "Get instrument name.",
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": true,
-                        "Timeout": 15.0,
-                        "SleepTime": 1.0,
-                        "ID": "SensorName",
-                        "Request": "%R1Q,5004:\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,\"(?P<SensorName>[\\w\\d\\s\\.]+))?",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "SensorName": {
-                                "Type": "String",
-                                "Unit": "none"
-                            }
+                    "RequestsOrder": [
+                        "get_sensor_id",
+                        "get_sensor_name"
+                    ],
+                    "ResponseSets": [
+                        {
+                            "Description": "ReturnCode",
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        {
+                            "Description": "SensorID",
+                            "Type": "String",
+                            "Unit": "none"
+                        },
+                        {
+                            "Description": "SensorName",
+                            "Type": "String",
+                            "Unit": "none"
                         }
-                    }
-                ],
-                "P1": [
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Set the horizontal and vertical direction.",
-                        "Enabled": true,
-                        "ID": "P1",
-                        "Name": "set_direction",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                    ]
+                },
+                {
+                    "Description": "Get complete measurement.",
+                    "Enabled": true,
+                    "ID": "P1",
+                    "Name": "P1",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "HelmertTransformer",
+                        "RealTimePublisher",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 3.0
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        },
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Measure the distance.",
-                        "Enabled": true,
-                        "ID": "P1",
-                        "Name": "do_measure_distance",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                    "RequestsOrder": [
+                        "set_direction",
+                        "measure_distance",
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
                         },
-                        "SleepTime": 2.0
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Get a complete measurement.",
-                        "Enabled": true,
-                        "Face": 1,
-                        "ID": "P1",
-                        "Name": "do_complete_measurement",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector",
-                            "DistanceCorrector",
-                            "HelmertTransformer",
-                            "RealTimePublisher",
-                            "FileExporter"
-                        ],
-                        "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "Hz": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "V": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccAngle": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "C": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "L": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccIncl": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "SlopeDist": {
-                                "Type": "Float",
-                                "Unit": "m"
-                            },
-                            "DistTime": {
-                                "Type": "Integer",
-                                "Unit": "ns"
-                            }
+                    "SleepTime": 15.0
+                },
+                {
+                    "Description": "Get complete measurement.",
+                    "Enabled": true,
+                    "ID": "P2",
+                    "Name": "P2",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "HelmertTransformer",
+                        "RealTimePublisher",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 2.0,
-                        "TargetHeight": 0.1100
-                    }
-                ],
-                "P2": [
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Set the horizontal and vertical direction.",
-                        "Enabled": true,
-                        "ID": "P2",
-                        "Name": "set_direction",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 3.0
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Measure the distance.",
-                        "Enabled": true,
-                        "ID": "P2",
-                        "Name": "do_measure_distance",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                    "RequestsOrder": [
+                        "set_direction",
+                        "measure_distance",
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
                         },
-                        "SleepTime": 2.0
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Get a complete measurement.",
-                        "Enabled": true,
-                        "Face": 1,
-                        "ID": "P2",
-                        "Name": "do_complete_measurement",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector",
-                            "DistanceCorrector",
-                            "HelmertTransformer",
-                            "RealTimePublisher",
-                            "FileExporter"
-                        ],
-                        "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "Hz": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "V": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccAngle": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "C": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "L": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccIncl": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "SlopeDist": {
-                                "Type": "Float",
-                                "Unit": "m"
-                            },
-                            "DistTime": {
-                                "Type": "Integer",
-                                "Unit": "ns"
-                            }
+                    "SleepTime": 15.0
+                },
+                {
+                    "Description": "Get complete measurement.",
+                    "Enabled": true,
+                    "ID": "P3",
+                    "Name": "P3",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "HelmertTransformer",
+                        "RealTimePublisher",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 2.0,
-                        "TargetHeight": 0.1100
-                    }
-                ],
-                "P3": [
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Set the horizontal and vertical direction.",
-                        "Enabled": true,
-                        "ID": "P3",
-                        "Name": "set_direction",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 3.0
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Measure the distance.",
-                        "Enabled": true,
-                        "ID": "P3",
-                        "Name": "do_measure_distance",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                    "RequestsOrder": [
+                        "set_direction",
+                        "measure_distance",
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
                         },
-                        "SleepTime": 2.0
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Get a complete measurement.",
-                        "Enabled": true,
-                        "Face": 1,
-                        "ID": "P3",
-                        "Name": "do_complete_measurement",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector",
-                            "DistanceCorrector",
-                            "HelmertTransformer",
-                            "RealTimePublisher",
-                            "FileExporter"
-                        ],
-                        "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "Hz": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "V": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccAngle": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "C": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "L": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccIncl": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "SlopeDist": {
-                                "Type": "Float",
-                                "Unit": "m"
-                            },
-                            "DistTime": {
-                                "Type": "Integer",
-                                "Unit": "ns"
-                            }
+                    "SleepTime": 15.0
+                },
+                {
+                    "Description": "Get complete measurement.",
+                    "Enabled": true,
+                    "ID": "P4",
+                    "Name": "P4",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "HelmertTransformer",
+                        "RealTimePublisher",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 2.0,
-                        "TargetHeight": 0.1100
-                    }
-                ],
-                "P4": [
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Set the horizontal and vertical direction.",
-                        "Enabled": true,
-                        "ID": "P4",
-                        "Name": "set_direction",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
                         },
-                        "SleepTime": 3.0
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Measure the distance.",
-                        "Enabled": true,
-                        "ID": "P4",
-                        "Name": "do_measure_distance",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
+                    "RequestsOrder": [
+                        "set_direction",
+                        "measure_distance",
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
                         },
-                        "SleepTime": 2.0
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
                     },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Get a complete measurement.",
-                        "Enabled": true,
-                        "Face": 1,
-                        "ID": "P4",
-                        "Name": "do_complete_measurement",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector",
-                            "DistanceCorrector",
-                            "HelmertTransformer",
-                            "RealTimePublisher",
-                            "FileExporter"
-                        ],
-                        "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "Hz": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "V": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccAngle": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "C": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "L": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccIncl": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "SlopeDist": {
-                                "Type": "Float",
-                                "Unit": "m"
-                            },
-                            "DistTime": {
-                                "Type": "Integer",
-                                "Unit": "ns"
-                            }
-                        },
-                        "SleepTime": 2.0,
-                        "TargetHeight": 0.1100
-                    }
-                ],
-                "P5": [
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Set the horizontal and vertical direction.",
-                        "Enabled": true,
-                        "ID": "P5",
-                        "Name": "set_direction",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,9027:2.69350,1.59309,2,1,0\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
-                        },
-                        "SleepTime": 3.0
-                    },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Measure the distance.",
-                        "Enabled": true,
-                        "ID": "P5",
-                        "Name": "do_measure_distance",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector"
-                        ],
-                        "Request": "%R1Q,2008:1,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            }
-                        },
-                        "SleepTime": 2.0
-                    },
-                    {
-                        "Timeout": 15.0,
-                        "Description": "Get a complete measurement.",
-                        "Enabled": true,
-                        "Face": 1,
-                        "ID": "P5",
-                        "Name": "do_complete_measurement",
-                        "NextReceiver": 0,
-                        "Onetime": false,
-                        "Receivers": [
-                            "PreProcessor",
-                            "ReturnCodeInspector",
-                            "DistanceCorrector",
-                            "HelmertTransformer",
-                            "RealTimePublisher",
-                            "FileExporter"
-                        ],
-                        "Request": "%R1Q,2167:5000,1\r\n",
-                        "ResponseDelimiter": "\r\n",
-                        "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>[0-9]+)(?:,(?P<Hz>[0-9]*\\.?[0-9]+),(?P<V>[0-9]*\\.?[0-9]+),(?P<AccAngle>-?[0-9]*\\.?[0-9]+),(?P<C>-?[0-9]*\\.?[0-9]*),(?P<L>-?[0-9]*\\.?[0-9]*),(?P<AccIncl>-?[0-9]*\\.?[0-9]*),(?P<SlopeDist>[0-9]*\\.?[0-9]*),(?P<DistTime>[0-9]*))",
-                        "ResponseSets": {
-                            "ReturnCode": {
-                                "Type": "Integer",
-                                "Unit": "none"
-                            },
-                            "Hz": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "V": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccAngle": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "C": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "L": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "AccIncl": {
-                                "Type": "Float",
-                                "Unit": "rad"
-                            },
-                            "SlopeDist": {
-                                "Type": "Float",
-                                "Unit": "m"
-                            },
-                            "DistTime": {
-                                "Type": "Integer",
-                                "Unit": "ns"
-                            }
-                        },
-                        "SleepTime": 2.0,
-                        "TargetHeight": 0.1100
-                    }
-                ]
-            }
+                    "SleepTime": 15.0
+                }
+            ]
         },
         "ADAM-4015": {
             "Description": "ADAM-4015 I/O module.",
             "Type": "I/O",
-            "Observations": {
-                "Main": [
-                    {
-                        "Name": "get_values",
-                        "Description": "Get temperature values.",
-                        "Receivers": [
-                            "PreProcessor",
-                            "FileExporter"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": false,
-                        "Timeout": 1.0,
-                        "SleepTime": 10.0,
-                        "ID": "Pt100",
-                        "Request": "#01\r",
-                        "ResponsePattern": ">(?P<Temperature1>[+-][\\d\\.]{6})(?P<Temperature2>[+-][\\d\\.]{6})(?P<Temperature3>[+-][\\d\\.]{6})(?P<Temperature4>[+-][\\d\\.]{6})(?P<Temperature5>[+-][\\d\\.]{6})(?P<Temperature6>[+-][\\d\\.]{6})",
-                        "ResponseDelimiter": "\r",
-                        "ResponseSets": {
-                            "Temperature1": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature2": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature3": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature4": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature5": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature6": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            }
+            "Observations": [
+                {
+                    "Name": "get_values",
+                    "Description": "Get temperature values.",
+                    "Receivers": [
+                        "PreProcessor",
+                        "FileExporter"
+                    ],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": false,
+                    "ID": "Pt100",
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "#01\r",
+                            "ResponsePattern": ">(?P<Temperature1>[+-][\\d\\.]{6})(?P<Temperature2>[+-][\\d\\.]{6})(?P<Temperature3>[+-][\\d\\.]{6})(?P<Temperature4>[+-][\\d\\.]{6})(?P<Temperature5>[+-][\\d\\.]{6})(?P<Temperature6>[+-][\\d\\.]{6})",
+                            "ResponseDelimiter": "\r",
+                            "SleepTime": 0.0,
+                            "Timeout": 5.0
+                        }
+                    },
+                    "RequestsOrders": [
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "Temperature1": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature2": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature3": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature4": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature5": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature6": {
+                            "Type": "Float",
+                            "Unit": "C"
                         }
                     }
-                ]
-            }
+                }
+            ]
         },
         "DFT 485": {
             "Description": "DFT 485 meteorology sensor",
             "Type": "Weather Station",
-            "Observations": {
-                "Main": [
-                    {
-                        "Name": "get_values",
-                        "Description": "Get temperature, air pressure, and humidity values.",
-                        "Receivers": [
-                            "PreProcessor",
-                            "DistanceCorrector",
-                            "FileExporter"
-                        ],
-                        "NextReceiver": 0,
-                        "Enabled": true,
-                        "Onetime": false,
-                        "Timeout": 0.8,
-                        "SleepTime": 5.0,
-                        "ID": "Meteo",
-                        "Request": "?U\r\n",
-                        "ResponsePattern": "TD(?P<TempPress>[\\d\\.]+), TE(?P<Temperature>[\\d\\.]+), DR(?P<Pressure>[\\d\\.]+), FE(?P<Humidity>[\\d\\.]+),",
-                        "ResponseDelimiter": ", \r\n",
-                        "ResponseSets": {
-                            "TempPress": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Temperature": {
-                                "Type": "Float",
-                                "Unit": "C"
-                            },
-                            "Pressure": {
-                                "Type": "Float",
-                                "Unit": "hPa"
-                            },
-                            "Humidity": {
-                                "Type": "Float",
-                                "Unit": "%"
-                            }
+            "Observations": [
+                {
+                    "Name": "get_values",
+                    "Description": "Get temperature, air pressure, and humidity values.",
+                    "Receivers": [
+                        "PreProcessor",
+                        "DistanceCorrector",
+                        "FileExporter"
+                    ],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": false,
+                    "SleepTime": 5.0,
+                    "ID": "Meteo",
+                    "RequestSets": {
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "?U\r\n",
+                            "ResponsePattern": "TD(?P<TempPress>[\\d\\.]+), TE(?P<Temperature>[\\d\\.]+), DR(?P<Pressure>[\\d\\.]+), FE(?P<Humidity>[\\d\\.]+),",
+                            "ResponseDelimiter": ", \r\n",
+                            "Timeout": 0.8,
+                            "SleepTime": 0.0
+                        }
+                    },
+                    "ResponseSets": {
+                        "TempPress": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Temperature": {
+                            "Type": "Float",
+                            "Unit": "C"
+                        },
+                        "Pressure": {
+                            "Type": "Float",
+                            "Unit": "hPa"
+                        },
+                        "Humidity": {
+                            "Type": "Float",
+                            "Unit": "%"
                         }
                     }
-                ]
-            }
+                }
+            ]
         }
     },
     "Schedulers": {
-        "Scheduler0": {
+        "Scheduler1": {
             "Port": "COM1",
             "Sensor": "STS DTM",
             "Schedules": [
@@ -870,14 +683,14 @@
                     "StartDate": "2016-02-01",
                     "EndDate": "2017-07-30",
                     "Schedule": {},
-                    "ObservationSets": [
-                        "Init",
-                        "Main"
+                    "Observations": [
+                        "initialize",
+                        "get_values"
                     ]
                 }
             ]
         },
-        "Scheduler1": {
+        "Scheduler2": {
             "Port": "COM2",
             "Sensor": "Leica TM30",
             "Schedules": [
@@ -899,22 +712,21 @@
                         "Saturday": [],
                         "Sunday": []
                     },
-                    "ObservationSets": [
-                        "Init",
+                    "Observations": [
+                        "initialize",
                         "P1",
                         "P2",
                         "P3",
-                        "P4",
-                        "P5"
+                        "P4"
                     ]
                 }
             ]
         }
     },
-    "Alarm": {
+    "Alert": {
         "Enabled": false,
         "Handlers": {
-            "ShortMessageSocketAlarmHandler": {
+            "ShortMessageSocketAlertHandler": {
                 "Enabled": false,
                 "LogLevels": [
                     "Error",
@@ -925,15 +737,15 @@
                 "PhoneNumbers": [
                     "+49176 12345678"
                 ],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project 1\": {asctime} - {level} - {msg}</cmgs>"
+                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project X\": {asctime} - {level} - {msg}</cmgs>"
             },
-            "MailAlarmHandler": {
+            "MailAlertHandler": {
                 "Enabled": false,
                 "LogLevels": [
                     "Error",
                     "Critical"
                 ],
-                "Subject": "[OpenADMS] Alarm Message - R318",
+                "Subject": "[OpenADMS] Alert Message - R318",
                 "Recipients": [
                     "engineer@example.com"
                 ],
@@ -947,8 +759,8 @@
         }
     },
     "DistanceCorrector": {
-        "Temperature": null,
-        "Pressure": null,
+        "Temperature": 20.0,
+        "Pressure": 1010.0,
         "Humidity": 0.6,
         "AtmosphericCorrectionEnabled": true,
         "SealevelCorrectionEnabled": false,
@@ -958,7 +770,9 @@
         "ResidualMismatchTransformationEnabled": true,
         "ViewPoint": {
             "ID": "P6",
-            "Receivers": ["OnlineViewer/P6"],
+            "Receivers": [
+                "OnlineViewer/P6"
+            ],
             "SensorHeight": 0.1500
         },
         "TiePoints": {
@@ -995,7 +809,9 @@
     },
     "RealTimePublisher": {
         "Enabled": true,
-        "Receivers": ["OnlineViewer"]
+        "Receivers": [
+            "OnlineViewer"
+        ]
     },
     "FileExporter": {
         "FileExtension": ".csv",
