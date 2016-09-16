@@ -26,7 +26,20 @@ from core.observation import Observation
 
 """Tests the OpenADMS processing modules."""
 
-data = { 'ID': 'Test', 'Response': '+0025.9\r', 'ResponsePattern': '(?P<Temperature>[+-]?\\d+\\.+\\d)', 'ResponseSets': { 'Temperature': { 'Type': 'Float', 'Unit': 'C' } } }
+data = {
+    'ID': 'Test',
+    'RequestSets': {
+        'get_value': {
+            'Response': '+0025.9\r',
+            'ResponsePattern': '(?P<Temperature>[+-]?\\d+\\.+\\d)'
+        }
+    },
+    'ResponseSets': {
+        'Temperature': {
+            'Type': 'Float',
+            'Unit': 'C' }
+    }
+}
 
 class TestPreProcessor():
 

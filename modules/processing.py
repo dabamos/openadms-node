@@ -48,18 +48,19 @@ class PreProcessor(Prototype):
             response_pattern = request_set.get('ResponsePattern')
 
             if response is None or response == '':
-                logger.warning('No response in observation "{}"'
-                               .format(obs.get('Name')))
+                logger.error('No response in observation "{}" with ID "{}"'
+                             .format(obs.get('Name'), obs.get('ID')))
                 return obs
 
             pattern = re.compile(response_pattern)
             match = pattern.search(response)
 
             if not match:
-                logger.error('Response "{}" of observation "{}" with ID "{}" '
-                             'from sensor "{}" on port "{}" does not match '
-                             'extraction pattern'
+                logger.error('Response "{}" of request "{}" of observation '
+                             '"{}" with ID "{}" from sensor "{}" on port "{}" '
+                             'does not match extraction pattern'
                              .format(self.sanitize(response),
+                                     set_name,
                                      obs.get('Name'),
                                      obs.get('ID'),
                                      obs.get('SensorName'),
@@ -106,12 +107,12 @@ class PreProcessor(Prototype):
                     response_value = raw_value
 
                 if response_value is not None:
-                    #logger.debug('Extracted "{}" from raw response "{}" of '
-                    #             'observation "{}" with ID "{}"'
-                    #             .format(response_value,
-                    #                     raw_value,
-                    #                     obs.get('Name'),
-                    #                     obs.get('ID')))
+                    logger.debug('Extracted "{}" from raw response "{}" of '
+                                 'observation "{}" with ID "{}"'
+                                 .format(response_value,
+                                         raw_value,
+                                         obs.get('Name'),
+                                         obs.get('ID')))
                     response_set['Value'] = response_value
 
         return obs
@@ -170,8 +171,8 @@ class PreProcessor(Prototype):
 class ReturnCodeInspector(Prototype):
 
     """
-    Inspects the return code in an observation sent by sensors of Leica
-    Geosystems and creates an appropriate log message.
+    ReturnCodeInspector inspects the return code in an observation sent by
+    sensors of Leica Geosystems and creates an appropriate log message.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -198,6 +199,7 @@ class ReturnCodeInspector(Prototype):
         """
         self.code_descriptions = {
             5:    [4, 'GeoCOM command unknown (not implemented yet)'],
+            6:    [4, 'Function execution timed out (result unspecified)'],
             514:  [4, 'Several targets detected'],
             1284: [3, 'Accuracy can not be guaranteed'],
             1285: [4, 'Only angle measurement valid'],

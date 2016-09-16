@@ -39,32 +39,47 @@ class VirtualSensor(Prototype):
         self.patterns = {}
 
     def action(self, obs):
-        timeout = obs.get('Timeout')
-        request = obs.get('Request')
-        response = ''
+        request_sets = obs.get('RequestSets')
 
-        logger.info('Sending observation "{}" to sensor "{}" on virtual port '
-                    '"{}"'.format(obs.get('Name'),
-                                  obs.get('SensorName'),
-                                  self.name))
+        for set_name, request_set in request_sets.items():
+            request = request_set.get('Request')
+            timeout = request_set.get('Timeout')
+            response = ''
 
-        for pattern in self.patterns:
-            reg_exp = re.compile(pattern)
-            parsed = reg_exp.search(request)
+            logger.info('Sending request "{}" to sensor "{}" on virtual '
+                        'port "{}"'.format(set_name,
+                                           obs.get('SensorName'),
+                                           self.name))
 
-            if not parsed:
-                continue
+            for pattern in self.patterns:
+                reg_exp = re.compile(pattern)
+                parsed = reg_exp.search(request)
 
-            response = self.patterns[pattern](request)
-            break
+                if not parsed:
+                    continue
+
+                response = self.patterns[pattern](request)
+
+                logger.info('Received response "{}" from sensor "{}" on '
+                            'virtual port "{}"'.format(self._sanitize(response),
+                                               obs.get('SensorName'),
+                                               self.name))
+                break
+
+            request_set['Response'] = response
+            time.sleep(0.15 * timeout)
 
         obs.set('PortName', self._name)
-        obs.set('Response', response)
         obs.set('TimeStamp', time.time())
 
-        time.sleep(0.15 * timeout)
-
         return obs
+
+    def _sanitize(self, s):
+        """Converts some non-printable characters of a given string."""
+        return s.replace('\n', '\\n') \
+            .replace('\r', '\\r') \
+            .replace('\t', '\\t') \
+            .strip()
 
 
 class VirtualLeicaTM30(VirtualSensor):

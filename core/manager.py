@@ -43,7 +43,10 @@ class ConfigurationManager:
         self._config = {}
 
         if config_file:
-            self.load(config_file)
+            try:
+                self.load(config_file)
+            except json.decoder.JSONDecodeError as e:
+                logger.error('Invalid JSON: "{}"'.format(e))
         else:
             logger.warning('No configuration file set')
 

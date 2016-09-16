@@ -5,13 +5,15 @@
         "COM2": "modules.port.SerialPort",
         "Scheduler1": "modules.schedule.Scheduler",
         "Scheduler2": "modules.schedule.Scheduler",
+        "Scheduler3": "modules.schedule.Scheduler",
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
         "DistanceCorrector": "modules.totalstation.DistanceCorrector",
         "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
         "HelmertTransformer": "modules.totalstation.HelmertTransformer",
-        "RealTimePublisher": "modules.export.RealTimePublisher"
+        "RealTimePublisher": "modules.export.RealTimePublisher",
+        "VirtualLeicaTM30": "modules.virtual.VirtualLeicaTM30"
     },
     "Project": {
         "Name": "Project X",
@@ -23,7 +25,7 @@
             "Host": "iot.eclipse.org",
             "Port": 1883,
             "KeepAlive": 60,
-            "Topic": "7b720202-f5af-4c68-bb98-641024ae6593/OpenADMS"
+            "Topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/OpenADMS"
         }
     },
     "Ports": {
@@ -170,8 +172,59 @@
             "Type": "Total Station",
             "Observations": [
                 {
+                    "Name": "beep",
+                    "Description": "Just beep.",
+                    "Receivers": [],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": true,
+                    "SleepTime": 5.0,
+                    "ID": "BEEP",
+                    "RequestSets": {
+                        "beep_on": {
+                            "Enabled": true,
+                            "Request": "%R1Q,20001:50\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 1.0,
+                            "Timeout": 15.0
+                        },
+                        "beep_off": {
+                            "Enabled": true,
+                            "Request": "%R1Q,20000:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        }
+                    },
+                    "RequestsOrder": [
+                        "beep_on",
+                        "beep_off"
+                    ],
+                    "ResponseSets": {
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        }
+                    }
+                },
+                {
+                    "Name": "wait",
+                    "Description": "Do wait.",
+                    "Receivers": [],
+                    "NextReceiver": 0,
+                    "Enabled": true,
+                    "Onetime": false,
+                    "SleepTime": 15.0,
+                    "ID": "WAIT",
+                    "RequestSets": {},
+                    "RequestsOrder": [],
+                    "ResponseSets": {}
+                },
+                {
                     "Name": "initialize",
-                    "Description": "Get instrument identification code.",
+                    "Description": "Initialize sensor.",
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector"
@@ -180,46 +233,123 @@
                     "Enabled": true,
                     "Onetime": true,
                     "SleepTime": 5.0,
-                    "ID": null,
+                    "ID": "INIT",
                     "RequestSets": {
                         "get_sensor_id": {
                             "Enabled": true,
                             "Request": "%R1Q,5003:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(\\d+))?",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorID>\\d+))",
                             "ResponseDelimiter": "\r\n",
-                            "SleepTime": 1.0,
+                            "SleepTime": 0.5,
                             "Timeout": 15.0
                         },
                         "get_sensor_name": {
                             "Enabled": true,
                             "Request": "%R1Q,5004:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,\"([\\w\\d\\s\\.]+))?",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorName>\"[\\w\\W]+\"))",
                             "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.0,
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "get_software_version": {
+                            "Enabled": true,
+                            "Request": "%R1Q,5034:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Release>\\d+),(?P<Version>\\d+),(?P<SubVersion>\\d+))",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "get_internal_temperature": {
+                            "Enabled": true,
+                            "Request": "%R1Q,5011:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<InternalTemperature>[\\d+\\.]+))",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "set_edm_type": {
+                            "Enabled": true,
+                            "Request": "%R1Q,17021:0\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "set_atmospheric_ppm": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2148:0\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "set_geometric_ppm_correction_factor": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2153:0,0,0,0,0\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "enable_angle_correction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2016:1,1,1,1\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
+                            "Timeout": 15.0
+                        },
+                        "do_beep": {
+                            "Enabled": true,
+                            "Request": "%R1Q,11004:\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "ResponseDelimiter": "\r\n",
+                            "SleepTime": 0.5,
                             "Timeout": 15.0
                         }
                     },
                     "RequestsOrder": [
+                        "do_beep",
                         "get_sensor_id",
-                        "get_sensor_name"
+                        "get_sensor_name",
+                        "get_software_version",
+                        "get_internal_temperature",
+                        "set_edm_type",
+                        "set_atmospheric_ppm",
+                        "set_geometric_ppm_correction_factor",
+                        "enable_angle_correction",
+                        "do_beep"
                     ],
-                    "ResponseSets": [
-                        {
-                            "Description": "ReturnCode",
+                    "ResponseSets": {
+                        "ReturnCode": {
                             "Type": "Integer",
                             "Unit": "none"
                         },
-                        {
-                            "Description": "SensorID",
+                        "SensorID": {
                             "Type": "String",
                             "Unit": "none"
                         },
-                        {
-                            "Description": "SensorName",
+                        "SensorName": {
                             "Type": "String",
                             "Unit": "none"
+                        },
+                        "Release": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "Version": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SubVersion": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "InternalTemperature": {
+                            "Type": "Float",
+                            "Unit": "C"
                         }
-                    ]
+                    }
                 },
                 {
                     "Description": "Get complete measurement.",
@@ -241,7 +371,7 @@
                             "Enabled": true,
                             "Request": "%R1Q,2167:5000,1\r\n",
                             "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
                             "SleepTime": 0.0,
                             "Timeout": 15.0
                         },
@@ -327,7 +457,7 @@
                             "Enabled": true,
                             "Request": "%R1Q,2167:5000,1\r\n",
                             "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
                             "SleepTime": 0.0,
                             "Timeout": 15.0
                         },
@@ -413,7 +543,7 @@
                             "Enabled": true,
                             "Request": "%R1Q,2167:5000,1\r\n",
                             "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
                             "SleepTime": 0.0,
                             "Timeout": 15.0
                         },
@@ -499,7 +629,7 @@
                             "Enabled": true,
                             "Request": "%R1Q,2167:5000,1\r\n",
                             "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>\\d*))",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
                             "SleepTime": 0.0,
                             "Timeout": 15.0
                         },
@@ -713,6 +843,34 @@
                         "Sunday": []
                     },
                     "Observations": [
+                        "wait",
+                        "initialize",
+                        "P1",
+                        "P2",
+                        "P3",
+                        "P4"
+                    ]
+                }
+            ]
+        },
+        "Scheduler3": {
+            "Port": "VirtualLeicaTM30",
+            "Sensor": "Leica TM30",
+            "Schedules": [
+                {
+                    "Enabled": false,
+                    "StartDate": "2016-02-01",
+                    "EndDate": "2017-07-30",
+                    "Schedule": {
+                        "Monday": [],
+                        "Tuesday": [],
+                        "Wednesday": [],
+                        "Thursday": [],
+                        "Friday": [],
+                        "Saturday": [],
+                        "Sunday": []
+                    },
+                    "Observations": [
                         "initialize",
                         "P1",
                         "P2",
@@ -759,8 +917,8 @@
         }
     },
     "DistanceCorrector": {
-        "Temperature": 20.0,
-        "Pressure": 1010.0,
+        "Temperature": null,
+        "Pressure": null,
         "Humidity": 0.6,
         "AtmosphericCorrectionEnabled": true,
         "SealevelCorrectionEnabled": false,
