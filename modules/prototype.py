@@ -109,7 +109,7 @@ class Module(threading.Thread):
         self._inbox.put(obs)
 
     def run(self):
-        """Checks the inbox for new messages and calls the `action()` for
+        """Checks the inbox for new messages and calls the `action()` method for
         further processing. Runs within a thread."""
         logger.debug('Connecting module "{}" to {}:{} ...'
                      .format(self._worker.name,
