@@ -246,7 +246,7 @@ class SerialMeasurementProcessor(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config[self._name]
 
-        self._max_faces = config['MaximumFaces']
+        self._max_faces = config['Faces']
         self._prior_observations = {}
 
     def _add(self, obs):
@@ -354,8 +354,8 @@ class SerialMeasurementProcessor(Prototype):
 class HelmertTransformer(Prototype):
 
     """
-    Calculates a 3-dimensional coordinates of a view point using the Helmert
-    transformation.
+    HelmertTransformer calculates a 3-dimensional coordinates of a view point
+    using the Helmert transformation.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -774,11 +774,11 @@ class HelmertTransformer(Prototype):
 class PolarTransformer(Prototype):
 
     """
-    Calculates 3-dimensional coordinates of a target using the sensor position,
-    and the azimuth position from the configuration together with the
-    horizontal direction, the vertical angle, and the distance of a total
-    station observation. The result (Y, X, Z) is added to the observation data
-    set.
+    PolarTransformer calculates 3-dimensional coordinates of a target using the
+    sensor position, and the azimuth position from the configuration together
+    with the horizontal direction, the vertical angle, and the distance of a
+    total station observation. The result (Y, X, Z) is added to the observation
+    data set.
     """
 
     def __init__(self, name, config_manager, sensor_manager):

@@ -625,6 +625,22 @@
                         "FileExporter"
                     ],
                     "RequestSets": {
+                        "change_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9028:1,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "get_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2026:\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Face>\\d+))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
                         "get_values": {
                             "Enabled": true,
                             "Request": "%R1Q,2167:5000,1\r\n",
@@ -652,6 +668,8 @@
                     },
                     "RequestsOrder": [
                         "set_direction",
+                        "change_face",
+                        "get_face",
                         "measure_distance",
                         "get_values"
                     ],
@@ -671,6 +689,10 @@
                         "DistTime": {
                             "Type": "Integer",
                             "Unit": "ns"
+                        },
+                        "Face": {
+                            "Type": "Integer",
+                            "Unit": "none"
                         },
                         "Hz": {
                             "Type": "Float",
