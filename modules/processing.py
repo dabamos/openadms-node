@@ -110,7 +110,7 @@ class PreProcessor(Prototype):
                     logger.debug('Extracted "{}" from raw response "{}" of '
                                  'observation "{}" with ID "{}"'
                                  .format(response_value,
-                                         raw_value,
+                                         group_name,
                                          obs.get('Name'),
                                          obs.get('ID')))
                     response_set['Value'] = response_value

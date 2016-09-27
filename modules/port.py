@@ -75,10 +75,10 @@ class SerialPort(Prototype):
             timeout = request_set.get('Timeout')
 
             # Send the request of the observation to the attached sensor.
-            logger.info('Sending request "{}" to sensor "{}" on port '
-                        '"{}"'.format(request_name,
-                                      obs.get('SensorName'),
-                                      self.name))
+            logger.debug('Sending request "{}" to sensor "{}" on port '
+                         '"{}"'.format(request_name,
+                                       obs.get('SensorName'),
+                                       self.name))
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
@@ -93,10 +93,12 @@ class SerialPort(Prototype):
                 response = self._read(response_delimiter, timeout)
 
                 if response != '':
-                    logger.info('Received response "{}" from sensor "{}" on '
-                                'port "{}"'.format(self._sanitize(response),
-                                                   obs.get('SensorName'),
-                                                   self.name))
+                    logger.debug('Received response "{}" for request "{}" from '
+                                 'sensor "{}" on port "{}"'
+                                 .format(self._sanitize(response),
+                                         request_name,
+                                         obs.get('SensorName'),
+                                         self.name))
                     break
 
                 # Try next attempt if response is empty.

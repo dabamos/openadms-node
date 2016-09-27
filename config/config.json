@@ -13,7 +13,7 @@
         "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
         "HelmertTransformer": "modules.totalstation.HelmertTransformer",
         "RealTimePublisher": "modules.export.RealTimePublisher",
-        "VirtualLeicaTM30": "modules.virtual.VirtualLeicaTM30"
+        "SerialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
     },
     "Project": {
         "Name": "Project X",
@@ -216,7 +216,7 @@
                     "NextReceiver": 0,
                     "Enabled": true,
                     "Onetime": false,
-                    "SleepTime": 15.0,
+                    "SleepTime": 10.0,
                     "ID": "WAIT",
                     "RequestSets": {},
                     "RequestsOrder": [],
@@ -227,7 +227,8 @@
                     "Description": "Initialize sensor.",
                     "Receivers": [
                         "PreProcessor",
-                        "ReturnCodeInspector"
+                        "ReturnCodeInspector",
+                        "FileExporter"
                     ],
                     "NextReceiver": 0,
                     "Enabled": true,
@@ -435,7 +436,7 @@
                             "Unit": "rad"
                         }
                     },
-                    "SleepTime": 15.0
+                    "SleepTime": 5.0
                 },
                 {
                     "Description": "Get complete measurement.",
@@ -521,7 +522,7 @@
                             "Unit": "rad"
                         }
                     },
-                    "SleepTime": 15.0
+                    "SleepTime": 5.0
                 },
                 {
                     "Description": "Get complete measurement.",
@@ -607,30 +608,129 @@
                             "Unit": "rad"
                         }
                     },
-                    "SleepTime": 15.0
+                    "SleepTime": 5.0
                 },
                 {
-                    "Description": "Get complete measurement.",
+                    "Description": "P4 first face.",
                     "Enabled": true,
                     "ID": "P4",
-                    "Name": "P4",
+                    "Name": "P4F1",
                     "NextReceiver": 0,
                     "Onetime": false,
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
                         "DistanceCorrector",
+                        "SerialMeasurementProcessor",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2026:\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Face>\\d+))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        },
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
+                    },
+                    "RequestsOrder": [
+                        "get_face",
+                        "set_direction",
+                        "measure_distance",
+                        "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Face": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
+                    },
+                    "SleepTime": 5.0
+                },
+                {
+                    "Description": "P4 second face.",
+                    "Enabled": true,
+                    "ID": "P4",
+                    "Name": "P4F2",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "SerialMeasurementProcessor",
                         "HelmertTransformer",
                         "RealTimePublisher",
                         "FileExporter"
                     ],
                     "RequestSets": {
-                        "change_face": {
+                         "change_face": {
                             "Enabled": true,
                             "Request": "%R1Q,9028:1,1,0\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 15.0
                         },
                         "get_face": {
@@ -671,7 +771,216 @@
                         "change_face",
                         "get_face",
                         "measure_distance",
+                        "get_values",
+                        "change_face"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Face": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
+                    },
+                    "SleepTime": 15.0
+                },
+                {
+                    "Description": "P5 first face.",
+                    "Enabled": true,
+                    "ID": "P5",
+                    "Name": "P5F1",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "SerialMeasurementProcessor",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                        "get_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2026:\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Face>\\d+))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        },
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:2.69364,1.59311,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
+                    },
+                    "RequestsOrder": [
+                        "get_face",
+                        "set_direction",
+                        "measure_distance",
                         "get_values"
+                    ],
+                    "ResponseSets": {
+                        "AccAngle": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "AccIncl": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "C": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "DistTime": {
+                            "Type": "Integer",
+                            "Unit": "ns"
+                        },
+                        "Face": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "Hz": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "L": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        },
+                        "ReturnCode": {
+                            "Type": "Integer",
+                            "Unit": "none"
+                        },
+                        "SlopeDist": {
+                            "Type": "Float",
+                            "Unit": "m"
+                        },
+                        "V": {
+                            "Type": "Float",
+                            "Unit": "rad"
+                        }
+                    },
+                    "SleepTime": 5.0
+                },
+                {
+                    "Description": "P5 second face.",
+                    "Enabled": true,
+                    "ID": "P5",
+                    "Name": "P5F2",
+                    "NextReceiver": 0,
+                    "Onetime": false,
+                    "Receivers": [
+                        "PreProcessor",
+                        "ReturnCodeInspector",
+                        "DistanceCorrector",
+                        "SerialMeasurementProcessor",
+                        "HelmertTransformer",
+                        "RealTimePublisher",
+                        "FileExporter"
+                    ],
+                    "RequestSets": {
+                         "change_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9028:1,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        },
+                        "get_face": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2026:\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Face>\\d+))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "get_values": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2167:5000,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Hz>\\d*\\.?\\d+),(?P<V>\\d*\\.?\\d+),(?P<AccAngle>-?\\d*\\.?\\d+),(?P<C>-?\\d*\\.?\\d*),(?P<L>-?\\d*\\.?\\d*),(?P<AccIncl>-?\\d*\\.?\\d*),(?P<SlopeDist>\\d*\\.?\\d*),(?P<DistTime>-?\\d*))",
+                            "SleepTime": 0.0,
+                            "Timeout": 15.0
+                        },
+                        "measure_distance": {
+                            "Enabled": true,
+                            "Request": "%R1Q,2008:1,1\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        },
+                        "set_direction": {
+                            "Enabled": true,
+                            "Request": "%R1Q,9027:2.69364,1.59311,2,1,0\r\n",
+                            "ResponseDelimiter": "\r\n",
+                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
+                            "SleepTime": 2.0,
+                            "Timeout": 15.0
+                        }
+                    },
+                    "RequestsOrder": [
+                        "set_direction",
+                        "change_face",
+                        "get_face",
+                        "measure_distance",
+                        "get_values",
+                        "change_face"
                     ],
                     "ResponseSets": {
                         "AccAngle": {
@@ -870,7 +1179,10 @@
                         "P1",
                         "P2",
                         "P3",
-                        "P4"
+                        "P4F1",
+                        "P4F2",
+                        "P5F1",
+                        "P5F2"
                     ]
                 }
             ]
@@ -896,8 +1208,7 @@
                         "initialize",
                         "P1",
                         "P2",
-                        "P3",
-                        "P4"
+                        "P3"
                     ]
                 }
             ]
@@ -952,24 +1263,20 @@
             "ID": "P6",
             "Receivers": [
                 "OnlineViewer/P6"
-            ],
-            "SensorHeight": 0.1500
+            ]
         },
         "TiePoints": {
             "P1": {
-                "TargetHeight": 0.1100,
                 "Y": 1000.0000,
                 "X": 2000.0000,
                 "Z": 100.0000
             },
             "P2": {
-                "TargetHeight": 0.1100,
                 "Y": 1003.7680,
                 "X": 1995.4880,
                 "Z": 100.0080
             },
             "P3": {
-                "TargetHeight": 0.1100,
                 "Y": 996.2600,
                 "X": 1994.4900,
                 "Z": 100.0210
