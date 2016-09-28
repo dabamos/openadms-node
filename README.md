@@ -6,6 +6,8 @@ in Python 3 and should run on Python 3.3 upwards. So far, it has been tested
 with CPython on FreeBSD 10 (x86-64), NetBSD 7 (ARMv7), and Windows 7 (x86).
 For more information, please see http://www.dabamos.de/.
 
+The current version of OpenADMS is 0.3 (code name “Copenhagen”).
+
 ## Installation
 To run OpenADMS, clone the branch and execute `openadms.py`:
 
@@ -25,7 +27,7 @@ Some additional modules have to be installed in order to use OpenADMS:
 The installation can be done with `pip`:
 
 ```
-$ python3 -m pip install coloredlogs paho-mqtt pyserial
+$ pip install coloredlogs paho-mqtt pyserial
 ```
 ## Message Broker
 The MQTT protocol is used for the internal message exchange in OpenADMS. An MQTT
@@ -61,7 +63,7 @@ used, which is part of Python 3:
 $ pyvenv-3.5 ~/virtual-environment
 $ bash
 $ source ~/virtual-environment/bin/activate
-$ python3 -m pip install coloredlogs paho-mqtt pyserial
+$ pip install coloredlogs paho-mqtt pyserial
 $ cd ~/virtual-environment
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
