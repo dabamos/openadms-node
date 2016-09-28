@@ -35,7 +35,6 @@ logger = logging.getLogger('openadms')
 
 
 class DistanceCorrector(Prototype):
-
     """
     Corrects the slope distance for EDM measurements using atmospheric
     data.
@@ -85,7 +84,7 @@ class DistanceCorrector(Prototype):
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
+        dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
         if dist is None:
             return obs
@@ -242,73 +241,7 @@ class DistanceCorrector(Prototype):
         self._sensor_height = sensor_height
 
 
-class SerialMeasurementProcessor(Prototype):
-
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        # config = self._config_manager.config[self._name]
-
-        self._observations = {}
-
-    def action(self, obs):
-        face = obs.validate('ResponseSets', 'Face', 'Value')
-
-        if face == 0:
-            self._observations[obs.get('ID')] = obs
-            logger.debug('Saved first face of observation "{}" with ID "{}"'
-                         .format(obs.get('Name'), obs.get('ID')))
-        elif face == 1:
-            first_obs = self._observations.get(obs.get('ID'))
-
-            if not first_obs:
-                logger.warning('No first face of observation "{}" with ID "{}" '
-                               'found'.format(obs.get('Name'), obs.get('ID')))
-                return obs
-
-            self._observations[obs.get('ID')] = None
-
-            hz = self._get_improved_hz_set(first_obs, obs)
-            v = self._get_improved_v_set(first_obs, obs)
-
-            response_sets = obs.get('ResponseSets')
-
-            response_sets['Hz'] = hz
-            response_sets['Hz1'] = first_obs.validate('ResponseSets', 'Hz')
-            response_sets['Hz2'] = obs.validate('ResponseSets', 'Hz')
-
-            response_sets['V'] = v
-            response_sets['V1'] = first_obs.validate('ResponseSets', 'V')
-            response_sets['V2'] = obs.validate('ResponseSets', 'V')
-
-        return obs
-
-    def _get_improved_hz_set(self, obs_1, obs_2):
-        hz_1 = obs_1.validate('ResponseSets', 'Hz', 'Value')
-        hz_2 = obs_2.validate('ResponseSets', 'Hz', 'Value')
-
-        # Accurate horizontal direction.
-        hz = (hz_1 + hz_2 - math.pi) / 2
-
-        return self.get_response_set('Float', 'rad', hz)
-
-    def _get_improved_v_set(self, obs_1, obs_2):
-        v_1 = obs_1.validate('ResponseSets', 'V', 'Value')
-        v_2 = obs_2.validate('ResponseSets', 'V', 'Value')
-
-        # Accurate vertical angle.
-        v = ((v_1 - v_2) + (2 * math.pi)) / 2
-
-        return self.get_response_set('Float', 'rad', v)
-
-    def get_response_set(self, t, u, v):
-        return {'Type': t, 'Unit': u, 'Value': v}
-
-    def rad_to_gon(self, angle):
-        return (angle / math.pi) * 200
-
-
 class HelmertTransformer(Prototype):
-
     """
     HelmertTransformer calculates a 3-dimensional coordinates of a view point
     using the Helmert transformation.
@@ -344,9 +277,9 @@ class HelmertTransformer(Prototype):
 
         An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
-        # Check if the given observation equals one of the defined tie points.
         is_tie_point = False
 
+        # Check if the given observation equals one of the defined tie points.
         if self._tie_points.get(obs.get('ID')):
             is_tie_point = True
 
@@ -430,9 +363,9 @@ class HelmertTransformer(Prototype):
         return vx, vy
 
     def _calculate_target_point(self, obs):
-        hz = obs.validate('ResponseSets', 'Hz', 'Value')
-        v = obs.validate('ResponseSets', 'V', 'Value')
-        dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
+        hz = obs.get_value('ResponseSets', 'Hz', 'Value')
+        v = obs.get_value('ResponseSets', 'V', 'Value')
+        dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
         if hz is None or v is None or dist is None:
             logger.warning('Hz, V, or distance missing in observation "{}" '
@@ -483,15 +416,15 @@ class HelmertTransformer(Prototype):
         return obs
 
     def _calculate_view_point(self, obs):
-        sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
+        sum_local_x = sum_local_y = sum_local_z = 0  # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
         num_tie_points = len(self._tie_points)  # n.
 
         # Calculate the centroid coordinates of the view point.
         for name, tie_point in self._tie_points.items():
-            hz = tie_point.get('Hz')        # Horizontal direction.
-            v = tie_point.get('V')          # Vertical angle.
-            dist = tie_point.get('Dist')    # Distance (slope or reduced).
+            hz = tie_point.get('Hz')  # Horizontal direction.
+            v = tie_point.get('V')  # Vertical angle.
+            dist = tie_point.get('Dist')  # Distance (slope or reduced).
 
             if hz is None or v is None or dist is None:
                 logger.warning('No "Hz", "V", or "Dist" in tie point "{}"'
@@ -527,11 +460,11 @@ class HelmertTransformer(Prototype):
             sum_global_z += global_z
 
         # Coordinates of the centroids.
-        local_centroid_x = sum_local_x / num_tie_points     # x_s.
-        local_centroid_y = sum_local_y / num_tie_points     # y_s.
+        local_centroid_x = sum_local_x / num_tie_points  # x_s.
+        local_centroid_y = sum_local_y / num_tie_points  # y_s.
 
-        global_centroid_x = sum_global_x / num_tie_points   # X_s.
-        global_centroid_y = sum_global_y / num_tie_points   # Y_s.
+        global_centroid_x = sum_global_x / num_tie_points  # X_s.
+        global_centroid_y = sum_global_y / num_tie_points  # Y_s.
 
         # Calculate transformation parameters.
         o_1 = o_2 = 0
@@ -571,9 +504,11 @@ class HelmertTransformer(Prototype):
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
         self._view_point['X'] = global_centroid_x - (self._a *
-                                local_centroid_x) + (self._o * local_centroid_y)
+                                                     local_centroid_x) + (
+                                self._o * local_centroid_y)
         self._view_point['Y'] = global_centroid_y - (self._a *
-                                local_centroid_y) - (self._o * local_centroid_x)
+                                                     local_centroid_y) - (
+                                self._o * local_centroid_x)
         self._view_point['Z'] = (sum_global_z - sum_local_z) / num_tie_points
 
         logger.info('Calculated coordinates of view point "{}" '
@@ -584,8 +519,8 @@ class HelmertTransformer(Prototype):
                             round(self._view_point.get('Z'), 5)))
 
         # Calculate the standard deviations.
-        sum_wx = sum_wy = 0                     # [W_x], [W_y].
-        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0   # [W_x^2], [W_y^2], [W_z^2].
+        sum_wx = sum_wy = 0  # [W_x], [W_y].
+        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0  # [W_x^2], [W_y^2], [W_z^2].
 
         for name, tie_point in self._tie_points.items():
             local_x = tie_point.get('x')
@@ -664,9 +599,9 @@ class HelmertTransformer(Prototype):
     def _update_tie_point(self, obs):
         """Adds horizontal direction, vertical angle, and slope distance
         of the observation to a tie point."""
-        hz = obs.validate('ResponseSets', 'Hz', 'Value')
-        v = obs.validate('ResponseSets', 'V', 'Value')
-        dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
+        hz = obs.get_value('ResponseSets', 'Hz', 'Value')
+        v = obs.get_value('ResponseSets', 'V', 'Value')
+        dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
         if hz is None or v is None or dist is None:
             return obs
@@ -723,7 +658,6 @@ class HelmertTransformer(Prototype):
 
 
 class PolarTransformer(Prototype):
-
     """
     PolarTransformer calculates 3-dimensional coordinates of a target using the
     sensor position, and the azimuth position from the configuration together
@@ -751,9 +685,9 @@ class PolarTransformer(Prototype):
                          .format(sensor_type))
             return obs
 
-        hz = obs.validate('ResponseSets', 'Hz', 'Value')
-        v = obs.validate('ResponseSets', 'V', 'Value')
-        dist = obs.validate('ResponseSets', 'SlopeDist', 'Value')
+        hz = obs.get_value('ResponseSets', 'Hz', 'Value')
+        v = obs.get_value('ResponseSets', 'V', 'Value')
+        dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
         if hz is None or v is None or dist is None:
             return obs
@@ -817,6 +751,45 @@ class PolarTransformer(Prototype):
         z = sensor_z + d_z
 
         return (x, y, z)
+
+    def get_response_set(self, t, u, v):
+        return {'Type': t, 'Unit': u, 'Value': v}
+
+
+class SerialMeasurementProcessor(Prototype):
+
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+
+    def action(self, obs):
+        # Calculate the serial measurement with two faces.
+        hz_0 = obs.get_value('ResponseSets', 'Hz0', 'Value')
+        hz_1 = obs.get_value('ResponseSets', 'Hz1', 'Value')
+        v_0 = obs.get_value('ResponseSets', 'V0', 'Value')
+        v_1 = obs.get_value('ResponseSets', 'V1', 'Value')
+        dist_0 = obs.get_value('ResponseSets', 'SlopeDist0', 'Value')
+        dist_1 = obs.get_value('ResponseSets', 'SlopeDist1', 'Value')
+
+        if None in [hz_0, hz_1, v_0, v_1, dist_0, dist_1]:
+            logger.warning('<<<ERROR>>>')
+            return obs
+
+        # Calculate new Hz, V, and slope distance.
+        hz = (hz_0 + hz_1 - math.pi) / 2
+        v = ((v_0 - v_1) + (2 * math.pi)) / 2
+        dist = (dist_0 + dist_1) / 2
+
+        # Save the calculated values.
+        response_sets = obs.get('ResponseSets')
+        response_sets['Hz'] = self.get_response_set('Float', 'rad', hz)
+        response_sets['V'] = self.get_response_set('Float', 'rad', v)
+        response_sets['SlopeDist'] = self.get_response_set('Float', 'm', dist)
+
+        logger.info('Calculated serial measurement with two faces for '
+                    'observation "{}" with ID "{}"'.format(obs.get('Name'),
+                                                           obs.get('ID')))
+
+        return obs
 
     def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}

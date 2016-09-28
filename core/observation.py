@@ -64,7 +64,7 @@ class Observation(object):
         """
         self._data = data
 
-    def get(self, key):
+    def get(self, key, default=None):
         """Returns the value to a given key.
 
         Args:
@@ -73,7 +73,30 @@ class Observation(object):
         Returns:
             Returns a value from the observation data.
         """
-        return self._data.get(key, None)
+        return self._data.get(key, default)
+
+    def get_value(self, *args):
+        """Returns the value of a set of keys.
+
+        Args:
+            *args (str): The keys.
+
+        Returns:
+            Returns a value from the observation data.
+        """
+        ref = self.data
+
+        for x in args:
+            try:
+                ref = ref.get(x)
+            except AttributeError:
+                # logger.info('No "{}" in observation "{}" with ID "{}"'
+                #             .format('->'.join(args),
+                #                     self.get('Name'),
+                #                     self.get('ID')))
+                return
+
+        return ref
 
     def set(self, key, value):
         """Sets key and value in the data set.
@@ -91,19 +114,3 @@ class Observation(object):
             str: Data in JSON format.
         """
         return json.dumps(self._data)
-
-    def validate(self, *args):
-        ref = self.data
-
-        for x in args:
-            try:
-                ref = ref.get(x)
-            except AttributeError:
-                logger.info('No "{}" in observation "{}" with ID "{}"'
-                            .format('->'.join(args),
-                                    self.get('Name'),
-                                    self.get('ID')))
-                return
-
-        return ref
-

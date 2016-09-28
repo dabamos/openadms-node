@@ -168,6 +168,40 @@ class PreProcessor(Prototype):
         return sanitized
 
 
+class ReturnCodes(object):
+
+    """
+    The dictionary has the following format:
+
+        {
+            return code number: [ log level, retry measurement, log message ]
+        }
+
+    The return code numbers and messages are take from the GeoCOM reference
+    manual of the Leica TPS 1200, TS 30, and TM 30 total stations. The log
+    level can be set to these values:
+
+        5: CRITICAL,
+        4: ERROR,
+        3: WARNING,
+        2: INFO,
+        1: DEBUG,
+        0: NONE.
+
+    Please choose a proper value for each return code.
+    """
+    codes = {
+        5:    [4, False, 'GeoCOM command unknown (not implemented yet)'],
+        6:    [4, False, 'Function execution timed out (result unspecified)'],
+        13:   [4, True,  'System busy'],
+        514:  [4, False, 'Several targets detected'],
+        1284: [3, False, 'Accuracy can not be guaranteed'],
+        1285: [4, True,  'Only angle measurement valid'],
+        1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
+        8710: [4, True,  'No target detected']
+    }
+
+
 class ReturnCodeInspector(Prototype):
 
     """
@@ -177,67 +211,60 @@ class ReturnCodeInspector(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        """
-        The dictionary has the following format:
+        config = self._config_manager.config.get(self._name)
 
-            {
-                return code number: [ log level, log message ]
-            }
-
-        The return code numbers and messages are take from the GeoCOM reference
-        manual of the Leica TPS 1200, TS 30, and TM 30 total stations. The log
-        level can be set to these values:
-
-            5: CRITICAL,
-            4: ERROR,
-            3: WARNING,
-            2: INFO,
-            1: DEBUG,
-            0: NONE.
-
-        Please choose a proper value for each return code.
-        """
-        self.code_descriptions = {
-            5:    [4, 'GeoCOM command unknown (not implemented yet)'],
-            6:    [4, 'Function execution timed out (result unspecified)'],
-            514:  [4, 'Several targets detected'],
-            1284: [3, 'Accuracy can not be guaranteed'],
-            1285: [4, 'Only angle measurement valid'],
-            1292: [4, 'Distance measurement not done (no aim, etc.)'],
-            8710: [4, 'No target detected']
-        }
+        self._keys = config.get('Keys')
+        self._retries = config.get('Retries')
 
     def action(self, obs):
-        return_code = obs.validate('ResponseSets', 'ReturnCode', 'Value')
+        for key in self._keys:
+            return_code = obs.get_value('ResponseSets', key, 'Value')
 
-        if return_code is None:
-            logger.warning('No return code in observation "{}" '
-                           'with ID "{}"'.format(obs.get('Name'),
-                                                 obs.get('ID')))
-            return obs
+            # Key not in response set.
+            if return_code is None or return_code == 0:
+                continue
 
-        if return_code == 0:
-            logger.debug('Observation "{}" with ID "{}" was successful '
-                         '(code "{}")'.format(obs.get('Name'),
-                                              obs.get('ID'),
-                                              return_code))
-            return obs
+            # Get level and error message of the return code.
+            values = ReturnCodes.codes.get(return_code)
 
-        # Get level and error message of the return code.
-        description = self.code_descriptions.get(return_code)
+            if values:
+                lvl, retry, msg = values
 
-        if description:
-            lvl, msg = description
+                # Return code related log message.
+                logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
+                                     '(code "{}")'.format(obs.get('Name'),
+                                                          obs.get('ID'),
+                                                          msg,
+                                                          return_code))
 
-            # Return code related log message.
-            logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
-                                 '(code "{}")'.format(obs.get('Name'),
-                                                      obs.get('ID'),
-                                                      msg,
-                                                      return_code))
-        else:
-            # Generic log message.
-            logger.error('Error occurred on observation "{}" (code "{}")'
-                         .format(obs.get('Name'), return_code))
+                # Retry measurement.
+                if retry:
+                    attempts = obs.get('Attempts', 0)
+
+                    if attempts < self._retries:
+                        obs.set('Attempts', attempts + 1)
+                        obs.set('NextReceiver', 0)
+                        obs.set('Corrupted', False)
+
+                        logger.info('Retrying observation "{}" with ID "{}" '
+                                    '(attempt {} of {})'
+                                    .format(obs.get('Name'),
+                                            obs.get('ID'),
+                                            attempts + 1,
+                                            self._retries + 1))
+                    else:
+                        obs.set('Corrupted', True)
+
+                        logger.info('Maximum number of attempts ({}) reached '
+                                    'for observation "{}" with ID "{}'
+                                    .format(self._retries + 1,
+                                            obs.get('Name'),
+                                            obs.get('ID')))
+
+                    return obs
+            else:
+                # Generic log message.
+                logger.error('Error occurred on observation "{}" (code "{}")'
+                             .format(obs.get('Name'), return_code))
 
         return obs

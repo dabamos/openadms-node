@@ -80,11 +80,21 @@ def main(t_file, c_file, o_file):
             if obs_data.get('ID') is not None:
                 obs_data['ID'] = obs_data.get('ID').replace('[% id %]', t_id)
 
+            if obs_data.get('Description') is not None:
+                obs_data['Description'] = obs_data.get('Description')\
+                                          .replace('[% id %]', t_id)
+
+            if obs_data.get('Name') is not None:
+                obs_data['Name'] = obs_data.get('Name')\
+                                   .replace('[% id %]', t_id)
+
             request_sets = obs_data['RequestSets']
 
             for set_name, request_set in request_sets.items():
-                request_set['Request'] = request_set.get('Request').replace('[% hz %]', hz_rad)
-                request_set['Request'] = request_set.get('Request').replace('[% v %]', v_rad)
+                request_set['Request'] = request_set.get('Request')\
+                                         .replace('[% hz %]', hz_rad)
+                request_set['Request'] = request_set.get('Request')\
+                                         .replace('[% v %]', v_rad)
 
     output = json.dumps(result,
                         sort_keys=True,

@@ -105,11 +105,15 @@ class FileExporter(Prototype):
             FileRotation.YEARLY: ts.strftime('%Y')}[self._file_rotation]
 
         file_name = self._file_name
+
         file_name = file_name.replace('{port}', obs.get('PortName'))
         file_name = file_name.replace('{date}', '{}'.format(date)
                                       if date else '')
         file_name = file_name.replace('{id}', '{}'.format(obs.get('ID'))
                                       if obs.get('ID') is not None else '')
+        file_name = file_name.replace('{name}', '{}'.format(obs.get('Name'))
+                                      if obs.get('Name') is not None else '')
+
         file_name += self._file_extension
 
         for path in self._paths:

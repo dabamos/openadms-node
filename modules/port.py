@@ -66,6 +66,13 @@ class SerialPort(Prototype):
         for request_name in requests_order:
             request_set = request_sets.get(request_name)
 
+            if not request_set:
+                logger.error('Request set "{}" not found in observation "{}" '
+                             'with ID "{}"'.format(request_name,
+                                                   obs.get('Name'),
+                                                   obs.get('ID')))
+                return
+
             # The response of the sensor.
             response = ''
             response_delimiter = request_set.get('ResponseDelimiter')
