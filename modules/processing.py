@@ -171,7 +171,8 @@ class PreProcessor(Prototype):
 class ReturnCodes(object):
 
     """
-    The dictionary has the following format:
+    ReturnCodes stores a dictionary of return codes of sensors of Leica
+    Geosystems. The dictionary is static and has the following structure:
 
         {
             return code number: [ log level, retry measurement, log message ]
@@ -241,7 +242,7 @@ class ReturnCodeInspector(Prototype):
                 if retry:
                     attempts = obs.get('Attempts', 0)
 
-                    if attempts < self._retries:
+                    if attempts < self._retries :
                         obs.set('Attempts', attempts + 1)
                         obs.set('NextReceiver', 0)
                         obs.set('Corrupted', False)
@@ -251,13 +252,13 @@ class ReturnCodeInspector(Prototype):
                                     .format(obs.get('Name'),
                                             obs.get('ID'),
                                             attempts + 1,
-                                            self._retries + 1))
+                                            self._retries))
                     else:
                         obs.set('Corrupted', True)
 
                         logger.info('Maximum number of attempts ({}) reached '
                                     'for observation "{}" with ID "{}'
-                                    .format(self._retries + 1,
+                                    .format(self._retries,
                                             obs.get('Name'),
                                             obs.get('ID')))
 

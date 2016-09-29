@@ -1628,7 +1628,7 @@
         }
     },
     "ReturnCodeInspector": {
-        "Retries": 2,
+        "Retries": 3,
         "Keys": [
             "ReturnCode",
             "RCChangeFace",

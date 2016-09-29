@@ -771,12 +771,22 @@ class SerialMeasurementProcessor(Prototype):
         dist_1 = obs.get_value('ResponseSets', 'SlopeDist1', 'Value')
 
         if None in [hz_0, hz_1, v_0, v_1, dist_0, dist_1]:
-            logger.warning('<<<ERROR>>>')
+            logger.warning('Values for serial measurement missing in '
+                           'observation "{}" with ID "{}"'
+                           .format(obs.get('Name'), obs.get('ID')))
             return obs
 
         # Calculate new Hz, V, and slope distance.
-        hz = (hz_0 + hz_1 - math.pi) / 2
-        v = ((v_0 - v_1) + (2 * math.pi)) / 2
+        hz = hz_0 + hz_1
+
+        if hz_0 > hz_1:
+            hz += math.pi
+        else:
+            hz -= math.pi
+
+        hz /= 2
+
+        v = ((2 * math.pi) + (v_0 - v_1)) / 2
         dist = (dist_0 + dist_1) / 2
 
         # Save the calculated values.
