@@ -367,7 +367,7 @@ class HelmertTransformer(Prototype):
         v = obs.get_value('ResponseSets', 'V', 'Value')
         dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
-        if hz is None or v is None or dist is None:
+        if None in [hz, v, dist]:
             logger.warning('Hz, V, or distance missing in observation "{}" '
                            'with ID "{}"'.format(obs.get('Name'),
                                                  obs.get('ID')))
@@ -395,17 +395,17 @@ class HelmertTransformer(Prototype):
             vx, vy = self._calculate_residual_mismatches(x, y)
 
             logger.debug('Calculated improvements for target point "{}" '
-                         '(x = {} m, y = {} m)'.format(obs.get('ID'),
-                                                       round(vx, 5),
-                                                       round(vy, 5)))
+                         '(x = {:4.5f} m, y = {:4.5f} m)'.format(obs.get('ID'),
+                                                                 vx,
+                                                                 vy))
 
             x += vx
             y += vy
 
             logger.debug('Updated coordinates of target point "{}" '
-                         '(X = {}, Y = {})'.format(obs.get('ID'),
-                                                   round(x, 5),
-                                                   round(y, 5)))
+                         '(X = {:4.5f}, Y = {:4.5f})'.format(obs.get('ID'),
+                                                             x,
+                                                             y))
 
         # Add response set.
         response_sets = obs.get('ResponseSets')
@@ -426,9 +426,10 @@ class HelmertTransformer(Prototype):
             v = tie_point.get('V')  # Vertical angle.
             dist = tie_point.get('Dist')  # Distance (slope or reduced).
 
-            if hz is None or v is None or dist is None:
-                logger.warning('No "Hz", "V", or "Dist" in tie point "{}"'
-                               .format(name))
+            if None in [hz, v, dist]:
+                logger.warning('Hz, V, or distance missing in observation "{}" '
+                               'with ID "{}"'.format(obs.get('Name'),
+                                                     obs.get('ID')))
                 return
 
             # Calculate horizontal distance out of slope distance and
@@ -512,11 +513,11 @@ class HelmertTransformer(Prototype):
         self._view_point['Z'] = (sum_global_z - sum_local_z) / num_tie_points
 
         logger.info('Calculated coordinates of view point "{}" '
-                    '(X = {}, Y = {}, Z = {})'
+                    '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5f})'
                     .format(self._view_point.get('ID'),
-                            round(self._view_point.get('X'), 5),
-                            round(self._view_point.get('Y'), 5),
-                            round(self._view_point.get('Z'), 5)))
+                            self._view_point.get('X'),
+                            self._view_point.get('Y'),
+                            self._view_point.get('Z')))
 
         # Calculate the standard deviations.
         sum_wx = sum_wy = 0  # [W_x], [W_y].
@@ -564,10 +565,8 @@ class HelmertTransformer(Prototype):
         sz = math.sqrt(sum_wz_wz / (num_tie_points - 1))
 
         logger.debug('Calculated standard deviations '
-                     '(s_x = {} m, s_y = {} m, s_z = {} m)'
-                     .format(round(sx, 5),
-                             round(sy, 5),
-                             round(sz, 5)))
+                     '(s_x = {:1.5f} m, s_y = {:1.5f} m, s_z = {:1.5f} m)'
+                     .format(sx, 5, sy, 5, sz, 5))
 
         # Scale factor.
         m = math.sqrt((self._a * self._a) + (self._o * self._o))
@@ -603,7 +602,10 @@ class HelmertTransformer(Prototype):
         v = obs.get_value('ResponseSets', 'V', 'Value')
         dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
-        if hz is None or v is None or dist is None:
+        if None in [hz, v, dist]:
+            logger.warning('Hz, V, or distance missing in observation "{}" '
+                           'with ID "{}"'.format(obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
         now = time.time()
@@ -615,12 +617,12 @@ class HelmertTransformer(Prototype):
         tie_point['Dist'] = dist
         tie_point['LastUpdate'] = now
 
-        logger.debug('Updated tie point "{}" (Hz = {}, V = {}, Dist = {}, '
-                     'LastUpdate = {})'.format(obs.get('ID'),
-                                               round(hz, 5),
-                                               round(v, 5),
-                                               round(dist, 5),
-                                               now))
+        logger.debug('Updated tie point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
+                     'Dist = {:3.5f}, LastUpdate = {})'.format(obs.get('ID'),
+                                                               hz,
+                                                               v,
+                                                               dist,
+                                                               now))
 
         # Calculate the coordinates of the tie point if the Helmert
         # transformation has already been done. Otherwise, use the datum from
@@ -636,11 +638,9 @@ class HelmertTransformer(Prototype):
                 self._a,
                 self._o)
 
-            logger.info('Calculated coordinates of tie point "{}" '
-                        '(X = {}, Y = {}, Z = {})'.format(obs.get('ID'),
-                                                          round(x, 5),
-                                                          round(y, 5),
-                                                          round(z, 5)))
+            logger.info('Calculated coordinates of tie point "{:3.5f}" '
+                        '(X = {:3.5f}, Y = {:3.5f}, Z = {:3.5f})'
+                        .format(obs.get('ID'), x, y, z))
         else:
             # Get the coordinates of the tie point from the configuration.
             x = tie_point.get('X')
@@ -689,7 +689,10 @@ class PolarTransformer(Prototype):
         v = obs.get_value('ResponseSets', 'V', 'Value')
         dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
 
-        if hz is None or v is None or dist is None:
+        if None in [hz, v, dist]:
+            logger.warning('Hz, V, or distance missing in observation "{}" '
+                           'with ID "{}"'.format(obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
         # Radiant to grad (gon).
@@ -728,29 +731,41 @@ class PolarTransformer(Prototype):
 
     def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
                   v, dist):
-        """Calculates coordinates (Y, X, Z) out of horizontal direction,
+        """Calculates coordinates (X, Y, Z) out of horizontal direction,
         vertical angle, and slope distance to a target point by doing a
         3-dimensional polar transformation."""
         # Calculate azimuth angle out of coordinates.
-        if azimuth_x == sensor_x:
-            # Because arctan(0) = 0.
-            azimuth_angle = 0
+        d_x = azimuth_x - sensor_x
+        d_y = azimuth_y - sensor_y
+
+        if d_x == 0:
+            if d_y > 0:
+                azimuth = 0.5 * math.pi
+            elif d_y < 0:
+                azimuth = 1.5 * math.pi
+            elif d_y == 0:
+                logger.error('Sensor position equals azimuth')
         else:
-            azimuth_angle = math.atan((azimuth_y - sensor_y) /
-                                      (azimuth_x - sensor_x))
+            azimuth = math.atan(d_y / d_x)
 
-        point_angle = azimuth_angle + hz
+        t = azimuth + hz
 
-        # Calculate coordinates of the new point.
-        d_y = dist * math.sin(v) * math.sin(point_angle)
-        d_x = dist * math.sin(v) * math.cos(point_angle)
+        if d_x < 0:
+            t += math.pi
+
+        if d_y < 0 < d_x:
+            t += 2 * math.pi
+
+        # Calculate coordinates of the target point.
+        d_x = dist * math.sin(v) * math.cos(t)
+        d_y = dist * math.sin(v) * math.sin(t)
         d_z = dist * math.cos(v)
 
         x = sensor_x + d_x
         y = sensor_y + d_y
         z = sensor_z + d_z
 
-        return (x, y, z)
+        return x, y, z
 
     def get_response_set(self, t, u, v):
         return {'Type': t, 'Unit': u, 'Value': v}
@@ -771,9 +786,9 @@ class SerialMeasurementProcessor(Prototype):
         dist_1 = obs.get_value('ResponseSets', 'SlopeDist1', 'Value')
 
         if None in [hz_0, hz_1, v_0, v_1, dist_0, dist_1]:
-            logger.warning('Values for serial measurement missing in '
-                           'observation "{}" with ID "{}"'
-                           .format(obs.get('Name'), obs.get('ID')))
+            logger.warning('Hz, V, or distance missing in observation "{}" '
+                           'with ID "{}"'.format(obs.get('Name'),
+                                                 obs.get('ID')))
             return obs
 
         # Calculate new Hz, V, and slope distance.
@@ -788,6 +803,10 @@ class SerialMeasurementProcessor(Prototype):
 
         v = ((2 * math.pi) + (v_0 - v_1)) / 2
         dist = (dist_0 + dist_1) / 2
+
+        # logger.info('<<< Hz0 = {}, V0 = {} >>>'.format(hz_0, v_0))
+        # logger.info('<<< Hz1 = {}, V1 = {} >>>'.format(hz_1, v_1))
+        # logger.info('<<< Hz = {}, V = {} >>>'.format(hz, v))
 
         # Save the calculated values.
         response_sets = obs.get('ResponseSets')
