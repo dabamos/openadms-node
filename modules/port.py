@@ -59,7 +59,7 @@ class SerialPort(Prototype):
                          .format(self.name, self._serial_port_config.port))
             return
 
-        requests_order = obs.get('RequestsOrder')
+        requests_order = obs.get('RequestsOrder', [])
         request_sets = obs.get('RequestSets')
 
         # Send requests one by one to the sensor.
