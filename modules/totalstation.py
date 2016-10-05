@@ -566,7 +566,7 @@ class HelmertTransformer(Prototype):
 
         logger.debug('Calculated standard deviations '
                      '(s_x = {:1.5f} m, s_y = {:1.5f} m, s_z = {:1.5f} m)'
-                     .format(sx, 5, sy, 5, sz, 5))
+                     .format(sx, sy, sz))
 
         # Scale factor.
         m = math.sqrt((self._a * self._a) + (self._o * self._o))
@@ -638,7 +638,7 @@ class HelmertTransformer(Prototype):
                 self._a,
                 self._o)
 
-            logger.info('Calculated coordinates of tie point "{:3.5f}" '
+            logger.info('Calculated coordinates of tie point "{}" '
                         '(X = {:3.5f}, Y = {:3.5f}, Z = {:3.5f})'
                         .format(obs.get('ID'), x, y, z))
         else:
