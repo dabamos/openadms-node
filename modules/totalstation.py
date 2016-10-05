@@ -146,10 +146,10 @@ class DistanceCorrector(Prototype):
         div = (1 + alpha * self.temperature)
         x = (7.5 * self.temperature / (237.3 + self.temperature)) + 0.7857
 
-        s1 = 0.29525 * self.pressure
-        s2 = 4.126 * math.pow(10, -4) * self.humidity
+        a = 0.29525 * self.pressure
+        b = 4.126 * math.pow(10, -4) * self.humidity
 
-        ppm = 286.34 - ((s1 / div) - ((s2 / div) * math.pow(10, int(x))))
+        ppm = 286.34 - ((a / div) - ((b / div) * math.pow(10, int(x))))
 
         return ppm
 
@@ -416,15 +416,15 @@ class HelmertTransformer(Prototype):
         return obs
 
     def _calculate_view_point(self, obs):
-        sum_local_x = sum_local_y = sum_local_z = 0  # [x], [y], [z].
+        sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
-        num_tie_points = len(self._tie_points)  # n.
+        num_tie_points = len(self._tie_points)          # n.
 
         # Calculate the centroid coordinates of the view point.
         for name, tie_point in self._tie_points.items():
-            hz = tie_point.get('Hz')  # Horizontal direction.
-            v = tie_point.get('V')  # Vertical angle.
-            dist = tie_point.get('Dist')  # Distance (slope or reduced).
+            hz = tie_point.get('Hz')        # Horizontal direction.
+            v = tie_point.get('V')          # Vertical angle.
+            dist = tie_point.get('Dist')    # Distance (slope or reduced).
 
             if None in [hz, v, dist]:
                 logger.warning('Hz, V, or distance missing in observation "{}" '
@@ -461,11 +461,11 @@ class HelmertTransformer(Prototype):
             sum_global_z += global_z
 
         # Coordinates of the centroids.
-        local_centroid_x = sum_local_x / num_tie_points  # x_s.
-        local_centroid_y = sum_local_y / num_tie_points  # y_s.
+        local_centroid_x = sum_local_x / num_tie_points     # x_s.
+        local_centroid_y = sum_local_y / num_tie_points     # y_s.
 
-        global_centroid_x = sum_global_x / num_tie_points  # X_s.
-        global_centroid_y = sum_global_y / num_tie_points  # Y_s.
+        global_centroid_x = sum_global_x / num_tie_points   # X_s.
+        global_centroid_y = sum_global_y / num_tie_points   # Y_s.
 
         # Calculate transformation parameters.
         o_1 = o_2 = 0
@@ -504,12 +504,12 @@ class HelmertTransformer(Prototype):
         # Y_0 = Y_s - a * y_s - o * x_s
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
-        self._view_point['X'] = global_centroid_x - (self._a *
-                                                     local_centroid_x) + (
-                                self._o * local_centroid_y)
-        self._view_point['Y'] = global_centroid_y - (self._a *
-                                                     local_centroid_y) - (
-                                self._o * local_centroid_x)
+        self._view_point['X'] = global_centroid_x -\
+                                (self._a * local_centroid_x) +\
+                                (self._o * local_centroid_y)
+        self._view_point['Y'] = global_centroid_y -\
+                                (self._a * local_centroid_y) -\
+                                (self._o * local_centroid_x)
         self._view_point['Z'] = (sum_global_z - sum_local_z) / num_tie_points
 
         logger.info('Calculated coordinates of view point "{}" '

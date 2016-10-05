@@ -66,8 +66,12 @@ class MQTTMessenger(object):
 
     def _on_message(self, client, userdata, msg):
         """Callback method for incoming messages."""
-        data = json.loads(str(msg.payload, encoding='UTF-8'))
-        self._uplink(data)
+        try:
+            data = json.loads(str(msg.payload, encoding='UTF-8'))
+            self._uplink(data)
+        except json.decode.JSONDecodeError:
+            logger.error('Message from client "{}" is corrupted (invalid JSON)'
+                         .format(client))
 
     def connect(self):
         """Connect to the message broker."""
