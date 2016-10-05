@@ -92,7 +92,7 @@ class FileExporter(Prototype):
         Returns:
             obs(Observation): The output observation object.
         """
-        ts = datetime.fromtimestamp(obs.get('TimeStamp'))
+        ts = datetime.fromtimestamp(obs.get('TimeStamp', 0))
 
         date = {
             # No file rotation, i.e., all data is stored in a single file.
@@ -136,7 +136,7 @@ class FileExporter(Prototype):
                     fh.write(header)
 
                 # Convert Unix time stamp to date and time.
-                dt = datetime.fromtimestamp(obs.get('TimeStamp'))
+                dt = datetime.fromtimestamp(obs.get('TimeStamp', 0))
                 line = dt.strftime(self._date_time_format)
 
                 if obs.get('ID') is not None:
