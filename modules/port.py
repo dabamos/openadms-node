@@ -62,6 +62,10 @@ class SerialPort(Prototype):
         requests_order = obs.get('RequestsOrder', [])
         request_sets = obs.get('RequestSets')
 
+        if len(requests_order) == 0:
+            logger.info('No requests order defined in observation "{}" with '
+                        'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
+
         # Send requests one by one to the sensor.
         for request_name in requests_order:
             request_set = request_sets.get(request_name)

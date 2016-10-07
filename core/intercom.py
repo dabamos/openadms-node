@@ -21,6 +21,7 @@ limitations under the Licence.
 
 import json
 import logging
+
 import paho.mqtt.client as mqtt
 
 logger = logging.getLogger('openadms')
@@ -39,7 +40,7 @@ class MQTTMessenger(object):
         self._client_id = None
         self._host = config.get('Host')
         self._port = config.get('Port')
-        self._keepalive = config.get('KeepAlive')
+        self._keep_alive = config.get('KeepAlive')
         self._topic = config.get('Topic')
 
         self._uplink = None
@@ -63,19 +64,22 @@ class MQTTMessenger(object):
         if rc != 0:
             logger.error('Unexpected disconnection from {}:{}'
                          .format(self._host, self._port))
+            logger.info('Reconnecting to {}:{} ...'
+                        .format(self._host, self._port))
+            self.connect()
 
     def _on_message(self, client, userdata, msg):
         """Callback method for incoming messages."""
         try:
             data = json.loads(str(msg.payload, encoding='UTF-8'))
             self._uplink(data)
-        except json.decode.JSONDecodeError:
+        except json.JSONDecodeError:
             logger.error('Message from client "{}" is corrupted (invalid JSON)'
                          .format(client))
 
     def connect(self):
         """Connect to the message broker."""
-        self._client.connect_async(self._host, self._port, self._keepalive)
+        self._client.connect_async(self._host, self._port, self._keep_alive)
         self._client.loop_start()
 
     def disconnect(self):

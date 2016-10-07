@@ -115,7 +115,7 @@
                             "Unit": "none"
                         }
                     },
-                    "SleepTime": 1.0
+                    "SleepTime": 5.0
                 },
                 {
                     "Name": "get_values",
@@ -163,7 +163,7 @@
                             "Unit": "mbar"
                         }
                     },
-                    "SleepTime": 20.0
+                    "SleepTime": 300.0
                 }
             ]
         },
@@ -362,9 +362,9 @@
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
-                        "DistanceCorrector",
                         "SerialMeasurementProcessor",
-                        "HelmertTransformer",
+                        "DistanceCorrector",
+                        "PolarTransformer",
                         "RealTimePublisher",
                         "FileExporter"
                     ],
@@ -563,8 +563,8 @@
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
-                        "DistanceCorrector",
                         "SerialMeasurementProcessor",
+                        "DistanceCorrector",
                         "HelmertTransformer",
                         "RealTimePublisher",
                         "FileExporter"
@@ -764,8 +764,8 @@
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
-                        "DistanceCorrector",
                         "SerialMeasurementProcessor",
+                        "DistanceCorrector",
                         "HelmertTransformer",
                         "RealTimePublisher",
                         "FileExporter"
@@ -965,9 +965,9 @@
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
-                        "DistanceCorrector",
                         "SerialMeasurementProcessor",
-                        "HelmertTransformer",
+                        "DistanceCorrector",
+                        "PolarTransformer",
                         "RealTimePublisher",
                         "FileExporter"
                     ],
@@ -1166,9 +1166,9 @@
                     "Receivers": [
                         "PreProcessor",
                         "ReturnCodeInspector",
-                        "DistanceCorrector",
                         "SerialMeasurementProcessor",
-                        "HelmertTransformer",
+                        "DistanceCorrector",
+                        "PolarTransformer",
                         "RealTimePublisher",
                         "FileExporter"
                     ],
@@ -1358,13 +1358,13 @@
                     "SleepTime": 25.0
                 },
                 {
-                    "Name": "wait60",
-                    "Description": "Do wait.",
+                    "Name": "wait300",
+                    "Description": "Do wait 5 minutes.",
                     "Receivers": [],
                     "NextReceiver": 0,
                     "Enabled": true,
                     "Onetime": false,
-                    "SleepTime": 60.0,
+                    "SleepTime": 300.0,
                     "ID": "WAIT",
                     "RequestSets": {},
                     "RequestsOrder": [],
@@ -1522,10 +1522,9 @@
                         "initialize",
                         "get_P1",
                         "get_P2",
-                        "get_P3",
                         "get_P4",
                         "get_P5",
-                        "wait60"
+                        "wait300"
                     ]
                 }
             ]
@@ -1611,18 +1610,18 @@
         },
         "TiePoints": {
             "P1": {
-                "Y": 1000.0000,
                 "X": 2000.0000,
+                "Y": 1000.0000,
                 "Z": 100.0000
             },
             "P2": {
-                "Y": 1003.7680,
                 "X": 1995.4880,
+                "Y": 1003.7680,
                 "Z": 100.0080
             },
             "P3": {
-                "Y": 996.2600,
                 "X": 1994.4900,
+                "Y": 996.2600,
                 "Z": 100.0210
             }
         }
@@ -1643,13 +1642,13 @@
     },
     "PolarTransformer": {
         "SensorPosition": {
-            "Y": 1000.0000,
             "X": 2000.0000,
+            "Y": 992.5100,
             "Z": 100.0000
         },
         "AzimuthPosition": {
-            "Y": 1007.4992,
-            "X": 2000.0000
+            "X": 2000.0000,
+            "Y": 1000.0000
         }
     },
     "RealTimePublisher": {
