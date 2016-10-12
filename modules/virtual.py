@@ -202,6 +202,11 @@ class VirtualSylvacSDialOne(VirtualSensor):
                                sensor_manager)
 
         self.patterns['\?'] = self.get_distance
+        self._current_value = 0.0
 
     def get_distance(self, request):
-        return '001.000\r'
+        x = (1.0 + math.sin(self._current_value)) * 12.5
+        response = '{:7.3f}\r'.format(x)
+        self._current_value += 0.25
+
+        return response
