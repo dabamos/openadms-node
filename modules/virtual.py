@@ -33,6 +33,9 @@ logger = logging.getLogger('openadms')
 
 
 class VirtualSensor(Prototype):
+    """
+    VirtualSensor is a prototype class for virtual sensors.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -62,8 +65,8 @@ class VirtualSensor(Prototype):
 
                 logger.info('Received response "{}" from sensor "{}" on '
                             'virtual port "{}"'.format(self._sanitize(response),
-                                               obs.get('SensorName'),
-                                               self.name))
+                                                       obs.get('SensorName'),
+                                                       self.name))
                 break
 
             request_set['Response'] = response
@@ -83,10 +86,9 @@ class VirtualSensor(Prototype):
 
 
 class VirtualLeicaTM30(VirtualSensor):
-
     """
-    VirtualLeicaTotalstation simulates a Leica TM30 totalstation by processing
-    GeoCOM commands.
+    VirtualLeicaTM30 simulates a Leica TM30 totalstation by processing GeoCOM
+    commands.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -125,13 +127,13 @@ class VirtualLeicaTM30(VirtualSensor):
 
     def get_sensor_id(self, request):
         return_code = '0'
-        response = '%R1P,0,0:{},999999'.format(return_code)
+        response = '%R1P,0,0:{},999999\r\n'.format(return_code)
 
         return response
 
     def get_sensor_name(self, request):
         return_code = '0'
-        response = '%R1P,0,0:{},"TM30 0.5"'.format(return_code)
+        response = '%R1P,0,0:{},"TM30 0.5"\r\n'.format(return_code)
 
         return response
 
@@ -149,6 +151,9 @@ class VirtualLeicaTM30(VirtualSensor):
 
 
 class VirtualDTM(VirtualSensor):
+    """
+    VirtualDTM simulates an STS DTM meteorological sensor.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         VirtualSensor.__init__(self, name, config_manager,
@@ -161,18 +166,21 @@ class VirtualDTM(VirtualSensor):
         self.patterns['TEMP ?'] = self.get_temperature
 
     def get_pressure(self, request):
-        return '+{:06.1f}\r'.format(random.uniform(980, 1150))
+        high = 1150
+        low = 980
+
+        return '+{:06.1f}\r'.format(random.uniform(low, high))
 
     def get_temperature(self, request):
-        t = random.uniform(-20, 40)
+        high = 40
+        low = -20
+
+        t = random.uniform(low, high)
 
         if t < 0:
             return '{:07.1f}\r'.format(t)
         else:
             return '+{:06.1f}\r'.format(t)
-
-    def get_pressure(self, request):
-        return '+{:06.1f}\r'.format(random.uniform(980, 1150))
 
     def power_on(self, request):
         return '#\r'
@@ -182,3 +190,18 @@ class VirtualDTM(VirtualSensor):
 
     def set_command_set(self, request):
         return '*\r'
+
+
+class VirtualSylvacSDialOne(VirtualSensor):
+    """
+    VirtualSylvacSDialOne simulates a Sylvac S_Dial One extensometer.
+    """
+
+    def __init__(self, name, config_manager, sensor_manager):
+        VirtualSensor.__init__(self, name, config_manager,
+                               sensor_manager)
+
+        self.patterns['\?'] = self.get_distance
+
+    def get_distance(self, request):
+        return '001.000\r'

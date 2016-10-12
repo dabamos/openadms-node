@@ -178,8 +178,12 @@ class RealTimePublisher(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
         self._receivers = config.get('Receivers')
+        self._is_enabled = config.get('Enabled')
 
     def action(self, obs):
+        if not self._is_enabled:
+            return obs
+
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
