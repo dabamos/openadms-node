@@ -21,8 +21,8 @@ limitations under the Licence.
 
 import copy
 import datetime as dt
+import json
 import logging
-import queue
 import threading
 import time
 
@@ -60,15 +60,15 @@ class Scheduler(Prototype):
 
         # Run through the schedules and create jobs.
         for schedule in schedules:
-            observations = schedule.get('Observations')
+            observations = schedule.get('ObservationSets')
 
             for obs_name in observations:
                 # Get all observations of the current observation set.
-                obs = self._sensor_manager.get(sensor_name) \
+                obs = self._sensor_manager.get(sensor_name)\
                                           .get_observation(obs_name)
 
                 if not obs:
-                    logger.error('No observation "{}" found'.format(obs_name))
+                    logger.error('Observation "{}" not found'.format(obs_name))
                     continue
 
                 # Create a new job.
@@ -78,14 +78,10 @@ class Scheduler(Prototype):
                           schedule['Enabled'],
                           schedule['StartDate'],
                           schedule['EndDate'],
-                          schedule['Schedule'],
+                          schedule['Weekdays'],
                           self.publish)
                 # Add the job to the jobs list.
                 self.add(job)
-
-    def action(self, obs):
-        """Simply returns the observation."""
-        return obs
 
     def add(self, job):
         """Appends a job to the jobs list."""
@@ -96,6 +92,10 @@ class Scheduler(Prototype):
     def run_jobs(self):
         """Threaded method to process the jobs queue."""
         while True:
+            if self._is_paused:
+                time.sleep(0.1)
+                continue
+
             for job in self._jobs:
                 if not job.enabled:
                     continue
@@ -115,12 +115,12 @@ class Job(object):
     """
 
     def __init__(self, name, port_name, obs, enabled, start_date, end_date,
-                 schedule, uplink):
+                 time_sheet, uplink):
         self._name = name               # Name of the job.
         self._port_name = port_name     # Name of the port.
         self._obs = obs                 # Observation object.
         self._enabled = enabled         # Is enabled or not.
-        self._schedule = schedule       # List of schedules.
+        self._time_sheet = time_sheet   # The time sheet.
         self._uplink = uplink           # Callback function.
 
         # Used date and time formats.
@@ -156,16 +156,16 @@ class Job(object):
         # Are we within the date range of the job?
         if self._start_date <= now < self._end_date:
             # No days defined, go on.
-            if len(self._schedule) == 0:
+            if len(self._time_sheet) == 0:
                 return True
 
             # Name of the current day (e.g., "Monday").
             current_day = now.strftime('%A')
 
             # Ignore current day if it is not listed in the schedule.
-            if current_day in self._schedule:
+            if current_day in self._time_sheet:
                 # Time ranges of the current day.
-                periods = self._schedule[current_day]
+                periods = self._time_sheet[current_day]
 
                 # No given time range means the job should be executed
                 # all day long.
@@ -211,8 +211,15 @@ class Job(object):
                              self._port_name))
 
         sleep_time = obs_copy.get('SleepTime')
-        # Send the observation to the target (i.e., message broker).
-        self._uplink(obs_copy)
+
+        # Send the observation to the sensor.
+        target = self._port_name
+        header = {'Type': 'Observation'}
+        payload = obs_copy.data
+
+        # Fire and forget.
+        self._uplink(target, header, payload)
+
         # Sleep until the next observation.
         time.sleep(sleep_time)
 

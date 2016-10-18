@@ -43,8 +43,10 @@ class MQTTMessenger(object):
         self._keep_alive = config.get('KeepAlive')
         self._topic = config.get('Topic')
 
-        self._uplink = None
+        # Function to send received messages to.
+        self._downlink = None
 
+        # MQTT client configuration.
         self._client = mqtt.Client(self._client_id)
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
@@ -69,10 +71,12 @@ class MQTTMessenger(object):
             self.connect()
 
     def _on_message(self, client, userdata, msg):
-        """Callback method for incoming messages."""
+        """Callback method for incoming messages. Converts the JSON-based
+        message to its real data type and then forwards it to the downlink
+        function."""
         try:
             data = json.loads(str(msg.payload, encoding='UTF-8'))
-            self._uplink(data)
+            self._downlink(data)
         except json.JSONDecodeError:
             logger.error('Message from client "{}" is corrupted (invalid JSON)'
                          .format(client))
@@ -102,6 +106,10 @@ class MQTTMessenger(object):
         return self._client
 
     @property
+    def downlink(self):
+        return self._downlink
+
+    @property
     def host(self):
         return self._host
 
@@ -113,12 +121,8 @@ class MQTTMessenger(object):
     def topic(self):
         return self._topic
 
-    @property
-    def uplink(self):
-        return self._uplink
-
-    @uplink.setter
-    def uplink(self, uplink):
+    @downlink.setter
+    def downlink(self, downlink):
         """Register a callback function which is called after a message has
         been received."""
-        self._uplink = uplink
+        self._downlink = downlink
