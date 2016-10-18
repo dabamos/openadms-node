@@ -47,7 +47,7 @@ class SerialPort(Prototype):
         #    self.close()
         pass
 
-    def action(self, obs):
+    def process_observation(self, obs):
         if not self._serial:
             self._open()
 

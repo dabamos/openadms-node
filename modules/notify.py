@@ -74,14 +74,11 @@ class Alert(Prototype):
 
         # Check the logging queue continuously for messages and proceed them to
         # the alert handlers.
-        self._thread = threading.Thread(target=self._process)
+        self._thread = threading.Thread(target=self.process_alert)
         self._thread.daemon = True
         self._thread.start()
 
-    def action(self, obs):
-        return obs
-
-    def _process(self):
+    def process_alert(self):
         if self._enabled:
             while True:
                 # Blocking I/O.

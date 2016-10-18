@@ -31,7 +31,6 @@ logger = logging.getLogger('openadms')
 
 
 class PreProcessor(Prototype):
-
     """
     Extracts values from the raw response of a given observation set and
     converts them to the defined types.
@@ -40,7 +39,7 @@ class PreProcessor(Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
 
-    def action(self, obs):
+    def process_observation(self, obs):
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('RequestSets').items():
@@ -122,9 +121,9 @@ class PreProcessor(Prototype):
 
         if self.is_float(dot_value):
             response_value = float(dot_value)
-            #logger.debug('Converted raw value "{}" to '
-            #             'float value "{}"'.format(raw_value,
-            #                                       response_value))
+            # logger.debug('Converted raw value "{}" to '
+            #              'float value "{}"'.format(raw_value,
+            #                                        response_value))
             return response_value
         else:
             logger.warning('Value "{}" could not be converted '
@@ -134,9 +133,9 @@ class PreProcessor(Prototype):
     def to_int(self, raw_value):
         if self.is_int(raw_value):
             response_value = int(raw_value)
-            #logger.debug('Converted raw value "{}" to integer '
-            #             'value "{}"'.format(raw_value,
-            #                                 response_value))
+            # logger.debug('Converted raw value "{}" to integer '
+            #              'value "{}"'.format(raw_value,
+            #                                  response_value))
             return response_value
         else:
             logger.warning('Value "{}" could not be converted '
@@ -169,13 +168,12 @@ class PreProcessor(Prototype):
 
 
 class ReturnCodes(object):
-
     """
     ReturnCodes stores a dictionary of return codes of sensors of Leica
     Geosystems. The dictionary is static and has the following structure:
 
         {
-            return code number: [ log level, retry measurement, log message ]
+            return code: [ log level, retry measurement, log message ]
         }
 
     The return code numbers and messages are take from the GeoCOM reference
@@ -196,6 +194,7 @@ class ReturnCodes(object):
         6:    [4, False, 'Function execution timed out (result unspecified)'],
         13:   [4, True,  'System busy'],
         514:  [4, False, 'Several targets detected'],
+        1283: [3, False, 'Measurement without full correction'],
         1284: [3, False, 'Accuracy can not be guaranteed'],
         1285: [4, True,  'Only angle measurement valid'],
         1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
@@ -204,7 +203,6 @@ class ReturnCodes(object):
 
 
 class ReturnCodeInspector(Prototype):
-
     """
     ReturnCodeInspector inspects the return code in an observation sent by
     sensors of Leica Geosystems and creates an appropriate log message.
@@ -217,11 +215,11 @@ class ReturnCodeInspector(Prototype):
         self._keys = config.get('Keys')
         self._retries = config.get('Retries')
 
-    def action(self, obs):
+    def process_observation(self, obs):
         for key in self._keys:
             return_code = obs.get_value('ResponseSets', key, 'Value')
 
-            # Key not in response set.
+            # Key is zero or not in response set.
             if return_code is None or return_code == 0:
                 continue
 
@@ -257,7 +255,7 @@ class ReturnCodeInspector(Prototype):
                         obs.set('Corrupted', True)
 
                         logger.info('Maximum number of attempts ({}) reached '
-                                    'for observation "{}" with ID "{}'
+                                    'for observation "{}" with ID "{}"'
                                     .format(self._retries,
                                             obs.get('Name'),
                                             obs.get('ID')))

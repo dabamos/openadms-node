@@ -50,8 +50,8 @@ class DistanceCorrector(Prototype):
 
         self._is_atmospheric_correction = \
             config.get('AtmosphericCorrectionEnabled')
-        self._is_sealevel_correction = \
-            config.get('SealevelCorrectionEnabled')
+        self._is_sea_level_correction = \
+            config.get('SeaLevelCorrectionEnabled')
 
         self._temperature = config.get('Temperature')
         self._pressure = config.get('Pressure')
@@ -59,7 +59,7 @@ class DistanceCorrector(Prototype):
         self._sensor_height = config.get('SensorHeight')
         self._last_update = time.time()
 
-    def action(self, obs):
+    def process_observation(self, obs):
         sensor_type = obs.get('SensorType')
 
         # Update atmospheric data if sensor is a weather station.
@@ -84,7 +84,8 @@ class DistanceCorrector(Prototype):
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        dist = obs.get_value('ResponseSets', 'SlopeDist', 'Value')
+        key = self._config.get('Key')
+        dist = obs.get_value('ResponseSets', key, 'Value')
 
         if dist is None:
             return obs
@@ -105,7 +106,7 @@ class DistanceCorrector(Prototype):
             response_sets['AtmosphericPPM'] = response_set
 
         # Calculate the sealevel reduction of the distance.
-        if self._is_sealevel_correction:
+        if self._is_sea_level_correction:
             earth_radius = 6.378 * math.pow(10, 6)
             # Delta distance: -(height / R) * 10^6
             d_dist_2 = -1 * (self.sensor_height / earth_radius)
@@ -113,7 +114,7 @@ class DistanceCorrector(Prototype):
             response_set = self.get_response_set('Float',
                                                  'm',
                                                  round(d_dist_2, 5))
-            response_sets['SealevelDelta'] = response_set
+            response_sets['SeaLevelDelta'] = response_set
 
         # Add reduced distance to the observation set.
         if d_dist_1 != 0 or d_dist_2 != 0:
@@ -128,8 +129,8 @@ class DistanceCorrector(Prototype):
                                                  'm',
                                                  round(r_dist, 5))
 
-            response_sets['RawSlopeDist'] = response_sets.get('SlopeDist')
-            response_sets['SlopeDist'] = response_set
+            response_sets['Raw' + key] = response_sets.get(key)
+            response_sets[key] = response_set
 
         return obs
 
@@ -267,7 +268,7 @@ class HelmertTransformer(Prototype):
 
         self._is_residual = config.get('ResidualMismatchTransformationEnabled')
 
-    def action(self, obs):
+    def process_observation(self, obs):
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
         either be of a tie point or of a target point.
@@ -677,7 +678,7 @@ class PolarTransformer(Prototype):
         self._azimuth_x = config.get('AzimuthPosition').get('X')
         self._azimuth_y = config.get('AzimuthPosition').get('Y')
 
-    def action(self, obs):
+    def process_observation(self, obs):
         sensor_type = obs.get('SensorType')
 
         if not SensorType.is_total_station(sensor_type.lower()):
@@ -776,7 +777,7 @@ class SerialMeasurementProcessor(Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
 
-    def action(self, obs):
+    def process_observation(self, obs):
         # Calculate the serial measurement with two faces.
         hz_0 = obs.get_value('ResponseSets', 'Hz0', 'Value')
         hz_1 = obs.get_value('ResponseSets', 'Hz1', 'Value')

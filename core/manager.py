@@ -168,7 +168,7 @@ class SensorManager(object):
 
     def get(self, name):
         """Returns the sensor object with the given name."""
-        return self._sensors[name]
+        return self._sensors.get(name)
 
     @property
     def sensors(self):

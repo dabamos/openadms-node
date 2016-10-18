@@ -37,7 +37,6 @@ logger = logging.getLogger('openadms')
 
 
 class Module(threading.Thread):
-
     """
     Module bundles a worker with a messenger and orchestrates the communication
     between them.
@@ -50,63 +49,26 @@ class Module(threading.Thread):
         self._messenger = messenger
         self._worker = worker
 
+        # Set the callback functions of the messenger and the worker.
+        self._messenger.downlink = self._retrieve
+        self._worker.uplink = self._publish
+
         self._inbox = queue.Queue()
         self._topic = self._messenger.topic
-
-        # Set the callback functions of the messenger and the worker.
-        self._messenger.uplink = self._retrieve
-        self._worker.uplink = self._publish
 
         # Subscribe to the worker's name.
         self._messenger.subscribe(self._topic + '/' + worker.name)
 
-    def _publish(self, obs):
+    def _publish(self, target, message):
         """Sends an `Observation` to the next receiver by using the
         messenger."""
-        if not self._messenger:
-            logger.warning('No messenger defined for module "{}"'
-                           .format(self._name))
-            return
+        target_path = '{}/{}'.format(self._topic, target)
+        self._messenger.publish(target_path, message)
 
-        receivers = obs.get('Receivers')
-        index = obs.get('NextReceiver')
-
-        # No receivers defined.
-        if len(receivers) == 0:
-            logging.debug('No receivers defined in observation "{}" '
-                          'with ID "{}"'.format(obs.get('Name'),
-                                                obs.get('ID')))
-            return
-
-        # No index defined.
-        if (index is None) or (index < 0):
-            logger.warning('Next receiver of observation "{}" with ID "{}" not '
-                           'defined'.format(obs.get('Name'),
-                                            obs.get('ID')))
-            return
-
-        # Receivers list has been processed and observation is finished.
-        if index >= len(receivers):
-            logger.debug('Observation "{}" with ID "{}" has been finished'
-                         .format(obs.get('Name'),
-                                 obs.get('ID')))
-            return
-
-        # Send the observation to the next module.
-        receiver = receivers[index]
-        index += 1
-        obs.set('NextReceiver', index)
-
-        target = '{}/{}'.format(self._topic, receiver)
-        payload = obs.to_json()
-
-        self._messenger.publish(target, payload)
-
-    def _retrieve(self, data):
+    def _retrieve(self, message):
         """Callback function for the messenger. New data from the message broker
         lands here."""
-        obs = Observation(data)
-        self._inbox.put(obs)
+        self._inbox.put(message)
 
     def run(self):
         """Checks the inbox for new messages and calls the `action()` method for
@@ -120,11 +82,8 @@ class Module(threading.Thread):
 
         while True:
             # Blocking I/O.
-            obs = self._inbox.get()
-            obs = self._worker.action(obs)
-
-            if obs is not None:
-                self._publish(obs)
+            message = self._inbox.get()
+            self._worker.action(message)
 
         self._messenger.disconnect()
 
@@ -145,39 +104,121 @@ class Module(threading.Thread):
         self._worker = worker
 
 
-class Prototype():
-
+class Prototype(object):
     """
     Prototype is used as a blueprint for OpenADMS workers.
     """
 
-    __metaclass__ = ABCMeta
-
     def __init__(self, name, config_manager, sensor_manager):
-        threading.Thread.__init__(self, name=name)
-
+        self._name = name
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
 
         self._uplink = None
+        self._is_paused = False
 
-    @abstractmethod
-    def action(self, *args):
-        """Abstract function that does the action of a module.
+        self._handlers = {
+            'Observation': self.handle_observation,
+            'Service': self.handle_service
+        }
+
+    def action(self, message):
+        """Processes messages by calling handler methods."""
+        header = message[0]
+        payload = message[1]
+
+        if not header or not payload:
+            logger.warning('{}: received data is corrupted'.format(self._name))
+            return
+
+        payload_type = header.get('Type')
+
+        if not payload_type:
+            logger.error('{}: no payload type defined'.format(self._name))
+            return
+
+        handler_func = self._handlers.get(payload_type)
+
+        if not handler_func:
+            logger.warning('{}: no handler found for payload type "{}"'
+                           .format(self._name, payload_type))
+            return
+
+        handler_func(header, payload)
+
+    def handle_observation(self, header, payload):
+        """Handles an observation by forwarding it to the processing method and
+        prepares the result for publishing."""
+        obs = Observation(payload)
+        obs = self.process_observation(obs)
+
+        if not obs:
+            return
+
+        receivers = obs.get('Receivers')
+        index = obs.get('NextReceiver')
+
+        # No receivers defined.
+        if len(receivers) == 0:
+            logging.debug('No receivers defined in observation "{}" '
+                          'with ID "{}"'.format(obs.get('Name'),
+                                                obs.get('ID')))
+            return
+
+        # No index defined.
+        if (index is None) or (index < 0):
+            logger.warning('Next receiver of observation "{}" with ID '
+                           '"{}" not defined'.format(obs.get('Name'),
+                                                     obs.get('ID')))
+            return
+
+        # Receivers list has been processed and observation is finished.
+        if index >= len(receivers):
+            logger.debug('Observation "{}" with ID "{}" has been finished'
+                         .format(obs.get('Name'),
+                                 obs.get('ID')))
+            return
+
+        # Increase the receivers index.
+        next_receiver = receivers[index]
+        index += 1
+        obs.set('NextReceiver', index)
+
+        # Send the observation to the next module.
+        header = {'Type': 'Observation'}
+        payload = obs.data
+
+        self.publish(next_receiver, header, payload)
+
+    def handle_service(self, header, payload):
+        """Processes service messages."""
+        # If `Pause` is set, change status of the worker accordingly.
+        pause = payload.get('Pause')
+
+        if pause is not None:
+            # Worker is now paused or running again.
+            self._is_paused = pause
+
+    def process_observation(self, obs):
+        return obs
+
+    def publish(self, target, header, payload):
+        """Appends header and payload to a list, converts the list to a JSON
+        string and sends it to the designated target by using the callback
+        function `_uplink`. The JSON string has the format:
+
+            [ { header }, { payload } ].
 
         Args:
-            *args: Variable length argument list.
+            target (str): The name of the target.
+            header (Dict): The header of the message.
+            payload (Dict): The payload of the message.
         """
-        pass
+        if not self._uplink:
+            return
 
-    def publish(self, obs):
-        """Sends `Observation` to the callback function of the parent module.
-
-        Args:
-            obs (Observation): Observation object.
-        """
-        if self._uplink:
-            self._uplink(obs)
+        message = json.dumps([header, payload])
+        self._uplink(target, message)
 
     @property
     def name(self):
@@ -186,6 +227,10 @@ class Prototype():
     @property
     def config_manager(self):
         return self._config_manager
+
+    @property
+    def is_paused(self):
+        return self._is_paused
 
     @property
     def sensor_manager(self):

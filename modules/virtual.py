@@ -41,7 +41,7 @@ class VirtualSensor(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         self.patterns = {}
 
-    def action(self, obs):
+    def process_observation(self, obs):
         request_sets = obs.get('RequestSets')
 
         for set_name, request_set in request_sets.items():
@@ -206,7 +206,6 @@ class VirtualSylvacSDialOne(VirtualSensor):
 
     def get_distance(self, request):
         x = (1.0 + math.sin(self._current_value)) * 12.5
-        response = '{:7.3f}\r'.format(x)
         self._current_value += 0.25
 
-        return response
+        return '{:7.3f}\r'.format(x)

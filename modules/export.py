@@ -83,7 +83,7 @@ class FileExporter(Prototype):
 
         return paths
 
-    def action(self, obs):
+    def process_observation(self, obs):
         """Append data to a flat file in CSV format.
 
         Args:
@@ -180,21 +180,24 @@ class RealTimePublisher(Prototype):
         self._receivers = config.get('Receivers')
         self._is_enabled = config.get('Enabled')
 
-    def action(self, obs):
+    def process_observation(self, obs):
         if not self._is_enabled:
             return obs
 
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
-            topic = receiver + '/' + obs_copy.get('ID')
+            target = receiver + '/' + obs_copy.get('ID')
 
             obs_copy.set('NextReceiver', 0)
-            obs_copy.set('Receivers', [topic])
+            obs_copy.set('Receivers', [target])
 
             logger.debug('Publishing observation "{}" with ID "{}" to "{}" ...'
-                         .format(obs.get('Name'), obs.get('ID'), topic))
+                         .format(obs.get('Name'), obs.get('ID'), target))
 
-            self.publish(obs_copy)
+            header = {'Type': 'Observation'}
+            payload = obs.data
+
+            self.publish(target, header, payload)
 
         return obs
