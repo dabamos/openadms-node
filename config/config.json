@@ -5,7 +5,6 @@
         "COM2": "modules.port.SerialPort",
         "Scheduler1": "modules.schedule.Scheduler",
         "Scheduler2": "modules.schedule.Scheduler",
-        "Scheduler3": "modules.schedule.Scheduler",
         "FileExporter": "modules.export.FileExporter",
         "PreProcessor": "modules.processing.PreProcessor",
         "PolarTransformer": "modules.totalstation.PolarTransformer",
@@ -17,12 +16,12 @@
     },
     "Project": {
         "Name": "Project X",
-        "ID": "7b720202-f5af-4c68-bb98-641024ae6593",
+        "ID": "",
         "Description": "Project for testing only."
     },
     "Intercom": {
         "MQTT": {
-            "Host": "iot.eclipse.org",
+            "Host": "127.0.0.1",
             "Port": 1883,
             "KeepAlive": 60,
             "Topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/OpenADMS"
@@ -382,7 +381,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_face_1": {
@@ -390,7 +389,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_values_face_0": {
@@ -583,7 +582,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_face_1": {
@@ -591,7 +590,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_values_face_0": {
@@ -784,7 +783,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_face_1": {
@@ -792,7 +791,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_values_face_0": {
@@ -985,7 +984,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_face_1": {
@@ -993,7 +992,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_values_face_0": {
@@ -1186,7 +1185,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_face_1": {
@@ -1194,7 +1193,7 @@
                             "Request": "%R1Q,2026:\r\n",
                             "ResponseDelimiter": "\r\n",
                             "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 0.0,
+                            "SleepTime": 2.0,
                             "Timeout": 30.0
                         },
                         "get_values_face_0": {
@@ -1355,7 +1354,7 @@
                             "Unit": "rad"
                         }
                     },
-                    "SleepTime": 25.0
+                    "SleepTime": 5.0
                 },
                 {
                     "Name": "wait300",
@@ -1487,7 +1486,7 @@
                     "Enabled": true,
                     "StartDate": "2016-02-01",
                     "EndDate": "2017-07-30",
-                    "Schedule": {},
+                    "Weekdays": {},
                     "Observations": [
                         "initialize",
                         "get_values"
@@ -1503,7 +1502,7 @@
                     "Enabled": true,
                     "StartDate": "2016-02-01",
                     "EndDate": "2017-07-30",
-                    "Schedule": {
+                    "Weekdays": {
                         "Monday": [
                             {
                                 "StartTime": "00:00:00",
@@ -1537,7 +1536,7 @@
                     "Enabled": false,
                     "StartDate": "2016-02-01",
                     "EndDate": "2017-07-30",
-                    "Schedule": {
+                    "Weekdays": {
                         "Monday": [],
                         "Tuesday": [],
                         "Wednesday": [],
@@ -1592,6 +1591,7 @@
         }
     },
     "DistanceCorrector": {
+        "DistanceName": "SlopeDist",
         "Temperature": null,
         "Pressure": null,
         "Humidity": 0.6,

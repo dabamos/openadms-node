@@ -21,7 +21,6 @@ limitations under the Licence.
 
 import copy
 import datetime as dt
-import json
 import logging
 import threading
 import time
@@ -32,7 +31,6 @@ logger = logging.getLogger('openadms')
 
 
 class Scheduler(Prototype):
-
     """
     Scheduler is used to manage the monitoring process by sending observations
     to a sensor. Each observation set is represented by a single job. Jobs are
@@ -43,14 +41,14 @@ class Scheduler(Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         self._jobs = []
-        self.load_jobs()
+        self._load_jobs()
 
         # Run the method self.run_jobs() within a thread.
         self._thread = threading.Thread(target=self.run_jobs)
         self._thread.daemon = True
         self._thread.start()
 
-    def load_jobs(self):
+    def _load_jobs(self):
         """Loads all observation sets from the configurations and creates jobs
         to put into the jobs list."""
         config = self._config_manager.config.get('Schedulers').get(self._name)
@@ -60,12 +58,12 @@ class Scheduler(Prototype):
 
         # Run through the schedules and create jobs.
         for schedule in schedules:
-            observations = schedule.get('ObservationSets')
+            observations = schedule.get('Observations')
 
             for obs_name in observations:
                 # Get all observations of the current observation set.
-                obs = self._sensor_manager.get(sensor_name)\
-                                          .get_observation(obs_name)
+                obs = self._sensor_manager.get(sensor_name) \
+                    .get_observation(obs_name)
 
                 if not obs:
                     logger.error('Observation "{}" not found'.format(obs_name))
@@ -86,42 +84,55 @@ class Scheduler(Prototype):
     def add(self, job):
         """Appends a job to the jobs list."""
         self._jobs.append(job)
-        logger.debug('Added job "{}" to scheduler "{}"'.format(job.name,
-                                                               self._name))
+        logger.debug('Added job "{}" to scheduler "{}"'
+                     .format(job.name, self._name))
 
     def run_jobs(self):
         """Threaded method to process the jobs queue."""
+        zombies = []
+
+        # Wait until we have a communication uplink to the messenger.
+        while not self._uplink:
+            time.sleep(0.1)
+
         while True:
             if self._is_paused:
                 time.sleep(0.1)
                 continue
 
             for job in self._jobs:
-                if not job.enabled:
+                if job.has_expired():
+                    zombies.append(job)
                     continue
 
-                if job.has_expired():
+                if not job.enabled:
                     continue
 
                 if job.is_pending():
                     job.run()
 
+            # Remove expired jobs from the jobs list.
+            while zombies:
+                zombie = zombies.pop()
+                logger.debug('Deleting expired job "{}" ...'
+                             .format(zombie.name))
+                self._jobs.remove(zombie)
+
 
 class Job(object):
-
     """
     Job stores a observation set and sends single observations to callback
     function if they are within a given time frame.
     """
 
     def __init__(self, name, port_name, obs, enabled, start_date, end_date,
-                 time_sheet, uplink):
-        self._name = name               # Name of the job.
-        self._port_name = port_name     # Name of the port.
-        self._obs = obs                 # Observation object.
-        self._enabled = enabled         # Is enabled or not.
-        self._time_sheet = time_sheet   # The time sheet.
-        self._uplink = uplink           # Callback function.
+                 weekdays, uplink):
+        self._name = name  # Name of the job.
+        self._port_name = port_name  # Name of the port.
+        self._obs = obs  # Observation object.
+        self._enabled = enabled  # Is enabled or not.
+        self._weekdays = weekdays  # The time sheet.
+        self._uplink = uplink  # Callback function.
 
         # Used date and time formats.
         self._date_fmt = '%Y-%m-%d'
@@ -140,7 +151,7 @@ class Job(object):
         now = dt.datetime.now()
 
         if now > self._end_date:
-            logger.debug('Job has expired')
+            logger.debug('Job "{}" has expired'.format(self._name))
             return True
 
         return False
@@ -156,16 +167,16 @@ class Job(object):
         # Are we within the date range of the job?
         if self._start_date <= now < self._end_date:
             # No days defined, go on.
-            if len(self._time_sheet) == 0:
+            if len(self._weekdays) == 0:
                 return True
 
             # Name of the current day (e.g., "Monday").
             current_day = now.strftime('%A')
 
             # Ignore current day if it is not listed in the schedule.
-            if current_day in self._time_sheet:
+            if current_day in self._weekdays:
                 # Time ranges of the current day.
-                periods = self._time_sheet[current_day]
+                periods = self._weekdays[current_day]
 
                 # No given time range means the job should be executed
                 # all day long.
@@ -190,34 +201,40 @@ class Job(object):
     def run(self):
         """Iterates trough the observation set and sends observations to an
         external callback function."""
-        # Continue if observation is disabled.
+        # Return if observation is disabled.
         if not self._obs.get('Enabled'):
             return
 
-        # Disable the observation if it should run one time only (for
-        # instance, for initialization purposes).
+        # Disable the observation if it should run one time only.
         if self._obs.get('Onetime'):
             self._obs.set('Enabled', False)
 
         # Make a deep copy, since we don't want to do any changes to the
         # observation in our observation set.
         obs_copy = copy.deepcopy(self._obs)
+
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
-        obs_copy.data['Receivers'].insert(0, self._port_name)
+        receivers = obs_copy.get('Receivers')
+        receivers.insert(0, self._port_name)
+        obs_copy.set('Receivers', receivers)
+
+        # Set the next receiver to the module following the port.
+        obs_copy.set('NextReceiver', 1)
 
         logger.debug('Starting job "{}" for port "{}" ...'
                      .format(self._obs.get('Name'),
                              self._port_name))
 
+        # Get the sleep time of the whole observation.
         sleep_time = obs_copy.get('SleepTime')
 
-        # Send the observation to the sensor.
+        # Create target, header, and payload in order to send the observation.
         target = self._port_name
         header = {'Type': 'Observation'}
         payload = obs_copy.data
 
-        # Fire and forget.
+        # Fire and forget the observation.
         self._uplink(target, header, payload)
 
         # Sleep until the next observation.

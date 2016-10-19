@@ -49,23 +49,23 @@ class Module(threading.Thread):
         self._messenger = messenger
         self._worker = worker
 
-        # Set the callback functions of the messenger and the worker.
-        self._messenger.downlink = self._retrieve
-        self._worker.uplink = self._publish
-
         self._inbox = queue.Queue()
         self._topic = self._messenger.topic
+
+        # Set the callback functions of the messenger and the worker.
+        self._messenger.downlink = self.retrieve
+        self._worker.uplink = self.publish
 
         # Subscribe to the worker's name.
         self._messenger.subscribe(self._topic + '/' + worker.name)
 
-    def _publish(self, target, message):
+    def publish(self, target, message):
         """Sends an `Observation` to the next receiver by using the
         messenger."""
         target_path = '{}/{}'.format(self._topic, target)
         self._messenger.publish(target_path, message)
 
-    def _retrieve(self, message):
+    def retrieve(self, message):
         """Callback function for the messenger. New data from the message broker
         lands here."""
         self._inbox.put(message)
@@ -199,6 +199,13 @@ class Prototype(object):
             # Worker is now paused or running again.
             self._is_paused = pause
 
+            if pause:
+                logger.info('Paused module "{}" by remote procedure call'
+                            .format(self._name))
+            else:
+                logger.info('Started module "{}" by remote procedure call'
+                            .format(self._name))
+
     def process_observation(self, obs):
         return obs
 
@@ -215,6 +222,8 @@ class Prototype(object):
             payload (Dict): The payload of the message.
         """
         if not self._uplink:
+            logger.error('No uplink defined for module "{}"'
+                         .format(self._name))
             return
 
         message = json.dumps([header, payload])

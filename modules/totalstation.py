@@ -53,6 +53,7 @@ class DistanceCorrector(Prototype):
         self._is_sea_level_correction = \
             config.get('SeaLevelCorrectionEnabled')
 
+        self._distance_name = config.get('DistanceName')
         self._temperature = config.get('Temperature')
         self._pressure = config.get('Pressure')
         self._humidity = config.get('Humidity')
@@ -84,8 +85,7 @@ class DistanceCorrector(Prototype):
 
         # Reduce the slope distance of the EDM measurement if the sensor is a
         # robotic total station.
-        key = self._config.get('Key')
-        dist = obs.get_value('ResponseSets', key, 'Value')
+        dist = obs.get_value('ResponseSets', self._distance_name, 'Value')
 
         if dist is None:
             return obs
@@ -129,8 +129,9 @@ class DistanceCorrector(Prototype):
                                                  'm',
                                                  round(r_dist, 5))
 
-            response_sets['Raw' + key] = response_sets.get(key)
-            response_sets[key] = response_set
+            response_sets['Raw' + self._distance_name] =\
+                response_sets.get(self._distance_name)
+            response_sets[self._distance_name] = response_set
 
         return obs
 

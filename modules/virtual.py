@@ -47,6 +47,7 @@ class VirtualSensor(Prototype):
         for set_name, request_set in request_sets.items():
             request = request_set.get('Request')
             timeout = request_set.get('Timeout')
+            sleep_time = request_set.get('SleepTime')
             response = ''
 
             logger.info('Sending request "{}" to sensor "{}" on virtual '
@@ -56,7 +57,7 @@ class VirtualSensor(Prototype):
 
             for pattern in self.patterns:
                 reg_exp = re.compile(pattern)
-                parsed = reg_exp.search(request)
+                parsed = reg_exp.match(request)
 
                 if not parsed:
                     continue
@@ -70,7 +71,7 @@ class VirtualSensor(Prototype):
                 break
 
             request_set['Response'] = response
-            time.sleep(0.15 * timeout)
+            time.sleep((timeout * 0.25) + sleep_time)
 
         obs.set('PortName', self._name)
         obs.set('TimeStamp', time.time())
@@ -95,11 +96,11 @@ class VirtualLeicaTM30(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['%R1Q,5003:'] = self.get_sensor_id
-        self.patterns['%R1Q,5004:'] = self.get_sensor_name
-        self.patterns['%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0'] = self.set_direction
-        self.patterns['%R1Q,2008:1,1'] = self.measure_distance
-        self.patterns['%R1Q,2167:5000,1'] = self.do_complete_measurement
+        self.patterns['%R1Q,5003:\\r\\n'] = self.get_sensor_id
+        self.patterns['%R1Q,5004:\\r\\n'] = self.get_sensor_name
+        self.patterns['%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n'] = self.set_direction
+        self.patterns['%R1Q,2008:1,1\\r\\n'] = self.measure_distance
+        self.patterns['%R1Q,2167:5000,1\\r\\n'] = self.do_complete_measurement
 
     def do_complete_measurement(self, request):
         return_code = '0'
@@ -159,11 +160,11 @@ class VirtualDTM(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['^A'] = self.power_on
-        self.patterns['CMDT 1'] = self.set_command_set
-        self.patterns['SAVE'] = self.save
-        self.patterns['PRES ?'] = self.get_pressure
-        self.patterns['TEMP ?'] = self.get_temperature
+        self.patterns['^A\\r'] = self.power_on
+        self.patterns['CMDT 1\\r'] = self.set_command_set
+        self.patterns['SAVE\\r'] = self.save
+        self.patterns['PRES \?\\r'] = self.get_pressure
+        self.patterns['TEMP \?\\r'] = self.get_temperature
 
     def get_pressure(self, request):
         high = 1150
@@ -201,7 +202,7 @@ class VirtualSylvacSDialOne(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['\?'] = self.get_distance
+        self.patterns['\?\r'] = self.get_distance
         self._current_value = 0.0
 
     def get_distance(self, request):
