@@ -207,9 +207,9 @@ class MailAlertHandler(AlertHandler):
         self._queue.put(record)
 
     def run(self):
-        while True:
-            records = []
+        records = []
 
+        while True:
             try:
                 record = self._queue.get_nowait()
                 records.append(record)
@@ -218,6 +218,7 @@ class MailAlertHandler(AlertHandler):
                     self.send_all(records)
 
                 time.sleep(self._collection_time)
+                records[:] = []
 
 
     def send_all(self, records):
