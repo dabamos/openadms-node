@@ -20,7 +20,6 @@ limitations under the Licence.
 """
 
 import logging
-import queue
 import smtplib
 import socket
 import threading
@@ -31,6 +30,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from queue import Queue
 
 from modules.prototype import Prototype
 
