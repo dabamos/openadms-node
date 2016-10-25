@@ -231,10 +231,9 @@ class MailAlertHandler(AlertHandler):
         text = 'The following incident(s) occurred:\n\n'
 
         for record in records:
-            text += ' - '.join([record.asctime,
-                                record.levelname,
-                                record.message])
-            text += '\n'
+            text += '{} - {} - {}\n'.format(record.asctime,
+                                            record.levelname,
+                                            record.message)
 
         text += '\n\nPlease do not reply as this e-mail was sent from an ' \
                 'automated alerting system.'

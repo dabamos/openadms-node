@@ -307,7 +307,20 @@ class HelmertTransformer(Prototype):
 
                 # Send the new view point observation to the next receiver.
                 if view_point:
-                    self.publish(view_point)
+                    # Get the name of the next receiver.
+                    index = view_point.get('NextReceiver')
+                    receivers = view_point.get('Receivers')
+                    next_receiver = receivers[index]
+                    index += 1
+                    view_point.set('NextReceiver', index)
+
+                    # Create target, header, and payload in order to send the observation.
+                    target = next_receiver
+                    header = {'Type': 'Observation'}
+                    payload = view_point.data
+
+                    # Fire and forget.
+                    self.publish(target, header, payload)
             else:
                 # Calculate the coordinates of the target point.
                 obs = self._calculate_target_point(obs)
@@ -589,6 +602,7 @@ class HelmertTransformer(Prototype):
         view_point = Observation()
         view_point.set('ID', self._view_point.get('ID'))
         view_point.set('Name', 'get_view_point')
+        view_point.set('NextReceiver', 0)
         view_point.set('PortName', obs.get('PortName'))
         view_point.set('Receivers', self._view_point.get('Receivers'))
         view_point.set('ResponseSets', response_sets)
