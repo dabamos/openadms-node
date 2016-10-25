@@ -40,6 +40,7 @@ logger = logging.getLogger('openadms')
 
 
 class Alert(Prototype):
+    """Alert is used to send warning and error messages by e-mail or SMS."""
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -173,6 +174,7 @@ class MailAlertHandler(AlertHandler):
         AlertHandler.__init__(self, config)
 
         self._enabled = self._config.get('Enabled')
+        self._collection_time = self._config.get('CollectionTime')
         self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
         self._recipients = self._config.get('Recipients')
         self._subject = self._config.get('Subject') or '[OpenADMS] Notification'
@@ -188,7 +190,11 @@ class MailAlertHandler(AlertHandler):
         if tls.lower() in ['yes', 'no', 'starttls']:
             self._tls = tls.lower()
 
-        self._last_message = ''
+        self._queue = Queue(-1)
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
     def handle(self, record):
         if not self._enabled:
@@ -197,16 +203,30 @@ class MailAlertHandler(AlertHandler):
         if record.levelname not in self._log_levels:
             return
 
-        # Do not send message if it equals the last one.
-        if record.message == self._last_message:
-            logger.debug('Skipped sending alert message (message equals '
-                         'last message)')
-            return
+        self._queue.put(record)
 
-        self._last_message = record.message
+    def run(self):
+        while True:
+            records = []
 
+            try:
+                record = self._queue.get_nowait()
+                records.append(record)
+            except Queue.Empty:
+                if len(messages) > 0:
+                    self.send_all(records)
+
+                time.sleep(self._collection_time)
+
+
+    def send_all(self, records):
         text = 'The following incident(s) occurred:\n\n'
-        text += ' - '.join([record.asctime, record.levelname, record.message])
+
+        for record in records:
+            text += ' - '.join([record.asctime,
+                                record.levelname,
+                                record.message])
+
         text += '\n\nPlease do not reply as this e-mail was sent from an ' \
                 'automated alerting system.'
 
@@ -247,3 +267,17 @@ class MailAlertHandler(AlertHandler):
             logger.warning('E-mail could not be sent (SMTP error)')
         except TimeoutError:
             logger.warning('E-mail could not be sent (timeout)')
+
+
+class Heartbeat(Prototype):
+
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
+
+        self._handlers['Heartbeat'] = self.handle_heartbeat
+
+    def handle_heartbeat(self, header, payload):
+        pass
+
+

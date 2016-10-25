@@ -83,6 +83,14 @@ class PreProcessor(Prototype):
             response_sets = obs.get('ResponseSets')
 
             for group_name, raw_value in match.groupdict().items():
+                if not raw_value:
+                    logger.error('No raw value found for response set "{}" of '
+                                 'observation "{}" with ID "{}"'
+                                 .format(group_name,
+                                         obs.get('Name'),
+                                         obs.get('ID')))
+                    continue
+
                 response_set = response_sets.get(group_name)
 
                 if not response_set:
@@ -190,6 +198,9 @@ class ReturnCodes(object):
     Please choose a proper value for each return code.
     """
     codes = {
+        2:    [4, False, 'Unknown error, result unspecified'],
+        3:    [3, False, 'Invalid result'],
+        4:    [4, False, 'Fatal error'],
         5:    [4, False, 'GeoCOM command unknown (not implemented yet)'],
         6:    [4, False, 'Function execution timed out (result unspecified)'],
         13:   [4, True,  'System busy'],
