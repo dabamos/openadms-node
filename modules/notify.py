@@ -214,10 +214,16 @@ class MailAlertHandler(AlertHandler):
                 record = self._queue.get_nowait()
                 records.append(record)
             except queue.Empty:
+                # Send an e-mail.
                 if len(records) > 0:
                     self.send_all(records)
 
+                # Sleep some time.
+                logger.debug('Next check for new alert messages in {} seconds'
+                             .format(self._collection_time))
                 time.sleep(self._collection_time)
+
+                # Clear the records list.
                 records[:] = []
 
 
@@ -228,6 +234,7 @@ class MailAlertHandler(AlertHandler):
             text += ' - '.join([record.asctime,
                                 record.levelname,
                                 record.message])
+            text += '\n'
 
         text += '\n\nPlease do not reply as this e-mail was sent from an ' \
                 'automated alerting system.'
