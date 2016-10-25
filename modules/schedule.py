@@ -73,10 +73,10 @@ class Scheduler(Prototype):
                 job = Job(obs_name,
                           port_name,
                           obs,
-                          schedule['Enabled'],
-                          schedule['StartDate'],
-                          schedule['EndDate'],
-                          schedule['Weekdays'],
+                          schedule.get('Enabled'),
+                          schedule.get('StartDate'),
+                          schedule.get('EndDate'),
+                          schedule.get('Weekdays'),
                           self.publish)
                 # Add the job to the jobs list.
                 self.add(job)
