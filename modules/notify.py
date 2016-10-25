@@ -47,7 +47,7 @@ class Alert(Prototype):
         config = self._config_manager.config.get(self._name)
 
         self._enabled = config.get('Enabled')
-        self._queue = queue.Queue(-1)
+        self._queue = Queue(-1)
         self._alert_handlers = []
 
         # Add logging handler to the logger.
