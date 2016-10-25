@@ -20,6 +20,7 @@ limitations under the Licence.
 """
 
 import logging
+import queue
 import smtplib
 import socket
 import threading
@@ -47,7 +48,7 @@ class Alert(Prototype):
         config = self._config_manager.config.get(self._name)
 
         self._enabled = config.get('Enabled')
-        self._queue = Queue(-1)
+        self._queue = queue.Queue(-1)
         self._alert_handlers = []
 
         # Add logging handler to the logger.
@@ -190,7 +191,7 @@ class MailAlertHandler(AlertHandler):
         if tls.lower() in ['yes', 'no', 'starttls']:
             self._tls = tls.lower()
 
-        self._queue = Queue(-1)
+        self._queue = queue.Queue(-1)
 
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
@@ -212,8 +213,8 @@ class MailAlertHandler(AlertHandler):
             try:
                 record = self._queue.get_nowait()
                 records.append(record)
-            except Queue.Empty:
-                if len(messages) > 0:
+            except queue.Empty:
+                if len(records) > 0:
                     self.send_all(records)
 
                 time.sleep(self._collection_time)
