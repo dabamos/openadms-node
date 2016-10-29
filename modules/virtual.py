@@ -42,17 +42,17 @@ class VirtualSensor(Prototype):
         self.patterns = {}
 
     def process_observation(self, obs):
-        request_sets = obs.get('RequestSets')
+        request_sets = obs.get('requestSets')
 
         for set_name, request_set in request_sets.items():
-            request = request_set.get('Request')
-            timeout = request_set.get('Timeout')
-            sleep_time = request_set.get('SleepTime')
+            request = request_set.get('request')
+            timeout = request_set.get('timeout')
+            sleep_time = request_set.get('sleepTime')
             response = ''
 
             logger.info('Sending request "{}" to sensor "{}" on virtual '
                         'port "{}"'.format(set_name,
-                                           obs.get('SensorName'),
+                                           obs.get('sensorName'),
                                            self.name))
 
             for pattern in self.patterns:
@@ -66,15 +66,15 @@ class VirtualSensor(Prototype):
 
                 logger.info('Received response "{}" from sensor "{}" on '
                             'virtual port "{}"'.format(self._sanitize(response),
-                                                       obs.get('SensorName'),
+                                                       obs.get('sensorName'),
                                                        self.name))
                 break
 
-            request_set['Response'] = response
+            request_set['response'] = response
             time.sleep((timeout * 0.25) + sleep_time)
 
-        obs.set('PortName', self._name)
-        obs.set('TimeStamp', time.time())
+        obs.set('portName', self._name)
+        obs.set('timeStamp', time.time())
 
         return obs
 
@@ -160,7 +160,7 @@ class VirtualDTM(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['^A\\r'] = self.power_on
+        self.patterns['A\\r'] = self.power_on
         self.patterns['CMDT 1\\r'] = self.set_command_set
         self.patterns['SAVE\\r'] = self.save
         self.patterns['PRES \?\\r'] = self.get_pressure

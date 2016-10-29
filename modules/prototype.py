@@ -71,8 +71,8 @@ class Module(threading.Thread):
         self._inbox.put(message)
 
     def run(self):
-        """Checks the inbox for new messages and calls the `action()` method for
-        further processing. Runs within a thread."""
+        """Checks the inbox for new messages and calls the `handle()` method of
+        the worker for further processing. Runs within a thread."""
         logger.debug('Connecting module "{}" to {}:{} ...'
                      .format(self._worker.name,
                              self._messenger.host,
@@ -81,9 +81,8 @@ class Module(threading.Thread):
         self._messenger.connect()
 
         while True:
-            # Blocking I/O.
-            message = self._inbox.get()
-            self._worker.action(message)
+            message = self._inbox.get()     # Blocking I/O.
+            self._worker.handle(message)    # Fire and forget.
 
         self._messenger.disconnect()
 
@@ -118,12 +117,20 @@ class Prototype(object):
         self._is_paused = False
 
         self._handlers = {
-            'Observation': self.handle_observation,
-            'Service': self.handle_service
+            'observation': self.handle_observation,
+            'service': self.handle_service
         }
 
-    def action(self, message):
+    def add_handler(self, name, func):
+        """Registers a callback function for handling of messages."""
+        self._handlers[name] = func
+
+    def handle(self, message):
         """Processes messages by calling handler methods."""
+        if len(message) < 2:
+            logger.warning('{}: received message is corrupted'.format(self._name))
+            return
+
         header = message[0]
         payload = message[1]
 
@@ -131,7 +138,7 @@ class Prototype(object):
             logger.warning('{}: received data is corrupted'.format(self._name))
             return
 
-        payload_type = header.get('Type')
+        payload_type = header.get('type')
 
         if not payload_type:
             logger.error('{}: no payload type defined'.format(self._name))
@@ -155,59 +162,73 @@ class Prototype(object):
         if not obs:
             return
 
-        receivers = obs.get('Receivers')
-        index = obs.get('NextReceiver')
+        self.publish_observation(obs)
+
+    def handle_service(self, header, payload):
+        """Processes service messages."""
+        # If `Pause` is set, change status of the worker accordingly.
+        sender = header.get('sender')
+        pause = payload.get('pause')
+
+        if pause is None or pause == self._is_paused:
+            return
+
+        self._is_paused = pause
+
+        if pause:
+            logger.info('Paused module "{}" by call from "{}"'
+                        .format(self._name, sender))
+        else:
+            logger.info('Started module "{}" by call from "{}"'
+                        .format(self._name, sender))
+
+    def process_observation(self, obs):
+        return obs
+
+    def process_service(self, service):
+        pass
+
+    def publish_observation(self, obs):
+        """Prepares the observation for publishing and forwards it to the
+        messenger."""
+        receivers = obs.get('receivers')
+        index = obs.get('nextReceiver')
 
         # No receivers defined.
         if len(receivers) == 0:
             logging.debug('No receivers defined in observation "{}" '
-                          'with ID "{}"'.format(obs.get('Name'),
-                                                obs.get('ID')))
+                          'with ID "{}"'.format(obs.get('name'),
+                                                obs.get('id')))
             return
 
         # No index defined.
         if (index is None) or (index < 0):
             logger.warning('Next receiver of observation "{}" with ID '
-                           '"{}" not defined'.format(obs.get('Name'),
-                                                     obs.get('ID')))
+                           '"{}" not defined'.format(obs.get('name'),
+                                                     obs.get('id')))
             return
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
             logger.debug('Observation "{}" with ID "{}" has been finished'
-                         .format(obs.get('Name'),
-                                 obs.get('ID')))
+                         .format(obs.get('name'),
+                                 obs.get('id')))
             return
 
         # Increase the receivers index.
         next_receiver = receivers[index]
         index += 1
-        obs.set('NextReceiver', index)
+        obs.set('nextReceiver', index)
 
-        # Send the observation to the next module.
-        header = {'Type': 'Observation'}
+        # Create header and payload.
+        header = {'type': 'observation'}
         payload = obs.data
 
+        # Send the observation to the next module.
         self.publish(next_receiver, header, payload)
 
-    def handle_service(self, header, payload):
-        """Processes service messages."""
-        # If `Pause` is set, change status of the worker accordingly.
-        pause = payload.get('Pause')
-
-        if pause is not None:
-            # Worker is now paused or running again.
-            self._is_paused = pause
-
-            if pause:
-                logger.info('Paused module "{}" by remote procedure call'
-                            .format(self._name))
-            else:
-                logger.info('Started module "{}" by remote procedure call'
-                            .format(self._name))
-
-    def process_observation(self, obs):
-        return obs
+    def publish_service(self, service):
+        pass
 
     def publish(self, target, header, payload):
         """Appends header and payload to a list, converts the list to a JSON

@@ -51,14 +51,14 @@ class Scheduler(Prototype):
     def _load_jobs(self):
         """Loads all observation sets from the configurations and creates jobs
         to put into the jobs list."""
-        config = self._config_manager.config.get('Schedulers').get(self._name)
-        port_name = config.get('Port')
-        sensor_name = config.get('Sensor')
-        schedules = config.get('Schedules')
+        config = self._config_manager.config.get('schedulers').get(self._name)
+        port_name = config.get('port')
+        sensor_name = config.get('sensor')
+        schedules = config.get('schedules')
 
         # Run through the schedules and create jobs.
         for schedule in schedules:
-            observations = schedule.get('Observations')
+            observations = schedule.get('observations')
 
             for obs_name in observations:
                 # Get all observations of the current observation set.
@@ -73,10 +73,10 @@ class Scheduler(Prototype):
                 job = Job(obs_name,
                           port_name,
                           obs,
-                          schedule.get('Enabled'),
-                          schedule.get('StartDate'),
-                          schedule.get('EndDate'),
-                          schedule.get('Weekdays'),
+                          schedule.get('enabled'),
+                          schedule.get('startDate'),
+                          schedule.get('endDate'),
+                          schedule.get('weekdays'),
                           self.publish)
                 # Add the job to the jobs list.
                 self.add(job)
@@ -170,13 +170,13 @@ class Job(object):
             if len(self._weekdays) == 0:
                 return True
 
-            # Name of the current day (e.g., "Monday").
-            current_day = now.strftime('%A')
+            # Name of the current day (e.g., "monday").
+            current_day = now.strftime('%A').lower()
 
             # Ignore current day if it is not listed in the schedule.
             if current_day in self._weekdays:
                 # Time ranges of the current day.
-                periods = self._weekdays[current_day]
+                periods = self._weekdays.get(current_day)
 
                 # No given time range means the job should be executed
                 # all day long.
@@ -187,9 +187,9 @@ class Job(object):
                 if len(periods) > 0:
                     for period in periods:
                         # Start and end time of the current day.
-                        start_time = self.get_datetime(period['StartTime'],
+                        start_time = self.get_datetime(period.get('startTime'),
                                                        self._time_fmt).time()
-                        end_time = self.get_datetime(period['EndTime'],
+                        end_time = self.get_datetime(period.get('endTime'),
                                                      self._time_fmt).time()
 
                         # Are we within the time range of the current day?
@@ -202,12 +202,12 @@ class Job(object):
         """Iterates trough the observation set and sends observations to an
         external callback function."""
         # Return if observation is disabled.
-        if not self._obs.get('Enabled'):
+        if not self._obs.get('enabled'):
             return
 
         # Disable the observation if it should run one time only.
-        if self._obs.get('Onetime'):
-            self._obs.set('Enabled', False)
+        if self._obs.get('onetime'):
+            self._obs.set('enabled', False)
 
         # Make a deep copy, since we don't want to do any changes to the
         # observation in our observation set.
@@ -215,23 +215,23 @@ class Job(object):
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
-        receivers = obs_copy.get('Receivers')
+        receivers = obs_copy.get('receivers')
         receivers.insert(0, self._port_name)
-        obs_copy.set('Receivers', receivers)
+        obs_copy.set('receivers', receivers)
 
         # Set the next receiver to the module following the port.
-        obs_copy.set('NextReceiver', 1)
+        obs_copy.set('nextReceiver', 1)
 
         logger.debug('Starting job "{}" for port "{}" ...'
-                     .format(self._obs.get('Name'),
+                     .format(self._obs.get('name'),
                              self._port_name))
 
         # Get the sleep time of the whole observation.
-        sleep_time = obs_copy.get('SleepTime')
+        sleep_time = obs_copy.get('sleepTime')
 
         # Create target, header, and payload in order to send the observation.
         target = self._port_name
-        header = {'Type': 'Observation'}
+        header = {'type': 'observation'}
         payload = obs_copy.data
 
         # Fire and forget the observation.

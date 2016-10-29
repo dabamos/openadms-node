@@ -41,15 +41,14 @@ logger = logging.getLogger('openadms')
 
 
 class Alert(Prototype):
-    """Alert is used to send warning and error messages by e-mail or SMS."""
+    """Alert is used to send warning and error messages to other modules."""
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._enabled = config.get('Enabled')
+        self._is_enabled = config.get('enabled')
         self._queue = queue.Queue(-1)
-        self._alert_handlers = []
 
         # Add logging handler to the logger.
         qh = logging.handlers.QueueHandler(self._queue)
@@ -57,89 +56,278 @@ class Alert(Prototype):
         logger.addHandler(qh)
 
         # Add the alert handlers to the alert handlers list.
-        handlers = config.get('Handlers')
-
-        for handler in handlers:
-            if handlers.get(handler).get('Enabled') is False:
-                continue
-
-            # Add handler to the handlers list.
-            handler_class = globals().get(handler)
-
-            if handler_class:
-                config = handlers.get(handler)
-                handler_instance = handler_class(config)
-                self._alert_handlers.append(handler_instance)
-                logger.debug('Loaded alert handler "{}"'.format(handler))
-            else:
-                logger.warning('Alert handler "{}" not found'.format(handler))
+        self._agents = config.get('agents')
 
         # Check the logging queue continuously for messages and proceed them to
-        # the alert handlers.
-        self._thread = threading.Thread(target=self.process_alert)
+        # the alert agents.
+        self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
 
-    def process_alert(self):
-        if self._enabled:
-            while True:
-                # Blocking I/O.
-                record = self._queue.get()
-                logger.info('Processing alert message ...')
+    def run(self):
+        while True:
+            # Blocking I/O.
+            log = self._queue.get()
+            logger.info('Processing alert message ...')
+            self.fire(log)
 
-                for alert_handler in self._alert_handlers:
-                    alert_handler.handle(record)
+    def fire(self, log):
+        for agent_name, agent in self._agents.items():
+            # Agent is disabled.
+            if not agent.get('enabled'):
+                continue
+
+            # Log level is not defined.
+            if not agent.get('receivers').get(log.levelname.lower()):
+                continue
+
+            # Log level has no receivers.
+            if len(agent.get('receivers').get(log.levelname.lower())) == 0:
+                continue
+
+            header = {
+                'type': 'alertMessage'
+            }
+
+            payload = {
+                'time': log.asctime,
+                'level': log.levelname,
+                'message': log.message,
+                'receiver': None
+            }
+
+            for level, receivers in agent.get('receivers').items():
+                if not receivers or len(receivers) == 0:
+                    continue
+
+                for receiver in receivers:
+                    # Set the receiver of the message.
+                    payload['receiver'] = receiver
+                    # Publish a single message for each receiver.
+                    self.publish(agent_name, header, payload)
 
 
-class AlertHandler(object):
+class AlertMessageFormatter(Prototype):
 
-    __metaclass__ = ABCMeta
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
 
-    def __init__(self, config):
-        self._config = config
+        # Configuration.
+        self._msg_collection_enabled = config.get('messageCollectionEnabled')
+        self._msg_collection_time = config.get('messageCollectionTime')
+        self._receivers = config.get('receivers')
+        self._templates = config.get('templates')
 
-    @abstractmethod
-    def handle(self, record):
-        pass
+        # Message handler.
+        self.add_handler('alertMessage', self.handle_alert_message)
+
+        # Queue for alert message collection.
+        self._queue = queue.Queue(-1)
+
+        # Threading for alert message collection.
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+
+        if self._msg_collection_enabled:
+            self._thread.start()
+
+    def handle_alert_message(self, header, payload):
+        if self._msg_collection_enabled:
+            # Add the message to the queue. It will be processed by the threaded
+            # `run()` method later.
+            self._queue.put(payload)
+        else:
+            # Process a single alert message.
+            receiver = payload.get('receiver')
+            messages = [payload]
+
+            if receiver and len(messages) > 0:
+                self.process_alert_messages(receiver, messages)
+
+    def process_alert_messages(self, receiver, messages):
+        # Create the target of the message.
+        target = self._config.get('receiver')
+
+        # Create the header of the message.
+        header = {
+            'type': self._config.get('type')
+        }
+
+        # Parse the properties.
+        properties = self._config.get('properties')
+
+        for prop_name, prop in properties.items():
+            properties[prop_name] = prop.replace('{{receiver}}', receiver)
+
+        # Load the templates
+        msg_header = self._templates.get('header')
+        msg_footer = self._templates.get('footer')
+
+        # Parse the header and the footer.
+        msg_header = msg_header.replace('{{receiver}}', receiver)
+        msg_footer = msg_footer.replace('{{receiver}}', receiver)
+
+        # Add the messages line by line to the main part.
+        msg_body = ''
+
+        for msg in messages:
+            line = self._templates.get('body')
+
+            for key, value in msg.items()
+                line = line.replace('{{' + key + '}}', value)
+                msg_body += line
+
+            # Concatenate the message parts.
+            complete_msg = ''.join(msg_header, msg_body, msg_footer)
+
+            # Create the payload of the message.
+            payload = properties
+            payload['message'] = complete_msg
+
+            # Fire and forget.
+            self.publish(target, header, payload)
+
+    def run(self, sleep_time=0.5):
+        cache = {}
+
+        while True:
+            try:
+                # Get a message from the queue.
+                msg = self._queue.get_nowait()
+
+                # Check the receiver.
+                receiver = msg.get('receiver')
+
+                if not receiver:
+                    logger.warning('No receiver defined in alert message')
+                else:
+                    # Create an empty list for messages.
+                    if not cache.get(receiver):
+                        cache[receiver] = []
+
+                    # Append the message to the cache of the receiver.
+                    cache[receiver].append(msg)
+            except queue.Empty:
+                if len(cache) > 0:
+                    for receiver, messages in cache.items():
+                        if len(messages) == 0:
+                            continue
+
+                        self.process_alert_messages(receiver, messages)
+                        time.sleep(sleep_time)
+
+                # Sleep some time.
+                logger.debug('Next check for new alert messages in {} seconds'
+                             .format(self._msg_collection_time))
+                time.sleep(self._msg_collection_time)
+
+                # Clear the messages cache.
+                cache.clear()
 
 
-class ShortMessageSocketAlertHandler(AlertHandler):
+class MailAgent(Prototype):
 
-    def __init__(self, config):
-        AlertHandler.__init__(self, config)
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
 
-        self._enabled = self._config.get('Enabled')
-        self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
-        self._host = self._config.get('Host')
-        self._port = self._config.get('Port')
-        self._phone_numbers = self._config.get('PhoneNumbers')
-        self._template = self._config.get('Template')
+        self._charset = self._config.get('charset')
+        self._default_subject = self._config.get('defaultSubject',
+                                                 '[OpenADMS] Notification')
+        self._default_from = 'OpenADMS'
+        self._host = self._config.get('host')
+        self._port = self._config.get('port')
+        self._starttls = self._config.get('startTLS')
+        self._tls = self._config.get('tls')
+        self._user_name = self._config.get('userName')
+        self._user_password = self._config.get('userPassword')
 
-        self._msg_vars = {}
-        self._last_message = ''
+        self.add_handler('email', self.handle_email)
 
-    def add_var(self, key, value):
-        self._msg_vars['{' + key + '}'] = value
-
-    def handle(self, record):
-        if not self._enabled:
+    def handle_email(self, header, payload):
+        if self._tls and self._starttls:
+            logger.error('TLS and StartTLS can not be used at the same time')
             return
 
-        if record.levelname not in self._log_levels:
+        mail_subject = payload.get('subject') or self._default_subject
+        mail_from = payload.get('from') or self._default_from
+        mail_to = payload.get('to')
+        mail_message = payload.get('message')
+
+        self.process_short_message(mail_from,
+                                   mail_to,
+                                   mail_subject,
+                                   mail_message)
+
+    def process_email(self, mail_from, mail_to, mail_subject, mail_message):
+        msg = MIMEMultipart('alternative')
+
+        msg['From'] = '{} <{}>'.format(mail_from, self._user_name)
+        msg['To'] = mail_to
+        msg['Date'] = formatdate(localtime=True)
+        msg['X-Mailer'] = 'OpenADMS Mail Agent'
+        msg['Subject'] = Header(mail_subject, self._charset)
+
+        plain_text = MIMEText(mail_message.encode(self._charset),
+                              'plain',
+                              self._charset)
+
+        msg.attach(plain_text)
+
+        try:
+            if self._tls:
+                smtp = smtplib.SMTP_SSL(self._host, self._port)
+            else:
+                smtp = smtplib.SMTP(self._host, self._port)
+
+            smtp.set_debuglevel(False)
+            smtp.ehlo()
+
+            if not self._tls and self._starttls:
+                smtp.starttls()
+                smtp.ehlo()
+
+            smtp.login(self._user_name, self._user_password)
+            smtp.sendmail(self._user_name,
+                          [mail_to],
+                          msg.as_string())
+            smtp.quit()
+
+            logger.info('E-mail has been send successfully to {}'
+                        .format(mail_to))
+        except smtplib.SMTPException:
+            logger.warning('E-mail could not be sent (SMTP error)')
+        except TimeoutError:
+            logger.warning('E-mail could not be sent (timeout)')
+
+
+class ShortMessageAgent(Prototype):
+
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
+
+        self._host = self._config.get('host')
+        self._port = self._config.get('port')
+
+        self.add_handler('sms', self.handle_short_message)
+
+    def handle_short_message(self, header, payload):
+        number = payload.get('number')
+        message = payload.get('message')
+
+        if not number:
+            logger.warning('No phone number defined in short message')
             return
 
-        # Do not send message if it equals the last one.
-        if record.message == self._last_message:
-            logger.debug('Skipped sending alert message (message equals '
-                         'last message)')
+        if not message:
+            logger.warning('No message text defined in short message')
             return
 
-        self._last_message = record.message
+        self.process_short_message(number, message)
 
-        self.add_var('asctime', record.asctime)
-        self.add_var('level', record.levelname)
-        self.add_var('msg', record.message)
-
+    def process_short_message(self, number, message):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
                 sock.connect((self._host, self._port))
@@ -154,127 +342,11 @@ class ShortMessageSocketAlertHandler(AlertHandler):
                              .format(self._host, self._port))
                 return
 
-            for number in self._phone_numbers:
-                text = self._template
-                self.add_var('number', number)
-
-                for key, value in self._msg_vars.items():
-                    text = text.replace(key, value)
-
-                logger.info('Sending SMS to "{}" ...'.format(number))
-                sock.send(text.encode())
-                time.sleep(1.0)
+            logger.info('Sending SMS to "{}" ...'.format(number))
+            sock.send(message.encode())
 
         logger.debug('Closed connection to "{}:{}"'
                      .format(self._host, self._port))
-
-
-class MailAlertHandler(AlertHandler):
-
-    def __init__(self, config):
-        AlertHandler.__init__(self, config)
-
-        self._enabled = self._config.get('Enabled')
-        self._collection_time = self._config.get('CollectionTime')
-        self._log_levels = [x.upper() for x in self._config.get('LogLevels')]
-        self._recipients = self._config.get('Recipients')
-        self._subject = self._config.get('Subject') or '[OpenADMS] Notification'
-        self._charset = self._config.get('Charset')
-
-        self._user_name = self._config.get('UserName')
-        self._user_password = self._config.get('UserPassword')
-        self._host = self._config.get('Host')
-        self._port = self._config.get('Port')
-
-        tls = self._config.get('TLS')
-
-        if tls.lower() in ['yes', 'no', 'starttls']:
-            self._tls = tls.lower()
-
-        self._queue = queue.Queue(-1)
-
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
-    def handle(self, record):
-        if not self._enabled:
-            return
-
-        if record.levelname not in self._log_levels:
-            return
-
-        self._queue.put(record)
-
-    def run(self):
-        records = []
-
-        while True:
-            try:
-                record = self._queue.get_nowait()
-                records.append(record)
-            except queue.Empty:
-                # Send an e-mail.
-                if len(records) > 0:
-                    self.send_all(records)
-
-                # Sleep some time.
-                logger.debug('Next check for new alert messages in {} seconds'
-                             .format(self._collection_time))
-                time.sleep(self._collection_time)
-
-                # Clear the records list.
-                records[:] = []
-
-
-    def send_all(self, records):
-        text = 'The following incident(s) occurred:\n\n'
-
-        for record in records:
-            text += '{} - {} - {}\n'.format(record.asctime,
-                                            record.levelname,
-                                            record.message)
-
-        text += '\n\nPlease do not reply as this e-mail was sent from an ' \
-                'automated alerting system.'
-
-        msg = MIMEMultipart('alternative')
-
-        msg['From'] = self._user_name
-        msg['To'] = ', '.join(self._recipients)
-        msg['Date'] = formatdate(localtime=True)
-        msg['X-Mailer'] = 'OpenADMS Mail Alert Handler'
-        msg['Subject'] = Header(self._subject, self._charset)
-
-        plain_text = MIMEText(text.encode(self._charset),
-                              'plain',
-                              self._charset)
-
-        msg.attach(plain_text)
-
-        try:
-            if self._tls == 'yes':
-                smtp = smtplib.SMTP_SSL(self._host, self._port)
-            else:
-                smtp = smtplib.SMTP(self._host, self._port)
-
-            smtp.set_debuglevel(False)
-            smtp.ehlo()
-
-            if self._tls == 'starttls':
-                smtp.starttls()
-                smtp.ehlo()
-
-            smtp.login(self._user_name, self._user_password)
-            smtp.sendmail(self._user_name, self._recipients, msg.as_string())
-            smtp.quit()
-
-            logger.info('E-mail has been send successfully to {}'
-                        .format(', '.join(self._recipients)))
-        except smtplib.SMTPException:
-            logger.warning('E-mail could not be sent (SMTP error)')
-        except TimeoutError:
-            logger.warning('E-mail could not be sent (timeout)')
 
 
 class Heartbeat(Prototype):
@@ -283,7 +355,7 @@ class Heartbeat(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._handlers['Heartbeat'] = self.handle_heartbeat
+        self._handlers['heartbeat'] = self.handle_heartbeat
 
     def handle_heartbeat(self, header, payload):
         pass

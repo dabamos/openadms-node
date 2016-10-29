@@ -37,15 +37,15 @@ class Observation(object):
     def __init__(self, data=None):
         if not data:
             self._data = {
-                'Enabled': True,
-                'ID': None,
-                'Name': None,
-                'NextReceiver': 0,
-                'PortName': None,
-                'Receivers': [],
-                'Response': None,
-                'ResponseSets': {},
-                'TimeStamp': None
+                'enabled': True,
+                'id': None,
+                'name': None,
+                'nextReceiver': 0,
+                'portName': None,
+                'receivers': [],
+                'response': None,
+                'responseSets': {},
+                'timeStamp': None
             }
         else:
             self._data = data

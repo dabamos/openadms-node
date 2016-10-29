@@ -1,1671 +1,1698 @@
 {
-    "Modules": {
-        "Alert": "modules.notify.Alert",
-        "COM1": "modules.port.SerialPort",
-        "COM2": "modules.port.SerialPort",
-        "Scheduler1": "modules.schedule.Scheduler",
-        "Scheduler2": "modules.schedule.Scheduler",
-        "FileExporter": "modules.export.FileExporter",
-        "PreProcessor": "modules.processing.PreProcessor",
-        "PolarTransformer": "modules.totalstation.PolarTransformer",
-        "DistanceCorrector": "modules.totalstation.DistanceCorrector",
-        "ReturnCodeInspector": "modules.processing.ReturnCodeInspector",
-        "HelmertTransformer": "modules.totalstation.HelmertTransformer",
-        "RealTimePublisher": "modules.export.RealTimePublisher",
-        "SerialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
+    "modules": {
+        "alert": "modules.notify.Alert",
+        "com1": "modules.port.SerialPort",
+        "com2": "modules.port.SerialPort",
+        "scheduler1": "modules.schedule.Scheduler",
+        "scheduler2": "modules.schedule.Scheduler",
+        "fileExporter": "modules.export.FileExporter",
+        "preProcessor": "modules.processing.PreProcessor",
+        "polarTransformer": "modules.totalstation.PolarTransformer",
+        "distanceCorrector": "modules.totalstation.DistanceCorrector",
+        "returnCodeInspector": "modules.processing.returnCodeInspector",
+        "helmertTransformer": "modules.totalstation.HelmertTransformer",
+        "realTimePublisher": "modules.export.RealTimePublisher",
+        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
     },
-    "Project": {
-        "Name": "Project X",
-        "ID": "",
-        "Description": "Project for testing only."
+    "project": {
+        "name": "projectX",
+        "id": "",
+        "description": "project for testing only"
     },
-    "Intercom": {
-        "MQTT": {
-            "Host": "127.0.0.1",
-            "Port": 1883,
-            "KeepAlive": 60,
-            "Topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/OpenADMS"
+    "intercom": {
+        "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/openADMS"
         }
     },
-    "Ports": {
-        "Serial": {
-            "COM1": {
-                "Port": "COM1",
-                "BaudRate": 4800,
-                "ByteSize": 8,
-                "StopBits": 1,
-                "Parity": "none",
-                "Timeout": 2.0,
-                "SoftwareFlowControl": false,
-                "HardwareFlowControl": false
+    "ports": {
+        "serial": {
+            "com1": {
+                "port": "COM1",
+                "baudRate": 4800,
+                "byteSize": 8,
+                "stopBits": 1,
+                "parity": "none",
+                "timeout": 2.0,
+                "softwareFlowControl": false,
+                "hardwareFlowControl": false
             },
-            "COM2": {
-                "Port": "COM2",
-                "BaudRate": 115200,
-                "ByteSize": 8,
-                "StopBits": 1,
-                "Parity": "none",
-                "Timeout": 2.0,
-                "SoftwareFlowControl": false,
-                "HardwareFlowControl": false
+            "com2": {
+                "port": "COM2",
+                "baudRate": 115200,
+                "byteSize": 8,
+                "stopBits": 1,
+                "parity": "none",
+                "timeout": 2.0,
+                "softwareFlowControl": false,
+                "hardwareFlowControl": false
             }
         }
     },
-    "Sensors": {
-        "STS DTM": {
-            "Description": "STS DTM meteorology sensor",
-            "Type": "Weather Station",
-            "Observations": [
+    "sensors": {
+        "stsDTM": {
+            "description": "STS DTM meteorology sensor",
+            "type": "weatherStation",
+            "observations": [
                 {
-                    "Description": "Initialize the sensor.",
-                    "Enabled": true,
-                    "ID": null,
-                    "Name": "initialize",
-                    "NextReceiver": 0,
-                    "Onetime": true,
-                    "Receivers": [
-                        "PreProcessor"
+                    "description": "initialize the sensor.",
+                    "enabled": true,
+                    "id": "init",
+                    "name": "initialize",
+                    "nextReceiver": 0,
+                    "onetime": true,
+                    "receivers": [
+                        "preProcessor"
                     ],
-                    "RequestSets": {
-                        "power_on": {
-                            "Enabled": true,
-                            "Request": "A\r",
-                            "Response": "",
-                            "ResponsePattern": "(?P<PowerOn>#)",
-                            "ResponseDelimiter": "\r",
-                            "SleepTime": 1.0,
-                            "Timeout": 1.0
+                    "requestSets": {
+                        "powerOn": {
+                            "enabled": true,
+                            "request": "A\r",
+                            "response": "",
+                            "responsePattern": "(?P<powerOn>#)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         },
-                        "set_command_set": {
-                            "Enabled": true,
-                            "Request": "CMDT 1\r",
-                            "Response": "",
-                            "ResponsePattern": "(?P<SetCmd>\\*)",
-                            "ResponseDelimiter": "\r",
-                            "SleepTime": 1.0,
-                            "Timeout": 1.0
+                        "setCommandSet": {
+                            "enabled": true,
+                            "request": "CMDT 1\r",
+                            "response": "",
+                            "responsePattern": "(?P<setCmd>\\*)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         },
                         "save": {
-                            "Enabled": true,
-                            "Request": "SAVE\r",
-                            "Response": "",
-                            "ResponsePattern": "(?P<Save>\\*)",
-                            "ResponseDelimiter": "\r",
-                            "SleepTime": 1.0,
-                            "Timeout": 1.0
+                            "enabled": true,
+                            "request": "SAVE\r",
+                            "response": "",
+                            "responsePattern": "(?P<save>\\*)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         }
                     },
-                    "RequestsOrder": [
-                        "power_on",
-                        "set_command_set",
+                    "requestsOrder": [
+                        "powerOn",
+                        "setCommandSet",
                         "save"
                     ],
-                    "ResponseSets": {
-                        "PowerOn": {
-                            "Type": "String",
-                            "Unit": "none"
+                    "responseSets": {
+                        "powerOn": {
+                            "type": "string",
+                            "unit": "none"
                         },
-                        "SetCmd": {
-                            "Type": "String",
-                            "Unit": "none"
+                        "setCmd": {
+                            "type": "string",
+                            "unit": "none"
                         },
-                        "Save": {
-                            "Type": "String",
-                            "Unit": "none"
+                        "save": {
+                            "type": "string",
+                            "unit": "none"
                         }
                     },
-                    "SleepTime": 5.0
+                    "sleepTime": 5.0
                 },
                 {
-                    "Name": "get_values",
-                    "Description": "Get sensor values (temperature, pressure).",
-                    "Receivers": [
-                        "PreProcessor",
-                        "DistanceCorrector",
-                        "FileExporter"
+                    "name": "getValues",
+                    "description": "gets temperature and pressure",
+                    "receivers": [
+                        "preProcessor",
+                        "distanceCorrector",
+                        "fileExporter"
                     ],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": false,
-                    "ID": "TP",
-                    "RequestsOrder": [
-                        "get_temperature",
-                        "get_pressure"
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "id": "tp",
+                    "requestsOrder": [
+                        "getTemperature",
+                        "getPressure"
                     ],
-                    "RequestSets": {
-                        "get_temperature": {
-                            "Enabled": true,
-                            "Request": "TEMP ?\r",
-                            "Response": "",
-                            "ResponseDelimiter": "\r",
-                            "ResponsePattern": "(?P<Temperature>[+-]?\\d+\\.+\\d)",
-                            "SleepTime": 1.0,
-                            "Timeout": 1.0
+                    "requestSets": {
+                        "getTemperature": {
+                            "enabled": true,
+                            "request": "TEMP ?\r",
+                            "response": "",
+                            "responseDelimiter": "\r",
+                            "responsePattern": "(?P<temperature>[+-]?\\d+\\.+\\d)",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         },
-                        "get_pressure": {
-                            "Enabled": true,
-                            "Request": "PRES ?\r",
-                            "Response": "",
-                            "ResponseDelimiter": "\r",
-                            "ResponsePattern": "(?P<Pressure>[+-]?\\d+\\.+\\d)",
-                            "SleepTime": 1.0,
-                            "Timeout": 1.0
+                        "getPressure": {
+                            "enabled": true,
+                            "request": "PRES ?\r",
+                            "response": "",
+                            "responseDelimiter": "\r",
+                            "responsePattern": "(?P<pressure>[+-]?\\d+\\.+\\d)",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         }
                     },
-                    "ResponseSets": {
-                        "Temperature": {
-                            "Type": "Float",
-                            "Unit": "C"
+                    "responseSets": {
+                        "temperature": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Pressure": {
-                            "Type": "Float",
-                            "Unit": "mbar"
+                        "pressure": {
+                            "type": "float",
+                            "unit": "mbar"
                         }
                     },
-                    "SleepTime": 300.0
+                    "sleepTime": 300.0
                 }
             ]
         },
-        "Leica TM30": {
-            "Description": "Leica TM30 total station",
-            "Type": "Total Station",
-            "Observations": [
+        "leicaTM30": {
+            "description": "Leica TM30 total station",
+            "type": "totalStation",
+            "observations": [
                 {
-                    "Name": "beep",
-                    "Description": "Just beep.",
-                    "Receivers": [],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": true,
-                    "SleepTime": 5.0,
-                    "ID": "BEEP",
-                    "RequestSets": {
-                        "beep_on": {
-                            "Enabled": true,
-                            "Request": "%R1Q,20001:50\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 1.0,
-                            "Timeout": 30.0
+                    "name": "beep",
+                    "description": "beeps 1 second",
+                    "receivers": [],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "sleepTime": 5.0,
+                    "id": "beep",
+                    "requestSets": {
+                        "beepOn": {
+                            "enabled": true,
+                            "request": "%R1Q,20001:50\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 1.0,
+                            "timeout": 30.0
                         },
-                        "beep_off": {
-                            "Enabled": true,
-                            "Request": "%R1Q,20000:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "beepOff": {
+                            "enabled": true,
+                            "request": "%R1Q,20000:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "beep_on",
-                        "beep_off"
+                    "requestsOrder": [
+                        "beepOn",
+                        "beepOff"
                     ],
-                    "ResponseSets": {
-                        "ReturnCode": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                    "responseSets": {
+                        "returnCode": {
+                            "type": "integer",
+                            "unit": "none"
                         }
                     }
                 },
                 {
-                    "Name": "wait10",
-                    "Description": "Do wait.",
-                    "Receivers": [],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": true,
-                    "SleepTime": 10.0,
-                    "ID": "WAIT",
-                    "RequestSets": {},
-                    "RequestsOrder": [],
-                    "ResponseSets": {}
+                    "name": "wait10",
+                    "description": "waits 10 seconds",
+                    "receivers": [],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "sleepTime": 10.0,
+                    "id": "wait",
+                    "requestSets": {},
+                    "requestsOrder": [],
+                    "responseSets": {}
                 },
                 {
-                    "Name": "initialize",
-                    "Description": "Initialize sensor.",
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "FileExporter"
+                    "name": "initialize",
+                    "description": "initialize sensor.",
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "fileExporter"
                     ],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": true,
-                    "SleepTime": 5.0,
-                    "ID": "INIT",
-                    "RequestSets": {
-                        "get_sensor_id": {
-                            "Enabled": true,
-                            "Request": "%R1Q,5003:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorID>\\d+))?",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "sleepTime": 5.0,
+                    "id": "init",
+                    "requestSets": {
+                        "getSensorId": {
+                            "enabled": true,
+                            "request": "%R1Q,5003:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<sensorId>\\d+))?",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "get_sensor_name": {
-                            "Enabled": true,
-                            "Request": "%R1Q,5004:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<SensorName>\"[\\w\\W]+\"))?",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "getsensorName": {
+                            "enabled": true,
+                            "request": "%R1Q,5004:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<sensorName>\"[\\w\\W]+\"))?",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "get_software_version": {
-                            "Enabled": true,
-                            "Request": "%R1Q,5034:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<Release>\\d+),(?P<Version>\\d+),(?P<SubVersion>\\d+))?",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "getSoftwareversion": {
+                            "enabled": true,
+                            "request": "%R1Q,5034:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<release>\\d+),(?P<version>\\d+),(?P<subVersion>\\d+))?",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "get_internal_temperature": {
-                            "Enabled": true,
-                            "Request": "%R1Q,5011:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)(?:,(?P<InternalTemperature>[\\d+\\.]+))?",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "getinternalTemperature": {
+                            "enabled": true,
+                            "request": "%R1Q,5011:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<internalTemperature>[\\d+\\.]+))?",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "set_edm_type": {
-                            "Enabled": true,
-                            "Request": "%R1Q,17021:0\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "setEdmType": {
+                            "enabled": true,
+                            "request": "%R1Q,17021:0\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "set_atmospheric_ppm": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2148:0\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "setAtmosphericPpm": {
+                            "enabled": true,
+                            "request": "%R1Q,2148:0\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "set_geometric_ppm_correction_factor": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2153:0,0,0,0,0\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "setGeometricPpmCorrectionFaction": {
+                            "enabled": true,
+                            "request": "%R1Q,2153:0,0,0,0,0\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "enable_angle_correction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2016:1,1,1,1\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "enableAngleCorrection": {
+                            "enabled": true,
+                            "request": "%R1Q,2016:1,1,1,1\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         },
-                        "do_beep": {
-                            "Enabled": true,
-                            "Request": "%R1Q,11004:\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<ReturnCode>\\d+)",
-                            "ResponseDelimiter": "\r\n",
-                            "SleepTime": 0.5,
-                            "Timeout": 30.0
+                        "doBeep": {
+                            "enabled": true,
+                            "request": "%R1Q,11004:\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+                            "responseDelimiter": "\r\n",
+                            "sleepTime": 0.5,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "do_beep",
-                        "get_sensor_id",
-                        "get_sensor_name",
-                        "get_software_version",
-                        "get_internal_temperature",
-                        "set_edm_type",
-                        "set_atmospheric_ppm",
-                        "set_geometric_ppm_correction_factor",
-                        "enable_angle_correction",
-                        "do_beep"
+                    "requestsOrder": [
+                        "doBeep",
+                        "getSensorId",
+                        "getsensorName",
+                        "getSoftwareversion",
+                        "getinternalTemperature",
+                        "setEdmType",
+                        "setAtmosphericPpm",
+                        "setGeometricPpmCorrectionFaction",
+                        "enableAngleCorrection",
+                        "doBeep"
                     ],
-                    "ResponseSets": {
-                        "ReturnCode": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                    "responseSets": {
+                        "returnCode": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SensorID": {
-                            "Type": "String",
-                            "Unit": "none"
+                        "sensorId": {
+                            "type": "string",
+                            "unit": "none"
                         },
-                        "SensorName": {
-                            "Type": "String",
-                            "Unit": "none"
+                        "sensorName": {
+                            "type": "string",
+                            "unit": "none"
                         },
-                        "Release": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "release": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Version": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "version": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SubVersion": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "subversion": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "InternalTemperature": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "internalTemperature": {
+                            "type": "float",
+                            "unit": "C"
                         }
                     }
                 },
                 {
-                    "Description": "Complete measurement of P1.",
-                    "Enabled": true,
-                    "ID": "P1",
-                    "Name": "get_P1",
-                    "NextReceiver": 0,
-                    "Onetime": false,
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "SerialMeasurementProcessor",
-                        "DistanceCorrector",
-                        "PolarTransformer",
-                        "RealTimePublisher",
-                        "FileExporter"
+                    "description": "complete measurement of P1",
+                    "enabled": true,
+                    "id": "p1",
+                    "name": "getP1",
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "serialMeasurementProcessor",
+                        "distanceCorrector",
+                        "polarTransformer",
+                        "realTimePublisher",
+                        "fileExporter"
                     ],
-                    "RequestSets": {
-                        "change_face": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9028:1,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCChangeFace>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                    "requestSets": {
+                        "changeFace": {
+                            "enabled": true,
+                            "request": "%R1Q,9028:1,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues0>\\d+)(?:,(?P<Hz0>\\d*\\.?\\d+),(?P<V0>\\d*\\.?\\d+),(?P<AccAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<SlopeDist0>\\d*\\.?\\d*),(?P<DistTime0>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues1>\\d+)(?:,(?P<Hz1>\\d*\\.?\\d+),(?P<V1>\\d*\\.?\\d+),(?P<AccAngle1>-?\\d*\\.?\\d+),(?P<C1>-?\\d*\\.?\\d*),(?P<L1>-?\\d*\\.?\\d*),(?P<AccIncl1>-?\\d*\\.?\\d*),(?P<SlopeDist1>\\d*\\.?\\d*),(?P<DistTime1>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance0>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance1>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "set_direction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCSetDirection>\\d+)",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "setDirection": {
+                            "enabled": true,
+                            "request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "set_direction",
-                        "get_face_0",
-                        "measure_distance_face_0",
-                        "get_values_face_0",
-                        "change_face",
-                        "get_face_1",
-                        "measure_distance_face_1",
-                        "get_values_face_1",
-                        "change_face"
+                    "requestsOrder": [
+                        "setDirection",
+                        "getFace0",
+                        "measureDistanceFace0",
+                        "getValuesFace0",
+                        "changeFace",
+                        "getFace1",
+                        "measureDistanceFace1",
+                        "getValuesFace1",
+                        "changeFace"
                     ],
-                    "ResponseSets": {
-                        "AccAngle0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                    "responseSets": {
+                        "accAngle0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccAngle1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accAngle1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "DistTime0": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime0": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "DistTime1": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime1": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "Face0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Face1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Hz0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "Hz1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "RCChangeFace": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcChangeFace": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCSetDirection": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcSetDirection": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SlopeDist0": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist0": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "SlopeDist1": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist1": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "V0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "V1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v1": {
+                            "type": "float",
+                            "unit": "rad"
                         }
                     },
-                    "SleepTime": 25.0
+                    "sleepTime": 25.0
                 },
                 {
-                    "Description": "Complete measurement of P2.",
-                    "Enabled": true,
-                    "ID": "P2",
-                    "Name": "get_P2",
-                    "NextReceiver": 0,
-                    "Onetime": false,
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "SerialMeasurementProcessor",
-                        "DistanceCorrector",
-                        "HelmertTransformer",
-                        "RealTimePublisher",
-                        "FileExporter"
+                    "description": "complete measurement of P2",
+                    "enabled": true,
+                    "id": "p2",
+                    "name": "getP2",
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "serialMeasurementProcessor",
+                        "distanceCorrector",
+                        "helmertTransformer",
+                        "realTimePublisher",
+                        "fileExporter"
                     ],
-                    "RequestSets": {
-                        "change_face": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9028:1,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCChangeFace>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                    "requestSets": {
+                        "changeFace": {
+                            "enabled": true,
+                            "request": "%R1Q,9028:1,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues0>\\d+)(?:,(?P<Hz0>\\d*\\.?\\d+),(?P<V0>\\d*\\.?\\d+),(?P<AccAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<SlopeDist0>\\d*\\.?\\d*),(?P<DistTime0>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues1>\\d+)(?:,(?P<Hz1>\\d*\\.?\\d+),(?P<V1>\\d*\\.?\\d+),(?P<AccAngle1>-?\\d*\\.?\\d+),(?P<C1>-?\\d*\\.?\\d*),(?P<L1>-?\\d*\\.?\\d*),(?P<AccIncl1>-?\\d*\\.?\\d*),(?P<SlopeDist1>\\d*\\.?\\d*),(?P<DistTime1>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance0>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance1>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "set_direction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCSetDirection>\\d+)",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "setDirection": {
+                            "enabled": true,
+                            "request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "set_direction",
-                        "get_face_0",
-                        "measure_distance_face_0",
-                        "get_values_face_0",
-                        "change_face",
-                        "get_face_1",
-                        "measure_distance_face_1",
-                        "get_values_face_1",
-                        "change_face"
+                    "requestsOrder": [
+                        "setDirection",
+                        "getFace0",
+                        "measureDistanceFace0",
+                        "getValuesFace0",
+                        "changeFace",
+                        "getFace1",
+                        "measureDistanceFace1",
+                        "getValuesFace1",
+                        "changeFace"
                     ],
-                    "ResponseSets": {
-                        "AccAngle0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                    "responseSets": {
+                        "accAngle0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccAngle1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accAngle1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "DistTime0": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime0": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "DistTime1": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime1": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "Face0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Face1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Hz0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "Hz1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "RCChangeFace": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcChangeFace": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCSetDirection": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcSetDirection": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SlopeDist0": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist0": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "SlopeDist1": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist1": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "V0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "V1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v1": {
+                            "type": "float",
+                            "unit": "rad"
                         }
                     },
-                    "SleepTime": 25.0
+                    "sleepTime": 25.0
                 },
                 {
-                    "Description": "Complete measurement of P3.",
-                    "Enabled": true,
-                    "ID": "P3",
-                    "Name": "get_P3",
-                    "NextReceiver": 0,
-                    "Onetime": false,
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "SerialMeasurementProcessor",
-                        "DistanceCorrector",
-                        "HelmertTransformer",
-                        "RealTimePublisher",
-                        "FileExporter"
+                    "description": "complete measurement of P3",
+                    "enabled": true,
+                    "id": "p3",
+                    "name": "getP3",
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "serialMeasurementProcessor",
+                        "distanceCorrector",
+                        "helmertTransformer",
+                        "realTimePublisher",
+                        "fileExporter"
                     ],
-                    "RequestSets": {
-                        "change_face": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9028:1,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCChangeFace>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                    "requestSets": {
+                        "changeFace": {
+                            "enabled": true,
+                            "request": "%R1Q,9028:1,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues0>\\d+)(?:,(?P<Hz0>\\d*\\.?\\d+),(?P<V0>\\d*\\.?\\d+),(?P<AccAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<SlopeDist0>\\d*\\.?\\d*),(?P<DistTime0>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues1>\\d+)(?:,(?P<Hz1>\\d*\\.?\\d+),(?P<V1>\\d*\\.?\\d+),(?P<AccAngle1>-?\\d*\\.?\\d+),(?P<C1>-?\\d*\\.?\\d*),(?P<L1>-?\\d*\\.?\\d*),(?P<AccIncl1>-?\\d*\\.?\\d*),(?P<SlopeDist1>\\d*\\.?\\d*),(?P<DistTime1>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance0>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance1>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "set_direction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCSetDirection>\\d+)",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "setDirection": {
+                            "enabled": true,
+                            "request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "set_direction",
-                        "get_face_0",
-                        "measure_distance_face_0",
-                        "get_values_face_0",
-                        "change_face",
-                        "get_face_1",
-                        "measure_distance_face_1",
-                        "get_values_face_1",
-                        "change_face"
+                    "requestsOrder": [
+                        "setDirection",
+                        "getFace0",
+                        "measureDistanceFace0",
+                        "getValuesFace0",
+                        "changeFace",
+                        "getFace1",
+                        "measureDistanceFace1",
+                        "getValuesFace1",
+                        "changeFace"
                     ],
-                    "ResponseSets": {
-                        "AccAngle0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                    "responseSets": {
+                        "accAngle0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccAngle1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accAngle1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "DistTime0": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime0": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "DistTime1": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime1": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "Face0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Face1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Hz0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "Hz1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "RCChangeFace": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcChangeFace": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCSetDirection": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcSetDirection": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SlopeDist0": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist0": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "SlopeDist1": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist1": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "V0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "V1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v1": {
+                            "type": "float",
+                            "unit": "rad"
                         }
                     },
-                    "SleepTime": 25.0
+                    "sleepTime": 25.0
                 },
                 {
-                    "Description": "Complete measurement of P4.",
-                    "Enabled": true,
-                    "ID": "P4",
-                    "Name": "get_P4",
-                    "NextReceiver": 0,
-                    "Onetime": false,
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "SerialMeasurementProcessor",
-                        "DistanceCorrector",
-                        "PolarTransformer",
-                        "RealTimePublisher",
-                        "FileExporter"
+                    "description": "complete measurement of P4",
+                    "enabled": true,
+                    "id": "p4",
+                    "name": "getP4",
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "serialMeasurementProcessor",
+                        "distanceCorrector",
+                        "polarTransformer",
+                        "realTimePublisher",
+                        "fileExporter"
                     ],
-                    "RequestSets": {
-                        "change_face": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9028:1,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCChangeFace>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                    "requestSets": {
+                        "changeFace": {
+                            "enabled": true,
+                            "request": "%R1Q,9028:1,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues0>\\d+)(?:,(?P<Hz0>\\d*\\.?\\d+),(?P<V0>\\d*\\.?\\d+),(?P<AccAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<SlopeDist0>\\d*\\.?\\d*),(?P<DistTime0>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues1>\\d+)(?:,(?P<Hz1>\\d*\\.?\\d+),(?P<V1>\\d*\\.?\\d+),(?P<AccAngle1>-?\\d*\\.?\\d+),(?P<C1>-?\\d*\\.?\\d*),(?P<L1>-?\\d*\\.?\\d*),(?P<AccIncl1>-?\\d*\\.?\\d*),(?P<SlopeDist1>\\d*\\.?\\d*),(?P<DistTime1>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance0>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance1>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "set_direction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCSetDirection>\\d+)",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "setDirection": {
+                            "enabled": true,
+                            "request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "set_direction",
-                        "get_face_0",
-                        "measure_distance_face_0",
-                        "get_values_face_0",
-                        "change_face",
-                        "get_face_1",
-                        "measure_distance_face_1",
-                        "get_values_face_1",
-                        "change_face"
+                    "requestsOrder": [
+                        "setDirection",
+                        "getFace0",
+                        "measureDistanceFace0",
+                        "getValuesFace0",
+                        "changeFace",
+                        "getFace1",
+                        "measureDistanceFace1",
+                        "getValuesFace1",
+                        "changeFace"
                     ],
-                    "ResponseSets": {
-                        "AccAngle0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                    "responseSets": {
+                        "accAngle0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccAngle1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accAngle1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "DistTime0": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime0": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "DistTime1": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime1": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "Face0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Face1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Hz0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "Hz1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "RCChangeFace": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcChangeFace": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCSetDirection": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcSetDirection": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SlopeDist0": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist0": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "SlopeDist1": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist1": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "V0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "V1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v1": {
+                            "type": "float",
+                            "unit": "rad"
                         }
                     },
-                    "SleepTime": 25.0
+                    "sleepTime": 25.0
                 },
                 {
-                    "Description": "Complete measurement of P5.",
-                    "Enabled": true,
-                    "ID": "P5",
-                    "Name": "get_P5",
-                    "NextReceiver": 0,
-                    "Onetime": false,
-                    "Receivers": [
-                        "PreProcessor",
-                        "ReturnCodeInspector",
-                        "SerialMeasurementProcessor",
-                        "DistanceCorrector",
-                        "PolarTransformer",
-                        "RealTimePublisher",
-                        "FileExporter"
+                    "description": "complete measurement of P5",
+                    "enabled": true,
+                    "id": "p5",
+                    "name": "getP5",
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "receivers": [
+                        "preProcessor",
+                        "returnCodeInspector",
+                        "serialMeasurementProcessor",
+                        "distanceCorrector",
+                        "polarTransformer",
+                        "realTimePublisher",
+                        "fileExporter"
                     ],
-                    "RequestSets": {
-                        "change_face": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9028:1,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCChangeFace>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                    "requestSets": {
+                        "changeFace": {
+                            "enabled": true,
+                            "request": "%R1Q,9028:1,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace0>\\d+)(?:,(?P<Face0>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2026:\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetFace1>\\d+)(?:,(?P<Face1>\\d+))?",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "getFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2026:\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues0>\\d+)(?:,(?P<Hz0>\\d*\\.?\\d+),(?P<V0>\\d*\\.?\\d+),(?P<AccAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<SlopeDist0>\\d*\\.?\\d*),(?P<DistTime0>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "get_values_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2167:5000,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCGetValues1>\\d+)(?:,(?P<Hz1>\\d*\\.?\\d+),(?P<V1>\\d*\\.?\\d+),(?P<AccAngle1>-?\\d*\\.?\\d+),(?P<C1>-?\\d*\\.?\\d*),(?P<L1>-?\\d*\\.?\\d*),(?P<AccIncl1>-?\\d*\\.?\\d*),(?P<SlopeDist1>\\d*\\.?\\d*),(?P<DistTime1>-?\\d*))?",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "getValuesFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2167:5000,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_0": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance0>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace0": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "measure_distance_face_1": {
-                            "Enabled": true,
-                            "Request": "%R1Q,2008:1,1\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCMeasureDistance1>\\d+)",
-                            "SleepTime": 0.0,
-                            "Timeout": 30.0
+                        "measureDistanceFace1": {
+                            "enabled": true,
+                            "request": "%R1Q,2008:1,1\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                            "sleepTime": 0.0,
+                            "timeout": 30.0
                         },
-                        "set_direction": {
-                            "Enabled": true,
-                            "Request": "%R1Q,9027:2.69364,1.59311,2,1,0\r\n",
-                            "ResponseDelimiter": "\r\n",
-                            "ResponsePattern": "(?:%R1P,0,0:)(?P<RCSetDirection>\\d+)",
-                            "SleepTime": 2.0,
-                            "Timeout": 30.0
+                        "setDirection": {
+                            "enabled": true,
+                            "request": "%R1Q,9027:2.69364,1.59311,2,1,0\r\n",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                            "sleepTime": 2.0,
+                            "timeout": 30.0
                         }
                     },
-                    "RequestsOrder": [
-                        "set_direction",
-                        "get_face_0",
-                        "measure_distance_face_0",
-                        "get_values_face_0",
-                        "change_face",
-                        "get_face_1",
-                        "measure_distance_face_1",
-                        "get_values_face_1",
-                        "change_face"
+                    "requestsOrder": [
+                        "setDirection",
+                        "getFace0",
+                        "measureDistanceFace0",
+                        "getValuesFace0",
+                        "changeFace",
+                        "getFace1",
+                        "measureDistanceFace1",
+                        "getValuesFace1",
+                        "changeFace"
                     ],
-                    "ResponseSets": {
-                        "AccAngle0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                    "responseSets": {
+                        "accAngle0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccAngle1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accAngle1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "AccIncl1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "accIncl1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "C1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "c1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "DistTime0": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime0": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "DistTime1": {
-                            "Type": "Integer",
-                            "Unit": "ns"
+                        "distTime1": {
+                            "type": "integer",
+                            "unit": "ns"
                         },
-                        "Face0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Face1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "face1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "Hz0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "Hz1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "hz1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "L1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "l1": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "RCChangeFace": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcChangeFace": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetFace1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetFace1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCGetValues1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcGetValues1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance0": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance0": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCMeasureDistance1": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcMeasureDistance1": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "RCSetDirection": {
-                            "Type": "Integer",
-                            "Unit": "none"
+                        "rcSetDirection": {
+                            "type": "integer",
+                            "unit": "none"
                         },
-                        "SlopeDist0": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist0": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "SlopeDist1": {
-                            "Type": "Float",
-                            "Unit": "m"
+                        "slopeDist1": {
+                            "type": "float",
+                            "unit": "m"
                         },
-                        "V0": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v0": {
+                            "type": "float",
+                            "unit": "rad"
                         },
-                        "V1": {
-                            "Type": "Float",
-                            "Unit": "rad"
+                        "v1": {
+                            "type": "float",
+                            "unit": "rad"
                         }
                     },
-                    "SleepTime": 5.0
+                    "sleepTime": 5.0
                 },
                 {
-                    "Name": "wait300",
-                    "Description": "Do wait 5 minutes.",
-                    "Receivers": [],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": false,
-                    "SleepTime": 300.0,
-                    "ID": "WAIT",
-                    "RequestSets": {},
-                    "RequestsOrder": [],
-                    "ResponseSets": {}
+                    "name": "wait300",
+                    "description": "waits 5 minutes",
+                    "receivers": [],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "sleepTime": 300.0,
+                    "id": "wait",
+                    "requestSets": {},
+                    "requestsOrder": [],
+                    "responseSets": {}
                 }
             ]
         },
-        "ADAM-4015": {
-            "Description": "ADAM-4015 I/O module.",
-            "Type": "I/O",
-            "Observations": [
+        "adam4015": {
+            "description": "ADAM-4015 I/O module.",
+            "type": "i/o",
+            "observations": [
                 {
-                    "Name": "get_values",
-                    "Description": "Get temperature values.",
-                    "Receivers": [
-                        "PreProcessor",
-                        "FileExporter"
+                    "name": "getValues",
+                    "description": "gets temperature values",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter"
                     ],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": false,
-                    "ID": "Pt100",
-                    "RequestSets": {
-                        "get_values": {
-                            "Enabled": true,
-                            "Request": "#01\r",
-                            "ResponsePattern": ">(?P<Temperature1>[+-][\\d\\.]{6})(?P<Temperature2>[+-][\\d\\.]{6})(?P<Temperature3>[+-][\\d\\.]{6})(?P<Temperature4>[+-][\\d\\.]{6})(?P<Temperature5>[+-][\\d\\.]{6})(?P<Temperature6>[+-][\\d\\.]{6})",
-                            "ResponseDelimiter": "\r",
-                            "SleepTime": 0.0,
-                            "Timeout": 5.0
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "id": "pt100",
+                    "requestSets": {
+                        "getValues": {
+                            "enabled": true,
+                            "request": "#01\r",
+                            "responsePattern": ">(?P<Temperature1>[+-][\\d\\.]{6})(?P<Temperature2>[+-][\\d\\.]{6})(?P<Temperature3>[+-][\\d\\.]{6})(?P<Temperature4>[+-][\\d\\.]{6})(?P<Temperature5>[+-][\\d\\.]{6})(?P<Temperature6>[+-][\\d\\.]{6})",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 0.0,
+                            "timeout": 5.0
                         }
                     },
-                    "RequestsOrders": [
-                        "get_values"
+                    "requestsOrders": [
+                        "getValues"
                     ],
-                    "ResponseSets": {
-                        "Temperature1": {
-                            "Type": "Float",
-                            "Unit": "C"
+                    "responseSets": {
+                        "temperature1": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature2": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature2": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature3": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature3": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature4": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature4": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature5": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature5": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature6": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature6": {
+                            "type": "float",
+                            "unit": "C"
                         }
                     }
                 }
             ]
         },
-        "DFT 485": {
-            "Description": "DFT 485 meteorology sensor",
-            "Type": "Weather Station",
-            "Observations": [
+        "dft485": {
+            "description": "DFT 485 meteorology sensor",
+            "type": "weatherStation",
+            "observations": [
                 {
-                    "Name": "get_values",
-                    "Description": "Get temperature, air pressure, and humidity values.",
-                    "Receivers": [
-                        "PreProcessor",
-                        "DistanceCorrector",
-                        "FileExporter"
+                    "name": "getValues",
+                    "description": "gets temperature, air pressure, and humidity",
+                    "receivers": [
+                        "preProcessor",
+                        "distanceCorrector",
+                        "fileExporter"
                     ],
-                    "NextReceiver": 0,
-                    "Enabled": true,
-                    "Onetime": false,
-                    "SleepTime": 5.0,
-                    "ID": "Meteo",
-                    "RequestSets": {
-                        "get_values": {
-                            "Enabled": true,
-                            "Request": "?U\r\n",
-                            "ResponsePattern": "TD(?P<TempPress>[\\d\\.]+), TE(?P<Temperature>[\\d\\.]+), DR(?P<Pressure>[\\d\\.]+), FE(?P<Humidity>[\\d\\.]+),",
-                            "ResponseDelimiter": ", \r\n",
-                            "Timeout": 0.8,
-                            "SleepTime": 0.0
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "sleepTime": 5.0,
+                    "id": "meteo",
+                    "requestSets": {
+                        "getValues": {
+                            "enabled": true,
+                            "request": "?U\r\n",
+                            "responsePattern": "TD(?P<tempPress>[\\d\\.]+), TE(?P<temperature>[\\d\\.]+), DR(?P<pressure>[\\d\\.]+), FE(?P<humidity>[\\d\\.]+),",
+                            "responseDelimiter": ", \r\n",
+                            "timeout": 0.8,
+                            "sleepTime": 0.0
                         }
                     },
-                    "ResponseSets": {
-                        "TempPress": {
-                            "Type": "Float",
-                            "Unit": "C"
+                    "responseSets": {
+                        "tempPress": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Temperature": {
-                            "Type": "Float",
-                            "Unit": "C"
+                        "temperature": {
+                            "type": "float",
+                            "unit": "C"
                         },
-                        "Pressure": {
-                            "Type": "Float",
-                            "Unit": "hPa"
+                        "pressure": {
+                            "type": "float",
+                            "unit": "hPa"
                         },
-                        "Humidity": {
-                            "Type": "Float",
-                            "Unit": "%"
+                        "humidity": {
+                            "type": "float",
+                            "unit": "%"
                         }
                     }
                 }
             ]
         }
     },
-    "Schedulers": {
-        "Scheduler1": {
-            "Port": "COM1",
-            "Sensor": "STS DTM",
-            "Schedules": [
+    "schedulers": {
+        "scheduler1": {
+            "port": "com1",
+            "sensor": "stsDTM",
+            "schedules": [
                 {
-                    "Enabled": true,
-                    "StartDate": "2016-02-01",
-                    "EndDate": "2017-07-30",
-                    "Weekdays": {},
-                    "Observations": [
+                    "enabled": true,
+                    "startDate": "2016-02-01",
+                    "endDate": "2017-07-30",
+                    "weekdays": {},
+                    "observations": [
                         "initialize",
-                        "get_values"
+                        "getValues"
                     ]
                 }
             ]
         },
-        "Scheduler2": {
-            "Port": "COM2",
-            "Sensor": "Leica TM30",
-            "Schedules": [
+        "scheduler2": {
+            "port": "com2",
+            "sensor": "leicaTM30",
+            "schedules": [
                 {
-                    "Enabled": true,
-                    "StartDate": "2016-02-01",
-                    "EndDate": "2017-07-30",
-                    "Weekdays": {
-                        "Monday": [
+                    "enabled": true,
+                    "startDate": "2016-02-01",
+                    "endDate": "2017-07-30",
+                    "weekdays": {
+                        "monday": [
                             {
-                                "StartTime": "00:00:00",
-                                "EndTime": "23:59:59"
+                                "startTime": "00:00:00",
+                                "endTime": "23:59:59"
                             }
                         ],
-                        "Tuesday": [],
-                        "Wednesday": [],
-                        "Thursday": [],
-                        "Friday": [],
-                        "Saturday": [],
-                        "Sunday": []
+                        "tuesday": [],
+                        "wednesday": [],
+                        "thursday": [],
+                        "friday": [],
+                        "saturday": [],
+                        "sunday": []
                     },
-                    "Observations": [
+                    "observations": [
                         "wait10",
                         "initialize",
-                        "get_P1",
-                        "get_P2",
-                        "get_P4",
-                        "get_P5",
+                        "getP1",
+                        "getP2",
+                        "getP4",
+                        "getP5",
                         "wait300"
                     ]
                 }
             ]
         },
-        "Scheduler3": {
-            "Port": "VirtualLeicaTM30",
-            "Sensor": "Leica TM30",
-            "Schedules": [
+        "scheduler3": {
+            "port": "virtualLeicaTM30",
+            "sensor": "leicaTM30",
+            "schedules": [
                 {
-                    "Enabled": false,
-                    "StartDate": "2016-02-01",
-                    "EndDate": "2017-07-30",
-                    "Weekdays": {
-                        "Monday": [],
-                        "Tuesday": [],
-                        "Wednesday": [],
-                        "Thursday": [],
-                        "Friday": [],
-                        "Saturday": [],
-                        "Sunday": []
+                    "enabled": false,
+                    "startDate": "2016-02-01",
+                    "endDate": "2017-07-30",
+                    "weekdays": {
+                        "monday": [],
+                        "tuesday": [],
+                        "wednesday": [],
+                        "thursday": [],
+                        "friday": [],
+                        "saturday": [],
+                        "sunday": []
                     },
-                    "Observations": [
+                    "observations": [
                         "initialize",
-                        "get_P1",
-                        "get_P2",
-                        "get_P3"
+                        "getP1",
+                        "getP2",
+                        "getP3"
                     ]
                 }
             ]
         }
     },
-    "Alert": {
-        "Enabled": false,
-        "Handlers": {
-            "ShortMessageSocketAlertHandler": {
-                "Enabled": false,
-                "LogLevels": [
-                    "Error",
-                    "Critical"
-                ],
-                "Host": "10.59.0.40",
-                "Port": 1432,
-                "PhoneNumbers": [
-                    "+49176 12345678"
-                ],
-                "Template": "<?xml version=\"1.0\"?><cmgs destaddr=\"{number}\">OpenADMS \"Project X\": {asctime} - {level} - {msg}</cmgs>"
+    "alert": {
+        "agents": {
+            "shortMessageFormatter": {
+                "enabled": true,
+                "receivers": {
+                    "warning": ["+49176 12345678"],
+                    "error": ["+49152 0987654", "+49178 43215678"],
+                    "critical": ["+49152 0987654", "+49178 43215678"]
+                }
             },
-            "MailAlertHandler": {
-                "Enabled": false,
-                "CollectionTime": 300,
-                "LogLevels": [
-                    "Error",
-                    "Critical"
-                ],
-                "Subject": "[OpenADMS] Alert Message - R318",
-                "Recipients": [
-                    "engineer@example.com"
-                ],
-                "Charset": "utf-8",
-                "UserName": "monitoring@example.com",
-                "UserPassword": "secret",
-                "Host": "smtp.example.com",
-                "Port": 465,
-                "TLS": "Yes"
+            "mailMessageFormatter": {
+                "enabled": true,
+                "receivers": {
+                    "warning": ["warning@example.com"],
+                    "error": ["engineer@example.com", "boss@example.com"]
+                }
             }
         }
     },
-    "DistanceCorrector": {
-        "DistanceName": "SlopeDist",
-        "Temperature": null,
-        "Pressure": null,
-        "Humidity": 0.6,
-        "AtmosphericCorrectionEnabled": true,
-        "SealevelCorrectionEnabled": false,
-        "SensorHeight": 100.0
+    "mailMessageFormatter": {
+        "messageCollectionEnabled": true,
+        "messageCollectionTime": 300,
+        "receiver": "mailAgent",
+        "type": "email",
+        "templates": {
+            "header": "The following incident(s) occurred:\n\n",
+            "body": "{{time}} - {{level}} - {{message}}\n",
+            "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
+        },
+        "header": {
+            "subject": "[OpenADMS] Alert Message - Project X",
+            "from": "OpenADMS",
+            "to": "{{receiver}}"
+        }
     },
-    "HelmertTransformer": {
-        "ResidualMismatchTransformationEnabled": true,
-        "ViewPoint": {
-            "ID": "P6",
-            "Receivers": [
-                "FileExporter",
-                "OnlineViewer/P6"
+    "shortMessageFormatter": {
+        "messageCollectionEnabled": false,
+        "messageCollectionTime": 0,
+        "receiver": "shortMessageAgent",
+        "type": "sms",
+        "templates": {
+            "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
+            "main": "{{time}} - {{level}} - {{message}}",
+            "footer": "</cmgs>"
+        },
+        "header": {
+            "number": "{{receiver}}"
+        }
+    },
+    "shortMessageAgent": {
+        "host": "10.59.0.40",
+        "port": 1432
+    },
+    "mailAgent": {
+        "defaultSubject": "[OpenADMS] Message",
+        "charset": "utf-8",
+        "userName": "monitoring@example.com",
+        "userPassword": "secret",
+        "host": "smtp.example.com",
+        "port": 465,
+        "tls": true,
+        "startTLS": false
+    },
+    "distanceCorrector": {
+        "distanceName": "slopeDist",
+        "temperature": null,
+        "pressure": null,
+        "humidity": 0.6,
+        "atmosphericCorrectionEnabled": true,
+        "sealevelCorrectionEnabled": false,
+        "sensorHeight": 100.0
+    },
+    "helmertTransformer": {
+        "residualMismatchTransformationEnabled": true,
+        "viewPoint": {
+            "id": "p6",
+            "receivers": [
+                "fileExporter",
+                "onlineViewer/p6"
             ]
         },
-        "TiePoints": {
-            "P1": {
-                "X": 2000.0000,
-                "Y": 1000.0000,
-                "Z": 100.0000
+        "tiePoints": {
+            "p1": {
+                "x": 2000.0000,
+                "y": 1000.0000,
+                "z": 100.0000
             },
-            "P2": {
-                "X": 1995.4880,
-                "Y": 1003.7680,
-                "Z": 100.0080
+            "p2": {
+                "x": 1995.4880,
+                "y": 1003.7680,
+                "z": 100.0080
             },
-            "P3": {
-                "X": 1994.4900,
-                "Y": 996.2600,
-                "Z": 100.0210
+            "p3": {
+                "x": 1994.4900,
+                "y": 996.2600,
+                "z": 100.0210
             }
         }
     },
-    "ReturnCodeInspector": {
-        "Retries": 3,
-        "Keys": [
-            "ReturnCode",
-            "RCChangeFace",
-            "RCGetFace0",
-            "RCGetFace1",
-            "RCGetValues0",
-            "RCGetValues1",
-            "RCMeasureDistance0",
-            "RCMeasureDistance1",
-            "RCSetDirection"
+    "returnCodeInspector": {
+        "retries": 3,
+        "keys": [
+            "returnCode",
+            "rcChangeFace",
+            "rcGetFace0",
+            "rcGetFace1",
+            "rcGetValues0",
+            "rcGetValues1",
+            "rcMeasureDistance0",
+            "rcMeasureDistance1",
+            "rcSetDirection"
         ]
     },
-    "PolarTransformer": {
-        "SensorPosition": {
-            "X": 2000.0000,
-            "Y": 992.5100,
-            "Z": 100.0000
+    "polarTransformer": {
+        "sensorPosition": {
+            "x": 2000.0000,
+            "y": 992.5100,
+            "z": 100.0000
         },
-        "AzimuthPosition": {
-            "X": 2000.0000,
-            "Y": 1000.0000
+        "azimuthPosition": {
+            "x": 2000.0000,
+            "y": 1000.0000
         }
     },
-    "RealTimePublisher": {
-        "Enabled": true,
-        "Receivers": [
-            "OnlineViewer"
+    "realTimePublisher": {
+        "enabled": true,
+        "receivers": [
+            "onlineViewer"
         ]
     },
-    "FileExporter": {
-        "FileExtension": ".csv",
-        "FileName": "{port}_{id}_{date}",
-        "FileRotation": "monthly",
-        "Paths": [
+    "fileExporter": {
+        "fileExtension": ".csv",
+        "fileName": "{port}_{id}_{date}",
+        "fileRotation": "monthly",
+        "paths": [
             "./data"
         ],
-        "Separator": ",",
-        "DateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
+        "separator": ",",
+        "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
     }
 }

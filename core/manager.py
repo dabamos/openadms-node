@@ -95,7 +95,7 @@ class ModuleManager(object):
 
     def add(self, module_name, class_path):
         """Instantiates a worker, instantiates a messenger, and bundles both
-        into a module. The module will be added to the modules dictionary."""
+        to a module. The module will be added to the modules dictionary."""
         worker = self._get_worker(module_name, class_path)
         messenger = MQTTMessenger(self._config_manager)
         module = Module(messenger, worker)
@@ -109,7 +109,7 @@ class ModuleManager(object):
         logger.debug('Started module "{}"'.format(module_name))
 
     def _get_worker(self, module_name, class_path):
-        """Load a Python class from a given path and return the instance."""
+        """Loads a Python class from a given path and return the instance."""
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = module_path.replace('.', '/') + '.py'
 

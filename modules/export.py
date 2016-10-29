@@ -56,16 +56,16 @@ class FileExporter(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._file_extension = config['FileExtension']
-        self._file_name = config['FileName']
+        self._file_extension = config.get('fileExtension')
+        self._file_name = config.get('fileName')
         self._file_rotation = {
             'none': FileRotation.NONE,
             'daily': FileRotation.DAILY,
             'monthly': FileRotation.MONTHLY,
-            'yearly': FileRotation.YEARLY}[config['FileRotation']]
-        self._date_time_format = config['DateTimeFormat']
-        self._separator = config['Separator']
-        self._paths = self._revise_paths(config['Paths'])
+            'yearly': FileRotation.YEARLY}.get(config.get('fileRotation'))
+        self._date_time_format = config.get('dateTimeFormat')
+        self._separator = config.get('separator')
+        self._paths = self._revise_paths(config.get('paths'))
 
     def _revise_paths(self, paths):
         """Checks whether the paths in a given list end with ``\``. Adds the
@@ -92,7 +92,7 @@ class FileExporter(Prototype):
         Returns:
             obs(Observation): The output observation object.
         """
-        ts = datetime.fromtimestamp(obs.get('TimeStamp', 0))
+        ts = datetime.fromtimestamp(obs.get('timeStamp', 0))
 
         date = {
             # No file rotation, i.e., all data is stored in a single file.
@@ -106,13 +106,13 @@ class FileExporter(Prototype):
 
         file_name = self._file_name
 
-        file_name = file_name.replace('{port}', obs.get('PortName'))
+        file_name = file_name.replace('{port}', obs.get('portName'))
         file_name = file_name.replace('{date}', '{}'.format(date)
                                       if date else '')
-        file_name = file_name.replace('{id}', '{}'.format(obs.get('ID'))
-                                      if obs.get('ID') is not None else '')
-        file_name = file_name.replace('{name}', '{}'.format(obs.get('Name'))
-                                      if obs.get('Name') is not None else '')
+        file_name = file_name.replace('{id}', '{}'.format(obs.get('id'))
+                                      if obs.get('id') is not None else '')
+        file_name = file_name.replace('{name}', '{}'.format(obs.get('name'))
+                                      if obs.get('name') is not None else '')
 
         file_name += self._file_extension
 
@@ -126,9 +126,9 @@ class FileExporter(Prototype):
 
             if not os.path.isfile(path + file_name):
                 header = '# Target "{}" of "{}" on "{}"\n' \
-                         .format(obs.get('ID'),
-                                 obs.get('SensorName'),
-                                 obs.get('PortName'))
+                         .format(obs.get('id'),
+                                 obs.get('sensorName'),
+                                 obs.get('portName'))
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
@@ -136,19 +136,19 @@ class FileExporter(Prototype):
                     fh.write(header)
 
                 # Convert Unix time stamp to date and time.
-                dt = datetime.fromtimestamp(obs.get('TimeStamp', 0))
+                dt = datetime.fromtimestamp(obs.get('timeStamp', 0))
                 line = dt.strftime(self._date_time_format)
 
-                if obs.get('ID') is not None:
-                    line += self._separator + obs.get('ID')
+                if obs.get('id') is not None:
+                    line += self._separator + obs.get('id')
 
-                response_sets = obs.get('ResponseSets')
+                response_sets = obs.get('responseSets')
 
                 for response_set_id in sorted(response_sets.keys()):
                     response_set = response_sets.get(response_set_id)
 
-                    v = response_set.get('Value')
-                    u = response_set.get('Unit')
+                    v = response_set.get('value')
+                    u = response_set.get('unit')
 
                     line += self._separator + format(response_set_id)
                     line += self._separator + format(v)
@@ -159,9 +159,9 @@ class FileExporter(Prototype):
 
                 logger.info('Saved observation "{}" with ID "{}" from '
                             'port "{}" to file "{}"'
-                            .format(obs.get('Name'),
-                                    obs.get('ID'),
-                                    obs.get('PortName'),
+                            .format(obs.get('name'),
+                                    obs.get('id'),
+                                    obs.get('portName'),
                                     path + file_name))
 
         return obs
@@ -177,8 +177,8 @@ class RealTimePublisher(Prototype):
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
-        self._receivers = config.get('Receivers')
-        self._is_enabled = config.get('Enabled')
+        self._receivers = config.get('receivers')
+        self._is_enabled = config.get('enabled')
 
     def process_observation(self, obs):
         if not self._is_enabled:
@@ -187,15 +187,15 @@ class RealTimePublisher(Prototype):
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
-            target = receiver + '/' + obs_copy.get('ID')
+            target = receiver + '/' + obs_copy.get('id')
 
-            obs_copy.set('NextReceiver', 0)
-            obs_copy.set('Receivers', [target])
+            obs_copy.set('nextReceiver', 0)
+            obs_copy.set('receivers', [target])
 
             logger.debug('Publishing observation "{}" with ID "{}" to "{}" ...'
-                         .format(obs.get('Name'), obs.get('ID'), target))
+                         .format(obs.get('name'), obs.get('id'), target))
 
-            header = {'Type': 'Observation'}
+            header = {'type': 'observation'}
             payload = obs.data
 
             self.publish(target, header, payload)

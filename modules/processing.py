@@ -42,13 +42,13 @@ class PreProcessor(Prototype):
     def process_observation(self, obs):
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
-        for set_name, request_set in obs.get('RequestSets').items():
-            response = request_set.get('Response')
-            response_pattern = request_set.get('ResponsePattern')
+        for set_name, request_set in obs.get('requestSets').items():
+            response = request_set.get('response')
+            response_pattern = request_set.get('responsePattern')
 
             if response is None or response == '':
                 logger.error('No response in observation "{}" with ID "{}"'
-                             .format(obs.get('Name'), obs.get('ID')))
+                             .format(obs.get('name'), obs.get('id')))
                 return obs
 
             pattern = re.compile(response_pattern)
@@ -60,10 +60,10 @@ class PreProcessor(Prototype):
                              'does not match extraction pattern'
                              .format(self.sanitize(response),
                                      set_name,
-                                     obs.get('Name'),
-                                     obs.get('ID'),
-                                     obs.get('SensorName'),
-                                     obs.get('PortName')))
+                                     obs.get('name'),
+                                     obs.get('id'),
+                                     obs.get('sensorName'),
+                                     obs.get('portName')))
                 return obs
 
             # The regular expression pattern needs a least one defined group
@@ -75,20 +75,20 @@ class PreProcessor(Prototype):
             if pattern.groups == 0:
                 logger.error('No group(s) defined in regular expression '
                              'pattern of observation "{}" with ID "{}"'
-                             .format(obs.get('Name'), obs.get('ID')))
+                             .format(obs.get('name'), obs.get('id')))
                 return obs
 
             # Convert the type of the parsed raw values from string to the
             # actual data type.
-            response_sets = obs.get('ResponseSets')
+            response_sets = obs.get('responseSets')
 
             for group_name, raw_value in match.groupdict().items():
                 if not raw_value:
                     logger.error('No raw value found for response set "{}" of '
                                  'observation "{}" with ID "{}"'
                                  .format(group_name,
-                                         obs.get('Name'),
-                                         obs.get('ID')))
+                                         obs.get('name'),
+                                         obs.get('id')))
                     continue
 
                 response_set = response_sets.get(group_name)
@@ -96,11 +96,11 @@ class PreProcessor(Prototype):
                 if not response_set:
                     logger.error('Response set "{}" of observation "{}" with '
                                  'ID "{}" not defined'.format(group_name,
-                                                              obs.get('Name'),
-                                                              obs.get('ID')))
+                                                              obs.get('name'),
+                                                              obs.get('id')))
                     continue
 
-                response_type = response_set.get('Type').lower()
+                response_type = response_set.get('type').lower()
 
                 # Convert raw value to float.
                 if response_type == 'float':
@@ -118,9 +118,9 @@ class PreProcessor(Prototype):
                                  'observation "{}" with ID "{}"'
                                  .format(response_value,
                                          group_name,
-                                         obs.get('Name'),
-                                         obs.get('ID')))
-                    response_set['Value'] = response_value
+                                         obs.get('name'),
+                                         obs.get('id')))
+                    response_set['value'] = response_value
 
         return obs
 
@@ -169,8 +169,8 @@ class PreProcessor(Prototype):
     def sanitize(self, s):
         """Removes some non-printable characters from a string."""
         sanitized = s.replace('\n', '\\n') \
-            .replace('\r', '\\r') \
-            .replace('\t', '\\t')
+                     .replace('\r', '\\r') \
+                     .replace('\t', '\\t')
 
         return sanitized
 
@@ -209,6 +209,7 @@ class ReturnCodes(object):
         1284: [3, False, 'Accuracy can not be guaranteed'],
         1285: [4, True,  'Only angle measurement valid'],
         1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
+        8708: [3, True,  'Position not exactly reached'],
         8710: [4, True,  'No target detected']
     }
 
@@ -223,12 +224,12 @@ class ReturnCodeInspector(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._keys = config.get('Keys')
-        self._retries = config.get('Retries')
+        self._keys = config.get('keys')
+        self._retries = config.get('retries')
 
     def process_observation(self, obs):
         for key in self._keys:
-            return_code = obs.get_value('ResponseSets', key, 'Value')
+            return_code = obs.get_value('responseSets', key, 'value')
 
             # Key is zero or not in response set.
             if return_code is None or return_code == 0:
@@ -242,8 +243,8 @@ class ReturnCodeInspector(Prototype):
 
                 # Return code related log message.
                 logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
-                                     '(code "{}")'.format(obs.get('Name'),
-                                                          obs.get('ID'),
+                                     '(code "{}")'.format(obs.get('name'),
+                                                          obs.get('id'),
                                                           msg,
                                                           return_code))
 
@@ -252,29 +253,29 @@ class ReturnCodeInspector(Prototype):
                     attempts = obs.get('Attempts', 0)
 
                     if attempts < self._retries :
-                        obs.set('Attempts', attempts + 1)
-                        obs.set('NextReceiver', 0)
-                        obs.set('Corrupted', False)
+                        obs.set('attempts', attempts + 1)
+                        obs.set('nextReceiver', 0)
+                        obs.set('corrupted', False)
 
                         logger.info('Retrying observation "{}" with ID "{}" '
                                     '(attempt {} of {})'
-                                    .format(obs.get('Name'),
-                                            obs.get('ID'),
+                                    .format(obs.get('name'),
+                                            obs.get('id'),
                                             attempts + 1,
                                             self._retries))
                     else:
-                        obs.set('Corrupted', True)
+                        obs.set('corrupted', True)
 
                         logger.info('Maximum number of attempts ({}) reached '
                                     'for observation "{}" with ID "{}"'
                                     .format(self._retries,
-                                            obs.get('Name'),
-                                            obs.get('ID')))
+                                            obs.get('name'),
+                                            obs.get('id')))
 
                     return obs
             else:
                 # Generic log message.
                 logger.error('Error occurred on observation "{}" (code "{}")'
-                             .format(obs.get('Name'), return_code))
+                             .format(obs.get('name'), return_code))
 
         return obs

@@ -52,7 +52,7 @@ class SerialPort(Prototype):
             self._open()
 
         # Add the name of this serial port to the observation.
-        obs.set('PortName', self.name)
+        obs.set('portName', self.name)
 
         if self._serial is None:
             logger.error('Could not write to port {} ({})'
@@ -60,11 +60,11 @@ class SerialPort(Prototype):
             return
 
         requests_order = obs.get('RequestsOrder', [])
-        request_sets = obs.get('RequestSets')
+        request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
             logger.info('No requests order defined in observation "{}" with '
-                        'ID "{}"'.format(obs.get('Name'), obs.get('ID')))
+                        'ID "{}"'.format(obs.get('name'), obs.get('id')))
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
@@ -73,22 +73,22 @@ class SerialPort(Prototype):
             if not request_set:
                 logger.error('Request set "{}" not found in observation "{}" '
                              'with ID "{}"'.format(request_name,
-                                                   obs.get('Name'),
-                                                   obs.get('ID')))
+                                                   obs.get('name'),
+                                                   obs.get('id')))
                 return
 
             # The response of the sensor.
             response = ''
             response_delimiter = request_set.get('ResponseDelimiter')
 
-            request = request_set.get('Request')
-            sleep_time = request_set.get('SleepTime')
-            timeout = request_set.get('Timeout')
+            request = request_set.get('request')
+            sleep_time = request_set.get('sleepTime')
+            timeout = request_set.get('timeout')
 
             # Send the request of the observation to the attached sensor.
             logger.debug('Sending request "{}" to sensor "{}" on port '
                          '"{}"'.format(request_name,
-                                       obs.get('SensorName'),
+                                       obs.get('sensorName'),
                                        self.name))
 
             for attempt in range(self._max_attempts):
@@ -108,23 +108,23 @@ class SerialPort(Prototype):
                                  'sensor "{}" on port "{}"'
                                  .format(self._sanitize(response),
                                          request_name,
-                                         obs.get('SensorName'),
+                                         obs.get('sensorName'),
                                          self.name))
                     break
 
                 # Try next attempt if response is empty.
                 logger.warning('No response from sensor "{}" on port "{}" for '
                                'observation "{}" with ID "{}"'
-                               .format(obs.get('SensorName'),
+                               .format(obs.get('sensorName'),
                                        self.name,
-                                       obs.get('Name'),
-                                       obs.get('ID')))
+                                       obs.get('name'),
+                                       obs.get('id')))
 
             # Add the raw response of the sensor to the observation set.
-            request_set['Response'] = response
+            request_set['response'] = response
 
             # Add the timestamp to the observation.
-            obs.set('TimeStamp', time.time())
+            obs.set('timeStamp', time.time())
 
             # Sleep until the next request.
             time.sleep(sleep_time)
@@ -137,22 +137,22 @@ class SerialPort(Prototype):
         self._serial.close()
 
     def _get_port_config(self):
-        p = self._config_manager.config.get('Ports') \
-                                       .get('Serial') \
+        p = self._config_manager.config.get('ports') \
+                                       .get('serial') \
                                        .get(self.name)
 
         if not p:
             logger.debug('No port {} in configuration'.format(self.name))
 
         return SerialPortConfiguration(
-            port=p.get('Port'),
-            baudrate=p.get('BaudRate'),
-            bytesize=p.get('ByteSize'),
-            stopbits=p.get('StopBits'),
-            parity=p.get('Parity'),
-            timeout=p.get('Timeout'),
-            xonxoff=p.get('SoftwareFlowControl'),
-            rtscts=p.get('HardwareFlowControl'))
+            port=p.get('port'),
+            baudrate=p.get('baudRate'),
+            bytesize=p.get('byteSize'),
+            stopbits=p.get('stopBits'),
+            parity=p.get('parity'),
+            timeout=p.get('timeout'),
+            xonxoff=p.get('softwareFlowControl'),
+            rtscts=p.get('hardwareFlowControl'))
 
     def _open(self):
         """Opens a serial port."""

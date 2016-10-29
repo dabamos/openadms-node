@@ -36,13 +36,13 @@ class Sensor(object):
         self._name = name
         self._config_manager = config_manager
 
-        config = self._config_manager.config.get('Sensors').get(self._name)
-        self._type = config.get('Type')
+        config = self._config_manager.config.get('sensors').get(self._name)
+        self._type = config.get('type')
         self._observations = {}
 
-        for data in config.get('Observations'):
+        for data in config.get('observations'):
             obs = self._create_observation(data)
-            self._observations[obs.get('Name')] = obs
+            self._observations[obs.get('name')] = obs
             logger.debug('Loaded observation "{}" of sensor "{}"'
                          .format(obs.get('Name'), self._name))
 
@@ -56,12 +56,12 @@ class Sensor(object):
 
     def _create_observation(self, data):
         """Creates an observation object."""
-        data['SensorName'] = self._name
-        data['SensorType'] = self._type
+        data['sensorName'] = self._name
+        data['sensorType'] = self._type
 
         # Character '\' is escaped in the JSON configuration file.
-        for set_name, request_set in data.get('RequestSets').items():
-            request_set['ResponsePattern'] = (request_set['ResponsePattern']
+        for set_name, request_set in data.get('requestSets').items():
+            request_set['responsePattern'] = (request_set['responsePattern']
                 .replace('\\\\', '\\'))
 
         return Observation(data)
@@ -78,10 +78,14 @@ class SensorType(object):
     # RTS: Robotic Total Station
     # TPS: Tachymeter-Positionierungssystem
     # TST: Total Station Theodolite
-    total_stations = ['rts', 'tachymeter', 'total station', 'totalstation',
-                      'tps', 'tst']
-    weather_stations = ['meteo', 'meteorological', 'meteorological sensor',
-                        'meteorological station', 'weather', 'weather station',
+    total_stations = ['rts',
+                      'tachymeter',
+                      'totalstation',
+                      'tps',
+                      'tst']
+    weather_stations = ['meteo',
+                        'meteorologicalsensor',
+                        'meteorologicalstation',
                         'weatherstation']
 
     @staticmethod

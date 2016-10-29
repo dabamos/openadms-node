@@ -35,13 +35,13 @@ class MQTTMessenger(object):
 
     def __init__(self, config_manager):
         self._config_manager = config_manager
-        config = self._config_manager.get('Intercom').get('MQTT')
+        config = self._config_manager.get('intercom').get('mqtt')
 
         self._client_id = None
-        self._host = config.get('Host')
-        self._port = config.get('Port')
-        self._keep_alive = config.get('KeepAlive')
-        self._topic = config.get('Topic')
+        self._host = config.get('host')
+        self._port = config.get('port')
+        self._keep_alive = config.get('keepAlive')
+        self._topic = config.get('topic')
 
         # Function to send received messages to.
         self._downlink = None
