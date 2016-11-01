@@ -59,7 +59,7 @@ class SerialPort(Prototype):
                          .format(self.name, self._serial_port_config.port))
             return
 
-        requests_order = obs.get('RequestsOrder', [])
+        requests_order = obs.get('requestsOrder', [])
         request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
@@ -79,7 +79,7 @@ class SerialPort(Prototype):
 
             # The response of the sensor.
             response = ''
-            response_delimiter = request_set.get('ResponseDelimiter')
+            response_delimiter = request_set.get('responseDelimiter')
 
             request = request_set.get('request')
             sleep_time = request_set.get('sleepTime')

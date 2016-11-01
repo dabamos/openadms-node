@@ -44,7 +44,7 @@ class Sensor(object):
             obs = self._create_observation(data)
             self._observations[obs.get('name')] = obs
             logger.debug('Loaded observation "{}" of sensor "{}"'
-                         .format(obs.get('Name'), self._name))
+                         .format(obs.get('name'), self._name))
 
     def get_observation(self, name):
         """Returns a single observation."""
@@ -83,6 +83,7 @@ class SensorType(object):
                       'totalstation',
                       'tps',
                       'tst']
+
     weather_stations = ['meteo',
                         'meteorologicalsensor',
                         'meteorologicalstation',

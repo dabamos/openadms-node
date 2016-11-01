@@ -1,6 +1,10 @@
 {
     "modules": {
         "alert": "modules.notify.Alert",
+        "mailFormatter": "modules.notify.AlertMessageFormatter",
+        "mailAgent": "modules.notify.MailAgent",
+        "shortMessageFormatter": "modules.notify.AlertMessageFormatter",
+        "shortMessageAgent": "modules.notify.ShortMessageAgent",
         "com1": "modules.port.SerialPort",
         "com2": "modules.port.SerialPort",
         "scheduler1": "modules.schedule.Scheduler",
@@ -9,7 +13,7 @@
         "preProcessor": "modules.processing.PreProcessor",
         "polarTransformer": "modules.totalstation.PolarTransformer",
         "distanceCorrector": "modules.totalstation.DistanceCorrector",
-        "returnCodeInspector": "modules.processing.returnCodeInspector",
+        "returnCodeInspector": "modules.processing.ReturnCodeInspector",
         "helmertTransformer": "modules.totalstation.HelmertTransformer",
         "realTimePublisher": "modules.export.RealTimePublisher",
         "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
@@ -254,7 +258,7 @@
                         "getSoftwareversion": {
                             "enabled": true,
                             "request": "%R1Q,5034:\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<release>\\d+),(?P<version>\\d+),(?P<subVersion>\\d+))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<release>\\d+),(?P<version>\\d+),(?P<subversion>\\d+))?",
                             "responseDelimiter": "\r\n",
                             "sleepTime": 0.5,
                             "timeout": 30.0
@@ -396,7 +400,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 0.0,
                             "timeout": 30.0
                         },
@@ -597,7 +601,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 0.0,
                             "timeout": 30.0
                         },
@@ -798,7 +802,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 0.0,
                             "timeout": 30.0
                         },
@@ -999,7 +1003,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 0.0,
                             "timeout": 30.0
                         },
@@ -1200,7 +1204,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<C0>-?\\d*\\.?\\d*),(?P<L0>-?\\d*\\.?\\d*),(?P<AccIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 0.0,
                             "timeout": 30.0
                         },
@@ -1357,13 +1361,13 @@
                     "sleepTime": 5.0
                 },
                 {
-                    "name": "wait300",
-                    "description": "waits 5 minutes",
+                    "name": "wait60",
+                    "description": "waits 1 minute",
                     "receivers": [],
                     "nextReceiver": 0,
                     "enabled": true,
                     "onetime": false,
-                    "sleepTime": 300.0,
+                    "sleepTime": 60.0,
                     "id": "wait",
                     "requestSets": {},
                     "requestsOrder": [],
@@ -1521,9 +1525,10 @@
                         "initialize",
                         "getP1",
                         "getP2",
+                        "getP3",
                         "getP4",
                         "getP5",
-                        "wait300"
+                        "wait60"
                     ]
                 }
             ]
@@ -1560,28 +1565,26 @@
             "shortMessageFormatter": {
                 "enabled": true,
                 "receivers": {
-                    "warning": ["+49176 12345678"],
-                    "error": ["+49152 0987654", "+49178 43215678"],
-                    "critical": ["+49152 0987654", "+49178 43215678"]
+                    "error": ["+49152 0987654"],
+                    "critical": ["+49152 0987654"]
                 }
             },
-            "mailMessageFormatter": {
+            "mailFormatter": {
                 "enabled": true,
                 "receivers": {
-                    "warning": ["warning@example.com"],
-                    "error": ["engineer@example.com", "boss@example.com"]
+                    "error": ["engineer@example.com"]
                 }
             }
         }
     },
-    "mailMessageFormatter": {
+    "mailFormatter": {
         "messageCollectionEnabled": true,
-        "messageCollectionTime": 300,
-        "receiver": "mailAgent",
+        "messageCollectionTime": 600,
+        "receiver": "",
         "type": "email",
         "templates": {
             "header": "The following incident(s) occurred:\n\n",
-            "body": "{{time}} - {{level}} - {{message}}\n",
+            "body": "{{dt}} - {{level}} - {{message}}\n",
             "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
         },
         "properties": {
@@ -1593,11 +1596,11 @@
     "shortMessageFormatter": {
         "messageCollectionEnabled": false,
         "messageCollectionTime": 0,
-        "receiver": "shortMessageAgent",
+        "receiver": "",
         "type": "sms",
         "templates": {
             "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
-            "main": "{{time}} - {{level}} - {{message}}",
+            "body": "{{dt}} - {{level}} - {{message}}",
             "footer": "</cmgs>"
         },
         "properties": {

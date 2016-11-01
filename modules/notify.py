@@ -75,7 +75,7 @@ class Alert(Prototype):
         }
 
         payload = {
-            'time': log.asctime,
+            'dt': log.asctime,
             'level': log.levelname,
             'message': log.message,
             'receiver': None
@@ -98,6 +98,9 @@ class Alert(Prototype):
                 if not receivers or len(receivers) == 0:
                     continue
 
+                if level != log.levelname.lower():
+                    continue
+
                 for receiver in receivers:
                     # Set the receiver of the message.
                     payload['receiver'] = receiver
@@ -109,13 +112,13 @@ class AlertMessageFormatter(Prototype):
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+        self._config = self._config_manager.config.get(self._name)
 
         # Configuration.
-        self._msg_collection_enabled = config.get('messageCollectionEnabled')
-        self._msg_collection_time = config.get('messageCollectionTime')
-        self._receivers = config.get('receivers')
-        self._templates = config.get('templates')
+        self._msg_collection_enabled = self._config.get('messageCollectionEnabled')
+        self._msg_collection_time = self._config.get('messageCollectionTime')
+        self._receivers = self._config.get('receivers')
+        self._templates = self._config.get('templates')
 
         # Message handler.
         self.add_handler('alertMessage', self.handle_alert_message)
@@ -147,6 +150,10 @@ class AlertMessageFormatter(Prototype):
         # Create the target of the message.
         target = self._config.get('receiver')
 
+        if not target:
+            logger.warning('No receiver defined for alert message')
+            return
+
         # Create the header of the message.
         header = {
             'type': self._config.get('type')
@@ -166,18 +173,22 @@ class AlertMessageFormatter(Prototype):
         msg_header = msg_header.replace('{{receiver}}', receiver)
         msg_footer = msg_footer.replace('{{receiver}}', receiver)
 
-        # Add the messages line by line to the main part.
+        # Insert the alert messages line by line into the body of the template.
         msg_body = ''
 
         for msg in messages:
             line = self._templates.get('body')
 
-            for key, value in msg.items()
+            for key, value in msg.items():
                 line = line.replace('{{' + key + '}}', value)
-                msg_body += line
+
+            # Add the line to the message body.
+            msg_body += line
 
             # Concatenate the message parts.
-            complete_msg = ''.join(msg_header, msg_body, msg_footer)
+            complete_msg = ''.join([msg_header,
+                                    msg_body,
+                                    msg_footer])
 
             # Create the payload of the message.
             payload = properties
@@ -186,7 +197,9 @@ class AlertMessageFormatter(Prototype):
             # Fire and forget.
             self.publish(target, header, payload)
 
-    def run(self, sleep_time=0.5):
+    def run(self, latency=0.5):
+        # Dictionary for caching alert messages. Stores a list of dictionaries:
+        # 'receiver_name': [msg_1, msg_2, ..., msg_n]
         cache = {}
 
         while True:
@@ -200,24 +213,22 @@ class AlertMessageFormatter(Prototype):
                 if not receiver:
                     logger.warning('No receiver defined in alert message')
                 else:
-                    # Create an empty list for messages.
+                    # Create an empty list for the alert messages.
                     if not cache.get(receiver):
                         cache[receiver] = []
 
-                    # Append the message to the cache of the receiver.
+                    # Append the message to the list of the receiver.
                     cache[receiver].append(msg)
             except queue.Empty:
                 if len(cache) > 0:
                     for receiver, messages in cache.items():
-                        if len(messages) == 0:
+                        if not messages or len(messages) == 0:
                             continue
 
                         self.process_alert_messages(receiver, messages)
-                        time.sleep(sleep_time)
+                        time.sleep(latency)
 
                 # Sleep some time.
-                logger.debug('Next check for new alert messages in {} seconds'
-                             .format(self._msg_collection_time))
                 time.sleep(self._msg_collection_time)
 
                 # Clear the messages cache.
@@ -230,17 +241,17 @@ class MailAgent(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._charset = self._config.get('charset')
-        self._default_subject = self._config.get('defaultSubject',
+        self._charset = config.get('charset')
+        self._default_subject = config.get('defaultSubject',
                                                  '[OpenADMS] Notification')
         self._default_from = 'OpenADMS'
-        self._host = self._config.get('host')
-        self._is_starttls = self._config.get('startTLS')
-        self._is_tls = self._config.get('tls')
-        self._port = self._config.get('port')
-        self._user_mail = self._config.get('userMail')
-        self._user_name = self._config.get('userName')
-        self._user_password = self._config.get('userPassword')
+        self._host = config.get('host')
+        self._is_starttls = config.get('startTLS')
+        self._is_tls = config.get('tls')
+        self._port = config.get('port')
+        self._user_mail = config.get('userMail')
+        self._user_name = config.get('userName')
+        self._user_password = config.get('userPassword')
         self._x_mailer = 'OpenADMS Mail Agent'
 
         self.add_handler('email', self.handle_mail)
@@ -255,10 +266,10 @@ class MailAgent(Prototype):
         mail_to = payload.get('to')
         mail_message = payload.get('message')
 
-        self.process_short_message(mail_from,
-                                   mail_to,
-                                   mail_subject,
-                                   mail_message)
+        self.process_mail(mail_from,
+                          mail_to,
+                          mail_subject,
+                          mail_message)
 
     def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
         msg = MIMEMultipart('alternative')
@@ -310,8 +321,8 @@ class ShortMessageAgent(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._host = self._config.get('host')
-        self._port = self._config.get('port')
+        self._host = config.get('host')
+        self._port = config.get('port')
 
         self.add_handler('sms', self.handle_short_message)
 

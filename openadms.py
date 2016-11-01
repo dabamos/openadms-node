@@ -57,7 +57,8 @@ VERSION_NAME = 'Copenhagen'
 
 
 def main(config_file):
-    v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
+    # v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
+    v = 'v.{}'.format(VERSION)
 
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
     logger.info(' _____             _____ ____  _____ _____')
@@ -120,8 +121,9 @@ if __name__ == '__main__':
     # Basic logging configuration.
     logger.setLevel(level)
 
-    fmt = '%(asctime)s - %(levelname)7s - %(module)12s:%(lineno)-4s - ' \
-          '%(message)s'
+    #fmt = '%(asctime)s - %(levelname)7s - %(module)12s:%(lineno)-4s - ' \
+    #      '%(message)s'
+    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
     formatter = logging.Formatter(fmt)
     # Logging file handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,

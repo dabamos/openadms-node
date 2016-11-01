@@ -69,6 +69,7 @@ class Observation(object):
 
         Args:
             key (str): The key of the value.
+            default: Default return value.
 
         Returns:
             Returns a value from the observation data.

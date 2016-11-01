@@ -87,7 +87,7 @@ class ModuleManager(object):
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
 
-        config = self._config_manager.get('Modules')
+        config = self._config_manager.get('modules')
         self._modules = {}
 
         for module_name, class_path in config.items():
@@ -150,7 +150,7 @@ class SensorManager(object):
 
     def load(self):
         """Creates the sensors defined in the configuration."""
-        sensors = self._config_manager.get('Sensors')
+        sensors = self._config_manager.get('sensors')
 
         # Create sensor objects.
         for sensor_name, sensor_config in sensors.items():
