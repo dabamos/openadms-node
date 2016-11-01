@@ -26,12 +26,10 @@ import socket
 import threading
 import time
 
-from abc import ABCMeta, abstractmethod
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from queue import Queue
 
 from modules.prototype import Prototype
 
@@ -72,6 +70,17 @@ class Alert(Prototype):
             self.fire(log)
 
     def fire(self, log):
+        header = {
+            'type': 'alertMessage'
+        }
+
+        payload = {
+            'time': log.asctime,
+            'level': log.levelname,
+            'message': log.message,
+            'receiver': None
+        }
+
         for agent_name, agent in self._agents.items():
             # Agent is disabled.
             if not agent.get('enabled'):
@@ -84,17 +93,6 @@ class Alert(Prototype):
             # Log level has no receivers.
             if len(agent.get('receivers').get(log.levelname.lower())) == 0:
                 continue
-
-            header = {
-                'type': 'alertMessage'
-            }
-
-            payload = {
-                'time': log.asctime,
-                'level': log.levelname,
-                'message': log.message,
-                'receiver': None
-            }
 
             for level, receivers in agent.get('receivers').items():
                 if not receivers or len(receivers) == 0:
@@ -134,8 +132,8 @@ class AlertMessageFormatter(Prototype):
 
     def handle_alert_message(self, header, payload):
         if self._msg_collection_enabled:
-            # Add the message to the queue. It will be processed by the threaded
-            # `run()` method later.
+            # Add the alert message to the collection queue. It will be
+            # processed by the threaded `run()` method later.
             self._queue.put(payload)
         else:
             # Process a single alert message.
@@ -237,16 +235,18 @@ class MailAgent(Prototype):
                                                  '[OpenADMS] Notification')
         self._default_from = 'OpenADMS'
         self._host = self._config.get('host')
+        self._is_starttls = self._config.get('startTLS')
+        self._is_tls = self._config.get('tls')
         self._port = self._config.get('port')
-        self._starttls = self._config.get('startTLS')
-        self._tls = self._config.get('tls')
+        self._user_mail = self._config.get('userMail')
         self._user_name = self._config.get('userName')
         self._user_password = self._config.get('userPassword')
+        self._x_mailer = 'OpenADMS Mail Agent'
 
-        self.add_handler('email', self.handle_email)
+        self.add_handler('email', self.handle_mail)
 
-    def handle_email(self, header, payload):
-        if self._tls and self._starttls:
+    def handle_mail(self, header, payload):
+        if self._is_tls and self._is_starttls:
             logger.error('TLS and StartTLS can not be used at the same time')
             return
 
@@ -260,13 +260,13 @@ class MailAgent(Prototype):
                                    mail_subject,
                                    mail_message)
 
-    def process_email(self, mail_from, mail_to, mail_subject, mail_message):
+    def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
         msg = MIMEMultipart('alternative')
 
-        msg['From'] = '{} <{}>'.format(mail_from, self._user_name)
+        msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
         msg['To'] = mail_to
         msg['Date'] = formatdate(localtime=True)
-        msg['X-Mailer'] = 'OpenADMS Mail Agent'
+        msg['X-Mailer'] = self._x_mailer
         msg['Subject'] = Header(mail_subject, self._charset)
 
         plain_text = MIMEText(mail_message.encode(self._charset),
@@ -276,7 +276,8 @@ class MailAgent(Prototype):
         msg.attach(plain_text)
 
         try:
-            if self._tls:
+            # TLS.
+            if self._is_tls:
                 smtp = smtplib.SMTP_SSL(self._host, self._port)
             else:
                 smtp = smtplib.SMTP(self._host, self._port)
@@ -284,12 +285,13 @@ class MailAgent(Prototype):
             smtp.set_debuglevel(False)
             smtp.ehlo()
 
-            if not self._tls and self._starttls:
+            # StartTLS.
+            if not self._is_tls and self._is_starttls:
                 smtp.starttls()
                 smtp.ehlo()
 
             smtp.login(self._user_name, self._user_password)
-            smtp.sendmail(self._user_name,
+            smtp.sendmail(self._user_mail,
                           [mail_to],
                           msg.as_string())
             smtp.quit()
@@ -355,9 +357,9 @@ class Heartbeat(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._handlers['heartbeat'] = self.handle_heartbeat
-
-    def handle_heartbeat(self, header, payload):
-        pass
+    def run(self):
+        header = {
+            'type': 'heartbeat'
+        }
 
 

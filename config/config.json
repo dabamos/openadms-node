@@ -1584,7 +1584,7 @@
             "body": "{{time}} - {{level}} - {{message}}\n",
             "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
         },
-        "header": {
+        "properties": {
             "subject": "[OpenADMS] Alert Message - Project X",
             "from": "OpenADMS",
             "to": "{{receiver}}"
@@ -1600,7 +1600,7 @@
             "main": "{{time}} - {{level}} - {{message}}",
             "footer": "</cmgs>"
         },
-        "header": {
+        "properties": {
             "number": "{{receiver}}"
         }
     },
@@ -1611,6 +1611,7 @@
     "mailAgent": {
         "defaultSubject": "[OpenADMS] Message",
         "charset": "utf-8",
+        "userMail": "monitoring@example.com",
         "userName": "monitoring@example.com",
         "userPassword": "secret",
         "host": "smtp.example.com",
