@@ -246,7 +246,7 @@ class MailAgent(Prototype):
                                                  '[OpenADMS] Notification')
         self._default_from = 'OpenADMS'
         self._host = config.get('host')
-        self._is_starttls = config.get('startTLS')
+        self._is_start_tls = config.get('startTls')
         self._is_tls = config.get('tls')
         self._port = config.get('port')
         self._user_mail = config.get('userMail')
@@ -257,7 +257,7 @@ class MailAgent(Prototype):
         self.add_handler('email', self.handle_mail)
 
     def handle_mail(self, header, payload):
-        if self._is_tls and self._is_starttls:
+        if self._is_tls and self._is_start_tls:
             logger.error('TLS and StartTLS can not be used at the same time')
             return
 
@@ -297,7 +297,7 @@ class MailAgent(Prototype):
             smtp.ehlo()
 
             # StartTLS.
-            if not self._is_tls and self._is_starttls:
+            if not self._is_tls and self._is_start_tls:
                 smtp.starttls()
                 smtp.ehlo()
 

@@ -88,6 +88,8 @@ class DistanceCorrector(Prototype):
         dist = obs.get_value('responseSets', self._distance_name, 'value')
 
         if dist is None:
+            logger.warning('No distance set in observation "{}" with ID "{}"'
+                           .format(obs.get('name'), obs.get('id')))
             return obs
 
         d_dist_1 = 0
@@ -105,7 +107,7 @@ class DistanceCorrector(Prototype):
                                                  round(ppm, 5))
             response_sets['atmosphericPpm'] = response_set
 
-        # Calculate the sealevel reduction of the distance.
+        # Calculate the sea level reduction of the distance.
         if self._is_sea_level_correction:
             earth_radius = 6.378 * math.pow(10, 6)
             # Delta distance: -(height / R) * 10^6
@@ -314,7 +316,8 @@ class HelmertTransformer(Prototype):
                     index += 1
                     view_point.set('nextReceiver', index)
 
-                    # Create target, header, and payload in order to send the observation.
+                    # Create target, header, and payload in order to send the
+                    # observation.
                     target = next_receiver
                     header = {'type': 'observation'}
                     payload = view_point.data
@@ -820,10 +823,6 @@ class SerialMeasurementProcessor(Prototype):
 
         v = ((2 * math.pi) + (v_0 - v_1)) / 2
         dist = (dist_0 + dist_1) / 2
-
-        # logger.info('<<< Hz0 = {}, V0 = {} >>>'.format(hz_0, v_0))
-        # logger.info('<<< Hz1 = {}, V1 = {} >>>'.format(hz_1, v_1))
-        # logger.info('<<< Hz = {}, V = {} >>>'.format(hz, v))
 
         # Save the calculated values.
         response_sets = obs.get('responseSets')

@@ -28,7 +28,6 @@ logger = logging.getLogger('openadms')
 
 
 class MQTTMessenger(object):
-
     """
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
     """

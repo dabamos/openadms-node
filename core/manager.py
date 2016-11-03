@@ -34,19 +34,15 @@ logger = logging.getLogger('openadms')
 
 
 class ConfigurationManager:
-
     """
     ConfigurationManager loads and stores the configuration.
     """
 
-    def __init__(self, config_file):
+    def __init__(self, file_name):
         self._config = {}
 
-        if config_file:
-            try:
-                self.load(config_file)
-            except json.decoder.JSONDecodeError as e:
-                logger.error('Invalid JSON: "{}"'.format(e))
+        if file_name:
+            self.load(file_name)
         else:
             logger.warning('No configuration file set')
 
@@ -57,8 +53,11 @@ class ConfigurationManager:
             return
 
         with open(file_name) as config_file:
-            self._config = json.loads(config_file.read())
-            logger.info('Loaded configuration file "{}"'.format(file_name))
+            try:
+                self._config = json.loads(config_file.read())
+                logger.info('Loaded configuration file "{}"'.format(file_name))
+            except json.decoder.JSONDecodeError as e:
+                logger.error('Invalid JSON: "{}"'.format(e))
 
     def dump(self):
         """Dumps the configuration to stdout."""
@@ -78,7 +77,6 @@ class ConfigurationManager:
 
 
 class ModuleManager(object):
-
     """
     ModuleManager loads and manages OpenADMS modules.
     """
@@ -96,20 +94,22 @@ class ModuleManager(object):
     def add(self, module_name, class_path):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary."""
-        worker = self._get_worker(module_name, class_path)
+        worker = self.get_worker(module_name, class_path)
         messenger = MQTTMessenger(self._config_manager)
         module = Module(messenger, worker)
 
         # Add the module to the modules dictionary.
-        # Start the module (as it is a thread).
+        # Start the module -- it's a thread.
         self._modules[module_name] = module
         module.start()
-
-        # Module has been started.
         logger.debug('Started module "{}"'.format(module_name))
 
-    def _get_worker(self, module_name, class_path):
-        """Loads a Python class from a given path and return the instance."""
+    def delete(self, module_name):
+        """Removes a module from the modules dictionary."""
+        self._modules[module_name] = None
+
+    def get_worker(self, module_name, class_path):
+        """Loads a Python class from a given path and returns the instance."""
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = module_path.replace('.', '/') + '.py'
 
@@ -128,29 +128,25 @@ class ModuleManager(object):
 
         return worker
 
-    def delete(self, module_name):
-        """Removes a module from the modules dictionary."""
-        self._modules[module_name] = None
-
     @property
     def modules(self):
         return self._modules
 
 
 class SensorManager(object):
-
     """
     SensorManager stores Sensor objects.
     """
 
     def __init__(self, config_manager):
-        self._sensors = {}
         self._config_manager = config_manager
+        self._sensors = {}
+
         self.load()
 
     def load(self):
         """Creates the sensors defined in the configuration."""
-        sensors = self._config_manager.get('sensors')
+        sensors = self._config_manager.config.get('sensors')
 
         # Create sensor objects.
         for sensor_name, sensor_config in sensors.items():

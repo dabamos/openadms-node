@@ -250,7 +250,7 @@ class ReturnCodeInspector(Prototype):
 
                 # Retry measurement.
                 if retry:
-                    attempts = obs.get('Attempts', 0)
+                    attempts = obs.get('attempts', 0)
 
                     if attempts < self._retries :
                         obs.set('attempts', attempts + 1)

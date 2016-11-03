@@ -247,7 +247,7 @@
                             "sleepTime": 0.5,
                             "timeout": 30.0
                         },
-                        "getsensorName": {
+                        "getSensorName": {
                             "enabled": true,
                             "request": "%R1Q,5004:\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<sensorName>\"[\\w\\W]+\"))?",
@@ -263,10 +263,10 @@
                             "sleepTime": 0.5,
                             "timeout": 30.0
                         },
-                        "getinternalTemperature": {
+                        "getInternalTemperature": {
                             "enabled": true,
                             "request": "%R1Q,5011:\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<internalTemperature>[\\d+\\.]+))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<internalTemperature>-?[\\d+\\.]+))?",
                             "responseDelimiter": "\r\n",
                             "sleepTime": 0.5,
                             "timeout": 30.0
@@ -315,9 +315,9 @@
                     "requestsOrder": [
                         "doBeep",
                         "getSensorId",
-                        "getsensorName",
+                        "getSensorName",
                         "getSoftwareversion",
-                        "getinternalTemperature",
+                        "getInternalTemperature",
                         "setEdmType",
                         "setAtmosphericPpm",
                         "setGeometricPpmCorrectionFaction",
@@ -377,7 +377,7 @@
                             "request": "%R1Q,9028:1,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getFace0": {
@@ -401,7 +401,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getValuesFace1": {
@@ -409,7 +409,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace0": {
@@ -417,7 +417,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace1": {
@@ -425,7 +425,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "setDirection": {
@@ -433,7 +433,7 @@
                             "request": "%R1Q,9027:0.0,1.59115,2,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
-                            "sleepTime": 2.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         }
                     },
@@ -554,7 +554,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 25.0
+                    "sleepTime": 60.0
                 },
                 {
                     "description": "complete measurement of P2",
@@ -578,7 +578,7 @@
                             "request": "%R1Q,9028:1,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getFace0": {
@@ -602,7 +602,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getValuesFace1": {
@@ -610,7 +610,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace0": {
@@ -618,7 +618,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace1": {
@@ -626,7 +626,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "setDirection": {
@@ -634,7 +634,7 @@
                             "request": "%R1Q,9027:0.38098,1.58265,2,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
-                            "sleepTime": 2.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         }
                     },
@@ -755,7 +755,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 25.0
+                    "sleepTime": 60.0
                 },
                 {
                     "description": "complete measurement of P3",
@@ -779,7 +779,7 @@
                             "request": "%R1Q,9028:1,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getFace0": {
@@ -803,7 +803,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getValuesFace1": {
@@ -811,7 +811,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace0": {
@@ -819,7 +819,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace1": {
@@ -827,7 +827,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "setDirection": {
@@ -835,7 +835,7 @@
                             "request": "%R1Q,9027:0.97279,1.59096,2,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
-                            "sleepTime": 2.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         }
                     },
@@ -956,7 +956,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 25.0
+                    "sleepTime": 60.0
                 },
                 {
                     "description": "complete measurement of P4",
@@ -980,7 +980,7 @@
                             "request": "%R1Q,9028:1,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getFace0": {
@@ -1004,7 +1004,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getValuesFace1": {
@@ -1012,7 +1012,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace0": {
@@ -1020,7 +1020,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace1": {
@@ -1028,7 +1028,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "setDirection": {
@@ -1036,7 +1036,7 @@
                             "request": "%R1Q,9027:2.16696,1.59125,2,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
-                            "sleepTime": 2.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         }
                     },
@@ -1157,7 +1157,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 25.0
+                    "sleepTime": 60.0
                 },
                 {
                     "description": "complete measurement of P5",
@@ -1181,7 +1181,7 @@
                             "request": "%R1Q,9028:1,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getFace0": {
@@ -1205,7 +1205,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "getValuesFace1": {
@@ -1213,7 +1213,7 @@
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
-                            "sleepTime": 0.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace0": {
@@ -1221,7 +1221,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "measureDistanceFace1": {
@@ -1229,7 +1229,7 @@
                             "request": "%R1Q,2008:1,1\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
-                            "sleepTime": 0.0,
+                            "sleepTime": 2.0,
                             "timeout": 30.0
                         },
                         "setDirection": {
@@ -1237,7 +1237,7 @@
                             "request": "%R1Q,9027:2.69364,1.59311,2,1,0\r\n",
                             "responseDelimiter": "\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
-                            "sleepTime": 2.0,
+                            "sleepTime": 10.0,
                             "timeout": 30.0
                         }
                     },
@@ -1358,7 +1358,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 5.0
+                    "sleepTime": 60.0
                 },
                 {
                     "name": "wait60",
@@ -1368,6 +1368,19 @@
                     "enabled": true,
                     "onetime": false,
                     "sleepTime": 60.0,
+                    "id": "wait",
+                    "requestSets": {},
+                    "requestsOrder": [],
+                    "responseSets": {}
+                },
+                {
+                    "name": "wait600",
+                    "description": "waits 10 minutes",
+                    "receivers": [],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "sleepTime": 600.0,
                     "id": "wait",
                     "requestSets": {},
                     "requestsOrder": [],
@@ -1453,7 +1466,7 @@
                         "getValues": {
                             "enabled": true,
                             "request": "?U\r\n",
-                            "responsePattern": "TD(?P<tempPress>[\\d\\.]+), TE(?P<temperature>[\\d\\.]+), DR(?P<pressure>[\\d\\.]+), FE(?P<humidity>[\\d\\.]+),",
+                            "responsePattern": "TD(?P<tempPress>-?[\\d\\.]+), TE(?P<temperature>-?[\\d\\.]+), DR(?P<pressure>[\\d\\.]+), FE(?P<humidity>[\\d\\.]+),",
                             "responseDelimiter": ", \r\n",
                             "timeout": 0.8,
                             "sleepTime": 0.0
@@ -1527,8 +1540,7 @@
                         "getP2",
                         "getP3",
                         "getP4",
-                        "getP5",
-                        "wait60"
+                        "wait600"
                     ]
                 }
             ]
@@ -1620,7 +1632,7 @@
         "host": "smtp.example.com",
         "port": 465,
         "tls": true,
-        "startTLS": false
+        "startTls": false
     },
     "distanceCorrector": {
         "distanceName": "slopeDist",
@@ -1642,24 +1654,24 @@
         },
         "tiePoints": {
             "p1": {
-                "x": 2000.0000,
-                "y": 1000.0000,
-                "z": 100.0000
+                "east": 2000.0000,
+                "north": 1000.0000,
+                "height": 100.0000
             },
             "p2": {
-                "x": 1995.4880,
-                "y": 1003.7680,
-                "z": 100.0080
+                "east": 1995.4880,
+                "north": 1003.7680,
+                "height": 100.0080
             },
             "p3": {
-                "x": 1994.4900,
-                "y": 996.2600,
-                "z": 100.0210
+                "east": 1994.4900,
+                "north": 996.2600,
+                "height": 100.0210
             }
         }
     },
     "returnCodeInspector": {
-        "retries": 3,
+        "retries": 1,
         "keys": [
             "returnCode",
             "rcChangeFace",
@@ -1674,13 +1686,13 @@
     },
     "polarTransformer": {
         "sensorPosition": {
-            "x": 2000.0000,
-            "y": 992.5100,
-            "z": 100.0000
+            "east": 2000.0000,
+            "north": 992.5100,
+            "height": 100.0000
         },
         "azimuthPosition": {
-            "x": 2000.0000,
-            "y": 1000.0000
+            "east": 2000.0000,
+            "north": 1000.0000
         }
     },
     "realTimePublisher": {
