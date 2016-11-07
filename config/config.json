@@ -20,7 +20,7 @@
     },
     "project": {
         "name": "projectX",
-        "id": "",
+        "id": "projectX",
         "description": "project for testing only"
     },
     "intercom": {
@@ -1573,7 +1573,7 @@
         }
     },
     "alert": {
-        "agents": {
+        "modules": {
             "shortMessageFormatter": {
                 "enabled": true,
                 "receivers": {
@@ -1623,6 +1623,10 @@
         "host": "10.59.0.40",
         "port": 1432
     },
+    "heartbeat": {
+        "receivers": ["heartbeat"],
+        "interval": 10
+    },
     "mailAgent": {
         "defaultSubject": "[OpenADMS] Message",
         "charset": "utf-8",
@@ -1654,19 +1658,19 @@
         },
         "tiePoints": {
             "p1": {
-                "east": 2000.0000,
-                "north": 1000.0000,
-                "height": 100.0000
+                "x": 2000.0000,
+                "y": 1000.0000,
+                "z": 100.0000
             },
             "p2": {
-                "east": 1995.4880,
-                "north": 1003.7680,
-                "height": 100.0080
+                "x": 1995.4880,
+                "y": 1003.7680,
+                "z": 100.0080
             },
             "p3": {
-                "east": 1994.4900,
-                "north": 996.2600,
-                "height": 100.0210
+                "x": 1994.4900,
+                "y": 996.2600,
+                "z": 100.0210
             }
         }
     },
@@ -1686,13 +1690,13 @@
     },
     "polarTransformer": {
         "sensorPosition": {
-            "east": 2000.0000,
-            "north": 992.5100,
-            "height": 100.0000
+            "x": 2000.0000,
+            "y": 992.5100,
+            "z": 100.0000
         },
         "azimuthPosition": {
-            "east": 2000.0000,
-            "north": 1000.0000
+            "x": 2000.0000,
+            "y": 1000.0000
         }
     },
     "realTimePublisher": {

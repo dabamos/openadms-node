@@ -127,8 +127,8 @@ class Prototype(object):
 
     def handle(self, message):
         """Processes messages by calling handler methods."""
-        if len(message) < 2:
-            logger.warning('{}: received message is corrupted'.format(self._name))
+        if not self.is_sequence(message) or len(message) < 2:
+            logger.warning('{}: received message is invalid'.format(self._name))
             return
 
         header = message[0]
@@ -182,8 +182,14 @@ class Prototype(object):
             logger.info('Started module "{}" by call from "{}"'
                         .format(self._name, sender))
 
+    def is_sequence(arg):
+        """Checks whether the argument is a list or a tuple."""
+        return (not hasattr(arg, 'strip') and
+                hasattr(arg, '__getitem__') or
+                hasattr(arg, '__iter__'))
+
     def process_observation(self, obs):
-        return obs
+        pass
 
     def process_service(self, service):
         pass

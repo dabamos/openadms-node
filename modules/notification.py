@@ -26,6 +26,7 @@ import socket
 import threading
 import time
 
+from datetime import datetime
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -53,8 +54,7 @@ class Alert(Prototype):
         qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
         logger.addHandler(qh)
 
-        # Add the alert handlers to the alert handlers list.
-        self._agents = config.get('agents')
+        self._modules = config.get('modules')
 
         # Check the logging queue continuously for messages and proceed them to
         # the alert agents.
@@ -76,25 +76,25 @@ class Alert(Prototype):
 
         payload = {
             'dt': log.asctime,
-            'level': log.levelname,
+            'level': log.levelname.lower,
             'message': log.message,
             'receiver': None
         }
 
-        for agent_name, agent in self._agents.items():
+        for module_name, module in self._modules.items():
             # Agent is disabled.
-            if not agent.get('enabled'):
+            if not module.get('enabled'):
                 continue
 
             # Log level is not defined.
-            if not agent.get('receivers').get(log.levelname.lower()):
+            if not module.get('receivers').get(log.levelname.lower()):
                 continue
 
             # Log level has no receivers.
-            if len(agent.get('receivers').get(log.levelname.lower())) == 0:
+            if len(module.get('receivers').get(log.levelname.lower())) == 0:
                 continue
 
-            for level, receivers in agent.get('receivers').items():
+            for level, receivers in module.get('receivers').items():
                 if not receivers or len(receivers) == 0:
                     continue
 
@@ -105,7 +105,7 @@ class Alert(Prototype):
                     # Set the receiver of the message.
                     payload['receiver'] = receiver
                     # Publish a single message for each receiver.
-                    self.publish(agent_name, header, payload)
+                    self.publish(module_name, header, payload)
 
 
 class AlertMessageFormatter(Prototype):
@@ -143,7 +143,7 @@ class AlertMessageFormatter(Prototype):
             receiver = payload.get('receiver')
             messages = [payload]
 
-            if receiver and len(messages) > 0:
+            if receiver not None and len(messages) > 0:
                 self.process_alert_messages(receiver, messages)
 
     def process_alert_messages(self, receiver, messages):
@@ -262,7 +262,7 @@ class MailAgent(Prototype):
             return
 
         mail_subject = payload.get('subject') or self._default_subject
-        mail_from = payload.get('from') or self._default_from
+        mail_from = payload.get('from') or self._user_mail
         mail_to = payload.get('to')
         mail_message = payload.get('message')
 
@@ -368,9 +368,34 @@ class Heartbeat(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-    def run(self):
-        header = {
-            'type': 'heartbeat'
-        }
+        self._receivers = config.get('receivers')
+        self._interval = config.get('interval')
+
+        self._header = {'type': 'heartbeat'}
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+    def run(self, sleep_time=0.5):
+        projectId = self._config_manager.config.get('project').get('id')
+
+        if not projectId:
+            projectId = ''
+
+        while True:
+            if self._is_paused:
+                time.sleep(sleep_time)
+                continue
+
+            payload = {
+                'dt': datetime.utcnow()
+                'projectId': projectId
+            }
+
+            for target in self._receivers:
+                self.publish(target, self._header, payload)
+
+            time.sleep(self._interval)
 
 
