@@ -64,8 +64,7 @@ class Alert(Prototype):
 
     def run(self):
         while True:
-            # Blocking I/O.
-            log = self._queue.get()
+            log = self._queue.get()         # Blocking I/O.
             logger.info('Processing alert message ...')
             self.fire(log)
 
@@ -78,7 +77,7 @@ class Alert(Prototype):
             'dt': log.asctime,
             'level': log.levelname.lower,
             'message': log.message,
-            'receiver': None
+            'receiver': None                # Will be set below.
         }
 
         for module_name, module in self._modules.items():
@@ -199,7 +198,7 @@ class AlertMessageFormatter(Prototype):
 
     def run(self, latency=0.5):
         # Dictionary for caching alert messages. Stores a list of dictionaries:
-        # 'receiver_name': [msg_1, msg_2, ..., msg_n]
+        # '<receiver_name>': [<msg_1>, <msg_2>, ..., <msg_n>]
         cache = {}
 
         while True:
@@ -273,7 +272,6 @@ class MailAgent(Prototype):
 
     def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
         msg = MIMEMultipart('alternative')
-
         msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
         msg['To'] = mail_to
         msg['Date'] = formatdate(localtime=True)
@@ -324,6 +322,7 @@ class ShortMessageAgent(Prototype):
         self._host = config.get('host')
         self._port = config.get('port')
 
+        # Capture messages of type "sms".
         self.add_handler('sms', self.handle_short_message)
 
     def handle_short_message(self, header, payload):
@@ -381,6 +380,7 @@ class Heartbeat(Prototype):
         projectId = self._config_manager.config.get('project').get('id')
 
         if not projectId:
+            logger.warning('No project ID set in configuration')
             projectId = ''
 
         while True:
@@ -398,4 +398,16 @@ class Heartbeat(Prototype):
 
             time.sleep(self._interval)
 
+
+class HeartbeatMonitor(Prototype):
+
+    def __init__(self, name, config_manager, sensor_manager):
+        Prototype.__init__(self, name, config_manager, sensor_manager)
+        config = self._config_manager.config.get(self._name)
+
+        # Capture messages of type "heartbeat".
+        self.add_handler('heartbeat', self.handle_heartbeat)
+
+    def handle_heartbeat(self, header, payload):
+        pass
 

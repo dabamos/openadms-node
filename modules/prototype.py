@@ -183,7 +183,7 @@ class Prototype(object):
                         .format(self._name, sender))
 
     def is_sequence(arg):
-        """Checks whether the argument is a list or a tuple."""
+        """Checks whether the argument is a list/a tuple or not."""
         return (not hasattr(arg, 'strip') and
                 hasattr(arg, '__getitem__') or
                 hasattr(arg, '__iter__'))
