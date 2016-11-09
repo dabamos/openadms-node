@@ -209,8 +209,10 @@ class ReturnCodes(object):
         1284: [3, False, 'Accuracy can not be guaranteed'],
         1285: [4, True,  'Only angle measurement valid'],
         1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
-        8708: [3, True,  'Position not exactly reached'],
-        8710: [4, True,  'No target detected']
+        8704: [4, True,  'Position not reached'],
+        8708: [4, True,  'Position not exactly reached'],
+        8710: [4, True,  'No target detected'],
+        8711: [4, False, 'Multiple targets detected'],
     }
 
 

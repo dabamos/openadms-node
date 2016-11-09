@@ -19,7 +19,6 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import hashlib
 import logging
 import math
 import time
@@ -106,7 +105,7 @@ class DistanceCorrector(Prototype):
 
             response_set = self.get_response_set('float',
                                                  'none',
-                                                 round(ppm, 5))
+                                                 round(c, 5))
             response_sets['atmosphericPpm'] = response_set
 
         # Calculate the sea level reduction of the distance.
@@ -273,21 +272,17 @@ class HelmertTransformer(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
+        self._is_residual = config.get('ResidualMismatchTransformationEnabled')
         self._tie_points = config.get('tiePoints')
         self._view_point = config.get('viewPoint')
-        # self._sensor_height = config.get('ViewPoint').get('SensorHeight')
 
         # Initialize view point.
         self._view_point['x'] = 0
         self._view_point['y'] = 0
         self._view_point['z'] = 0
 
-        self._is_ready = False
-
         self._a = None
         self._o = None
-
-        self._is_residual = config.get('ResidualMismatchTransformationEnabled')
 
     def process_observation(self, obs):
         """Calculates the coordinates of the view point and further target
@@ -305,8 +300,8 @@ class HelmertTransformer(Prototype):
 
         # Only calculate the view point's coordinates if all tie points have
         # been measured at least once.
-        if self._is_ready:
-            if self._is_tie_point:
+        if self._is_ready():
+            if self._is_tie_point(obs):
                 # Calculate the coordinates of the view point by using the
                 # Helmert transformation and create a new observation of the
                 # view point.
@@ -314,30 +309,19 @@ class HelmertTransformer(Prototype):
 
                 # Send the new view point observation to the next receiver.
                 if view_point:
-                    # Get the name of the next receiver.
-                    index = view_point.get('nextReceiver')
-                    receivers = view_point.get('receivers')
-                    next_receiver = receivers[index]
-                    view_point.set('nextReceiver', index + 1)
-
-                    # Create target, header, and payload in order to send the
-                    # observation.
-                    target = next_receiver
-                    header = {'type': 'observation'}
-                    payload = view_point.data
-
-                    # Fire and forget.
-                    self.publish(target, header, payload)
+                    self.publish_observation(view_point)
             else:
                 # Calculate the coordinates of the target point.
                 obs = self._calculate_target_point(obs)
 
         return obs
 
-    def _calculate_point_coordinates(self, hz, v, dist, view_point_x,
-                                     view_point_y, view_point_z, a, o):
+    def _calculate_point_coordinates(self,
+                                     hz, v, dist,
+                                     view_point_x,  view_point_y, view_point_z,
+                                     a, o):
         # Calculate Cartesian coordinates out of polar coordinates.
-        local_x, local_y, local_y = _get_cartesian_coordinates(hz, v, dist)
+        local_x, local_y, local_z = self._get_cartesian_coordinates(hz, v, dist)
 
         x = view_point_x + (a * local_x) - (o * local_y)
         y = view_point_y + (a * local_y) + (o * local_x)
@@ -404,10 +388,7 @@ class HelmertTransformer(Prototype):
 
         logger.info('Calculated coordinates of target point "{}" '
                     '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5g})'
-                    .format(obs.get('id'),
-                            x,
-                            y,
-                            z))
+                    .format(obs.get('id'), x, y, z))
 
         # Do residual mismatch transformation.
         if self._is_residual:
@@ -452,7 +433,9 @@ class HelmertTransformer(Prototype):
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
-            local_x, local_y, local_y = _get_cartesian_coordinates(hz, v, dist)
+            local_x, local_y, local_z = self._get_cartesian_coordinates(hz,
+                                                                        v,
+                                                                        dist)
 
             # Store local coordinates in the tie point dictionary.
             tie_point['localX'] = local_x
@@ -499,15 +482,15 @@ class HelmertTransformer(Prototype):
             r_global_centroid_y = global_y - global_centroid_y
 
             # o = [ x_i * Y_i - y_i * X_i ] * [ x_i^2 + y_i^2 ]^-1
-            o_1 += (r_local_centroid_x * r_global_centroid_y) - \
+            o_1 += (r_local_centroid_x * r_global_centroid_y) -\
                    (r_local_centroid_y * r_global_centroid_x)
-            o_2 += math.pow(r_local_centroid_x, 2) + \
+            o_2 += math.pow(r_local_centroid_x, 2) +\
                    math.pow(r_local_centroid_y, 2)
 
             # a = [ x_i * X_i + y_i * Y_i ] * [ x_i^2 + y_i^2 ]^-1
-            a_1 += (r_local_centroid_x * r_global_centroid_x) + \
+            a_1 += (r_local_centroid_x * r_global_centroid_x) +\
                    (r_local_centroid_y * r_global_centroid_y)
-            a_2 += math.pow(r_local_centroid_x, 2) + \
+            a_2 += math.pow(r_local_centroid_x, 2) +\
                    math.pow(r_local_centroid_y, 2)
 
         self._o = o_1 / o_2  # Parameter o.
@@ -627,7 +610,7 @@ class HelmertTransformer(Prototype):
             return False
 
     def _is_ready(self):
-        """Checks if a tie point has been measured already or not."""
+        """Checks whether all tie points has been measured already or not."""
         is_ready = True
 
         for tie_point_id, tie_point in self._tie_points.items():
@@ -651,30 +634,16 @@ class HelmertTransformer(Prototype):
                                                  obs.get('id')))
             return obs
 
-        now = time.time()
-
-        # Set the values.
-        tie_point = self._tie_points.get(obs.get('id'))
-        tie_point['hz'] = hz
-        tie_point['v'] = v
-        tie_point['dist'] = dist
-        tie_point['lastUpdate'] = now
-
-        logger.debug('Updated tie point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
-                     'Dist = {:3.5f}, LastUpdate = {})'.format(obs.get('id'),
-                                                               hz,
-                                                               v,
-                                                               dist,
-                                                               now))
-
         # Calculate the coordinates of the tie point if the Helmert
         # transformation has already been done. Otherwise, use the datum from
         # the configuration.
-        if self._is_ready:
+        tie_point = self._tie_points.get(obs.get('id'))
+
+        if self._is_ready():
             x, y, z = self._calculate_point_coordinates(
-                tie_point.get('hz'),
-                tie_point.get('v'),
-                tie_point.get('dist'),
+                hz,
+                v,
+                dist,
                 self._view_point.get('x'),
                 self._view_point.get('y'),
                 self._view_point.get('z'),
@@ -689,6 +658,20 @@ class HelmertTransformer(Prototype):
             x = tie_point.get('x')
             y = tie_point.get('y')
             z = tie_point.get('z')
+
+        # Update the values.
+        tie_point['hz'] = hz
+        tie_point['v'] = v
+        tie_point['dist'] = dist
+        tie_point['lastUpdate'] = time.time()
+
+        logger.debug('Updated tie point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
+                     'Distance = {:3.5f}, Last Update = {})'
+                     .format(obs.get('id'),
+                             tie_point['hz'],
+                             tie_point['v'],
+                             tie_point['dist'],
+                             tie_point['lastUpdate']))
 
         # Add global Cartesian coordinates of the tie point to the observation.
         response_sets = obs.get('responseSets')
@@ -777,6 +760,7 @@ class PolarTransformer(Prototype):
         # Calculate azimuth angle out of coordinates.
         d_x = azimuth_x - sensor_x
         d_y = azimuth_y - sensor_y
+        azimuth = None
 
         if d_x == 0:
             if d_y > 0:

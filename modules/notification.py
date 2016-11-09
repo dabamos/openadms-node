@@ -114,7 +114,8 @@ class AlertMessageFormatter(Prototype):
         self._config = self._config_manager.config.get(self._name)
 
         # Configuration.
-        self._msg_collection_enabled = self._config.get('messageCollectionEnabled')
+        self._msg_collection_enabled =\
+            self._config.get('messageCollectionEnabled')
         self._msg_collection_time = self._config.get('messageCollectionTime')
         self._receivers = self._config.get('receivers')
         self._templates = self._config.get('templates')
@@ -142,7 +143,7 @@ class AlertMessageFormatter(Prototype):
             receiver = payload.get('receiver')
             messages = [payload]
 
-            if receiver not None and len(messages) > 0:
+            if receiver is not None and len(messages) > 0:
                 self.process_alert_messages(receiver, messages)
 
     def process_alert_messages(self, receiver, messages):
@@ -242,7 +243,7 @@ class MailAgent(Prototype):
 
         self._charset = config.get('charset')
         self._default_subject = config.get('defaultSubject',
-                                                 '[OpenADMS] Notification')
+                                           '[OpenADMS] Notification')
         self._default_from = 'OpenADMS'
         self._host = config.get('host')
         self._is_start_tls = config.get('startTls')
@@ -377,11 +378,11 @@ class Heartbeat(Prototype):
         self._thread.start()
 
     def run(self, sleep_time=0.5):
-        projectId = self._config_manager.config.get('project').get('id')
+        project_id = self._config_manager.config.get('project').get('id')
 
-        if not projectId:
+        if not project_id:
             logger.warning('No project ID set in configuration')
-            projectId = ''
+            project_id = ''
 
         while True:
             if self._is_paused:
@@ -389,8 +390,8 @@ class Heartbeat(Prototype):
                 continue
 
             payload = {
-                'dt': datetime.utcnow()
-                'projectId': projectId
+                'dt': datetime.utcnow(),
+                'projectId': project_id
             }
 
             for target in self._receivers:
@@ -410,4 +411,3 @@ class HeartbeatMonitor(Prototype):
 
     def handle_heartbeat(self, header, payload):
         pass
-

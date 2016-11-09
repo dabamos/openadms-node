@@ -182,7 +182,7 @@ class Prototype(object):
             logger.info('Started module "{}" by call from "{}"'
                         .format(self._name, sender))
 
-    def is_sequence(arg):
+    def is_sequence(self, arg):
         """Checks whether the argument is a list/a tuple or not."""
         return (not hasattr(arg, 'strip') and
                 hasattr(arg, '__getitem__') or

@@ -1,10 +1,10 @@
 {
     "modules": {
-        "alert": "modules.notify.Alert",
-        "mailFormatter": "modules.notify.AlertMessageFormatter",
-        "mailAgent": "modules.notify.MailAgent",
-        "shortMessageFormatter": "modules.notify.AlertMessageFormatter",
-        "shortMessageAgent": "modules.notify.ShortMessageAgent",
+        "alert": "modules.notification.Alert",
+        "mailFormatter": "modules.notification.AlertMessageFormatter",
+        "mailAgent": "modules.notification.MailAgent",
+        "shortMessageFormatter": "modules.notification.AlertMessageFormatter",
+        "shortMessageAgent": "modules.notification.ShortMessageAgent",
         "com1": "modules.port.SerialPort",
         "com2": "modules.port.SerialPort",
         "scheduler1": "modules.schedule.Scheduler",
@@ -367,6 +367,7 @@
                         "returnCodeInspector",
                         "serialMeasurementProcessor",
                         "distanceCorrector",
+                        "helmertTransformer",
                         "polarTransformer",
                         "realTimePublisher",
                         "fileExporter"
@@ -1540,7 +1541,7 @@
                         "getP2",
                         "getP3",
                         "getP4",
-                        "wait600"
+                        "wait60"
                     ]
                 }
             ]
@@ -1575,14 +1576,14 @@
     "alert": {
         "modules": {
             "shortMessageFormatter": {
-                "enabled": true,
+                "enabled": false,
                 "receivers": {
                     "error": ["+49152 0987654"],
                     "critical": ["+49152 0987654"]
                 }
             },
             "mailFormatter": {
-                "enabled": true,
+                "enabled": false,
                 "receivers": {
                     "error": ["engineer@example.com"]
                 }
