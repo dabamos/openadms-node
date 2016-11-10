@@ -377,6 +377,13 @@ class Heartbeat(Prototype):
         self._thread.daemon = True
         self._thread.start()
 
+        self.add_handler('heartbeat', self.process_heartbeat)
+
+    def process_heartbeat(self, header, payload):
+        logger.info('Received heartbeat at "{}" UTC for project "{}"'.
+                    format(payload.get('dt'),
+                           payload.get('projectId')))
+
     def run(self, sleep_time=0.5):
         project_id = self._config_manager.config.get('project').get('id')
 
@@ -384,13 +391,16 @@ class Heartbeat(Prototype):
             logger.warning('No project ID set in configuration')
             project_id = ''
 
+        while not self._uplink:
+            time.sleep(sleep_time)
+
         while True:
             if self._is_paused:
                 time.sleep(sleep_time)
                 continue
 
             payload = {
-                'dt': datetime.utcnow(),
+                'dt': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
                 'projectId': project_id
             }
 

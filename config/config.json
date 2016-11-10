@@ -16,7 +16,8 @@
         "returnCodeInspector": "modules.processing.ReturnCodeInspector",
         "helmertTransformer": "modules.totalstation.HelmertTransformer",
         "realTimePublisher": "modules.export.RealTimePublisher",
-        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
+        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor",
+        "heartbeat": "modules.notification.Heartbeat"
     },
     "project": {
         "name": "projectX",
@@ -1541,7 +1542,7 @@
                         "getP2",
                         "getP3",
                         "getP4",
-                        "wait60"
+                        "wait600"
                     ]
                 }
             ]

@@ -62,7 +62,7 @@ class Scheduler(Prototype):
 
             for obs_name in observations:
                 # Get all observations of the current observation set.
-                obs = self._sensor_manager.get(sensor_name) \
+                obs = self._sensor_manager.get(sensor_name)\
                     .get_observation(obs_name)
 
                 if not obs:
