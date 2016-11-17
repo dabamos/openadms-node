@@ -253,8 +253,11 @@ class Prototype(object):
                          .format(self._name))
             return
 
-        message = json.dumps([header, payload])
-        self._uplink(target, message)
+        try:
+            message = json.dumps([header, payload])
+            self._uplink(target, message)
+        except TypeError:
+            logger.error('Can\'t publish message (header or payload invalid)')
 
     @property
     def name(self):
