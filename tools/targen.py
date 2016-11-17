@@ -60,7 +60,7 @@ def main(t_file, c_file, o_file):
 
     logger.debug('Opened commands file {}'.format(t_file))
 
-    result = { 'Observations': [] }
+    result = { 'observations': [] }
 
     for target in targets:
         t_id, t_hz, t_v = target.strip('\n').split(',')
@@ -73,28 +73,28 @@ def main(t_file, c_file, o_file):
                      .format(t_id, hz_rad, v_rad))
 
         for command in commands:
-            result['Observations'].append(copy.deepcopy(command))
-            l = len(result.get('Observations'))
-            obs_data = result.get('Observations')[l - 1]
+            result['observations'].append(copy.deepcopy(command))
+            l = len(result.get('observations'))
+            obs_data = result.get('observations')[l - 1]
 
-            if obs_data.get('ID') is not None:
-                obs_data['ID'] = obs_data.get('ID').replace('[% id %]', t_id)
+            if obs_data.get('id') is not None:
+                obs_data['id'] = obs_data.get('id').replace('{{id}}', t_id)
 
-            if obs_data.get('Description') is not None:
-                obs_data['Description'] = obs_data.get('Description')\
-                                          .replace('[% id %]', t_id)
+            if obs_data.get('description') is not None:
+                obs_data['description'] = obs_data.get('description')\
+                                          .replace('{{id}}', t_id)
 
-            if obs_data.get('Name') is not None:
-                obs_data['Name'] = obs_data.get('Name')\
-                                   .replace('[% id %]', t_id)
+            if obs_data.get('name') is not None:
+                obs_data['name'] = obs_data.get('name')\
+                                   .replace('{{id}}', t_id)
 
-            request_sets = obs_data['RequestSets']
+            request_sets = obs_data['requestSets']
 
             for set_name, request_set in request_sets.items():
-                request_set['Request'] = request_set.get('Request')\
-                                         .replace('[% hz %]', hz_rad)
-                request_set['Request'] = request_set.get('Request')\
-                                         .replace('[% v %]', v_rad)
+                request_set['request'] = request_set.get('request')\
+                                         .replace('{{hz}}', hz_rad)
+                request_set['request'] = request_set.get('request')\
+                                         .replace('{{v}}', v_rad)
 
     output = json.dumps(result,
                         sort_keys=True,

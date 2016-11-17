@@ -226,12 +226,12 @@ class ReturnCodeInspector(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._keys = config.get('keys')
+        self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')
 
     def process_observation(self, obs):
-        for key in self._keys:
-            return_code = obs.get_value('responseSets', key, 'value')
+        for response_set in self._response_sets:
+            return_code = obs.get_value('responseSets', response_set, 'value')
 
             # Key is zero or not in response set.
             if return_code is None or return_code == 0:

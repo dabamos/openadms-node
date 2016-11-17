@@ -1678,7 +1678,7 @@
     },
     "returnCodeInspector": {
         "retries": 1,
-        "keys": [
+        "responseSets": [
             "returnCode",
             "rcChangeFace",
             "rcGetFace0",
