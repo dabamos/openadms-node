@@ -75,7 +75,7 @@ class Alert(Prototype):
 
         payload = {
             'dt': log.asctime,
-            'level': log.levelname.lower,
+            'level': log.levelname.lower(),
             'message': log.message,
             'receiver': None                # Will be set below.
         }
