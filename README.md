@@ -27,7 +27,7 @@ Some additional modules have to be installed in order to use OpenADMS:
 The installation can be done with `pip`:
 
 ```
-$ pip install coloredlogs paho-mqtt pyserial
+$ pip install -U -r requirements.txt
 ```
 ## Message Broker
 The MQTT protocol is used for the internal message exchange in OpenADMS. An MQTT

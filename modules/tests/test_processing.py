@@ -27,17 +27,17 @@ from core.observation import Observation
 """Tests the OpenADMS processing modules."""
 
 data = {
-    'ID': 'Test',
-    'RequestSets': {
-        'get_value': {
-            'Response': '+0025.9\r',
-            'ResponsePattern': '(?P<Temperature>[+-]?\\d+\\.+\\d)'
+    'id': 'Test',
+    'requestSets': {
+        'getValue': {
+            'response': '+0025.9\r',
+            'responsePattern': '(?P<temperature>[+-]?\\d+\\.+\\d)'
         }
     },
-    'ResponseSets': {
-        'Temperature': {
-            'Type': 'Float',
-            'Unit': 'C' }
+    'responseSets': {
+        'temperature': {
+            'type': 'float',
+            'unit': 'C' }
     }
 }
 
@@ -50,5 +50,5 @@ class TestPreProcessor():
         obs = Observation(data)
         obj = PreProcessor('Test', None, None)
         result = obj.action(obs)
-        t = result.get('ResponseSets').get('Temperature').get('Value')
+        t = result.get('responseSets').get('temperature').get('value')
         assert t == 25.9
