@@ -37,7 +37,8 @@ data = {
     'responseSets': {
         'temperature': {
             'type': 'float',
-            'unit': 'C' }
+            'unit': 'C'
+        }
     }
 }
 
