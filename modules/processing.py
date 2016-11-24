@@ -129,9 +129,6 @@ class PreProcessor(Prototype):
 
         if self.is_float(dot_value):
             response_value = float(dot_value)
-            # logger.debug('Converted raw value "{}" to '
-            #              'float value "{}"'.format(raw_value,
-            #                                        response_value))
             return response_value
         else:
             logger.warning('Value "{}" could not be converted '
@@ -141,9 +138,6 @@ class PreProcessor(Prototype):
     def to_int(self, raw_value):
         if self.is_int(raw_value):
             response_value = int(raw_value)
-            # logger.debug('Converted raw value "{}" to integer '
-            #              'value "{}"'.format(raw_value,
-            #                                  response_value))
             return response_value
         else:
             logger.warning('Value "{}" could not be converted '
