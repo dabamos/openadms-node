@@ -86,9 +86,9 @@ class VirtualSensor(Prototype):
                 .strip()
 
 
-class VirtualLeicaTM30(VirtualSensor):
+class VirtualTotalStationTM30(VirtualSensor):
     """
-    VirtualLeicaTM30 simulates a Leica TM30 totalstation by processing GeoCOM
+    VirtualTotalStationTM30 simulates a Leica TM30 totalstation by processing GeoCOM
     commands.
     """
 
@@ -197,9 +197,10 @@ class VirtualDTM(VirtualSensor):
         return '*\r'
 
 
-class VirtualSylvacSDialOne(VirtualSensor):
+class VirtualIndicatorOne(VirtualSensor):
     """
-    VirtualSylvacSDialOne simulates a Sylvac S_Dial One extensometer.
+    VirtualIndicatorOne simulates a Sylvac S_Dial One digital
+    indicator/extensometer.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
