@@ -27,7 +27,7 @@ Some additional modules have to be installed in order to use OpenADMS:
 The installation can be done with `pip`:
 
 ```
-$ pip install coloredlogs paho-mqtt pyserial
+$ pip install -U -r requirements.txt
 ```
 ## Message Broker
 The MQTT protocol is used for the internal message exchange in OpenADMS. An MQTT
@@ -63,10 +63,10 @@ used, which is part of Python 3:
 $ pyvenv-3.5 ~/virtual-environment
 $ bash
 $ source ~/virtual-environment/bin/activate
-$ pip install coloredlogs paho-mqtt pyserial
 $ cd ~/virtual-environment
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
+$ pip install -r requirements.txt
 $ python3 openadms.py
 ```
 

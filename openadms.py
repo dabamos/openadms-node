@@ -125,18 +125,20 @@ if __name__ == '__main__':
     #      '%(message)s'
     fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
     formatter = logging.Formatter(fmt)
-    # Logging file handler.
+
+    # File handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
                                               maxBytes=10485760,  # 10 MB.
                                               backupCount=1,
                                               encoding='utf8')
     fh.setLevel(level)
     fh.setFormatter(formatter)
+
     # Add handlers to logger.
     logger.addHandler(fh)
 
     date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=level, fmt=fmt, datefmt=date_fmt)
+    coloredlogs.install(level=logging.DEBUG, fmt=fmt, datefmt=date_fmt)
 
     # Use a signal handler to catch ^C and quit the program gracefully.
     signal.signal(signal.SIGINT, signal_handler)

@@ -217,7 +217,6 @@ class SerialPort(Prototype):
 
 
 class SerialPortConfiguration(object):
-
     """
     SerialPortConfiguration saves a serial port configration.
     """

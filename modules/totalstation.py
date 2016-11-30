@@ -743,10 +743,7 @@ class PolarTransformer(Prototype):
                                  dist)
 
         logger.info('Transformed target "{}" (X = {:3.4f}, Y = {:3.4f}, '
-                    'Z = {:3.4f})'.format(obs.get('id'),
-                                          x,
-                                          y,
-                                          z))
+                    'Z = {:3.4f})'.format(obs.get('id'), x, y, z))
 
         # Add to observation data set.
         response_sets = obs.get('responseSets')

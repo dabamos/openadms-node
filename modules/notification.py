@@ -173,7 +173,7 @@ class AlertMessageFormatter(Prototype):
         msg_header = msg_header.replace('{{receiver}}', receiver)
         msg_footer = msg_footer.replace('{{receiver}}', receiver)
 
-        # Insert the alert messages line by line into the body of the template.
+        # Append the alert messages line by line to the body of the template.
         msg_body = ''
 
         for msg in messages:

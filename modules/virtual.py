@@ -65,7 +65,7 @@ class VirtualSensor(Prototype):
                 response = self.patterns[pattern](request)
 
                 logger.info('Received response "{}" from sensor "{}" on '
-                            'virtual port "{}"'.format(self._sanitize(response),
+                            'virtual port "{}"'.format(self.sanitize(response),
                                                        obs.get('sensorName'),
                                                        self.name))
                 break
@@ -78,12 +78,12 @@ class VirtualSensor(Prototype):
 
         return obs
 
-    def _sanitize(self, s):
+    def sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        return s.replace('\n', '\\n') \
-            .replace('\r', '\\r') \
-            .replace('\t', '\\t') \
-            .strip()
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')\
+                .strip()
 
 
 class VirtualLeicaTM30(VirtualSensor):
@@ -96,11 +96,13 @@ class VirtualLeicaTM30(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['%R1Q,5003:\\r\\n'] = self.get_sensor_id
-        self.patterns['%R1Q,5004:\\r\\n'] = self.get_sensor_name
-        self.patterns['%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n'] = self.set_direction
-        self.patterns['%R1Q,2008:1,1\\r\\n'] = self.measure_distance
-        self.patterns['%R1Q,2167:5000,1\\r\\n'] = self.do_complete_measurement
+        self.patterns = {
+            '%R1Q,5003:\\r\\n': self.get_sensor_id,
+            '%R1Q,5004:\\r\\n': self.get_sensor_name,
+            '%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n': self.set_direction,
+            '%R1Q,2008:1,1\\r\\n': self.measure_distance,
+            '%R1Q,2167:5000,1\\r\\n': self.do_complete_measurement
+        }
 
     def do_complete_measurement(self, request):
         return_code = '0'
@@ -160,11 +162,13 @@ class VirtualDTM(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['A\\r'] = self.power_on
-        self.patterns['CMDT 1\\r'] = self.set_command_set
-        self.patterns['SAVE\\r'] = self.save
-        self.patterns['PRES \?\\r'] = self.get_pressure
-        self.patterns['TEMP \?\\r'] = self.get_temperature
+        self.patterns = {
+            'A\\r': self.power_on,
+            'CMDT 1\\r': self.set_command_set,
+            'SAVE\\r': self.save,
+            'PRES \?\\r': self.get_pressure,
+            'TEMP \?\\r': self.get_temperature
+        }
 
     def get_pressure(self, request):
         high = 1150
@@ -202,7 +206,9 @@ class VirtualSylvacSDialOne(VirtualSensor):
         VirtualSensor.__init__(self, name, config_manager,
                                sensor_manager)
 
-        self.patterns['\?\r'] = self.get_distance
+        self.patterns = {
+            '\?\r': self.get_distance
+        }
         self._current_value = 0.0
 
     def get_distance(self, request):
