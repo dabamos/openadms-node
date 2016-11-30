@@ -52,8 +52,8 @@ Example:
 logger = logging.getLogger('openadms')
 
 LOG_FILE = 'openadms.log'
-VERSION = 0.3
-VERSION_NAME = 'Copenhagen'
+VERSION = 0.4
+VERSION_NAME = 'Dar es Salaam'
 
 
 def main(config_file):
@@ -72,7 +72,7 @@ def main(config_file):
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
     # Start the monitoring.
-    m = Monitor(config_file)
+    Monitor(config_file)
     # Run to infinity and beyond (probably not).
     stay_alive()
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         epilog='\nOpenADMS has been developed at the University of Applied '
                'Sciences Neubrandenburg (Germany).\n'
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
-               '\nFor further information visit http://www.dabamos.de/.\n')
+               '\nFor further information, visit http://www.dabamos.de/.\n')
 
     parser.add_option('-c', '--config',
                       dest='config_file',
@@ -101,44 +101,49 @@ if __name__ == '__main__':
                       help='path to the configuration file',
                       default='config/config.json')
 
-    parser.add_option('-v', '--verbose',
+    parser.add_option('-v', '--verbosity',
                       dest='verbosity',
                       action='store',
                       type='int',
-                      help='print more diagnostic messages',
-                      default=5)
+                      help='log more diagnostic messages',
+                      default=3)
+
+    parser.add_option('-d', '--debug',
+                      dest='debug',
+                      action='store_true',
+                      help='print debug messages',
+                      default=False)
 
     (options, args) = parser.parse_args()
 
-    level = {
+    # Basic logging configuration.
+    console_level = logging.DEBUG if options.debug else logging.INFO
+    logger.setLevel(console_level)
+
+    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
+    formatter = logging.Formatter(fmt)
+
+    # File handler.
+    file_level = {
         1: logging.CRITICAL,
         2: logging.ERROR,
         3: logging.WARNING,
         4: logging.INFO,
         5: logging.DEBUG
-    }.get(options.verbosity, logging.DEBUG)
+    }.get(options.verbosity, logging.WARNING)
 
-    # Basic logging configuration.
-    logger.setLevel(level)
-
-    #fmt = '%(asctime)s - %(levelname)7s - %(module)12s:%(lineno)-4s - ' \
-    #      '%(message)s'
-    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
-    formatter = logging.Formatter(fmt)
-
-    # File handler.
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
                                               maxBytes=10485760,  # 10 MB.
                                               backupCount=1,
                                               encoding='utf8')
-    fh.setLevel(level)
+    fh.setLevel(file_level)
     fh.setFormatter(formatter)
 
     # Add handlers to logger.
     logger.addHandler(fh)
 
     date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=logging.DEBUG, fmt=fmt, datefmt=date_fmt)
+    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
     # Use a signal handler to catch ^C and quit the program gracefully.
     signal.signal(signal.SIGINT, signal_handler)
