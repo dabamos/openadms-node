@@ -23,8 +23,6 @@ import logging
 
 from core.observation import Observation
 
-logger = logging.getLogger('openadms')
-
 
 class Sensor(object):
 
@@ -36,6 +34,8 @@ class Sensor(object):
         self._name = name
         self._config_manager = config_manager
 
+        self.logger = logging.getLogger(self.name)
+
         config = self._config_manager.config.get('sensors').get(self._name)
         self._type = config.get('type')
         self._observations = {}
@@ -43,8 +43,8 @@ class Sensor(object):
         for data in config.get('observations'):
             obs = self._create_observation(data)
             self._observations[obs.get('name')] = obs
-            logger.debug('Loaded observation "{}" of sensor "{}"'
-                         .format(obs.get('name'), self._name))
+            self.logger.debug('Loaded observation "{}" of sensor "{}"'
+                              .format(obs.get('name'), self._name))
 
     def get_observation(self, name):
         """Returns a single observation."""

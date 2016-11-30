@@ -19,7 +19,6 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import logging
 import math
 import random
 import re
@@ -28,8 +27,6 @@ import time
 from modules.prototype import Prototype
 
 """Module for virtual sensors."""
-
-logger = logging.getLogger('openadms')
 
 
 class VirtualSensor(Prototype):
@@ -50,10 +47,10 @@ class VirtualSensor(Prototype):
             sleep_time = request_set.get('sleepTime')
             response = ''
 
-            logger.info('Sending request "{}" to sensor "{}" on virtual '
-                        'port "{}"'.format(set_name,
-                                           obs.get('sensorName'),
-                                           self.name))
+            self.logger.info('Sending request "{}" to sensor "{}" on virtual '
+                             'port "{}"'.format(set_name,
+                                                obs.get('sensorName'),
+                                                self.name))
 
             for pattern in self.patterns:
                 reg_exp = re.compile(pattern)
@@ -64,10 +61,11 @@ class VirtualSensor(Prototype):
 
                 response = self.patterns[pattern](request)
 
-                logger.info('Received response "{}" from sensor "{}" on '
-                            'virtual port "{}"'.format(self.sanitize(response),
-                                                       obs.get('sensorName'),
-                                                       self.name))
+                self.logger.info('Received response "{}" from sensor "{}" on '
+                                 'virtual port "{}"'
+                                 .format(self.sanitize(response),
+                                         obs.get('sensorName'),
+                                         self.name))
                 break
 
             request_set['response'] = response

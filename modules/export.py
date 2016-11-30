@@ -20,9 +20,7 @@ limitations under the Licence.
 """
 
 import copy
-import logging
 import os
-import time
 
 from datetime import datetime
 from enum import Enum
@@ -30,8 +28,6 @@ from enum import Enum
 from modules.prototype import Prototype
 
 """Module for the export of sensor data to files and databases."""
-
-logger = logging.getLogger('openadms')
 
 
 class FileRotation(Enum):
@@ -118,7 +114,7 @@ class FileExporter(Prototype):
 
         for path in self._paths:
             if not os.path.isdir(path):
-                logger.error('Path "{}" does not exist'.format(path))
+                self.logger.error('Path "{}" does not exist'.format(path))
                 continue
 
             # Create a header if a new file has to be touched.
@@ -157,12 +153,12 @@ class FileExporter(Prototype):
                 # Write line to file.
                 fh.write(line + '\n')
 
-                logger.info('Saved observation "{}" with ID "{}" from '
-                            'port "{}" to file "{}"'
-                            .format(obs.get('name'),
-                                    obs.get('id'),
-                                    obs.get('portName'),
-                                    path + file_name))
+                self.logger.info('Saved observation "{}" with ID "{}" from '
+                                 'port "{}" to file "{}"'
+                                 .format(obs.get('name'),
+                                         obs.get('id'),
+                                         obs.get('portName'),
+                                         path + file_name))
 
         return obs
 
@@ -192,8 +188,8 @@ class RealTimePublisher(Prototype):
             obs_copy.set('nextReceiver', 0)
             obs_copy.set('receivers', [target])
 
-            logger.debug('Publishing observation "{}" with ID "{}" to "{}" ...'
-                         .format(obs.get('name'), obs.get('id'), target))
+            self.logger.debug('Publishing observation "{}" with ID "{}" to "{}"'
+                              .format(obs.get('name'), obs.get('id'), target))
 
             header = {'type': 'observation'}
             payload = obs.data

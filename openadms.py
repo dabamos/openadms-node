@@ -49,9 +49,12 @@ Example:
     The monitoring will begin automatically.
 """
 
-logger = logging.getLogger('openadms')
+logger = logging.getLogger('main')
 
 LOG_FILE = 'openadms.log'
+LOG_FILE_BACKUP_COUNT = 1
+MAX_LOG_FILE_SIZE = 10485760    # 10 MB.
+
 VERSION = 0.4
 VERSION_NAME = 'Dar es Salaam'
 
@@ -120,7 +123,7 @@ if __name__ == '__main__':
     console_level = logging.DEBUG if options.debug else logging.INFO
     logger.setLevel(console_level)
 
-    fmt = '%(asctime)s - %(levelname)7s - %(module)12s - %(message)s'
+    fmt = '%(asctime)s - %(levelname)7s - %(name)28s - %(message)s'
     formatter = logging.Formatter(fmt)
 
     # File handler.
@@ -133,8 +136,8 @@ if __name__ == '__main__':
     }.get(options.verbosity, logging.WARNING)
 
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
-                                              maxBytes=10485760,  # 10 MB.
-                                              backupCount=1,
+                                              maxBytes=MAX_LOG_FILE_SIZE,
+                                              backupCount=LOG_FILE_BACKUP_COUNT,
                                               encoding='utf8')
     fh.setLevel(file_level)
     fh.setFormatter(formatter)

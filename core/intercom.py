@@ -24,8 +24,6 @@ import logging
 
 import paho.mqtt.client as mqtt
 
-logger = logging.getLogger('openadms')
-
 
 class MQTTMessenger(object):
     """
@@ -33,6 +31,7 @@ class MQTTMessenger(object):
     """
 
     def __init__(self, config_manager):
+        self.logger = logging.getLogger('mqttMessenger')
         self._config_manager = config_manager
         config = self._config_manager.get('intercom').get('mqtt')
 
@@ -63,10 +62,10 @@ class MQTTMessenger(object):
     def _on_disconnect(self, client, userdata, rc):
         """Callback method is called after disconnection."""
         if rc != 0:
-            logger.error('Unexpected disconnection from {}:{}'
-                         .format(self._host, self._port))
-            logger.info('Reconnecting to {}:{} ...'
-                        .format(self._host, self._port))
+            self.logger.error('Unexpected disconnection from {}:{}'
+                              .format(self._host, self._port))
+            self.logger.info('Reconnecting to {}:{} ...'
+                             .format(self._host, self._port))
             self.connect()
 
     def _on_message(self, client, userdata, msg):
@@ -77,8 +76,8 @@ class MQTTMessenger(object):
             data = json.loads(str(msg.payload, encoding='UTF-8'))
             self._downlink(data)
         except json.JSONDecodeError:
-            logger.error('Message from client "{}" is corrupted (invalid JSON)'
-                         .format(client))
+            self.logger.error('Message from client "{}" is corrupted '
+                              '(invalid JSON)'.format(client))
 
     def connect(self):
         """Connect to the message broker."""

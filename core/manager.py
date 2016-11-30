@@ -30,8 +30,6 @@ from modules.prototype import *
 
 """Collection of manager classes."""
 
-logger = logging.getLogger('openadms')
-
 
 class ConfigurationManager:
     """
@@ -39,6 +37,7 @@ class ConfigurationManager:
     """
 
     def __init__(self, file_name):
+        self.logger = logging.getLogger('configurationManager')
         self._config = {}
 
         if file_name:
@@ -49,15 +48,17 @@ class ConfigurationManager:
     def load(self, file_name):
         """Loads configuration from JSON file."""
         if not os.path.exists(file_name):
-            logger.error('Configuration file "{}" not found.'.format(file_name))
+            self.logger.error('Configuration file "{}" not found.'
+                              .format(file_name))
             return
 
         with open(file_name) as config_file:
             try:
                 self._config = json.loads(config_file.read())
-                logger.info('Loaded configuration file "{}"'.format(file_name))
+                self.logger.info('Loaded configuration file "{}"'
+                                 .format(file_name))
             except json.decoder.JSONDecodeError as e:
-                logger.error('Invalid JSON: "{}"'.format(e))
+                self.logger.error('Invalid JSON: "{}"'.format(e.rstrip()))
 
     def dump(self):
         """Dumps the configuration to stdout."""
@@ -82,6 +83,8 @@ class ModuleManager(object):
     """
 
     def __init__(self, config_manager, sensor_manager):
+        self.logger = logging.getLogger('moduleManager')
+
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
 
@@ -102,7 +105,7 @@ class ModuleManager(object):
         # Start the module -- it's a thread.
         self._modules[module_name] = module
         module.start()
-        logger.debug('Started module "{}"'.format(module_name))
+        self.logger.debug('Started module "{}"'.format(module_name))
 
     def delete(self, module_name):
         """Removes a module from the modules dictionary."""
@@ -114,7 +117,7 @@ class ModuleManager(object):
         file_path = module_path.replace('.', '/') + '.py'
 
         if not os.path.isfile(file_path):
-            logger.error('File "{}" not found'.format(file_path))
+            self.logger.error('File "{}" not found'.format(file_path))
             return
 
         try:
@@ -123,7 +126,7 @@ class ModuleManager(object):
                                          self._config_manager,
                                          self._sensor_manager)
         except AttributeError:
-            logger.error('Module "{}" not found'.format(class_path))
+            self.logger.error('Module "{}" not found'.format(class_path))
             return
 
         return worker
@@ -139,6 +142,8 @@ class SensorManager(object):
     """
 
     def __init__(self, config_manager):
+        self.logger = logging.getLogger('sensorManager')
+
         self._config_manager = config_manager
         self._sensors = {}
 
@@ -152,7 +157,7 @@ class SensorManager(object):
         for sensor_name, sensor_config in sensors.items():
             sensor_obj = Sensor(sensor_name, self._config_manager)
             self.add(sensor_name, sensor_obj)
-            logger.info('Created sensor {}'.format(sensor_name))
+            self.logger.info('Created sensor {}'.format(sensor_name))
 
     def add(self, name, sensor):
         """Adds a sensor to the sensors dictionary."""
