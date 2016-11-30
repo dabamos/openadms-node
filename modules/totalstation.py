@@ -447,6 +447,10 @@ class HelmertTransformer(Prototype):
             global_y = tie_point.get('y')
             global_z = tie_point.get('z')
 
+            if global_x is None or global_y is None or global_z is None:
+                logger.error('Tie point "{}" not set in configuration'
+                             .format(name))
+
             # Sums of the coordinates.
             sum_local_x += local_x
             sum_local_y += local_y
