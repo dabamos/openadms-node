@@ -79,6 +79,7 @@ class SerialPort(Prototype):
             response = ''
             response_delimiter = request_set.get('responseDelimiter')
 
+            # Data of the request set.
             request = request_set.get('request')
             sleep_time = request_set.get('sleepTime')
             timeout = request_set.get('timeout')

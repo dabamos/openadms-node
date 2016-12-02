@@ -123,7 +123,7 @@ if __name__ == '__main__':
     console_level = logging.DEBUG if options.debug else logging.INFO
     logger.setLevel(console_level)
 
-    fmt = '%(asctime)s - %(levelname)7s - %(name)28s - %(message)s'
+    fmt = '%(asctime)s - %(levelname)7s - %(name)26s - %(message)s'
     formatter = logging.Formatter(fmt)
 
     # File handler.

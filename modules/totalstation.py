@@ -805,19 +805,19 @@ class RefractionCorrector(Prototype):
         z = obs.get_value('responseSets', 'z', 'value')
 
         if not z:
-            self.logger.error('No Z coordinate defined in observation "{}" '
-                              'with ID "{}"'.format(obs.get('name'),
-                                                    obs.get('id')))
+            self.logger.error('No height defined in observation "{}" with '
+                              'ID "{}"'.format(obs.get('name'),
+                                               obs.get('id')))
             return obs
 
         d = obs.get_value('responseSets', 'slopeDist', 'value')
 
-        k = 0.13                        # Refraction coefficient.
-        r = 6370000                     # Earth radius.
+        k = 0.13                    # Refraction coefficient.
+        r = 6370000                 # Earth radius.
 
-        k_e = (d * d) / (2 * r)         # Correction of earth radius.
-        k_r = -1 * k * k_e              # Correction of refraction.
-        r = k_e + k_r
+        k_e = (d * d) / (2 * r)     # Correction of earth radius.
+        k_r = k * k_e               # Correction of refraction.
+        r = k_e - k_r
 
         self.logger.info('Updated height of observation "{}" with ID "{}" from '
                          '{:3.4f} m to {:3.4f} m (refraction value: {:3.5f} m)'
@@ -827,16 +827,13 @@ class RefractionCorrector(Prototype):
                                  z + r,
                                  r))
 
-        # Save refraction value.
-        refraction = self.get_response_set('float', 'm', r)
-        obs.set('refraction', refraction)
-
-        # Save old Z value to `zRaw` and corrected Z value to `z`.
-        z_new = self.get_response_set('float', 'm', z + r)
+        refraction = self.get_response_set('float', 'm', round(r, 6))
+        z_new = self.get_response_set('float', 'm', round(z + r, 5))
         z_raw = self.get_response_set('float', 'm', z)
 
-        obs.set('zRaw', z_raw)
-        obs.set('z', z_new)
+        obs.data['responseSets']['refraction'] = refraction
+        obs.data['responseSets']['zRaw'] = z_raw
+        obs.data['responseSets']['z'] = z_new
 
         return obs
 
