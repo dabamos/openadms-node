@@ -189,10 +189,12 @@ class RealTimePublisher(Prototype):
             obs_copy.set('receivers', [target])
 
             self.logger.debug('Publishing observation "{}" with ID "{}" to "{}"'
-                              .format(obs.get('name'), obs.get('id'), target))
+                              .format(obs_copy.get('name'),
+                                      obs_copy.get('id'),
+                                      target))
 
             header = {'type': 'observation'}
-            payload = obs.data
+            payload = obs_copy.data
 
             self.publish(target, header, payload)
 
