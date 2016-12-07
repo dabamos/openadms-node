@@ -13,11 +13,11 @@
         "preProcessor": "modules.processing.PreProcessor",
         "polarTransformer": "modules.totalstation.PolarTransformer",
         "distanceCorrector": "modules.totalstation.DistanceCorrector",
+        "refractionCorrector": "modules.totalstation.RefractionCorrector",
         "returnCodeInspector": "modules.processing.ReturnCodeInspector",
         "helmertTransformer": "modules.totalstation.HelmertTransformer",
         "realTimePublisher": "modules.export.RealTimePublisher",
-        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor",
-        "heartbeat": "modules.notification.Heartbeat"
+        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
     },
     "project": {
         "name": "projectX",
@@ -214,19 +214,6 @@
                     }
                 },
                 {
-                    "name": "wait10",
-                    "description": "waits 10 seconds",
-                    "receivers": [],
-                    "nextReceiver": 0,
-                    "enabled": true,
-                    "onetime": true,
-                    "sleepTime": 10.0,
-                    "id": "wait",
-                    "requestSets": {},
-                    "requestsOrder": [],
-                    "responseSets": {}
-                },
-                {
                     "name": "initialize",
                     "description": "initialize sensor.",
                     "receivers": [
@@ -256,7 +243,7 @@
                             "sleepTime": 0.5,
                             "timeout": 30.0
                         },
-                        "getSoftwareversion": {
+                        "getSoftwareVersion": {
                             "enabled": true,
                             "request": "%R1Q,5034:\r\n",
                             "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<release>\\d+),(?P<version>\\d+),(?P<subversion>\\d+))?",
@@ -317,7 +304,7 @@
                         "doBeep",
                         "getSensorId",
                         "getSensorName",
-                        "getSoftwareversion",
+                        "getSoftwareVersion",
                         "getInternalTemperature",
                         "setEdmType",
                         "setAtmosphericPpm",
@@ -370,6 +357,7 @@
                         "distanceCorrector",
                         "helmertTransformer",
                         "polarTransformer",
+                        "refractionCorrector",
                         "realTimePublisher",
                         "fileExporter"
                     ],
@@ -571,6 +559,7 @@
                         "serialMeasurementProcessor",
                         "distanceCorrector",
                         "helmertTransformer",
+                        "refractionCorrector",
                         "realTimePublisher",
                         "fileExporter"
                     ],
@@ -772,6 +761,7 @@
                         "serialMeasurementProcessor",
                         "distanceCorrector",
                         "helmertTransformer",
+                        "refractionCorrector",
                         "realTimePublisher",
                         "fileExporter"
                     ],
@@ -973,6 +963,7 @@
                         "serialMeasurementProcessor",
                         "distanceCorrector",
                         "polarTransformer",
+                        "refractionCorrector",
                         "realTimePublisher",
                         "fileExporter"
                     ],
@@ -1363,6 +1354,19 @@
                     "sleepTime": 60.0
                 },
                 {
+                    "name": "wait10",
+                    "description": "waits 10 seconds",
+                    "receivers": [],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "sleepTime": 10.0,
+                    "id": "wait",
+                    "requestSets": {},
+                    "requestsOrder": [],
+                    "responseSets": {}
+                },
+                {
                     "name": "wait60",
                     "description": "waits 1 minute",
                     "receivers": [],
@@ -1542,7 +1546,7 @@
                         "getP2",
                         "getP3",
                         "getP4",
-                        "wait600"
+                        "wait60"
                     ]
                 }
             ]
