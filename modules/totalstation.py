@@ -133,7 +133,8 @@ class DistanceCorrector(Prototype):
 
         return obs
 
-    def get_atmospheric_correction(self, temperature, pressure, humidity):
+    @staticmethod
+    def get_atmospheric_correction(temperature, pressure, humidity):
         """Calculates the atmospheric correction value in parts per million
         (ppm) for the reduction of distances gained by electronic distance
         measurement (EDM).
@@ -143,12 +144,12 @@ class DistanceCorrector(Prototype):
         stations of Leica Geosystems. For further information, please see Leica
         TM30 manual on page 76."""
         alpha = 1 / 273.15
-        div = (1 + alpha * temperature)
-        x = (7.5 * temperature / (237.3 + temperature)) + 0.7857
+        div = 1 + (alpha * temperature)
+        x = (7.5 * (temperature / (237.3 + temperature))) + 0.7857
 
         a = 0.29525 * pressure
         b = 4.126 * math.pow(10, -4) * humidity
-        c = 286.34 - ((a / div) - ((b / div) * math.pow(10, int(x))))
+        c = 286.34 - ((a / div) - ((b / div) * math.pow(10, x)))
 
         return c
 

@@ -21,10 +21,10 @@ limitations under the Licence.
 
 import pytest
 
-from modules.processing import *
+from modules.totalstation import *
 from core.observation import Observation
 
-"""Tests the OpenADMS the classes of the processing module."""
+"""Tests the OpenADMS the classes of the totalstation module."""
 
 data = {
     'id': 'Test',
@@ -43,14 +43,20 @@ data = {
 }
 
 
-class TestPreProcessor():
+class TestDistanceCorrector():
 
     def setup(self):
         pass
 
-    def test_process_observation(self):
-        obs = Observation(data)
-        obj = PreProcessor('Test', None, None)
-        result = obj.process_observation(obs)
-        t = result.get('responseSets').get('temperature').get('value')
-        assert t == 25.9
+    def test_get_atmospheric_correction(self):
+        t = [-12.48, 0.35, 12.0, 26.6, 38.7]
+        p = [1000.78, 1005.45, 1013.3, 1011.25, 990.0]
+        h = [0.998, 0.9575, 0.8, 0.5531, 0.129]
+
+        targets = [-23.2859, -10.1367, -0.2421, 14.2711, 30.3193]
+
+        for i in range(len(targets)):
+            a = DistanceCorrector.get_atmospheric_correction(t[i], p[i], h[i])
+            r = round(a, 4)
+
+            assert r == targets[i]
