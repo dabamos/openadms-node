@@ -49,7 +49,7 @@ Example:
     The monitoring will begin automatically.
 """
 
-logger = logging.getLogger('main')
+logger = logging.getLogger()
 
 LOG_FILE = 'openadms.log'
 LOG_FILE_BACKUP_COUNT = 1
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         3: logging.WARNING,
         4: logging.INFO,
         5: logging.DEBUG
-    }.get(options.verbosity, logging.WARNING)
+    }.get(options.verbosity, 3)
 
     fh = logging.handlers.RotatingFileHandler(LOG_FILE,
                                               maxBytes=MAX_LOG_FILE_SIZE,
