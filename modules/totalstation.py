@@ -296,7 +296,7 @@ class HelmertTransformer(Prototype):
         An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
         # Update the tie point data (Hz, V, slope distance).
-        if self._is_tie_point:
+        if self._is_tie_point(obs):
             self._update_tie_point(obs)
 
         # Only calculate the view point's coordinates if all tie points have
@@ -371,7 +371,7 @@ class HelmertTransformer(Prototype):
         dist = obs.get_value('responseSets', 'slopeDist', 'value')
 
         if None in [hz, v, dist]:
-            self.logger.warning('Hz, V, or distance missing in observation '
+            self.logger.warning('Hz, V, or distance is missing in observation '
                                 '"{}" with ID "{}"'.format(obs.get('name'),
                                                            obs.get('id')))
             return obs
@@ -427,9 +427,9 @@ class HelmertTransformer(Prototype):
             dist = tie_point.get('dist')    # Distance (slope or reduced).
 
             if None in [hz, v, dist]:
-                self.logger.warning('Hz, V, or distance missing in observation '
-                                    '"{}" with ID "{}"'.format(obs.get('name'),
-                                                               obs.get('id')))
+                self.logger.warning('Hz, V, or distance is missing in '
+                                    'observation "{}" with ID "{}"'
+                                    .format(obs.get('name'), obs.get('id')))
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
@@ -597,7 +597,8 @@ class HelmertTransformer(Prototype):
         # Return the observation of the view point.
         return view_point
 
-    def _get_cartesian_coordinates(self, hz, v, slope_dist):
+    @staticmethod
+    def _get_cartesian_coordinates(hz, v, slope_dist):
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
@@ -615,7 +616,7 @@ class HelmertTransformer(Prototype):
             return False
 
     def _is_ready(self):
-        """Checks whether all tie points has been measured already or not."""
+        """Checks whether all tie points have been measured already or not."""
         is_ready = True
 
         for tie_point_id, tie_point in self._tie_points.items():
@@ -634,7 +635,7 @@ class HelmertTransformer(Prototype):
         dist = obs.get_value('responseSets', 'slopeDist', 'value')
 
         if None in [hz, v, dist]:
-            self.logger.warning('Hz, V, or distance missing in observation '
+            self.logger.warning('Hz, V, or distance is missing in observation '
                                 '"{}" with ID "{}"'.format(obs.get('name'),
                                                            obs.get('id')))
             return obs
@@ -721,7 +722,7 @@ class PolarTransformer(Prototype):
         dist = obs.get_value('responseSets', 'slopeDist', 'value')
 
         if None in [hz, v, dist]:
-            self.logger.warning('Hz, V, or distance missing in observation '
+            self.logger.warning('Hz, V, or distance is missing in observation '
                                 '"{}" with ID "{}"'.format(obs.get('name'),
                                                            obs.get('id')))
             return obs
@@ -851,13 +852,15 @@ class SerialMeasurementProcessor(Prototype):
         # Calculate the serial measurement with two faces.
         hz_0 = obs.get_value('responseSets', 'hz0', 'value')
         hz_1 = obs.get_value('responseSets', 'hz1', 'value')
+
         v_0 = obs.get_value('responseSets', 'v0', 'value')
         v_1 = obs.get_value('responseSets', 'v1', 'value')
+
         dist_0 = obs.get_value('responseSets', 'slopeDist0', 'value')
         dist_1 = obs.get_value('responseSets', 'slopeDist1', 'value')
 
         if None in [hz_0, hz_1, v_0, v_1, dist_0, dist_1]:
-            self.logger.warning('Hz, V, or distance missing in observation '
+            self.logger.warning('Hz, V, or distance is missing in observation '
                                 '"{}" with ID "{}"'.format(obs.get('name'),
                                                            obs.get('id')))
             return obs
