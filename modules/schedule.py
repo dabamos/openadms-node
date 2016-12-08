@@ -27,8 +27,6 @@ import time
 
 from modules.prototype import Prototype
 
-logger = logging.getLogger('openadms')
-
 
 class Scheduler(Prototype):
     """
@@ -66,7 +64,8 @@ class Scheduler(Prototype):
                     .get_observation(obs_name)
 
                 if not obs:
-                    logger.error('Observation "{}" not found'.format(obs_name))
+                    self.logger.error('Observation "{}" not found'
+                                      .format(obs_name))
                     continue
 
                 # Create a new job.
@@ -84,8 +83,8 @@ class Scheduler(Prototype):
     def add(self, job):
         """Appends a job to the jobs list."""
         self._jobs.append(job)
-        logger.debug('Added job "{}" to scheduler "{}"'
-                     .format(job.name, self._name))
+        self.logger.debug('Added job "{}" to scheduler "{}"'
+                          .format(job.name, self._name))
 
     def run_jobs(self):
         """Threaded method to process the jobs queue."""
@@ -114,8 +113,8 @@ class Scheduler(Prototype):
             # Remove expired jobs from the jobs list.
             while zombies:
                 zombie = zombies.pop()
-                logger.debug('Deleting expired job "{}" ...'
-                             .format(zombie.name))
+                self.logger.debug('Deleting expired job "{}" ...'
+                                  .format(zombie.name))
                 self._jobs.remove(zombie)
 
 
@@ -134,6 +133,8 @@ class Job(object):
         self._weekdays = weekdays  # The time sheet.
         self._uplink = uplink  # Callback function.
 
+        self.logger = logging.getLogger('job')
+
         # Used date and time formats.
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
@@ -151,7 +152,7 @@ class Job(object):
         now = dt.datetime.now()
 
         if now > self._end_date:
-            logger.debug('Job "{}" has expired'.format(self._name))
+            self.logger.debug('Job "{}" has expired'.format(self._name))
             return True
 
         return False
@@ -222,9 +223,9 @@ class Job(object):
         # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
-        logger.debug('Starting job "{}" for port "{}" ...'
-                     .format(self._obs.get('name'),
-                             self._port_name))
+        self.logger.debug('Starting job "{}" for port "{}" ...'
+                          .format(self._obs.get('name'),
+                                  self._port_name))
 
         # Get the sleep time of the whole observation.
         sleep_time = obs_copy.get('sleepTime')

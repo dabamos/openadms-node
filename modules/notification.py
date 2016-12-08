@@ -25,7 +25,6 @@ import smtplib
 import socket
 import threading
 import time
-
 from datetime import datetime
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
@@ -35,8 +34,6 @@ from email.utils import formatdate
 from modules.prototype import Prototype
 
 """Module for alerting."""
-
-logger = logging.getLogger('openadms')
 
 
 class Alert(Prototype):
@@ -52,7 +49,7 @@ class Alert(Prototype):
         # Add logging handler to the logger.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
-        logger.addHandler(qh)
+        self.logger.addHandler(qh)
 
         self._modules = config.get('modules')
 
@@ -65,7 +62,7 @@ class Alert(Prototype):
     def run(self):
         while True:
             log = self._queue.get()         # Blocking I/O.
-            logger.info('Processing alert message ...')
+            self.logger.info('Processing alert message ...')
             self.fire(log)
 
     def fire(self, log):
@@ -151,7 +148,7 @@ class AlertMessageFormatter(Prototype):
         target = self._config.get('receiver')
 
         if not target:
-            logger.warning('No receiver defined for alert message')
+            self.logger.warning('No receiver defined for alert message')
             return
 
         # Create the header of the message.
@@ -211,7 +208,7 @@ class AlertMessageFormatter(Prototype):
                 receiver = msg.get('receiver')
 
                 if not receiver:
-                    logger.warning('No receiver defined in alert message')
+                    self.logger.warning('No receiver defined in alert message')
                 else:
                     # Create an empty list for the alert messages.
                     if not cache.get(receiver):
@@ -258,7 +255,7 @@ class MailAgent(Prototype):
 
     def handle_mail(self, header, payload):
         if self._is_tls and self._is_start_tls:
-            logger.error('TLS and StartTLS can not be used at the same time')
+            self.logger.error('TLS and StartTLS can\'t be used together')
             return
 
         mail_subject = payload.get('subject') or self._default_subject
@@ -306,12 +303,12 @@ class MailAgent(Prototype):
                           msg.as_string())
             smtp.quit()
 
-            logger.info('E-mail has been send successfully to {}'
-                        .format(mail_to))
+            self.logger.info('E-mail has been send successfully to {}'
+                             .format(mail_to))
         except smtplib.SMTPException:
-            logger.warning('E-mail could not be sent (SMTP error)')
+            self.logger.warning('E-mail could not be sent (SMTP error)')
         except TimeoutError:
-            logger.warning('E-mail could not be sent (timeout)')
+            self.logger.warning('E-mail could not be sent (timeout)')
 
 
 class ShortMessageAgent(Prototype):
@@ -331,11 +328,11 @@ class ShortMessageAgent(Prototype):
         message = payload.get('message')
 
         if not number:
-            logger.warning('No phone number defined in short message')
+            self.logger.warning('No phone number defined in short message')
             return
 
         if not message:
-            logger.warning('No message text defined in short message')
+            self.logger.warning('No message text defined in short message')
             return
 
         self.process_short_message(number, message)
@@ -344,21 +341,22 @@ class ShortMessageAgent(Prototype):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
                 sock.connect((self._host, self._port))
-                logger.debug('Established connection to "{}:{}"'
-                             .format(self._host, self._port))
+                self.logger.debug('Established connection to "{}:{}"'
+                                  .format(self._host, self._port))
             except ConnectionRefusedError:
-                logger.error('Could not connect to "{}:{}" (connection refused)'
-                             .format(self._host, self._port))
+                self.logger.error('Could not connect to "{}:{}" '
+                                  '(connection refused)'.format(self._host,
+                                                                self._port))
                 return
             except TimeoutError:
-                logger.error('Could not connect to "{}:{}" (timeout)'
+                self.logger.error('Could not connect to "{}:{}" (timeout)'
                              .format(self._host, self._port))
                 return
 
-            logger.info('Sending SMS to "{}" ...'.format(number))
+                self.logger.info('Sending SMS to "{}" ...'.format(number))
             sock.send(message.encode())
 
-        logger.debug('Closed connection to "{}:{}"'
+            self.logger.debug('Closed connection to "{}:{}"'
                      .format(self._host, self._port))
 
 
@@ -380,15 +378,15 @@ class Heartbeat(Prototype):
         self.add_handler('heartbeat', self.process_heartbeat)
 
     def process_heartbeat(self, header, payload):
-        logger.info('Received heartbeat at "{}" UTC for project "{}"'.
-                    format(payload.get('dt'),
-                           payload.get('projectId')))
+        self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
+                         .format(payload.get('dt'),
+                                 payload.get('projectId')))
 
     def run(self, sleep_time=0.5):
         project_id = self._config_manager.config.get('project').get('id')
 
         if not project_id:
-            logger.warning('No project ID set in configuration')
+            self.logger.warning('No project ID set in configuration')
             project_id = ''
 
         while not self._uplink:

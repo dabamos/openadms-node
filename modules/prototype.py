@@ -21,19 +21,13 @@ limitations under the Licence.
 
 import json
 import logging
-import paho.mqtt.client as mqtt
 import queue
 import threading
-import time
-
-from abc import ABCMeta, abstractmethod
 
 from core.observation import Observation
 
 """Collects prototype classes which can be used as blueprints for other
 OpenADMS modules."""
-
-logger = logging.getLogger('openadms')
 
 
 class Module(threading.Thread):
@@ -44,6 +38,7 @@ class Module(threading.Thread):
 
     def __init__(self, messenger, worker):
         threading.Thread.__init__(self, name=worker.name)
+        self.logger = logging.getLogger(worker.name)
         self.daemon = True
 
         self._messenger = messenger
@@ -73,10 +68,10 @@ class Module(threading.Thread):
     def run(self):
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
-        logger.debug('Connecting module "{}" to {}:{} ...'
-                     .format(self._worker.name,
-                             self._messenger.host,
-                             self._messenger.port))
+        self.logger.debug('Connecting module "{}" to {}:{} ...'
+                          .format(self._worker.name,
+                                  self._messenger.host,
+                                  self._messenger.port))
 
         self._messenger.connect()
 
@@ -110,6 +105,8 @@ class Prototype(object):
 
     def __init__(self, name, config_manager, sensor_manager):
         self._name = name
+        self.logger = logging.getLogger(self.name)
+
         self._config_manager = config_manager
         self._sensor_manager = sensor_manager
 
@@ -128,27 +125,29 @@ class Prototype(object):
     def handle(self, message):
         """Processes messages by calling handler methods."""
         if not self.is_sequence(message) or len(message) < 2:
-            logger.warning('{}: received message is invalid'.format(self._name))
+            self.logger.warning('{}: received message is invalid'
+                                .format(self._name))
             return
 
         header = message[0]
         payload = message[1]
 
         if not header or not payload:
-            logger.warning('{}: received data is corrupted'.format(self._name))
+            self.logger.warning('{}: received data is corrupted'
+                                .format(self._name))
             return
 
         payload_type = header.get('type')
 
         if not payload_type:
-            logger.error('{}: no payload type defined'.format(self._name))
+            self.logger.error('{}: no payload type defined'.format(self._name))
             return
 
         handler_func = self._handlers.get(payload_type)
 
         if not handler_func:
-            logger.warning('{}: no handler found for payload type "{}"'
-                           .format(self._name, payload_type))
+            self.logger.warning('{}: no handler found for payload type "{}"'
+                                .format(self._name, payload_type))
             return
 
         handler_func(header, payload)
@@ -176,11 +175,11 @@ class Prototype(object):
         self._is_paused = pause
 
         if pause:
-            logger.info('Paused module "{}" by call from "{}"'
-                        .format(self._name, sender))
+            self.logger.info('Paused module "{}" by call from "{}"'
+                             .format(self._name, sender))
         else:
-            logger.info('Started module "{}" by call from "{}"'
-                        .format(self._name, sender))
+            self.logger.info('Started module "{}" by call from "{}"'
+                             .format(self._name, sender))
 
     def is_sequence(self, arg):
         """Checks whether the argument is a list/a tuple or not."""
@@ -209,16 +208,16 @@ class Prototype(object):
 
         # No index defined.
         if (index is None) or (index < 0):
-            logger.warning('Next receiver of observation "{}" with ID '
-                           '"{}" not defined'.format(obs.get('name'),
-                                                     obs.get('id')))
+            self.logger.warning('Next receiver of observation "{}" with ID '
+                                '"{}" not defined'.format(obs.get('name'),
+                                                          obs.get('id')))
             return
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            logger.debug('Observation "{}" with ID "{}" has been finished'
-                         .format(obs.get('name'),
-                                 obs.get('id')))
+            self.logger.debug('Observation "{}" with ID "{}" has been finished'
+                              .format(obs.get('name'),
+                                      obs.get('id')))
             return
 
         # Increase the receivers index.
@@ -249,15 +248,16 @@ class Prototype(object):
             payload (Dict): The payload of the message.
         """
         if not self._uplink:
-            logger.error('No uplink defined for module "{}"'
-                         .format(self._name))
+            self.logger.error('No uplink defined for module "{}"'
+                              .format(self._name))
             return
 
         try:
             message = json.dumps([header, payload])
             self._uplink(target, message)
         except TypeError:
-            logger.error('Can\'t publish message (header or payload invalid)')
+            self.logger.error('Can\'t publish message '
+                              '(header or payload invalid)')
 
     @property
     def name(self):

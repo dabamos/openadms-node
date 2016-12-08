@@ -20,15 +20,12 @@ limitations under the Licence.
 """
 
 import logging
-import queue
-import threading
-import time
 
 from core import manager
 
 """Main monitoring module."""
 
-logger = logging.getLogger('openadms')
+logger = logging.getLogger('monitor')
 
 
 class Monitor(object):
@@ -40,6 +37,8 @@ class Monitor(object):
     def __init__(self, config_file):
         self._config_manager = manager.ConfigurationManager(config_file)
         self._sensor_manager = manager.SensorManager(self._config_manager)
+
+        logger.info('Starting monitoring ...')
         self._module_manager = manager.ModuleManager(self._config_manager,
                                                      self._sensor_manager)
 
