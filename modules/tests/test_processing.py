@@ -43,7 +43,7 @@ data = {
 }
 
 
-class TestPreProcessor():
+class TestPreProcessor:
 
     def setup(self):
         pass

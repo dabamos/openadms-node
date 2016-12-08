@@ -43,7 +43,7 @@ data = {
 }
 
 
-class TestDistanceCorrector():
+class TestDistanceCorrector:
 
     def setup(self):
         pass
@@ -53,10 +53,10 @@ class TestDistanceCorrector():
         p = [1000.78, 1005.45, 1013.3, 1011.25, 990.0]
         h = [0.998, 0.9575, 0.8, 0.5531, 0.129]
 
-        targets = [-23.2859, -10.1367, -0.2421, 14.2711, 30.3193]
+        results = [-23.2859, -10.1367, -0.2421, 14.2711, 30.3193]
 
-        for i in range(len(targets)):
+        for i in range(len(results)):
             a = DistanceCorrector.get_atmospheric_correction(t[i], p[i], h[i])
             r = round(a, 4)
 
-            assert r == targets[i]
+            assert r == results[i]

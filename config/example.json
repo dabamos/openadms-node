@@ -390,7 +390,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -398,7 +398,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -439,27 +439,27 @@
                         "changeFace"
                     ],
                     "responseSets": {
-                        "accAngle0": {
+                        "accuracyAngle0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accAngle1": {
+                        "accuracyAngle1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl0": {
+                        "accuracyInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl1": {
+                        "accuracyInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c0": {
+                        "crossInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c1": {
+                        "crossInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -487,11 +487,11 @@
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l0": {
+                        "lengthInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l1": {
+                        "lengthInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -592,7 +592,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -600,7 +600,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -641,27 +641,27 @@
                         "changeFace"
                     ],
                     "responseSets": {
-                        "accAngle0": {
+                        "accuracyAngle0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accAngle1": {
+                        "accuracyAngle1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl0": {
+                        "accuracyInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl1": {
+                        "accuracyInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c0": {
+                        "crossInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c1": {
+                        "crossInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -689,11 +689,11 @@
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l0": {
+                        "lengthInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l1": {
+                        "lengthInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -794,7 +794,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -802,7 +802,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -843,27 +843,27 @@
                         "changeFace"
                     ],
                     "responseSets": {
-                        "accAngle0": {
+                        "accuracyAngle0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accAngle1": {
+                        "accuracyAngle1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl0": {
+                        "accuracyInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl1": {
+                        "accuracyInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c0": {
+                        "crossInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c1": {
+                        "crossInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -891,11 +891,11 @@
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l0": {
+                        "lengthInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l1": {
+                        "lengthInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -996,7 +996,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -1004,7 +1004,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -1045,27 +1045,27 @@
                         "changeFace"
                     ],
                     "responseSets": {
-                        "accAngle0": {
+                        "accuracyAngle0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accAngle1": {
+                        "accuracyAngle1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl0": {
+                        "accuracyInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl1": {
+                        "accuracyInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c0": {
+                        "crossInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c1": {
+                        "crossInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -1093,11 +1093,11 @@
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l0": {
+                        "lengthInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l1": {
+                        "lengthInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -1197,7 +1197,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accAngle0>-?\\d*\\.?\\d+),(?P<c0>-?\\d*\\.?\\d*),(?P<l0>-?\\d*\\.?\\d*),(?P<accIncl0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -1205,7 +1205,7 @@
                             "enabled": true,
                             "request": "%R1Q,2167:5000,1\r\n",
                             "responseDelimiter": "\r\n",
-                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accAngle1>-?\\d*\\.?\\d+),(?P<c1>-?\\d*\\.?\\d*),(?P<l1>-?\\d*\\.?\\d*),(?P<accIncl1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                            "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
                             "sleepTime": 10.0,
                             "timeout": 30.0
                         },
@@ -1246,27 +1246,27 @@
                         "changeFace"
                     ],
                     "responseSets": {
-                        "accAngle0": {
+                        "accuracyAngle0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accAngle1": {
+                        "accuracyAngle1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl0": {
+                        "accuracyInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "accIncl1": {
+                        "accuracyInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c0": {
+                        "crossInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "c1": {
+                        "crossInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
@@ -1294,11 +1294,11 @@
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l0": {
+                        "lengthInclination0": {
                             "type": "float",
                             "unit": "rad"
                         },
-                        "l1": {
+                        "lengthInclination1": {
                             "type": "float",
                             "unit": "rad"
                         },
