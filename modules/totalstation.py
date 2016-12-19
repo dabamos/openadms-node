@@ -19,18 +19,18 @@ Seehe Licence for the specific language governing permissions and
 limitationsnder the Licence.
 """
 
-importath
-importime
+import math
+import time
 
-fromore.observation import Observation
-fromore.sensor import SensorType
-fromodules.prototype import Prototype
+from core.observation import Observation
+from core.sensor import SensorType
+from modules.prototype import Prototype
 
 """Moduleor data processing (pre-processing, atmospheric corrections,
 transformations)."""
 
 
-classistanceCorrector(Prototype):
+class DistanceCorrector(Prototype):
   """
   Corrects the slope distance for EDM measurements using atmospheric
   data.
@@ -267,7 +267,7 @@ classistanceCorrector(Prototype):
       self._sensor_height = sensor_height
 
 
-classelmertTransformer(Prototype):
+class HelmertTransformer(Prototype):
   """
   HelmertTransformer calculates a 3-dimensional coordinates of a view point
   using the Helmert transformation.
@@ -693,7 +693,7 @@ classelmertTransformer(Prototype):
       return {'type': t, 'unit': u, 'value': v}
 
 
-classolarTransformer(Prototype):
+class PolarTransformer(Prototype):
   """
   PolarTransformer calculates 3-dimensional coordinates of a target using the
   sensor position, and the azimuth position from the configuration together
@@ -802,7 +802,7 @@ classolarTransformer(Prototype):
       return {'type': t, 'unit': u, 'value': v}
 
 
-classefractionCorrector(Prototype):
+class RefractionCorrector(Prototype):
   """
   RefractionCorrector removes the influence of the refraction from a measured
   distance and corrects the Z value of an observed target.
@@ -851,7 +851,7 @@ classefractionCorrector(Prototype):
       return {'type': t, 'unit': u, 'value': v}
 
 
-classerialMeasurementProcessor(Prototype):
+class SerialMeasurementProcessor(Prototype):
   """
   SerialMeasurementProcessor calculates serial measurements by using
   observations of one target in two faces. The two faces, consisting of
