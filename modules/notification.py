@@ -105,7 +105,7 @@ class AlertMessageFormatter(Prototype):
         self._msg_collection_enabled =\
             self._config.get('messageCollectionEnabled')
         self._msg_collection_time = self._config.get('messageCollectionTime')
-        self._receiver = config.get('receiver')
+        self._receiver = selfg._config.get('receiver')
         self._templates = self._config.get('templates')
 
         # Message handler.
