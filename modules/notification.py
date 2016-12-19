@@ -72,12 +72,6 @@ class Alert(Prototype):
             'type': 'alertMessage'
         }
 
-        payload = {
-            'dt': log.asctime,
-            'level': log.levelname.lower(),
-            'message': log.message,
-            'receiver': None                # Will be set below.
-        }
 
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
@@ -93,7 +87,13 @@ class Alert(Prototype):
 
             # Publish a single message for each receiver.
             for receiver in receivers:
-                payload['receiver'] = receiver
+                payload = {
+                    'dt': log.asctime,
+                    'level': log.levelname.lower(),
+                    'message': log.message,
+                    'receiver': receiver
+                }
+
                 self.publish(module_name, header, payload)
 
 
@@ -144,9 +144,9 @@ class AlertMessageFormatter(Prototype):
         }
 
         # Parse the properties.
-        properties = self._config.get('properties')
+        properties = {}
 
-        for prop_name, prop in properties.items():
+        for prop_name, prop in self._config.get('properties').items():
             properties[prop_name] = prop.replace('{{receiver}}', receiver)
 
         # Load the templates
@@ -174,12 +174,12 @@ class AlertMessageFormatter(Prototype):
                                     msg_body,
                                     msg_footer])
 
-            # Create the payload of the message.
-            payload = properties
-            payload['message'] = complete_msg
+        # Create the payload of the message.
+        payload = properties
+        payload['message'] = complete_msg
 
-            # Fire and forget.
-            self.publish(self._receiver, header, payload)
+        # Fire and forget.
+        self.publish(self._receiver, header, payload)
 
     def run(self):
         # Dictionary for caching alert messages. Stores a list of dictionaries:
@@ -196,13 +196,14 @@ class AlertMessageFormatter(Prototype):
 
                 if not receiver:
                     self.logger.warning('No receiver defined in alert message')
-                else:
-                    # Create an empty list for the alert messages.
-                    if not cache.get(receiver):
-                        cache[receiver] = []
+                    continue
 
-                    # Append the message to the list of the receiver.
-                    cache[receiver].append(msg)
+                # Create an empty list for the alert messages.
+                if not cache.get(receiver):
+                    cache[receiver] = []
+
+                # Append the message to the list of the receiver.
+                cache[receiver].append(msg)
             except queue.Empty:
                 if len(cache) > 0:
                     for receiver, messages in cache.items():
@@ -240,14 +241,10 @@ class MailAgent(Prototype):
         self.add_handler('email', self.handle_mail)
 
     def handle_mail(self, header, payload):
-        if self._is_tls and self._is_start_tls:
-            self.logger.error('TLS and StartTLS can\'t be used together')
-            return
-
         mail_subject = payload.get('subject') or self._default_subject
         mail_from = payload.get('from') or self._user_mail
-        mail_to = payload.get('to')
-        mail_message = payload.get('message')
+        mail_to = payload.get('to') or ''
+        mail_message = payload.get('message') or ''
 
         self.process_mail(mail_from,
                           mail_to,
@@ -255,6 +252,10 @@ class MailAgent(Prototype):
                           mail_message)
 
     def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
+        if self._is_tls and self._is_start_tls:
+            self.logger.error('TLS and StartTLS can\'t be used together')
+            return
+
         msg = MIMEMultipart('alternative')
         msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
         msg['To'] = mail_to
