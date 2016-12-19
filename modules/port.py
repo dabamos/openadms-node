@@ -204,9 +204,9 @@ class SerialPort(Prototype):
 
     def _sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        return s.replace('\n', '\\n')
-                .replace('\r', '\\r')
-                .replace('\t', '\\t')
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')\
                 .strip()
 
     def _write(self, data):
