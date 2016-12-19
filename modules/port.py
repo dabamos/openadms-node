@@ -29,7 +29,7 @@ from modules.prototype import Prototype
 
 class SerialPort(Prototype):
     """
-    I/O on serial port.
+    SerialPort does I/O on a given serial port.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -204,9 +204,9 @@ class SerialPort(Prototype):
 
     def _sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        return s.replace('\n', '\\n') \
-                .replace('\r', '\\r') \
-                .replace('\t', '\\t') \
+        return s.replace('\n', '\\n')
+                .replace('\r', '\\r')
+                .replace('\t', '\\t')
                 .strip()
 
     def _write(self, data):

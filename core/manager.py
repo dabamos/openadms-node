@@ -102,7 +102,7 @@ class ModuleManager(object):
         module = Module(messenger, worker)
 
         # Add the module to the modules dictionary.
-        # Start the module -- it's a thread.
+        # Start the threaded module.
         self._modules[module_name] = module
         module.start()
         self.logger.debug('Started module "{}"'.format(module_name))

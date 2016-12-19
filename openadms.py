@@ -49,6 +49,7 @@ Example:
     The monitoring will begin automatically.
 """
 
+# Get root logger.
 logger = logging.getLogger()
 
 LOG_FILE = 'openadms.log'
@@ -142,7 +143,7 @@ if __name__ == '__main__':
     fh.setLevel(file_level)
     fh.setFormatter(formatter)
 
-    # Add handlers to logger.
+    # Add handler to logger.
     logger.addHandler(fh)
 
     date_fmt = '%Y-%m-%dT%H:%M:%S'

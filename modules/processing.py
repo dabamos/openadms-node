@@ -160,11 +160,9 @@ class PreProcessor(Prototype):
 
     def sanitize(self, s):
         """Removes some non-printable characters from a string."""
-        sanitized = s.replace('\n', '\\n') \
-                     .replace('\r', '\\r') \
-                     .replace('\t', '\\t')
-
-        return sanitized
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')
 
 
 class ReturnCodes(object):

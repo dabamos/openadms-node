@@ -44,7 +44,8 @@ class Observation(object):
                 'receivers': [],
                 'response': None,
                 'responseSets': {},
-                'timeStamp': None
+                'timeStamp': None,
+                'type': 'observation'
             }
         else:
             self._data = data
@@ -90,10 +91,6 @@ class Observation(object):
             try:
                 ref = ref.get(x)
             except AttributeError:
-                # logger.info('No "{}" in observation "{}" with ID "{}"'
-                #             .format('->'.join(args),
-                #                     self.get('Name'),
-                #                     self.get('ID')))
                 return
 
         return ref

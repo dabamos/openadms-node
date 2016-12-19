@@ -6,7 +6,7 @@ in Python 3 and should run on Python 3.3 upwards. So far, it has been tested
 with CPython on FreeBSD 10 (x86-64), NetBSD 7 (ARMv7), and Windows 7 (x86).
 For more information, please see http://www.dabamos.de/.
 
-The current version of OpenADMS is 0.3 (code name “Copenhagen”).
+The current development version of OpenADMS is 0.4 (code name “Dar es Salaam”).
 
 ## Installation
 To run OpenADMS, clone the branch and execute `openadms.py`:

@@ -32,7 +32,7 @@ OpenADMS modules."""
 
 class Module(threading.Thread):
     """
-    Module bundles a worker with a messenger and orchestrates the communication
+    Module bundles a worker with a messenger and manages the communication
     between them.
     """
 
@@ -55,7 +55,7 @@ class Module(threading.Thread):
         self._messenger.subscribe(self._topic + '/' + worker.name)
 
     def publish(self, target, message):
-        """Sends an `Observation` to the next receiver by using the
+        """Sends an `Observation` object to the next receiver by using the
         messenger."""
         target_path = '{}/{}'.format(self._topic, target)
         self._messenger.publish(target_path, message)
@@ -113,6 +113,9 @@ class Prototype(object):
         self._uplink = None
         self._is_paused = False
 
+        # A dictionary of the various payload data types and their respective
+        # callback functions.  Further callback functions can be added with the
+        # `add_handler()` method.
         self._handlers = {
             'observation': self.handle_observation,
             'service': self.handle_service
@@ -123,7 +126,8 @@ class Prototype(object):
         self._handlers[name] = func
 
     def handle(self, message):
-        """Processes messages by calling handler methods."""
+        """Processes messages by calling callback functions for data
+        handling."""
         if not self.is_sequence(message) or len(message) < 2:
             self.logger.warning('{}: received message is invalid'
                                 .format(self._name))
@@ -165,8 +169,8 @@ class Prototype(object):
 
     def handle_service(self, header, payload):
         """Processes service messages."""
-        # If `Pause` is set, change status of the worker accordingly.
-        sender = header.get('sender')
+        # If `pause` is set, change status of the worker accordingly.
+        sender = header.get('from')
         pause = payload.get('pause')
 
         if pause is None or pause == self._is_paused:
@@ -220,13 +224,20 @@ class Prototype(object):
                                       obs.get('id')))
             return
 
+        # Name of the sending module.
+        sender = receivers[index - 1]
+
         # Increase the receivers index.
         next_receiver = receivers[index]
         index += 1
         obs.set('nextReceiver', index)
 
         # Create header and payload.
-        header = {'type': 'observation'}
+        header = {
+            'from': sender,
+            'type': 'observation'
+        }
+
         payload = obs.data
 
         # Send the observation to the next module.
@@ -238,9 +249,9 @@ class Prototype(object):
     def publish(self, target, header, payload):
         """Appends header and payload to a list, converts the list to a JSON
         string and sends it to the designated target by using the callback
-        function `_uplink`. The JSON string has the format:
+        function `_uplink()`. The JSON string has the format:
 
-            [ { header }, { payload } ].
+            [ { <header> }, { <payload> } ].
 
         Args:
             target (str): The name of the target.

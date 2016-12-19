@@ -78,9 +78,9 @@ class VirtualSensor(Prototype):
 
     def sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        return s.replace('\n', '\\n')\
-                .replace('\r', '\\r')\
-                .replace('\t', '\\t')\
+        return s.replace('\n', '\\n')
+                .replace('\r', '\\r')
+                .replace('\t', '\\t')
                 .strip()
 
 
@@ -202,13 +202,15 @@ class VirtualIndicatorOne(VirtualSensor):
     """
 
     def __init__(self, name, config_manager, sensor_manager):
-        VirtualSensor.__init__(self, name, config_manager,
+        VirtualSensor.__init__(self,
+                               name,
+                               config_manager,
                                sensor_manager)
 
+        self._current_value = 0.0
         self.patterns = {
             '\?\r': self.get_distance
         }
-        self._current_value = 0.0
 
     def get_distance(self, request):
         x = (1.0 + math.sin(self._current_value)) * 12.5

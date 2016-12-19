@@ -25,9 +25,9 @@ from core.observation import Observation
 
 
 class Sensor(object):
-
     """
-    Sensor stores the configuration of a sensor, including all used commands.
+    Sensor stores the configuration of a sensor, especially, all defined
+    observations.
     """
 
     def __init__(self, name, config_manager):
@@ -41,10 +41,26 @@ class Sensor(object):
         self._observations = {}
 
         for data in config.get('observations'):
-            obs = self._create_observation(data)
+            obs = self.create_observation(data)
             self._observations[obs.get('name')] = obs
+
             self.logger.debug('Loaded observation "{}" of sensor "{}"'
                               .format(obs.get('name'), self._name))
+
+    @staticmethod
+    def create_observation(self, data):
+        """Creates an observation object."""
+        data['sensorName'] = self._name
+        data['sensorType'] = self._type
+        data['type'] = 'observation'
+
+        # Character '\' is escaped in the JSON configuration file. The
+        # additional backslashes have to be removed.
+        for set_name, request_set in data.get('requestSets').items():
+            request_set['responsePattern'] = request_set['responsePattern']\
+                .replace('\\\\', '\\')
+
+        return Observation(data) 
 
     def get_observation(self, name):
         """Returns a single observation."""
@@ -54,29 +70,20 @@ class Sensor(object):
         """Returns all observations."""
         return self._observations
 
-    def _create_observation(self, data):
-        """Creates an observation object."""
-        data['sensorName'] = self._name
-        data['sensorType'] = self._type
-
-        # Character '\' is escaped in the JSON configuration file.
-        for set_name, request_set in data.get('requestSets').items():
-            request_set['responsePattern'] = (request_set['responsePattern']
-                .replace('\\\\', '\\'))
-
-        return Observation(data)
-
     @property
     def name(self):
         return self._name
 
 
 class SensorType(object):
+    """
+    SensorType is used to determine the type of a sensor.
+    """
 
     # Acronyms of valid sensor types:
     #
     # RTS: Robotic Total Station
-    # TPS: Tachymeter-Positionierungssystem
+    # TPS: Total Station Positioning System
     # TST: Total Station Theodolite
     total_stations = ['rts',
                       'tachymeter',

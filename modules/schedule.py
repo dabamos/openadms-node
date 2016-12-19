@@ -31,9 +31,9 @@ from modules.prototype import Prototype
 class Scheduler(Prototype):
     """
     Scheduler is used to manage the monitoring process by sending observations
-    to a sensor. Each observation set is represented by a single job. Jobs are
-    stored in a jobs list and will be executed at the given date/time. For each
-    sensor a separate scheduler is needed.
+    to a sensor. Each observation is represented by a single job. Jobs are
+    stored in a jobs list and will be executed at the given date and time. A
+    separate scheduler is necessary for each serial port.
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -120,8 +120,8 @@ class Scheduler(Prototype):
 
 class Job(object):
     """
-    Job stores a observation set and sends single observations to callback
-    function if they are within a given time frame.
+    Job stores an observation object and sends it to a callback function if the
+    current date and time are within the set schedule.
     """
 
     def __init__(self, name, port_name, obs, enabled, start_date, end_date,
