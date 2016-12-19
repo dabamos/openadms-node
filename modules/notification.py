@@ -78,31 +78,20 @@ class Alert(Prototype):
             'receiver': None                # Will be set below.
         }
 
+        # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
-            # Agent is disabled.
             if not module.get('enabled'):
                 continue
 
-            # Log level is not defined.
-            if not module.get('receivers').get(log.levelname.lower()):
+            receivers = module.get('receivers').get(log.levelname.lower())
+
+            if not receivers or len(receivers) == 0:
                 continue
 
-            # Log level has no receivers.
-            if len(module.get('receivers').get(log.levelname.lower())) == 0:
-                continue
-
-            for level, receivers in module.get('receivers').items():
-                if not receivers or len(receivers) == 0:
-                    continue
-
-                if level != log.levelname.lower():
-                    continue
-
-                for receiver in receivers:
-                    # Set the receiver of the message.
-                    payload['receiver'] = receiver
-                    # Publish a single message for each receiver.
-                    self.publish(module_name, header, payload)
+            # Publish a single message for each receiver.
+            for receiver in receivers:
+                payload['receiver'] = receiver
+                self.publish(module_name, header, payload)
 
 
 class AlertMessageFormatter(Prototype):
@@ -115,7 +104,6 @@ class AlertMessageFormatter(Prototype):
         self._msg_collection_enabled =\
             self._config.get('messageCollectionEnabled')
         self._msg_collection_time = self._config.get('messageCollectionTime')
-        self._receivers = self._config.get('receivers')
         self._templates = self._config.get('templates')
 
         # Message handler.
@@ -139,16 +127,11 @@ class AlertMessageFormatter(Prototype):
         else:
             # Process a single alert message.
             receiver = payload.get('receiver')
-            messages = [payload]
-
-            if receiver is not None and len(messages) > 0:
-                self.process_alert_messages(receiver, messages)
+            self.process_alert_messages(receiver, [payload])
 
     def process_alert_messages(self, receiver, messages):
         # Create the target of the message.
-        target = self._config.get('receiver')
-
-        if not target:
+        if not receiver or receiver == '':
             self.logger.warning('No receiver defined for alert message')
             return
 

@@ -198,6 +198,8 @@ class ReturnCodes(object):
         1283: [3, False, 'Measurement without full correction'],
         1284: [3, False, 'Accuracy can not be guaranteed'],
         1285: [4, True,  'Only angle measurement valid'],
+        1288: [3, False, 'Only angle measurement valid, but without full '\
+                         'correction'],
         1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
         8704: [4, True,  'Position not reached'],
         8708: [4, True,  'Position not exactly reached'],

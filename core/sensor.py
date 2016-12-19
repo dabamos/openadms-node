@@ -47,7 +47,6 @@ class Sensor(object):
             self.logger.debug('Loaded observation "{}" of sensor "{}"'
                               .format(obs.get('name'), self._name))
 
-    @staticmethod
     def create_observation(self, data):
         """Creates an observation object."""
         data['sensorName'] = self._name
@@ -60,7 +59,7 @@ class Sensor(object):
             request_set['responsePattern'] = request_set['responsePattern']\
                 .replace('\\\\', '\\')
 
-        return Observation(data) 
+        return Observation(data)
 
     def get_observation(self, name):
         """Returns a single observation."""

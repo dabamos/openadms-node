@@ -154,7 +154,7 @@ classistanceCorrector(Prototype):
       return c
 
   @staticmethod
-  def get_sea_level_correction(self, sensor_height):
+  def get_sea_level_correction(sensor_height):
       earth_radius = 6.378 * math.pow(10, 6)
       c = -1 * (sensor_height / earth_radius)
 
@@ -322,8 +322,7 @@ classelmertTransformer(Prototype):
       return obs
 
   @staticmethod
-  def _calculate_point_coordinates(self,
-                                   hz, v, dist,
+  def _calculate_point_coordinates(hz, v, dist,
                                    view_point_x,  view_point_y, view_point_z,
                                    a, o):
       # Calculate Cartesian coordinates out of polar coordinates.
