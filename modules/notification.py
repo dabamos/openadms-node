@@ -47,10 +47,11 @@ class Alert(Prototype):
         self._is_enabled = config.get('enabled')
         self._queue = queue.Queue(-1)
 
-        # Add logging handler to the logger.
+        # Add logging handler to the root logger.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
-        self.logger.addHandler(qh)
+        root = logging.getLogger()
+        root.addHandler(qh)
 
         self._modules = config.get('modules')
 
