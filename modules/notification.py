@@ -87,6 +87,8 @@ class Alert(Prototype):
             receivers = module.get('receivers').get(log.levelname.lower())
 
             if not receivers or len(receivers) == 0:
+                self.logger.debug('No receivers defined for log level "{}"'
+                                  .format(log.levelname.lower()))
                 continue
 
             # Publish a single message for each receiver.
@@ -179,7 +181,7 @@ class AlertMessageFormatter(Prototype):
             # Fire and forget.
             self.publish(self._receiver, header, payload)
 
-    def run(self, latency=0.5):
+    def run(self):
         # Dictionary for caching alert messages. Stores a list of dictionaries:
         # '<receiver_name>': [<msg_1>, <msg_2>, ..., <msg_n>]
         cache = {}
@@ -208,7 +210,6 @@ class AlertMessageFormatter(Prototype):
                             continue
 
                         self.process_alert_messages(receiver, messages)
-                        time.sleep(latency)
 
                 # Sleep some time.
                 time.sleep(self._msg_collection_time)
