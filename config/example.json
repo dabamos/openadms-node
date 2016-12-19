@@ -1,23 +1,23 @@
 {
     "modules": {
         "alert": "modules.notification.Alert",
-        "mailFormatter": "modules.notification.AlertMessageFormatter",
-        "mailAgent": "modules.notification.MailAgent",
-        "shortMessageFormatter": "modules.notification.AlertMessageFormatter",
-        "shortMessageAgent": "modules.notification.ShortMessageAgent",
         "com1": "modules.port.SerialPort",
         "com2": "modules.port.SerialPort",
-        "scheduler1": "modules.schedule.Scheduler",
-        "scheduler2": "modules.schedule.Scheduler",
-        "fileExporter": "modules.export.FileExporter",
-        "preProcessor": "modules.processing.PreProcessor",
-        "polarTransformer": "modules.totalstation.PolarTransformer",
         "distanceCorrector": "modules.totalstation.DistanceCorrector",
+        "fileExporter": "modules.export.FileExporter",
+        "helmertTransformer": "modules.totalstation.HelmertTransformer",
+        "mailAgent": "modules.notification.MailAgent",
+        "mailFormatter": "modules.notification.AlertMessageFormatter",
+        "polarTransformer": "modules.totalstation.PolarTransformer",
+        "preProcessor": "modules.processing.PreProcessor",
+        "realTimePublisher": "modules.export.RealTimePublisher",
         "refractionCorrector": "modules.totalstation.RefractionCorrector",
         "returnCodeInspector": "modules.processing.ReturnCodeInspector",
-        "helmertTransformer": "modules.totalstation.HelmertTransformer",
-        "realTimePublisher": "modules.export.RealTimePublisher",
-        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
+        "scheduler1": "modules.schedule.Scheduler",
+        "scheduler2": "modules.schedule.Scheduler",
+        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor",
+        "shortMessageAgent": "modules.notification.ShortMessageAgent",
+        "shortMessageFormatter": "modules.notification.AlertMessageFormatter"
     },
     "project": {
         "name": "projectX",
@@ -1598,7 +1598,6 @@
     "mailFormatter": {
         "messageCollectionEnabled": true,
         "messageCollectionTime": 600,
-        "receiver": "",
         "type": "email",
         "templates": {
             "header": "The following incident(s) occurred:\n\n",
@@ -1614,7 +1613,6 @@
     "shortMessageFormatter": {
         "messageCollectionEnabled": false,
         "messageCollectionTime": 0,
-        "receiver": "",
         "type": "sms",
         "templates": {
             "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
