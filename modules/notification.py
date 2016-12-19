@@ -105,6 +105,7 @@ class AlertMessageFormatter(Prototype):
         self._msg_collection_enabled =\
             self._config.get('messageCollectionEnabled')
         self._msg_collection_time = self._config.get('messageCollectionTime')
+        self._receiver = config.get('receiver')
         self._templates = self._config.get('templates')
 
         # Message handler.
@@ -131,7 +132,6 @@ class AlertMessageFormatter(Prototype):
             self.process_alert_messages(receiver, [payload])
 
     def process_alert_messages(self, receiver, messages):
-        # Create the target of the message.
         if not receiver or receiver == '':
             self.logger.warning('No receiver defined for alert message')
             return
@@ -177,7 +177,7 @@ class AlertMessageFormatter(Prototype):
             payload['message'] = complete_msg
 
             # Fire and forget.
-            self.publish(target, header, payload)
+            self.publish(self._receiver, header, payload)
 
     def run(self, latency=0.5):
         # Dictionary for caching alert messages. Stores a list of dictionaries:

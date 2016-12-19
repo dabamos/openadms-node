@@ -53,7 +53,7 @@ class SerialPort(Prototype):
 
         if self._serial is None:
             self.logger.error('Could not write to port "{}"'
-                         .format(self._serial_port_config.port))
+                              .format(self._serial_port_config.port))
             return
 
         requests_order = obs.get('requestsOrder', [])
