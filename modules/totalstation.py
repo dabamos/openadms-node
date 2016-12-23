@@ -327,8 +327,7 @@ class HelmertTransformer(Prototype):
                                      view_point_x, view_point_y, view_point_z,
                                      a, o):
         # Calculate Cartesian coordinates out of polar coordinates.
-        local_x, local_y, local_z = self._get_cartesian_coordinates(
-            hz, v, dist)
+        local_x, local_y, local_z = _get_cartesian_coordinates(hz, v, dist)
 
         x = view_point_x + (a * local_x) - (o * local_y)
         y = view_point_y + (a * local_y) + (o * local_x)
@@ -439,9 +438,7 @@ class HelmertTransformer(Prototype):
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
-            local_x, local_y, local_z = self._get_cartesian_coordinates(hz,
-                                                                        v,
-                                                                        dist)
+            local_x, local_y, local_z = _get_cartesian_coordinates(hz, v, dist)
 
             # Store local coordinates in the tie point dictionary.
             tie_point['localX'] = local_x
@@ -495,13 +492,13 @@ class HelmertTransformer(Prototype):
             o_1 += (r_local_centroid_x * r_global_centroid_y) -\
                    (r_local_centroid_y * r_global_centroid_x)
             o_2 += math.pow(r_local_centroid_x, 2) +\
-                math.pow(r_local_centroid_y, 2)
+                   math.pow(r_local_centroid_y, 2)
 
             # a = [ x_i * X_i + y_i * Y_i ] * [ x_i^2 + y_i^2 ]^-1
             a_1 += (r_local_centroid_x * r_global_centroid_x) +\
                    (r_local_centroid_y * r_global_centroid_y)
             a_2 += math.pow(r_local_centroid_x, 2) +\
-                math.pow(r_local_centroid_y, 2)
+                   math.pow(r_local_centroid_y, 2)
 
         self._o = o_1 / o_2  # Parameter o.
         self._a = a_1 / a_2  # Parameter a.
@@ -511,11 +508,11 @@ class HelmertTransformer(Prototype):
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
         self._view_point['x'] = global_centroid_x -\
-            (self._a * local_centroid_x) +\
-            (self._o * local_centroid_y)
+                                (self._a * local_centroid_x) +\
+                                (self._o * local_centroid_y)
         self._view_point['y'] = global_centroid_y -\
-            (self._a * local_centroid_y) -\
-            (self._o * local_centroid_x)
+                                (self._a * local_centroid_y) -\
+                                (self._o * local_centroid_x)
         self._view_point['z'] = (sum_global_z - sum_local_z) / num_tie_points
 
         self.logger.info('Calculated coordinates of view point "{}" '
@@ -542,9 +539,9 @@ class HelmertTransformer(Prototype):
             view_point_y = self._view_point.get('y')
             view_point_z = self._view_point.get('z')
 
-            wx_i = (-1 * view_point_x) - (self._a * local_x) + \
+            wx_i = (-1 * view_point_x) - (self._a * local_x) +\
                    (self._o * local_y) + global_x
-            wy_i = (-1 * view_point_y) - (self._a * local_y) - \
+            wy_i = (-1 * view_point_y) - (self._a * local_y) -\
                    (self._o * local_x) + global_y
 
             sum_wx += wx_i
@@ -570,7 +567,7 @@ class HelmertTransformer(Prototype):
         sz = math.sqrt(sum_wz_wz / (num_tie_points - 1))
 
         self.logger.debug('Calculated standard deviations '
-                          '(sx = {:1.5f} m, sy = {:1.5f} m, sz = {:1.5f} m)'
+                          '(sX = {:1.5f} m, sY = {:1.5f} m, sZ = {:1.5f} m)'
                           .format(sx, sy, sz))
 
         # Scale factor.
@@ -830,10 +827,13 @@ class RefractionCorrector(Prototype):
         k_r = k * k_e               # Correction of refraction.
         r = k_e - k_r
 
-        self.logger.info(
-            'Updated height of observation "{}" with ID "{}" from '
-            '{:3.4f} m to {:3.4f} m (refraction value: {:3.5f} m)' .format(
-                obs.get('name'), obs.get('id'), z, z + r, r))
+        self.logger.info('Updated height of observation "{}" with ID "{}" '
+                         'from {:3.4f} m to {:3.4f} m (refraction value: '
+                         '{:3.5f} m)'.format(obs.get('name'),
+                                             obs.get('id'),
+                                             z,
+                                             z + r,
+                                             r))
 
         refraction = self.get_response_set('float', 'm', round(r, 6))
         z_new = self.get_response_set('float', 'm', round(z + r, 5))

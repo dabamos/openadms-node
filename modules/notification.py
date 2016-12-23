@@ -213,6 +213,8 @@ class AlertMessageFormatter(Prototype):
                         self.process_alert_messages(receiver, messages)
 
                 # Sleep some time.
+                self.logger.debug('Waiting {} s to collect new alert messages ...'
+                                  .format(self._msg_collection_time))
                 time.sleep(self._msg_collection_time)
 
                 # Clear the messages cache.
