@@ -81,7 +81,7 @@ def main(config_file):
     stay_alive()
 
 def exception_hook(type, value, traceback):
-    logger.critical('Unhandled exception: {} {}'
+    logger.critical('Unhandled exception: {} {} {}'
                     .format(type, value, traceback.rstrip()))
 
 def signal_handler(signal, frame):
