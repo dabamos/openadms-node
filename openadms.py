@@ -80,6 +80,10 @@ def main(config_file):
     # Run to infinity and beyond (probably not).
     stay_alive()
 
+def exception_hook(type, value, traceback):
+    logger.critical('Unhandled exception: {} {}'
+                    .format(type, value, traceback.rstrip()))
+
 def signal_handler(signal, frame):
     logger.info('Exiting ...')
     sys.exit(0)
@@ -89,6 +93,7 @@ def stay_alive():
         time.sleep(1)
 
 if __name__ == '__main__':
+    # Parse command line options.
     optparse.OptionParser.format_epilog = lambda self, formatter: self.epilog
     parser = optparse.OptionParser(
         usage='%prog [options]',
@@ -148,6 +153,9 @@ if __name__ == '__main__':
 
     date_fmt = '%Y-%m-%dT%H:%M:%S'
     coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+
+    # Set the hook for unhandled exceptions.
+    sys.excepthook = exception_hook
 
     # Use a signal handler to catch ^C and quit the program gracefully.
     signal.signal(signal.SIGINT, signal_handler)
