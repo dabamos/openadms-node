@@ -71,9 +71,8 @@ class DistanceCorrector(Prototype):
             return obs
 
         # Check if atmospheric data has been set.
-        if not self.temperature or not self.pressure or not self.humidity:
-            self.logger.warning(
-                'No temperature, air pressure, or humidity set')
+        if None in [self.temperature, self.pressure, not self.humidity]:
+            self.logger.warning('No temperature, air pressure, or humidity set')
             return obs
 
         # Check the age of the atmospheric data.
