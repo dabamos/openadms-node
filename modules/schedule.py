@@ -228,7 +228,7 @@ class Job(object):
                                   self._port_name))
 
         # Get the sleep time of the whole observation.
-        sleep_time = obs_copy.get('sleepTime')
+        sleep_time = obs_copy.get('sleepTime', 0)
 
         # Create target, header, and payload in order to send the observation.
         target = self._port_name

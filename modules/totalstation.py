@@ -326,9 +326,9 @@ class HelmertTransformer(Prototype):
                                      view_point_x, view_point_y, view_point_z,
                                      a, o):
         # Calculate Cartesian coordinates out of polar coordinates.
-        local_x, local_y, local_z = self._get_cartesian_coordinates(hz,
-                                                                    v,
-                                                                    dist)
+        local_x, local_y, local_z = _get_cartesian_coordinates(hz,
+                                                               v,
+                                                               dist)
 
         x = view_point_x + (a * local_x) - (o * local_y)
         y = view_point_y + (a * local_y) + (o * local_x)
@@ -439,9 +439,9 @@ class HelmertTransformer(Prototype):
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
-            local_x, local_y, local_z = self._get_cartesian_coordinates(hz,
-                                                                        v,
-                                                                        dist)
+            local_x, local_y, local_z = _get_cartesian_coordinates(hz,
+                                                                   v,
+                                                                   dist)
 
             # Store local coordinates in the tie point dictionary.
             tie_point['localX'] = local_x
