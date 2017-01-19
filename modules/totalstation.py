@@ -322,13 +322,13 @@ class HelmertTransformer(Prototype):
         return obs
 
     @staticmethod
-    def _calculate_point_coordinates(hz, v, dist,
+    def calculate_point_coordinates(hz, v, dist,
                                      view_point_x, view_point_y, view_point_z,
                                      a, o):
         # Calculate Cartesian coordinates out of polar coordinates.
-        local_x, local_y, local_z = _get_cartesian_coordinates(hz,
-                                                               v,
-                                                               dist)
+        local_x, local_y, local_z = self.get_cartesian_coordinates(hz,
+                                                                   v,
+                                                                   dist)
 
         x = view_point_x + (a * local_x) - (o * local_y)
         y = view_point_y + (a * local_y) + (o * local_x)
@@ -349,7 +349,7 @@ class HelmertTransformer(Prototype):
             p = 1 / s
 
             # Global Cartesian coordinates of the tie point.
-            x, y, z = self._calculate_point_coordinates(
+            x, y, z = self.calculate_point_coordinates(
                 tie_point.get('hz'),
                 tie_point.get('v'),
                 tie_point.get('dist'),
@@ -383,7 +383,7 @@ class HelmertTransformer(Prototype):
             return obs
 
         # Calculate the coordinates in the global system (X, Y, Z).
-        x, y, z = self._calculate_point_coordinates(
+        x, y, z = self.calculate_point_coordinates(
             hz,
             v,
             dist,
@@ -439,9 +439,9 @@ class HelmertTransformer(Prototype):
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
-            local_x, local_y, local_z = _get_cartesian_coordinates(hz,
-                                                                   v,
-                                                                   dist)
+            local_x, local_y, local_z = self.get_cartesian_coordinates(hz,
+                                                                       v,
+                                                                       dist)
 
             # Store local coordinates in the tie point dictionary.
             tie_point['localX'] = local_x
@@ -603,7 +603,7 @@ class HelmertTransformer(Prototype):
         return view_point
 
     @staticmethod
-    def _get_cartesian_coordinates(hz, v, slope_dist):
+    def get_cartesian_coordinates(hz, v, slope_dist):
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
@@ -651,7 +651,7 @@ class HelmertTransformer(Prototype):
         tie_point = self._tie_points.get(obs.get('id'))
 
         if self._is_ready():
-            x, y, z = self._calculate_point_coordinates(
+            x, y, z = self.calculate_point_coordinates(
                 hz,
                 v,
                 dist,

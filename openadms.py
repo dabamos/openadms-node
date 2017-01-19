@@ -23,6 +23,7 @@ import logging.handlers
 import optparse
 import signal
 import sys
+import threading
 import time
 
 import coloredlogs
@@ -79,6 +80,29 @@ def main(config_file):
     Monitor(config_file)
     # Run to infinity and beyond (probably not).
     stay_alive()
+
+def setup_thread_excepthook():
+    """Workaround for `sys.excepthook` thread bug from:
+    http://bugs.python.org/issue1230540
+
+    Call once from the main thread before creating any threads."""
+
+    init_original = threading.Thread.__init__
+
+    def init(self, *args, **kwargs):
+
+        init_original(self, *args, **kwargs)
+        run_original = self.run
+
+        def run_with_except_hook(*args2, **kwargs2):
+            try:
+                run_original(*args2, **kwargs2)
+            except Exception:
+                sys.excepthook(*sys.exc_info())
+
+        self.run = run_with_except_hook
+
+    threading.Thread.__init__ = init
 
 def exception_hook(type, value, traceback):
     logger.critical('Unhandled exception: {} {} {}'
@@ -155,6 +179,7 @@ if __name__ == '__main__':
     coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
     # Set the hook for unhandled exceptions.
+    setup_thread_excepthook()
     sys.excepthook = exception_hook
 
     # Use a signal handler to catch ^C and quit the program gracefully.
