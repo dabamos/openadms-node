@@ -106,8 +106,9 @@ def setup_thread_excepthook():
     threading.Thread.__init__ = init
 
 def exception_hook(type, value, tb):
+    fmt_exception = ''.join(traceback.format_exception(type, value, tb)).replace('\n', '')
     logger.critical('Unhandled exception: {}'
-                    .format(''.join(traceback.format_exception(type, value, tb)).replace('\n', '')))
+                    .format(fmt_exception))
 
 def signal_handler(signal, frame):
     logger.info('Exiting ...')
