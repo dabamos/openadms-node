@@ -133,7 +133,6 @@ class DistanceCorrector(Prototype):
 
         return obs
 
-    @staticmethod
     def get_atmospheric_correction(temperature, pressure, humidity):
         """Calculates the atmospheric correction value in parts per million
         (ppm) for the reduction of distances gained by electronic distance
@@ -153,7 +152,6 @@ class DistanceCorrector(Prototype):
 
         return c
 
-    @staticmethod
     def get_sea_level_correction(sensor_height):
         earth_radius = 6.378 * math.pow(10, 6)
         c = -1 * (sensor_height / earth_radius)
@@ -321,7 +319,6 @@ class HelmertTransformer(Prototype):
 
         return obs
 
-    @staticmethod
     def calculate_point_coordinates(hz, v, dist,
                                      view_point_x, view_point_y, view_point_z,
                                      a, o):
@@ -602,7 +599,6 @@ class HelmertTransformer(Prototype):
         # Return the observation of the view point.
         return view_point
 
-    @staticmethod
     def get_cartesian_coordinates(hz, v, slope_dist):
         hz_dist = slope_dist * math.sin(v)
 
