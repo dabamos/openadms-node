@@ -25,6 +25,7 @@ import signal
 import sys
 import threading
 import time
+import traceback
 
 import coloredlogs
 
@@ -104,9 +105,9 @@ def setup_thread_excepthook():
 
     threading.Thread.__init__ = init
 
-def exception_hook(type, value, traceback):
-    logger.critical('Unhandled exception: {} {} {}'
-                    .format(type, value, traceback.rstrip()))
+def exception_hook(type, value, tb):
+    logger.critical('Unhandled exception: {}'
+                    .format(''.join(traceback.format_exception(type, value, tb)).replace('\n', '')))
 
 def signal_handler(signal, frame):
     logger.info('Exiting ...')
@@ -153,7 +154,7 @@ if __name__ == '__main__':
     console_level = logging.DEBUG if options.debug else logging.INFO
     logger.setLevel(console_level)
 
-    fmt = '%(asctime)s - %(levelname)7s - %(name)26s - %(message)s'
+    fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
     formatter = logging.Formatter(fmt)
 
     # File handler.
