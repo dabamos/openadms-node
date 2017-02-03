@@ -501,8 +501,8 @@ class HelmertTransformer(Prototype):
             a_2 += math.pow(r_local_centroid_x, 2) +\
                    math.pow(r_local_centroid_y, 2)
 
-        self._o = o_1 / o_2  # Parameter o.
-        self._a = a_1 / a_2  # Parameter a.
+        self._o = o_1 / o_2 if o_2 > 0 else 0  	# Parameter o.
+        self._a = a_1 / a_2 if a_2 > 0 else 0	# Parameter a.
 
         # Calculate the coordinates of the view point:
         # Y_0 = Y_s - a * y_s - o * x_s
