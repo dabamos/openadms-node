@@ -205,6 +205,7 @@ class ReturnCodes(object):
         8708: [4, True,  'Position not exactly reached'],
         8710: [4, True,  'No target detected'],
         8711: [4, False, 'Multiple targets detected'],
+        8716: [4, True,  'Target position not exactly reached'],
     }
 
 
