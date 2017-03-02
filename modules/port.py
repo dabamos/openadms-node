@@ -198,11 +198,6 @@ class SerialPort(Prototype):
                 self.logger.warning('Timeout on port "{}" after {} s'
                                     .format(self._serial_port_config.port,
                                             timeout))
-                # Try to open the port again.
-                self.close()
-                time.sleep(1)
-                self._open()
-
                 break
 
         return response
