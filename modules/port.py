@@ -199,7 +199,7 @@ class SerialPort(Prototype):
                                     .format(self._serial_port_config.port,
                                             timeout))
                 # Try to open the port again.
-                self._close()
+                self.close()
                 time.sleep(1)
                 self._open()
 
