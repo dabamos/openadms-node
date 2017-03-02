@@ -128,8 +128,8 @@ class SerialPort(Prototype):
         return obs
 
     def close(self):
-        self.logger.info('Closing port "{}"'
-                    .format(self._serial_port_config.port))
+        self.logger.info('Closing port "{}" ...'
+                         .format(self._serial_port_config.port))
         self._serial.close()
 
     def _get_port_config(self):
@@ -198,6 +198,11 @@ class SerialPort(Prototype):
                 self.logger.warning('Timeout on port "{}" after {} s'
                                     .format(self._serial_port_config.port,
                                             timeout))
+                # Try to open the port again.
+                self._close()
+                time.sleep(1)
+                self._open()
+
                 break
 
         return response
