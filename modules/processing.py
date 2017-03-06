@@ -231,47 +231,45 @@ class ReturnCodeInspector(Prototype):
                 continue
 
             # Get level and error message of the return code.
-            values = ReturnCodes.codes.get(return_code)
+            error_values = ReturnCodes.codes.get(return_code)
+            lvl, retry, msg = error_values
 
-            if values:
-                lvl, retry, msg = values
+            attempts = obs.get('attempts', 0)
 
-                # Return code related log message.
-                self.logger.log(lvl * 10, 'Observation "{}" with ID "{}": {} '
-                                          '(code "{}")'.format(obs.get('name'),
-                                                               obs.get('id'),
-                                                               msg,
-                                                               return_code))
+            # Retry measurement.
+            if retry and attempts < self._retries:
+                obs.set('attempts', attempts + 1)
+                obs.set('nextReceiver', 0)
+                obs.set('corrupted', False)
 
-                # Retry measurement.
-                if retry:
-                    attempts = obs.get('attempts', 0)
-
-                    if attempts < self._retries :
-                        obs.set('attempts', attempts + 1)
-                        obs.set('nextReceiver', 0)
-                        obs.set('corrupted', False)
-
-                        self.logger.info('Retrying observation "{}" with ID '
-                                         '"{}" (attempt {} of {})'
-                                         .format(obs.get('name'),
-                                                 obs.get('id'),
-                                                 attempts + 1,
-                                                 self._retries))
-                    else:
-                        obs.set('corrupted', True)
-
-                        self.logger.info('Maximum number of attempts ({}) '
-                                         'reached for observation "{}" with '
-                                         'ID "{}"'.format(self._retries,
-                                                          obs.get('name'),
-                                                          obs.get('id')))
-
-                    return obs
+                self.logger.info('Retrying observation "{}" with ID "{}" due '
+                                 'to return code {} of response "{}" '
+                                 '(attempt {} of {})'.format(obs.get('name'),
+                                                             obs.get('id'),
+                                                             return_code,
+                                                             response_set,
+                                                             attempts + 1,
+                                                             self._retries))
             else:
-                # Generic log message.
-                self.logger.error('Error occurred on observation "{}" '
-                                  '(code "{}")'.format(obs.get('name'),
-                                                       return_code))
+                obs.set('corrupted', True)
+
+                if error_values:
+                    # Return code related log message.
+                    self.logger.log(lvl * 10, 'Observation "{}" with ID "{}": '
+                                              '{} (code {} in response "{}")'
+                                              .format(obs.get('name'),
+                                                      obs.get('id'),
+                                                      msg,
+                                                      return_code,
+                                                      response_set))
+
+                else:
+                    # Generic log message.
+                    self.logger.error('Error occurred on observation "{}" '
+                                      '(code {} in response "{}")'
+                                      .format(obs.get('name'),
+                                              return_code,
+                                              response_set))
+            return obs
 
         return obs
