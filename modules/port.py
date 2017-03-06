@@ -46,15 +46,22 @@ class SerialPort(Prototype):
 
     def process_observation(self, obs):
         if not self._serial:
-            self._open()
-
-        # Add the name of this serial port to the observation.
-        obs.set('portName', self.name)
+            self._create()
+            self._serial.reset_input_buffer()
 
         if self._serial is None:
             self.logger.error('Could not write to port "{}"'
                               .format(self._serial_port_config.port))
             return
+
+        if not self._serial.is_open:
+            self.logger.info('Re-opening port "{}" ...'
+                             .format(self._serial_port_config.port))
+            self._serial.open()
+            self._serial.reset_input_buffer()
+
+        # Add the name of this serial port to the observation.
+        obs.set('portName', self.name)
 
         requests_order = obs.get('requestsOrder', [])
         request_sets = obs.get('requestSets')
@@ -85,9 +92,10 @@ class SerialPort(Prototype):
             timeout = request_set.get('timeout')
 
             # Send the request of the observation to the attached sensor.
-            self.logger.info('Sending request "{}" to sensor "{}"'
-                             .format(request_name,
-                                     obs.get('sensorName')))
+            self.logger.info('Sending request "{}" of observation "{}" to '
+                             'sensor "{}"'.format(request_name,
+                                                  obs.get('name'),
+                                                  obs.get('sensorName')))
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
@@ -103,9 +111,10 @@ class SerialPort(Prototype):
 
                 if response != '':
                     self.logger.debug('Received response "{}" for request "{}" '
-                                      'from sensor "{}"'
+                                      'of observation "{}" from sensor "{}"'
                                       .format(self._sanitize(response),
                                               request_name,
+                                              obs.get('name'),
                                               obs.get('sensorName')))
                     break
 
@@ -151,7 +160,7 @@ class SerialPort(Prototype):
             xonxoff=p.get('softwareFlowControl'),
             rtscts=p.get('hardwareFlowControl'))
 
-    def _open(self):
+    def _create(self):
         """Opens a serial port."""
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
