@@ -58,6 +58,7 @@ class SerialPort(Prototype):
             self.logger.info('Re-opening port "{}" ...'
                              .format(self._serial_port_config.port))
             self._serial.open()
+            self._serial.reset_output_buffer()
             self._serial.reset_input_buffer()
 
         # Add the name of this serial port to the observation.
@@ -108,6 +109,9 @@ class SerialPort(Prototype):
 
                 # Get the response of the sensor.
                 response = self._read(response_delimiter, timeout)
+
+                self._serial.reset_output_buffer()
+                self._serial.reset_input_buffer()
 
                 if response != '':
                     self.logger.debug('Received response "{}" for request "{}" '

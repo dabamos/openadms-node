@@ -46,7 +46,7 @@ class PreProcessor(Prototype):
             if response is None or response == '':
                 self.logger.error('No response in observation "{}" with ID "{}"'
                                   .format(obs.get('name'), obs.get('id')))
-                return obs
+                continue
 
             pattern = re.compile(response_pattern)
             match = pattern.search(response)
