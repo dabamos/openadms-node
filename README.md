@@ -1,10 +1,10 @@
 ![OpenADMS](http://www.dabamos.de/github/openadms.png)
 
 OpenADMS is an open source automatic deformation monitoring system for
-geodetical and geotechnical surveillance measurements. The software is written
-in Python 3 and should run on Python 3.3 upwards. So far, it has been tested
-with CPython on FreeBSD 10 (x86-64), NetBSD 7 (ARMv7), and Windows 7 (x86).
-For more information, please see http://www.dabamos.de/.
+geodetical and geotechnical measurements. The software is written in Python 3
+and should run on Python 3.5 upwards. So far, it has been tested with CPython on
+FreeBSD 10 (x86-64), NetBSD 7 (ARMv7), and Windows 7 (x86).  For more
+information, please see http://www.dabamos.de/.
 
 The current development version of OpenADMS is 0.4 (code name “Dar es Salaam”).
 
@@ -14,7 +14,7 @@ To run OpenADMS, clone the branch and execute `openadms.py`:
 ```
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
-$ python3 openadms.py
+$ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
 ### Libraries
@@ -47,12 +47,12 @@ using the hostname `iot.eclipse.org` and port `1883`. For encryption, use port
 
 ## Configuration
 The configuration of OpenADMS is done by using a JSON-based text file, located
-in the directory `./config`. Please define serial ports, sensors, and
-connections between them there. OpenADMS takes the file name of the
-configuration as an argument. Run:
+in the directory `./config`. Please define modules, serial ports, sensors, and
+so on there. OpenADMS takes the file name of your custom configuration as an
+argument. Run:
 
 ```
-$ python3 openadms.py --config ./config/my_config.json
+$ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
 ## Virtual Environment
