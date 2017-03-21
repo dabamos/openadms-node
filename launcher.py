@@ -20,6 +20,8 @@ limitations under the Licence.
 '''
 
 import os
+import platform
+import re
 import shlex
 import signal
 import subprocess
@@ -30,6 +32,11 @@ from tkinter import *
 
 APP_NAME = 'OpenADMS Launcher'
 APP_VERSION = '1.0'
+
+# Get the name of the operating system, to switch Windows-specific conventions.
+OS = platform.system()
+# Windows doesn't know the generic "Monospace" name for fixed-width fonts.
+MONOSPACE_FONT = 'Courier New' if OS  == 'Windows' else 'Monospace'
 
 class App(Thread):
 
@@ -82,7 +89,7 @@ class App(Thread):
                          width=160)
         self.text.configure(background='black',
                             foreground='gold',
-                            font=('Monospace', 10))
+                            font=(MONOSPACE_FONT, 10))
 
         #
         # Scrollbar
@@ -90,10 +97,10 @@ class App(Thread):
         self.scrollbar = Scrollbar(self.frame, command=self.text.yview)
         self.text['yscrollcommand'] = self.scrollbar.set
 
-        # Config
+        # Config Entry
         l1 = Label(self.frame, text='Configuration File: ')
 
-        self.e = Entry(self.frame, width=40, font=('Monospace', 10))
+        self.e = Entry(self.frame, width=40, font=(MONOSPACE_FONT, 10))
         self.e.insert(0, './config/config.json')
 
         b = Button(self.frame, text='...', command=self.ask_open_file_name)
@@ -144,31 +151,48 @@ class App(Thread):
     def print_lines(self, pipe):
         with pipe:
             for line in pipe:
-                self.text.insert(END, str(line))
-                self.text.see('end')
+                ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
+                clean = ansi_escape.sub('', str(line))
+                self.text.insert(END, clean)
+                self.text.see(END)
 
     def stop_monitoring(self):
-        self.button['text'] = 'Stop\n Monitoring'
+        self.button['text'] = 'Start\n Monitoring'
         self.button['command'] = self.stop_monitoring
 
-        os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+        if OS == 'Windows':
+            os.kill(self.process.pid, signal.CTRL_BREAK_EVENT)
+        else:
+            os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+
         self.text.insert(END, '[Stopped]')
-        self.text.see('end')
+        self.text.see(END)
 
     def start_monitoring(self):
         self.button['text'] = 'Stop\n Monitoring'
         self.button['command'] = self.stop_monitoring
 
-        cmd = 'python3 openadms.py --debug --config config/virtual.json'
+        cmd = 'openadms.py --debug --verbosity 3 --config config/example.json'
 
-        self.process = subprocess.Popen(cmd,
-                                        preexec_fn=os.setsid,
-                                        shell=True,
-                                        stderr=subprocess.STDOUT,
-                                        stdout=subprocess.PIPE,
-                                        universal_newlines=True)
+        if OS == 'Windows':
+            self.process = subprocess.Popen(
+                cmd,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                universal_newlines=True)
+        else:
+            self.process = subprocess.Popen(
+                cmd,
+                preexec_fn=os.setsid,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                universal_newlines=True)
 
         Thread(target=self.print_lines, args=[self.process.stdout]).start()
+
 
 if __name__ == '__main__':
     app = App()
