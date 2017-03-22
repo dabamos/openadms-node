@@ -33,9 +33,9 @@ from core.monitor import Monitor
 
 """OpenADMS - Open Automatic Deformation Monitoring System
 
-OpenADMS is an open source automatic deformation monitoring system for
-surveillance measurements. It can be used to monitor buildings, terrain, and
-other objects with the help of geodetical or geotechnical sensors.
+OpenADMS is an open source automatic deformation monitoring system for permanent
+measurements. It can be used to monitor buildings, terrain, and other objects
+with the help of geodetical or geotechnical sensors.
 
 Example:
     At first, start an MQTT message broker like Eclipse Mosquitto. The message
@@ -108,7 +108,7 @@ def setup_thread_excepthook():
 def exception_hook(type, value, tb):
     fmt_exception = ''.join(traceback.format_exception(type, value, tb)).replace('\n', '')
     logger.critical('Unhandled exception: {}'
-                    .format(fmt_exception))
+                    .format(''.join(fmt_exception.split())))
 
 def signal_handler(signal, frame):
     logger.info('Exiting ...')
