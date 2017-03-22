@@ -108,7 +108,7 @@ class Launcher(Thread):
         self.config_label = Label(self.frame, text='Configuration File: ')
         self.config_entry = Entry(self.frame,
                                   width=40,
-                                  font=(MONOSPACE_FONT, 10))
+                                  font=(MONOSPACE_FONT, 9))
 
         if OS == 'Windows':
             # On Microsoft Windows.
@@ -155,8 +155,8 @@ class Launcher(Thread):
             sticky='nsew')
         self.scrollbar.grid(column=4, padx=2, pady=2, row=3, sticky='nsew')
         self.config_label.grid(column=0, row=0, sticky='w')
-        self.config_entry.grid(column=1, row=0, sticky='w')
-        self.config_button.grid(column=2, row=0, sticky='w')
+        self.config_entry.grid(column=1, row=0, padx=2, sticky='w')
+        self.config_button.grid(column=2, row=0, padx=2, sticky='w')
         self.options_label.grid(column=0, row=2, sticky='w')
         self.debug_check.grid(column=1, row=2, sticky='w')
         self.log_level_label.grid(column=0, row=1, sticky='w')
