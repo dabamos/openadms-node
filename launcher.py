@@ -39,27 +39,33 @@ MONOSPACE_FONT = 'Courier New' if OS  == 'Windows' else 'Monospace'
 # Maximum number of lines in text widget.
 CONSOLE_MAX_LINES = 500
 
-class App(Thread):
+
+class Launcher(Thread):
+    """Simple graphical tool to start an HBMQTT message broker and the OpenADMS
+    monitoring system."""
 
     def __init__(self):
         Thread.__init__(self)
         self.start()
 
-    def callback(self):
+    def quit(self):
         self.root.quit()
 
     def run(self):
         self.root = Tk()
         self.root.resizable(width=False, height=False)
         #self.root.geometry('1000x600')
-        self.root.protocol('WM_DELETE_WINDOW', self.callback)
+        self.root.protocol('WM_DELETE_WINDOW', self.quit)
         self.root.title('{} {}'.format(APP_NAME, APP_VERSION))
 
         self.create_widgets()
+        self.align_widgets()
 
         self.root.mainloop()
 
     def ask_open_file_name(self):
+        """Opens a file dialog window and inserts the path to the selected file
+        into the config entry widget."""        
         file_name = filedialog.askopenfilename(
             initialdir='.',
             title='Select Configuration File',
@@ -72,6 +78,7 @@ class App(Thread):
             self.config_entry.insert(0, file_name)
 
     def create_widgets(self):
+        """Creates all widgets of the user interface."""
         self.frame = Frame(self.root, padx=5, pady=5)
         self.frame.pack(expand=True)
         # Ensure a consistent GUI size.
@@ -87,6 +94,7 @@ class App(Thread):
                             height=50,
                             width=160,
                             undo=False)
+        # Set read-only.
         self.console.bind('<Key>', lambda e: 'break')
         self.console.configure(background='black',
                                foreground='gold',
@@ -98,15 +106,18 @@ class App(Thread):
 
         # Path to config file.
         self.config_label = Label(self.frame, text='Configuration File: ')
-        self.config_entry = Entry(self.frame, width=40, font=(MONOSPACE_FONT, 10))
+        self.config_entry = Entry(self.frame,
+                                  width=40,
+                                  font=(MONOSPACE_FONT, 10))
 
         if OS == 'Windows':
+            # On Microsoft Windows.
             path = 'config\config.json'
         else:
+            # On Unix-like operating systems.
             path = './config/config.json'
 
         self.config_entry.insert(0, path)
-
         self.config_button = Button(self.frame,
                                     text='...',
                                     command=self.ask_open_file_name)
@@ -138,7 +149,8 @@ class App(Thread):
         self.monitoring_button['text'] = 'Start\n Monitoring'
         self.monitoring_button['command'] = self.start_monitoring
 
-        # Grids.
+    def align_widgets(self):
+        """Places the widgets in the main window."""
         self.console.grid(column=0, columnspan=4, padx=2, pady=2, row=3,
             sticky='nsew')
         self.scrollbar.grid(column=4, padx=2, pady=2, row=3, sticky='nsew')
@@ -155,28 +167,36 @@ class App(Thread):
             rowspan=2, sticky='ne')
 
     def print_lines(self, pipe, color):
+        """Prints the output of a pipe to the console text widget."""
         with pipe:
             for line in pipe:
+                # Remove old lines.
                 n_lines = int(self.console.index('end-1c').split('.')[0])
 
                 if n_lines > CONSOLE_MAX_LINES:
                     self.console.delete(1.0, 2.0)
 
+                # Remove ANSI colors.
                 ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
-                clean_line = ansi_escape.sub('', str(line))
+                clean_line = ansi_escape.sub('', line)
 
+                # Set text color of the line.
                 self.console.tag_configure(color, foreground=color)
-
+                # Insert text.
                 self.console.insert(END, clean_line, color)
                 self.console.see(END)
 
     def kill_process(self, pid):
+        """Kills an external process."""
         if OS == 'Windows':
+            # On Microsoft Windows.
             os.kill(pid, signal.CTRL_BREAK_EVENT)
         else:
+            # On Unix-like operating systems.
             os.killpg(os.getpgid(pid), signal.SIGTERM)
 
     def start_broker(self):
+        """Starts the HBMQTT message broker."""
         self.broker_button['text'] = 'Stop\n Message Broker'
         self.broker_button['command'] = self.stop_broker
 
@@ -193,12 +213,15 @@ class App(Thread):
                       args=[self.broker_process.stdout, 'turquoise']).start()
 
     def stop_broker(self):
+        """Stops the message broker."""
         self.broker_button['text'] = 'Start\n Message Broker'
         self.broker_button['command'] = self.start_broker
 
         self.kill_process(self.broker_process.pid)
 
     def start_monitoring(self):
+        """Reads the options set by the user and starts the OpenADMS
+        process."""
         self.monitoring_button['text'] = 'Stop\n Monitoring'
         self.monitoring_button['command'] = self.stop_monitoring
 
@@ -214,6 +237,7 @@ class App(Thread):
         config = '--config {}'.format(self.config_entry.get())
 
         if OS == 'Windows':
+            # On Microsoft Windows.
             cmd = 'openadms.py {} {} {}'.format(debug, verbosity, config)
             self.monitoring_process = subprocess.Popen(
                 cmd,
@@ -223,6 +247,7 @@ class App(Thread):
                 stdout=subprocess.PIPE,
                 universal_newlines=True)
         else:
+            # On Unix-like operating systems.
             cmd = 'python3 openadms.py {} {} {}'.format(debug, verbosity, config)
             self.monitoring_process = subprocess.Popen(
                 cmd,
@@ -236,6 +261,7 @@ class App(Thread):
                args=[self.monitoring_process.stdout, 'gold']).start()
 
     def stop_monitoring(self):
+        """Stops the monitoring process."""
         self.monitoring_button['text'] = 'Start\n Monitoring'
         self.monitoring_button['command'] = self.stop_monitoring
 
@@ -246,4 +272,4 @@ class App(Thread):
 
 
 if __name__ == '__main__':
-    app = App()
+    launcher = Launcher()
