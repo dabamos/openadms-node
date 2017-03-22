@@ -22,7 +22,6 @@ limitations under the Licence.
 import os
 import platform
 import re
-import shlex
 import signal
 import subprocess
 
@@ -37,6 +36,8 @@ APP_VERSION = '1.0'
 OS = platform.system()
 # Windows doesn't know the generic "Monospace" name for fixed-width fonts.
 MONOSPACE_FONT = 'Courier New' if OS  == 'Windows' else 'Monospace'
+# Maximum number of lines in text widget.
+CONSOLE_MAX_LINES = 500
 
 class App(Thread):
 
@@ -67,115 +68,154 @@ class App(Thread):
         )
 
         if file_name:
-            self.e.delete(0, END)
-            self.e.insert(0, file_name)
+            self.config_entry.delete(0, END)
+            self.config_entry.insert(0, file_name)
 
     def create_widgets(self):
         self.frame = Frame(self.root, padx=5, pady=5)
         self.frame.pack(expand=True)
-        # ensure a consistent GUI size
+        # Ensure a consistent GUI size.
         #self.frame.grid_propagate(False)
-        # implement stretchability
+        # Implement stretchability.
         self.frame.grid_rowconfigure(3, weight=1)
         self.frame.grid_columnconfigure(2, weight=1)
 
-        #
-        # Textbox
-        #
-        self.text = Text(self.frame,
-                         borderwidth=5,
-                         relief='sunken',
-                         height=50,
-                         width=160)
-        self.text.configure(background='black',
-                            foreground='gold',
-                            font=(MONOSPACE_FONT, 10))
+        # Textbox for process output.
+        self.console = Text(self.frame,
+                            borderwidth=3,
+                            relief='sunken',
+                            height=50,
+                            width=160,
+                            undo=False)
+        self.console.bind('<Key>', lambda e: 'break')
+        self.console.configure(background='black',
+                               foreground='gold',
+                               font=(MONOSPACE_FONT, 10))
 
-        #
-        # Scrollbar
-        #
-        self.scrollbar = Scrollbar(self.frame, command=self.text.yview)
-        self.text['yscrollcommand'] = self.scrollbar.set
+        # Scrollbar.
+        self.scrollbar = Scrollbar(self.frame, command=self.console.yview)
+        self.console['yscrollcommand'] = self.scrollbar.set
 
-        # Config Entry
-        l1 = Label(self.frame, text='Configuration File: ')
+        # Path to config file.
+        self.config_label = Label(self.frame, text='Configuration File: ')
+        self.config_entry = Entry(self.frame, width=40, font=(MONOSPACE_FONT, 10))
 
-        self.e = Entry(self.frame, width=40, font=(MONOSPACE_FONT, 10))
-        self.e.insert(0, './config/config.json')
+        if OS == 'Windows':
+            path = 'config\config.json'
+        else:
+            path = './config/config.json'
 
-        b = Button(self.frame, text='...', command=self.ask_open_file_name)
+        self.config_entry.insert(0, path)
 
-        #
-        # Debug Messages
-        #
-        l2 = Label(self.frame, text='Options:')
-        self.var = IntVar()
-        self.var.set(1)
-        self.check = Checkbutton(self.frame,
-                                 text='Show Debug Messages',
-                                 variable=self.var)
+        self.config_button = Button(self.frame,
+                                    text='...',
+                                    command=self.ask_open_file_name)
 
-        #
-        # Log Level
-        #
-        l3 = Label(self.frame, text='Log Level:')
+        # Options.
+        self.options_label = Label(self.frame, text='Options:')
+        self.debug_var = IntVar()
+        self.debug_var.set(1)
+        self.debug_check = Checkbutton(self.frame,
+                                       text='Show Debug Messages',
+                                       variable=self.debug_var)
 
-        choices = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
-        choice_var = StringVar(self.frame)
-        choice_var.set('WARNING')
+        # Log Level.
+        self.log_level_label = Label(self.frame, text='Log Level:')
+        log_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
+        self.log_level_var = StringVar(self.frame)
+        self.log_level_var.set('WARNING')
+        self.options = OptionMenu(self.frame, self.log_level_var, *log_levels)
 
-        self.options = OptionMenu(self.frame, choice_var, *choices)
+        # Buttons for HBMQTT and OpenADMS.
+        self.broker_button = Button(self.frame, width=15)
+        self.broker_button['text'] = 'Start\n Message Broker'
+        self.broker_button['command'] = self.start_broker
 
-        #
-        # Start/Stop Button
-        #
-        self.button = Button(self.frame)
-        self.button['text'] = 'Start\n Monitoring'
-        self.button['command'] = self.start_monitoring
+        if OS != 'Windows':
+            self.broker_button['state'] = DISABLED
 
-        self.text.grid(row=3, column=0, columnspan=4, sticky='nsew', padx=2, pady=2)
-        self.scrollbar.grid(row=3, column=4, sticky='nsew', padx=2, pady=2)
-        l1.grid(row=0, column=0, sticky='w')
-        self.e.grid(row=0, column=1, sticky='w')
-        b.grid(row=0, column=2, sticky='w')
-        l2.grid(row=2, column=0, sticky='w')
-        self.check.grid(row=2, column=1, sticky='w')
-        l3.grid(row=1, column=0, sticky='w')
-        self.options.grid(row=1, column=1, sticky='w')
-        self.button.grid(row=0, column=3, rowspan=3, columnspan=2, sticky='ne')
+        self.monitoring_button = Button(self.frame, width=15)
+        self.monitoring_button['text'] = 'Start\n Monitoring'
+        self.monitoring_button['command'] = self.start_monitoring
 
-        # self.quit = Button(self, text='QUIT', fg='red',
-        #                       command=root.destroy)
-        # self.quit.pack(side='bottom')
+        # Grids.
+        self.console.grid(column=0, columnspan=4, padx=2, pady=2, row=3,
+            sticky='nsew')
+        self.scrollbar.grid(column=4, padx=2, pady=2, row=3, sticky='nsew')
+        self.config_label.grid(column=0, row=0, sticky='w')
+        self.config_entry.grid(column=1, row=0, sticky='w')
+        self.config_button.grid(column=2, row=0, sticky='w')
+        self.options_label.grid(column=0, row=2, sticky='w')
+        self.debug_check.grid(column=1, row=2, sticky='w')
+        self.log_level_label.grid(column=0, row=1, sticky='w')
+        self.options.grid(column=1, row=1, sticky='w')
+        self.broker_button.grid(column=2, columnspan=1, padx=2, row=0,
+            rowspan=2, sticky='ne')
+        self.monitoring_button.grid(column=3, columnspan=2, padx=2, row=0,
+            rowspan=2, sticky='ne')
 
-    def print_lines(self, pipe):
+    def print_lines(self, pipe, color):
         with pipe:
             for line in pipe:
+                n_lines = int(self.console.index('end-1c').split('.')[0])
+
+                if n_lines > CONSOLE_MAX_LINES:
+                    self.console.delete(1.0, 2.0)
+
                 ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
-                clean = ansi_escape.sub('', str(line))
-                self.text.insert(END, clean)
-                self.text.see(END)
+                clean_line = ansi_escape.sub('', str(line))
 
-    def stop_monitoring(self):
-        self.button['text'] = 'Start\n Monitoring'
-        self.button['command'] = self.stop_monitoring
+                self.console.tag_configure(color, foreground=color)
 
+                self.console.insert(END, clean_line, color)
+                self.console.see(END)
+
+    def kill_process(self, pid):
         if OS == 'Windows':
-            os.kill(self.process.pid, signal.CTRL_BREAK_EVENT)
+            os.kill(pid, signal.CTRL_BREAK_EVENT)
         else:
-            os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+            os.killpg(os.getpgid(pid), signal.SIGTERM)
 
-        self.text.insert(END, '[Stopped]')
-        self.text.see(END)
+    def start_broker(self):
+        self.broker_button['text'] = 'Stop\n Message Broker'
+        self.broker_button['command'] = self.stop_broker
+
+        cmd = 'hbmqtt'
+        self.broker_process = subprocess.Popen(
+            cmd,
+            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+            shell=True,
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            universal_newlines=True)
+
+        Thread(target=self.print_lines,
+                      args=[self.broker_process.stdout, 'turquoise']).start()
+
+    def stop_broker(self):
+        self.broker_button['text'] = 'Start\n Message Broker'
+        self.broker_button['command'] = self.start_broker
+
+        self.kill_process(self.broker_process.pid)
 
     def start_monitoring(self):
-        self.button['text'] = 'Stop\n Monitoring'
-        self.button['command'] = self.stop_monitoring
+        self.monitoring_button['text'] = 'Stop\n Monitoring'
+        self.monitoring_button['command'] = self.stop_monitoring
 
-        cmd = 'openadms.py --debug --verbosity 3 --config config/example.json'
+        debug = '--debug' if self.debug_var.get() else ''
+        log_level = {
+            'CRITICAL': 1,
+            'ERROR': 2,
+            'WARNING': 3,
+            'INFO': 4,
+            'DEBUG': 5
+        }.get(self.log_level_var.get(), 'WARNING')
+        verbosity = '--verbosity {}'.format(log_level)
+        config = '--config {}'.format(self.config_entry.get())
 
         if OS == 'Windows':
-            self.process = subprocess.Popen(
+            cmd = 'openadms.py {} {} {}'.format(debug, verbosity, config)
+            self.monitoring_process = subprocess.Popen(
                 cmd,
                 creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
                 shell=True,
@@ -183,7 +223,8 @@ class App(Thread):
                 stdout=subprocess.PIPE,
                 universal_newlines=True)
         else:
-            self.process = subprocess.Popen(
+            cmd = 'python3 openadms.py {} {} {}'.format(debug, verbosity, config)
+            self.monitoring_process = subprocess.Popen(
                 cmd,
                 preexec_fn=os.setsid,
                 shell=True,
@@ -191,7 +232,17 @@ class App(Thread):
                 stdout=subprocess.PIPE,
                 universal_newlines=True)
 
-        Thread(target=self.print_lines, args=[self.process.stdout]).start()
+        Thread(target=self.print_lines,
+               args=[self.monitoring_process.stdout, 'gold']).start()
+
+    def stop_monitoring(self):
+        self.monitoring_button['text'] = 'Start\n Monitoring'
+        self.monitoring_button['command'] = self.stop_monitoring
+
+        self.kill_process(self.monitoring_process.pid)
+
+        self.console.insert(END, '[Stopped]')
+        self.console.see(END)
 
 
 if __name__ == '__main__':
