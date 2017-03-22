@@ -263,7 +263,7 @@ class Launcher(Thread):
     def stop_monitoring(self):
         """Stops the monitoring process."""
         self.monitoring_button['text'] = 'Start\n Monitoring'
-        self.monitoring_button['command'] = self.stop_monitoring
+        self.monitoring_button['command'] = self.start_monitoring
 
         self.kill_process(self.monitoring_process.pid)
 
