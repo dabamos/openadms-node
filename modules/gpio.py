@@ -1,7 +1,5 @@
-
-
 #!/usr/bin/env python3
-
+"""
 import shlex
 import subprocess
 
@@ -16,3 +14,4 @@ if pin17 == 1:
     print('ALARM')
 else:
     print('OK')
+"""

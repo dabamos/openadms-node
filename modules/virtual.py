@@ -78,9 +78,9 @@ class VirtualSensor(Prototype):
 
     def sanitize(self, s):
         """Converts some non-printable characters of a given string."""
-        return s.replace('\n', '\\n')
-                .replace('\r', '\\r')
-                .replace('\t', '\\t')
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')\
                 .strip()
 
 
