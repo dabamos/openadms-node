@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-'''
+"""
 Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licensed under the EUPL, Version 1.1 or - as soon they will be approved
@@ -10,15 +10,16 @@ You may not use this work except in compliance with the Licence.
 
 You may obtain a copy of the Licence at:
 
-    http://ec.europa.eu/idabc/eupl
+    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the Licence is distributed on an 'AS IS' basis,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the Licence for the specific language governing permissions and
 limitations under the Licence.
-'''
+"""
 
+import importlib.util
 import os
 import platform
 import re
@@ -30,7 +31,7 @@ from tkinter import filedialog
 from tkinter import *
 
 APP_NAME = 'OpenADMS Launcher'
-APP_VERSION = '1.0'
+APP_VERSION = '1.1'
 
 # Get the name of the operating system, to switch Windows-specific conventions.
 OS = platform.system()
@@ -65,7 +66,7 @@ class Launcher(Thread):
 
     def ask_open_file_name(self):
         """Opens a file dialog window and inserts the path to the selected file
-        into the config entry widget."""        
+        into the config entry widget."""
         file_name = filedialog.askopenfilename(
             initialdir='.',
             title='Select Configuration File',
@@ -76,6 +77,11 @@ class Launcher(Thread):
         if file_name:
             self.config_entry.delete(0, END)
             self.config_entry.insert(0, file_name)
+
+    def has_hbmqtt(self):
+        hbmqtt_spec = importlib.util.find_spec('hbmqtt')
+        found = hbmqtt_spec is not None
+        return found
 
     def create_widgets(self):
         """Creates all widgets of the user interface."""
@@ -142,7 +148,8 @@ class Launcher(Thread):
         self.broker_button['text'] = 'Start\n Message Broker'
         self.broker_button['command'] = self.start_broker
 
-        if OS != 'Windows':
+        # Show button only if HBMQTT is installed.
+        if not self.has_hbmqtt():
             self.broker_button['state'] = DISABLED
 
         self.monitoring_button = Button(self.frame, width=15)
@@ -201,16 +208,28 @@ class Launcher(Thread):
         self.broker_button['command'] = self.stop_broker
 
         cmd = 'hbmqtt'
-        self.broker_process = subprocess.Popen(
-            cmd,
-            creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
-            shell=True,
-            stderr=subprocess.STDOUT,
-            stdout=subprocess.PIPE,
-            universal_newlines=True)
+
+        if OS == 'Windows':
+            # On Microsoft Windows.
+            self.broker_process = subprocess.Popen(
+                cmd,
+                creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                universal_newlines=True)
+        else:
+            # On Unix-like operating systems.
+            self.broker_process = subprocess.Popen(
+                cmd,
+                preexec_fn=os.setsid,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                universal_newlines=True)
 
         Thread(target=self.print_lines,
-                      args=[self.broker_process.stdout, 'turquoise']).start()
+               args=[self.broker_process.stdout, 'turquoise']).start()
 
     def stop_broker(self):
         """Stops the message broker."""

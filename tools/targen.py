@@ -10,7 +10,7 @@ You may not use this work except in compliance with the Licence.
 
 You may obtain a copy of the Licence at:
 
-    http://ec.europa.eu/idabc/eupl
+    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the Licence is distributed on an "AS IS" basis,
@@ -112,7 +112,7 @@ if __name__ == '__main__':
         description='Target Generator',
         epilog='\nTarget file generator for OpenADMS.\n'
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
-               '\nFor further information visit http://www.dabamos.de/.\n')
+               '\nFor further information visit https://www.dabamos.de/.\n')
 
     parser.add_option('-t', '--targets',
                       dest='t_file',

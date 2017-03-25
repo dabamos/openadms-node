@@ -10,7 +10,7 @@ You may not use this work except in compliance with the Licence.
 
 You may obtain a copy of the Licence at:
 
-    http://ec.europa.eu/idabc/eupl
+    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the Licence is distributed on an "AS IS" basis,
@@ -84,7 +84,7 @@ def main(config_file):
 
 def setup_thread_excepthook():
     """Workaround for `sys.excepthook` thread bug from:
-    http://bugs.python.org/issue1230540
+    https://bugs.python.org/issue1230540
 
     Call once from the main thread before creating any threads."""
 
@@ -127,7 +127,7 @@ if __name__ == '__main__':
         epilog='\nOpenADMS has been developed at the University of Applied '
                'Sciences Neubrandenburg (Germany).\n'
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
-               '\nFor further information, visit http://www.dabamos.de/.\n')
+               '\nFor further information, visit https://www.dabamos.de/.\n')
 
     parser.add_option('-c', '--config',
                       dest='config_file',
