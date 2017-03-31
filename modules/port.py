@@ -47,7 +47,6 @@ class SerialPort(Prototype):
     def process_observation(self, obs):
         if not self._serial:
             self._create()
-            self._serial.reset_input_buffer()
 
         if self._serial is None:
             self.logger.error('Could not write to port "{}"'
