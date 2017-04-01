@@ -241,9 +241,6 @@ class Launcher(Thread):
     def start_monitoring(self):
         """Reads the options set by the user and starts the OpenADMS
         process."""
-        self.monitoring_button['text'] = 'Stop\n Monitoring'
-        self.monitoring_button['command'] = self.stop_monitoring
-
         debug = '--debug' if self.debug_var.get() else ''
         log_level = {
             'CRITICAL': 1,
@@ -257,7 +254,19 @@ class Launcher(Thread):
 
         if OS == 'Windows':
             # On Microsoft Windows.
-            cmd = 'openadms.py {} {} {}'.format(debug, verbosity, config)
+            py_file = 'openadms.py'
+            exe_file = 'openadms.exe'
+
+            if os.path.isfile(exe_file):
+                file = exe_file
+            elif os.path.isfile(py_file):
+                file = py_file
+            else:
+                self.console.insert(END, 'OpenADMS not found\n')
+                self.console.see(END)
+                return
+                                
+            cmd = '{} {} {} {}'.format(file, debug, verbosity, config)
             self.monitoring_process = subprocess.Popen(
                 cmd,
                 creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
@@ -275,6 +284,9 @@ class Launcher(Thread):
                 stderr=subprocess.STDOUT,
                 stdout=subprocess.PIPE,
                 universal_newlines=True)
+
+        self.monitoring_button['text'] = 'Stop\n Monitoring'
+        self.monitoring_button['command'] = self.stop_monitoring
 
         Thread(target=self.print_lines,
                args=[self.monitoring_process.stdout, 'gold']).start()
