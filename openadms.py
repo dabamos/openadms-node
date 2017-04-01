@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg an other contributors.
 
 Licensed under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -117,6 +117,7 @@ def signal_handler(signal, frame):
 def stay_alive():
     while True:
         time.sleep(1)
+
 
 if __name__ == '__main__':
     # Parse command line options.
