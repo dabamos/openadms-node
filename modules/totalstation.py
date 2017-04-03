@@ -1,6 +1,6 @@
 #!/usr/bin/envython3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg and other contributors.
 
 Licensed under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -26,8 +26,8 @@ from core.observation import Observation
 from core.sensor import SensorType
 from modules.prototype import Prototype
 
-"""Module for data processing (pre-processing, atmospheric corrections,
-transformations)."""
+"""Module for the processing of observations of total stations (pre-processing,
+atmospheric corrections, transformations)."""
 
 
 class DistanceCorrector(Prototype):
@@ -80,8 +80,8 @@ class DistanceCorrector(Prototype):
             self.logger.warning('Atmospheric data is older than {} hour(s)'
                                 .format(int(self._max_age / 3600)))
 
-        # Reduce the slope distance of the EDM measurement if the sensor is a
-        # robotic total station.
+        # Reduce the slope distance of the EDM measurement if the sensor is of
+        # type "total station".
         dist = obs.get_value('responseSets', self._distance_name, 'value')
 
         if dist is None:
@@ -267,7 +267,7 @@ class DistanceCorrector(Prototype):
 
 class HelmertTransformer(Prototype):
     """
-    HelmertTransformer calculates a 3-dimensional coordinates of a view point
+    HelmertTransformer calculates the 3-dimensional coordinates of a view point
     using the Helmert transformation.
     """
 
@@ -275,7 +275,7 @@ class HelmertTransformer(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._is_residual = config.get('ResidualMismatchTransformationEnabled')
+        self._is_residual = config.get('residualMismatchTransformationEnabled')
         self._tie_points = config.get('tiePoints')
         self._view_point = config.get('viewPoint')
 
@@ -284,6 +284,7 @@ class HelmertTransformer(Prototype):
         self._view_point['y'] = 0
         self._view_point['z'] = 0
 
+        # Transformation parameters.
         self._a = None
         self._o = None
 
@@ -293,11 +294,12 @@ class HelmertTransformer(Prototype):
         either be of a tie point or of a target point.
 
         Measured polar coordinates of the tie points are used to determine the
-        Cartesian coordinates of the view point and given target points.
+        Cartesian coordinates of the view point and the given target points.
 
         An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
-        # Update the tie point data (Hz, V, slope distance).
+        # Update the tie point data of the configuration (Hz, V, slope distance)
+        # by using the current observation.
         if self._is_tie_point(obs):
             self._update_tie_point(obs)
 
@@ -451,7 +453,7 @@ class HelmertTransformer(Prototype):
             global_y = tie_point.get('y')
             global_z = tie_point.get('z')
 
-            if global_x is None or global_y is None or global_z is None:
+            if None in [global_x, global_y, global_z]:
                 self.logger.error('Tie point "{}" not set in configuration'
                                   .format(name))
 
@@ -501,8 +503,8 @@ class HelmertTransformer(Prototype):
             a_2 += math.pow(r_local_centroid_x, 2) +\
                    math.pow(r_local_centroid_y, 2)
 
-        self._o = o_1 / o_2 if o_2 > 0 else 0  	# Parameter o.
-        self._a = a_1 / a_2 if a_2 > 0 else 0	# Parameter a.
+        self._o = o_1 / o_2 if o_2 > 0 else 0   # Parameter o.
+        self._a = a_1 / a_2 if a_2 > 0 else 0   # Parameter a.
 
         # Calculate the coordinates of the view point:
         # Y_0 = Y_s - a * y_s - o * x_s
@@ -587,7 +589,7 @@ class HelmertTransformer(Prototype):
             'scaleFactor': self.get_response_set('float', 'm', m)
         }
 
-        # Create observation instance of the view point.
+        # Create Observation instance for the view point.
         view_point = Observation()
         view_point.set('id', self._view_point.get('id'))
         view_point.set('name', 'getViewPoint')
@@ -597,7 +599,7 @@ class HelmertTransformer(Prototype):
         view_point.set('responseSets', response_sets)
         view_point.set('timeStamp', time.time())
 
-        # Return the observation of the view point.
+        # Return the view point Observation object.
         return view_point
 
     def get_cartesian_coordinates(self, hz, v, slope_dist):
@@ -694,7 +696,7 @@ class HelmertTransformer(Prototype):
 class PolarTransformer(Prototype):
     """
     PolarTransformer calculates 3-dimensional coordinates of a target using the
-    sensor position, and the azimuth position from the configuration together
+    sensor position and the azimuth position from the configuration together
     with the horizontal direction, the vertical angle, and the distance of a
     total station observation. The result (Y, X, Z) is added to the observation
     data set.
@@ -730,8 +732,8 @@ class PolarTransformer(Prototype):
             return obs
 
         # Radiant to grad (gon).
-        hz_grad = hz * 200 / math.pi
-        v_grad = v * 200 / math.pi
+        hz_grad = self.rad_to_grad(hz)
+        v_grad = self.rad_to_grad(v)
 
         self.logger.debug('Starting polar transformation of target "{}" (Hz = '
                           '{:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m)'
@@ -760,7 +762,7 @@ class PolarTransformer(Prototype):
     def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
                   v, dist):
         """Calculates coordinates (x, y, z) out of horizontal direction,
-        vertical angle, and slope distance to a target point by doing a
+        vertical angle, and slope distance to a target point using a
         3-dimensional polar transformation."""
         # Calculate azimuth angle out of coordinates.
         d_x = azimuth_x - sensor_x
@@ -798,6 +800,9 @@ class PolarTransformer(Prototype):
 
     def get_response_set(self, t, u, v):
         return {'type': t, 'unit': u, 'value': v}
+
+    def rad_to_grad(self, a):
+        return a * 200 / math.pi
 
 
 class RefractionCorrector(Prototype):
@@ -861,7 +866,7 @@ class SerialMeasurementProcessor(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
 
     def process_observation(self, obs):
-        # Calculate the serial measurement with two faces.
+        # Calculate the serial measurement of an observation in two faces.
         hz_0 = obs.get_value('responseSets', 'hz0', 'value')
         hz_1 = obs.get_value('responseSets', 'hz1', 'value')
 
