@@ -276,7 +276,7 @@ class HelmertTransformer(Prototype):
         config = self._config_manager.config.get(self._name)
 
         self._is_residual = config.get('residualMismatchTransformationEnabled')
-        self._tie_points = config.get('tiePoints')
+        self._fixed_points = config.get('fixedPoints')
         self._view_point = config.get('viewPoint')
 
         # Initialize the view point.
@@ -291,22 +291,22 @@ class HelmertTransformer(Prototype):
     def process_observation(self, obs):
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
-        either be of a tie point or of a target point.
+        either be of a fixed point or of a target point.
 
-        Measured polar coordinates of the tie points are used to determine the
+        Measured polar coordinates of the fixed points are used to determine the
         Cartesian coordinates of the view point and the given target points.
 
         An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
-        # Update the tie point data of the configuration (Hz, V, slope distance)
+        # Update the fixed point data of the configuration (Hz, V, slope distance)
         # by using the current observation.
-        if self._is_tie_point(obs):
-            self._update_tie_point(obs)
+        if self._is_fixed_point(obs):
+            self._update_fixed_point(obs)
 
-        # Only calculate the view point's coordinates if all tie points have
+        # Only calculate the view point's coordinates if all fixed points have
         # been measured at least once.
         if self._is_ready():
-            if self._is_tie_point(obs):
+            if self._is_fixed_point(obs):
                 # Calculate the coordinates of the view point by using the
                 # Helmert transformation and create a new observation of the
                 # view point.
@@ -342,25 +342,25 @@ class HelmertTransformer(Prototype):
         sum_p_vy = 0
 
         # Calculate residual mismatches.
-        for tie_point_id, tie_point in self._tie_points.items():
-            a = math.pow(global_x - tie_point.get('x'), 2)
-            b = math.pow(global_y - tie_point.get('y'), 2)
+        for fixed_point_id, fixed_point in self._fixed_points.items():
+            a = math.pow(global_x - fixed_point.get('x'), 2)
+            b = math.pow(global_y - fixed_point.get('y'), 2)
             s = math.sqrt(a + b)
             p = 1 / s
 
-            # Global Cartesian coordinates of the tie point.
+            # Global Cartesian coordinates of the fixed point.
             x, y, z = self.calculate_point_coordinates(
-                tie_point.get('hz'),
-                tie_point.get('v'),
-                tie_point.get('dist'),
+                fixed_point.get('hz'),
+                fixed_point.get('v'),
+                fixed_point.get('dist'),
                 self._view_point.get('x'),
                 self._view_point.get('y'),
                 self._view_point.get('z'),
                 self._a,
                 self._o)
 
-            vx = tie_point.get('x') - x
-            vy = tie_point.get('y') - y
+            vx = fixed_point.get('x') - x
+            vy = fixed_point.get('y') - y
 
             sum_p_vx += p * vx
             sum_p_vy += p * vy
@@ -424,13 +424,13 @@ class HelmertTransformer(Prototype):
     def _calculate_view_point(self, obs):
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
-        num_tie_points = len(self._tie_points)          # n.
+        num_fixed_points = len(self._fixed_points)          # n.
 
         # Calculate the centroid coordinates of the view point.
-        for name, tie_point in self._tie_points.items():
-            hz = tie_point.get('hz')        # Horizontal direction.
-            v = tie_point.get('v')          # Vertical angle.
-            dist = tie_point.get('dist')    # Distance (slope or reduced).
+        for name, fixed_point in self._fixed_points.items():
+            hz = fixed_point.get('hz')        # Horizontal direction.
+            v = fixed_point.get('v')          # Vertical angle.
+            dist = fixed_point.get('dist')    # Distance (slope or reduced).
 
             if None in [hz, v, dist]:
                 self.logger.warning('Hz, V, or distance is missing in '
@@ -443,15 +443,15 @@ class HelmertTransformer(Prototype):
                                                                        v,
                                                                        dist)
 
-            # Store local coordinates in the tie point dictionary.
-            tie_point['localX'] = local_x
-            tie_point['localY'] = local_y
-            tie_point['localZ'] = local_z
+            # Store local coordinates in the fixed point dictionary.
+            fixed_point['localX'] = local_x
+            fixed_point['localY'] = local_y
+            fixed_point['localZ'] = local_z
 
             # Coordinates in the global system (X, Y, Z).
-            global_x = tie_point.get('x')
-            global_y = tie_point.get('y')
-            global_z = tie_point.get('z')
+            global_x = fixed_point.get('x')
+            global_y = fixed_point.get('y')
+            global_z = fixed_point.get('z')
 
             if None in [global_x, global_y, global_z]:
                 self.logger.error('Tie point "{}" not set in configuration'
@@ -467,22 +467,22 @@ class HelmertTransformer(Prototype):
             sum_global_z += global_z
 
         # Coordinates of the centroids.
-        local_centroid_x = sum_local_x / num_tie_points     # x_s.
-        local_centroid_y = sum_local_y / num_tie_points     # y_s.
+        local_centroid_x = sum_local_x / num_fixed_points     # x_s.
+        local_centroid_y = sum_local_y / num_fixed_points     # y_s.
 
-        global_centroid_x = sum_global_x / num_tie_points   # X_s.
-        global_centroid_y = sum_global_y / num_tie_points   # Y_s.
+        global_centroid_x = sum_global_x / num_fixed_points   # X_s.
+        global_centroid_y = sum_global_y / num_fixed_points   # Y_s.
 
         # Calculate transformation parameters.
         o_1 = o_2 = 0
         a_1 = a_2 = 0
 
-        for name, tie_point in self._tie_points.items():
-            local_x = tie_point.get('localX')
-            local_y = tie_point.get('localY')
+        for name, fixed_point in self._fixed_points.items():
+            local_x = fixed_point.get('localX')
+            local_y = fixed_point.get('localY')
 
-            global_x = tie_point.get('x')
-            global_y = tie_point.get('y')
+            global_x = fixed_point.get('x')
+            global_y = fixed_point.get('y')
 
             # Reduced coordinates of the centroids.
             r_local_centroid_x = local_x - local_centroid_x
@@ -516,7 +516,7 @@ class HelmertTransformer(Prototype):
         self._view_point['y'] = global_centroid_y -\
                                 (self._a * local_centroid_y) -\
                                 (self._o * local_centroid_x)
-        self._view_point['z'] = (sum_global_z - sum_local_z) / num_tie_points
+        self._view_point['z'] = (sum_global_z - sum_local_z) / num_fixed_points
 
         self.logger.info('Calculated coordinates of view point "{}" '
                          '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5f})'
@@ -529,14 +529,14 @@ class HelmertTransformer(Prototype):
         sum_wx = sum_wy = 0  # [W_x], [W_y].
         sum_wx_wx = sum_wy_wy = sum_wz_wz = 0  # [W_x^2], [W_y^2], [W_z^2].
 
-        for name, tie_point in self._tie_points.items():
-            local_x = tie_point.get('localX')
-            local_y = tie_point.get('localY')
-            local_z = tie_point.get('localZ')
+        for name, fixed_point in self._fixed_points.items():
+            local_x = fixed_point.get('localX')
+            local_y = fixed_point.get('localY')
+            local_z = fixed_point.get('localZ')
 
-            global_x = tie_point.get('x')
-            global_y = tie_point.get('y')
-            global_z = tie_point.get('z')
+            global_x = fixed_point.get('x')
+            global_y = fixed_point.get('y')
+            global_z = fixed_point.get('z')
 
             view_point_x = self._view_point.get('x')
             view_point_y = self._view_point.get('y')
@@ -565,9 +565,9 @@ class HelmertTransformer(Prototype):
                     self._view_point.get('id'), r_sum_wx, r_sum_wy))
 
         # Standard deviations.
-        sx = math.sqrt((sum_wx_wx + sum_wy_wy) / ((2 * num_tie_points) - 4))
+        sx = math.sqrt((sum_wx_wx + sum_wy_wy) / ((2 * num_fixed_points) - 4))
         sy = sx
-        sz = math.sqrt(sum_wz_wz / (num_tie_points - 1))
+        sz = math.sqrt(sum_wz_wz / (num_fixed_points - 1))
 
         self.logger.debug('Calculated standard deviations '
                           '(sX = {:1.5f} m, sY = {:1.5f} m, sZ = {:1.5f} m)'
@@ -611,29 +611,29 @@ class HelmertTransformer(Prototype):
 
         return x, y, z
 
-    def _is_tie_point(self, obs):
-        """Checks if the given observation equals one of the defined tie
+    def _is_fixed_point(self, obs):
+        """Checks if the given observation equals one of the defined fixed
         points."""
-        if self._tie_points.get(obs.get('id')):
+        if self._fixed_points.get(obs.get('id')):
             return True
         else:
             return False
 
     def _is_ready(self):
-        """Checks whether all tie points have been measured already or not."""
+        """Checks whether all fixed points have been measured already or not."""
         is_ready = True
 
-        for tie_point_id, tie_point in self._tie_points.items():
-            if tie_point.get('lastUpdate') is None:
+        for fixed_point_id, fixed_point in self._fixed_points.items():
+            if fixed_point.get('lastUpdate') is None:
                 # Tie point has not been measured yet.
                 is_ready = False
                 break
 
         return is_ready
 
-    def _update_tie_point(self, obs):
+    def _update_fixed_point(self, obs):
         """Adds horizontal direction, vertical angle, and slope distance
-        of the observation to a tie point."""
+        of the observation to a fixed point."""
         hz = obs.get_value('responseSets', 'hz', 'value')
         v = obs.get_value('responseSets', 'v', 'value')
         dist = obs.get_value('responseSets', 'slopeDist', 'value')
@@ -644,10 +644,10 @@ class HelmertTransformer(Prototype):
                                                            obs.get('id')))
             return obs
 
-        # Calculate the coordinates of the tie point if the Helmert
+        # Calculate the coordinates of the fixed point if the Helmert
         # transformation has already been done. Otherwise, use the datum from
         # the configuration.
-        tie_point = self._tie_points.get(obs.get('id'))
+        fixed_point = self._fixed_points.get(obs.get('id'))
 
         if self._is_ready():
             x, y, z = self.calculate_point_coordinates(
@@ -660,30 +660,30 @@ class HelmertTransformer(Prototype):
                 self._a,
                 self._o)
 
-            self.logger.info('Calculated coordinates of tie point "{}" '
+            self.logger.info('Calculated coordinates of fixed point "{}" '
                              '(X = {:3.5f}, Y = {:3.5f}, Z = {:3.5f})'
                              .format(obs.get('id'), x, y, z))
         else:
-            # Get the coordinates of the tie point from the configuration.
-            x = tie_point.get('x')
-            y = tie_point.get('y')
-            z = tie_point.get('z')
+            # Get the coordinates of the fixed point from the configuration.
+            x = fixed_point.get('x')
+            y = fixed_point.get('y')
+            z = fixed_point.get('z')
 
         # Update the values.
-        tie_point['hz'] = hz
-        tie_point['v'] = v
-        tie_point['dist'] = dist
-        tie_point['lastUpdate'] = time.time()
+        fixed_point['hz'] = hz
+        fixed_point['v'] = v
+        fixed_point['dist'] = dist
+        fixed_point['lastUpdate'] = time.time()
 
-        self.logger.debug('Updated tie point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
+        self.logger.debug('Updated fixed point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
                           'Distance = {:3.5f}, Last Update = {})'
                           .format(obs.get('id'),
-                                  tie_point['hz'],
-                                  tie_point['v'],
-                                  tie_point['dist'],
-                                  tie_point['lastUpdate']))
+                                  fixed_point['hz'],
+                                  fixed_point['v'],
+                                  fixed_point['dist'],
+                                  fixed_point['lastUpdate']))
 
-        # Add global Cartesian coordinates of the tie point to the observation.
+        # Add global Cartesian coordinates of the fixed point to the observation.
         response_sets = obs.get('responseSets')
         response_sets['x'] = self.get_response_set('float', 'm', x)
         response_sets['y'] = self.get_response_set('float', 'm', y)
@@ -706,12 +706,36 @@ class PolarTransformer(Prototype):
         Prototype.__init__(self, name, config_manager, sensor_manager)
         config = self._config_manager.config.get(self._name)
 
-        self._sensor_x = config.get('sensorPosition').get('x')
-        self._sensor_y = config.get('sensorPosition').get('y')
-        self._sensor_z = config.get('sensorPosition').get('z')
+        self._view_point = config.get('viewPoint')
+        self._fixed_points = config.get('fixedPoints')
 
-        self._azimuth_x = config.get('azimuthPosition').get('x')
-        self._azimuth_y = config.get('azimuthPosition').get('y')
+        self._orientation_value = 0
+
+    def _is_fixed_point(self, obs):
+        """Checks if the given observation equals one of the defined fixed
+        points."""
+        if self._fixed_points.get(obs.get('id')):
+            return True
+        else:
+            return False
+
+    def _is_ready(self):
+        """Checks whether all fixed points have been measured already or not."""
+        is_ready = True
+
+        for fixed_point_id, fixed_point in self._fixed_points.items():
+            if fixed_point.get('lastUpdate') is None:
+                # Tie point has not been measured yet.
+                is_ready = False
+                break
+
+        return is_ready
+
+    def _update_fixed_point(self, obs):
+        fixed_point = self._fixed_points.get(obs.get('id'))
+        hz = obs.get_value('responseSets', 'hz', 'value')
+        fixed_point['hz'] = hz
+        fixed_point['lastUpdate'] = time.time()
 
     def process_observation(self, obs):
         sensor_type = obs.get('sensorType')
@@ -730,6 +754,9 @@ class PolarTransformer(Prototype):
                                 '"{}" with ID "{}"'.format(obs.get('name'),
                                                            obs.get('id')))
             return obs
+
+        if self._is_fixed_point(obs):
+            self._update_fixed_point(obs)
 
         # Radiant to grad (gon).
         hz_grad = self.rad_to_grad(hz)

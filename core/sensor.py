@@ -19,6 +19,7 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+import codecs
 import logging
 
 from core.observation import Observation
@@ -53,11 +54,18 @@ class Sensor(object):
         data['sensorType'] = self._type
         data['type'] = 'observation'
 
-        # Character '\' is escaped in the JSON configuration file. The
-        # additional backslashes have to be removed.
+        # Character '\' is escaped in the JSON configuration file. We have to
+        # decode the encoded bytes.
         for set_name, request_set in data.get('requestSets').items():
-            request_set['responsePattern'] = request_set['responsePattern']\
-                .replace('\\\\', '\\')
+            request_set['request'] = codecs.decode(
+                request_set['request'],
+                'unicode_escape')
+            request_set['responseDelimiter'] = codecs.decode(
+                request_set['responseDelimiter'],
+                'unicode_escape')
+            request_set['responsePattern'] = codecs.decode(
+                request_set['responsePattern'],
+                'unicode_escape')
 
         return Observation(data)
 

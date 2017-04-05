@@ -57,8 +57,8 @@ class ConfigurationManager:
                 self._config = json.loads(config_file.read())
                 self.logger.info('Loaded configuration file "{}"'
                                  .format(file_name))
-            except json.decoder.JSONDecodeError as e:
-                self.logger.error('Invalid JSON: "{}"'.format(e.rstrip()))
+            except ValueError as e:
+                self.logger.error('Invalid JSON: "{}"'.format(e))
 
     def dump(self):
         """Dumps the configuration to stdout."""

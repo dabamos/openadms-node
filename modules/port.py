@@ -37,7 +37,7 @@ class SerialPort(Prototype):
 
         self._serial = None     # Pyserial object.
         self._serial_port_config = None
-        self._max_attempts = 3  # TODO: Move to configuration file.
+        self._max_attempts = 1  # TODO: Move to configuration file.
 
     def __del__(self):
         #if self._serial is not None:
@@ -145,8 +145,8 @@ class SerialPort(Prototype):
         self._serial.close()
 
     def _get_port_config(self):
-        p = self._config_manager.config.get('ports') \
-                                       .get('serial') \
+        p = self._config_manager.config.get('ports')\
+                                       .get('serial')\
                                        .get(self.name)
 
         if not p:
