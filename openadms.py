@@ -21,6 +21,7 @@ limitations under the Licence.
 
 import logging.handlers
 import optparse
+import platform
 import signal
 import sys
 import threading
@@ -61,6 +62,8 @@ MAX_LOG_FILE_SIZE = 10485760    # 10 MB.
 VERSION = 0.4
 VERSION_NAME = 'Dar es Salaam'
 
+# Get the name of the operating system, to switch Windows-specific conventions.
+OS = platform.system()
 
 def main(config_file):
     # v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
@@ -178,8 +181,14 @@ if __name__ == '__main__':
     # Add handler to logger.
     logger.addHandler(fh)
 
-    date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+    if OS == 'Windows':
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        logger.addHandler(ch)
+    else:
+        # Colored logging on Linux/Unix only.
+        date_fmt = '%Y-%m-%dT%H:%M:%S'
+        coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
     # Set the hook for unhandled exceptions.
     setup_thread_excepthook()
