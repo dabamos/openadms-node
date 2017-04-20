@@ -1,4 +1,4 @@
-#!/usr/bin/envython3
+#!/usr/bin/env python3
 """
 Copyright (c) 2017 Hochschule Neubrandenburg and other contributors.
 
@@ -80,8 +80,7 @@ class DistanceCorrector(Prototype):
             self.logger.warning('Atmospheric data is older than {} hour(s)'
                                 .format(int(self._max_age / 3600)))
 
-        # Reduce the slope distance of the EDM measurement if the sensor is of
-        # type "total station".
+        # Reduce the slope distance of the EDM measurement.
         dist = obs.get_value('responseSets', self._distance_name, 'value')
 
         if dist is None:
@@ -140,8 +139,8 @@ class DistanceCorrector(Prototype):
 
         The formulas are taken from the official manual of the Leica TM30
         robotic total station. They should be valid for all modern total
-        stations of Leica Geosystems. For further information, please see Leica
-        TM30 manual on page 76."""
+        stations of Leica Geosystems. For further information, please see
+        Leica TM30 manual on page 76."""
         alpha = 1 / 273.15
         div = 1 + (alpha * temperature)
         x = (7.5 * (temperature / (237.3 + temperature))) + 0.7857
@@ -408,10 +407,9 @@ class HelmertTransformer(Prototype):
             x += vx
             y += vy
 
-            self.logger.debug(
-                'Updated coordinates of target point "{}" '
-                '(X = {:4.5f}, Y = {:4.5f})'.format(
-                    obs.get('id'), x, y))
+            self.logger.debug('Updated coordinates of target point "{}" '
+                              '(X = {:4.5f}, Y = {:4.5f})'
+                              .format(obs.get('id'), x, y))
 
         # Add response set.
         response_sets = obs.get('responseSets')
@@ -424,7 +422,7 @@ class HelmertTransformer(Prototype):
     def _calculate_view_point(self, obs):
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
-        num_fixed_points = len(self._fixed_points)          # n.
+        num_fixed_points = len(self._fixed_points)      # n.
 
         # Calculate the centroid coordinates of the view point.
         for name, fixed_point in self._fixed_points.items():
@@ -526,8 +524,8 @@ class HelmertTransformer(Prototype):
                                  self._view_point.get('z')))
 
         # Calculate the standard deviations.
-        sum_wx = sum_wy = 0  # [W_x], [W_y].
-        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0  # [W_x^2], [W_y^2], [W_z^2].
+        sum_wx = sum_wy = 0                     # [W_x], [W_y].
+        sum_wx_wx = sum_wy_wy = sum_wz_wz = 0   # [W_x^2], [W_y^2], [W_z^2].
 
         for name, fixed_point in self._fixed_points.items():
             local_x = fixed_point.get('localX')
@@ -559,10 +557,11 @@ class HelmertTransformer(Prototype):
         r_sum_wy = abs(round(sum_wy, 5))
 
         if r_sum_wx != 0 or r_sum_wy != 0:
-            self.logger.warning(
-                'Calculated coordinates of view point "{}" are '
-                'inaccurate ([Wx] = {}, [Wy] = {})' .format(
-                    self._view_point.get('id'), r_sum_wx, r_sum_wy))
+            self.logger.warning('Calculated coordinates of view point "{}" '
+                                'are inaccurate ([Wx] = {}, [Wy] = {})'
+                                .format(self._view_point.get('id'),
+                                        r_sum_wx,
+                                        r_sum_wy))
 
         # Standard deviations.
         sx = math.sqrt((sum_wx_wx + sum_wy_wy) / ((2 * num_fixed_points) - 4))
@@ -599,7 +598,7 @@ class HelmertTransformer(Prototype):
         view_point.set('responseSets', response_sets)
         view_point.set('timeStamp', time.time())
 
-        # Return the view point Observation object.
+        # Return the Observation object of the view point.
         return view_point
 
     def get_cartesian_coordinates(self, hz, v, slope_dist):
@@ -621,15 +620,12 @@ class HelmertTransformer(Prototype):
 
     def _is_ready(self):
         """Checks whether all fixed points have been measured already or not."""
-        is_ready = True
-
         for fixed_point_id, fixed_point in self._fixed_points.items():
             if fixed_point.get('lastUpdate') is None:
                 # Tie point has not been measured yet.
-                is_ready = False
-                break
+                return False
 
-        return is_ready
+        return True
 
     def _update_fixed_point(self, obs):
         """Adds horizontal direction, vertical angle, and slope distance
@@ -645,7 +641,7 @@ class HelmertTransformer(Prototype):
             return obs
 
         # Calculate the coordinates of the fixed point if the Helmert
-        # transformation has already been done. Otherwise, use the datum from
+        # transformation has been done already. Otherwise, use the datum from
         # the configuration.
         fixed_point = self._fixed_points.get(obs.get('id'))
 
@@ -675,13 +671,8 @@ class HelmertTransformer(Prototype):
         fixed_point['dist'] = dist
         fixed_point['lastUpdate'] = time.time()
 
-        self.logger.debug('Updated fixed point "{}" (Hz = {:1.5f}, V = {:1.5f}, '
-                          'Distance = {:3.5f}, Last Update = {})'
-                          .format(obs.get('id'),
-                                  fixed_point['hz'],
-                                  fixed_point['v'],
-                                  fixed_point['dist'],
-                                  fixed_point['lastUpdate']))
+        self.logger.debug('Updated fixed point with ID "{}"'
+                          .format(obs.get('id')))
 
         # Add global Cartesian coordinates of the fixed point to the observation.
         response_sets = obs.get('responseSets')
@@ -700,6 +691,9 @@ class PolarTransformer(Prototype):
     with the horizontal direction, the vertical angle, and the distance of a
     total station observation. The result (Y, X, Z) is added to the observation
     data set.
+
+    It is possible to use multiple fixed points in order to improve the
+    accuracy of the horizontal directions ("Abriss" in German).
     """
 
     def __init__(self, name, config_manager, sensor_manager):
@@ -709,7 +703,29 @@ class PolarTransformer(Prototype):
         self._view_point = config.get('viewPoint')
         self._fixed_points = config.get('fixedPoints')
 
-        self._orientation_value = 0
+        self._azimuth_point_name = config.get('azimuthPointName')
+        self._azimuth_point = self._fixed_points.get(self._azimuth_point_name)
+        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle'))
+
+        self._is_adjustment_enabled = config.get('adjustmentEnabled')
+
+    def _get_adjustment_value(self):
+        delta_hz_sum = 0
+        fixed_point_count = 0
+        r = 0
+
+        for fixed_point_id, fixed_point in self._fixed_points.items():
+            if fixed_point.get('deltaHz') is None:
+                # Fixed point has not been measured yet.
+                continue
+
+            delta_hz_sum += fixed_point.get('deltaHz')
+            fixed_point_count += 1
+
+        if fixed_point_count > 0:
+            r = delta_hz_sum / fixed_point_count
+
+        return r
 
     def _is_fixed_point(self, obs):
         """Checks if the given observation equals one of the defined fixed
@@ -719,30 +735,81 @@ class PolarTransformer(Prototype):
         else:
             return False
 
-    def _is_ready(self):
-        """Checks whether all fixed points have been measured already or not."""
-        is_ready = True
-
-        for fixed_point_id, fixed_point in self._fixed_points.items():
-            if fixed_point.get('lastUpdate') is None:
-                # Tie point has not been measured yet.
-                is_ready = False
-                break
-
-        return is_ready
-
-    def _update_fixed_point(self, obs):
-        fixed_point = self._fixed_points.get(obs.get('id'))
-        hz = obs.get_value('responseSets', 'hz', 'value')
-        fixed_point['hz'] = hz
-        fixed_point['lastUpdate'] = time.time()
-
-    def process_observation(self, obs):
+    def _is_valid_sensor_type(self, obs):
         sensor_type = obs.get('sensorType')
 
         if not SensorType.is_total_station(sensor_type.lower()):
             self.logger.error('Sensor type "{}" is not supported'
                               .format(sensor_type))
+            return False
+
+        return True
+
+    def _update_fixed_point(self, obs):
+        fixed_point = self._fixed_points.get(obs.get('id'))
+        hz = obs.get_value('responseSets', 'hz', 'value')
+
+        azimuth = self.get_azimuth_angle(self._azimuth_angle,
+                                         self._view_point.get('x'),
+                                         self._view_point.get('y'),
+                                         fixed_point.get('x'),
+                                         fixed_point.get('y'))
+
+        fixed_point['hz'] = hz
+        fixed_point['azimuth'] = azimuth
+        fixed_point['lastUpdate'] = time.time()
+
+        # Calculate the orientation.
+        delta_hz = azimuth - hz
+
+        if delta_hz < 0:
+            # Add 400 gon.
+            delta_hz += 2 * math.pi
+
+        fixed_point['deltaHz'] = delta_hz
+
+    def get_azimuth_angle(self,
+                          view_point_azimuth,
+                          view_point_x, view_point_y,
+                          target_point_x, target_point_y):
+        """Calculates the azimuth angle to a target point by using the
+        direction and the distance from a view point."""
+        # Angle to the target point.
+        azimuth = 0.0
+
+        # Calculate azimuth angle out of coordinates.
+        d_x = target_point_x - view_point_x
+        d_y = target_point_y - view_point_y
+
+        if d_x == 0:
+            if d_y > 0:
+                azimuth = 0.5 * math.pi
+            elif d_y < 0:
+                azimuth = 1.5 * math.pi
+            elif d_y == 0:
+                self.logger.error('Sensor position equals azimuth position')
+        else:
+            azimuth = math.atan(d_y / d_x)
+
+        # Consider the quadrant of the target point.
+        if d_x < 0:
+            # Add 200 gon.
+            azimuth += math.pi
+
+        if d_y < 0 < d_x:
+            # Add 400 gon.
+            azimuth += 2 * math.pi
+
+        # Remove the global azimuth angle of the sensor from the calculated
+        # azimuth.
+        if azimuth != 0:
+            azimuth = azimuth - view_point_azimuth
+
+        return azimuth
+
+    def process_observation(self, obs):
+        # Only total stations are supported.
+        if not self._is_valid_sensor_type(obs):
             return obs
 
         hz = obs.get_value('responseSets', 'hz', 'value')
@@ -756,21 +823,32 @@ class PolarTransformer(Prototype):
             return obs
 
         if self._is_fixed_point(obs):
+            # Add measured Hz and calculated Hz to the fixed point.
             self._update_fixed_point(obs)
-
-        # Radiant to grad (gon).
-        hz_grad = self.rad_to_grad(hz)
-        v_grad = self.rad_to_grad(v)
+            self.logger.debug('Updated fixed point with ID "{}"'
+                              .format(obs.get('id')))
 
         self.logger.debug('Starting polar transformation of target "{}" (Hz = '
                           '{:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m)'
-                          .format(obs.get('id'), hz_grad, v_grad, dist))
+                          .format(obs.get('id'),
+                                  self.rad_to_gon(hz),
+                                  self.rad_to_gon(v),
+                                  dist))
 
-        x, y, z = self.transform(self._sensor_x,
-                                 self._sensor_y,
-                                 self._sensor_z,
-                                 self._azimuth_x,
-                                 self._azimuth_y,
+        if self._is_adjustment_enabled:
+            # Add the adjustment value to the horizontal direction.
+            adj = self._get_adjustment_value()
+            self.logger.info('Calculated adjustment value for polar '
+                             'transformation ({:3.5f} gon)'
+                             .format(self.rad_to_gon(adj)))
+            hz += adj
+
+        # Calculate the coordinates of the observation.
+        x, y, z = self.transform(self._view_point.get('x'),
+                                 self._view_point.get('y'),
+                                 self._view_point.get('z'),
+                                 self._azimuth_point.get('x'),
+                                 self._azimuth_point.get('y'),
                                  hz,
                                  v,
                                  dist)
@@ -784,51 +862,49 @@ class PolarTransformer(Prototype):
         response_sets['y'] = self.get_response_set('float', 'm', round(y, 5))
         response_sets['z'] = self.get_response_set('float', 'm', round(z, 5))
 
+        if self._is_adjustment_enabled:
+            response_sets['hzAdjusted'] = self.get_response_set('float',
+                                                                'rad',
+                                                                round(hz, 16))
+
         return obs
 
-    def transform(self, sensor_x, sensor_y, sensor_z, azimuth_x, azimuth_y, hz,
-                  v, dist):
+    def transform(self,
+                  view_point_x, view_point_y, view_point_z,
+                  target_point_x, target_point_y,
+                  hz, v, dist):
         """Calculates coordinates (x, y, z) out of horizontal direction,
         vertical angle, and slope distance to a target point using a
         3-dimensional polar transformation."""
-        # Calculate azimuth angle out of coordinates.
-        d_x = azimuth_x - sensor_x
-        d_y = azimuth_y - sensor_y
-        azimuth = None
+        t = self.get_azimuth_angle(0,
+                                   view_point_x,
+                                   view_point_y,
+                                   target_point_x,
+                                   target_point_y)
 
-        if d_x == 0:
-            if d_y > 0:
-                azimuth = 0.5 * math.pi
-            elif d_y < 0:
-                azimuth = 1.5 * math.pi
-            elif d_y == 0:
-                self.logger.error('Sensor position equals azimuth')
-        else:
-            azimuth = math.atan(d_y / d_x)
-
-        t = azimuth + hz
-
-        if d_x < 0:
-            t += math.pi
-
-        if d_y < 0 < d_x:
-            t += 2 * math.pi
+        # Append the measured horizontal direction to the angle.
+        t += hz
 
         # Calculate coordinates of the target point.
         d_x = dist * math.sin(v) * math.cos(t)
         d_y = dist * math.sin(v) * math.sin(t)
         d_z = dist * math.cos(v)
 
-        x = sensor_x + d_x
-        y = sensor_y + d_y
-        z = sensor_z + d_z
+        x = view_point_x + d_x
+        y = view_point_y + d_y
+        z = view_point_z + d_z
 
         return x, y, z
 
     def get_response_set(self, t, u, v):
         return {'type': t, 'unit': u, 'value': v}
 
-    def rad_to_grad(self, a):
+    def gon_to_rad(self, a):
+        """Converts from gon (grad) to radiant."""
+        return a * math.pi / 200
+
+    def rad_to_gon(self, a):
+        """Converts from radiant to gon (grad)."""
         return a * 200 / math.pi
 
 

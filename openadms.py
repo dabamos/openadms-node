@@ -39,9 +39,9 @@ measurements. It can be used to monitor buildings, terrain, and other objects
 with the help of geodetical or geotechnical sensors.
 
 Example:
-    At first, start an MQTT message broker like Eclipse Mosquitto. The message
-    broker is used for distributing the messages of the OpenADMS modules. On
-    Unix, Mosquitto can be started with:
+    At first, start an MQTT message broker like Eclipse Mosquitto or HBMQTT.
+    The message broker is used for the distribution of messages between the
+    OpenADMS modules. On Unix, Mosquitto can be started with:
 
         $ sudo service mosquitto onestart
 
@@ -85,7 +85,7 @@ def main(config_file):
     # Run to infinity and beyond (probably not).
     stay_alive()
 
-def setup_thread_excepthook():
+def setup_thread_exception_hook():
     """Workaround for `sys.excepthook` thread bug from:
     https://bugs.python.org/issue1230540
 
@@ -98,13 +98,13 @@ def setup_thread_excepthook():
         init_original(self, *args, **kwargs)
         run_original = self.run
 
-        def run_with_except_hook(*args2, **kwargs2):
+        def run_with_exception_hook(*args2, **kwargs2):
             try:
                 run_original(*args2, **kwargs2)
             except Exception:
                 sys.excepthook(*sys.exc_info())
 
-        self.run = run_with_except_hook
+        self.run = run_with_exception_hook
 
     threading.Thread.__init__ = init
 
@@ -148,15 +148,21 @@ if __name__ == '__main__':
                       default=3)
 
     parser.add_option('-d', '--debug',
-                      dest='debug',
+                      dest='is_debug',
                       action='store_true',
                       help='print debug messages',
+                      default=False)
+
+    parser.add_option('-f', '--force-colored-log',
+                      dest='is_colored_log',
+                      action='store_true',
+                      help='force colored output of log messages',
                       default=False)
 
     (options, args) = parser.parse_args()
 
     # Basic logging configuration.
-    console_level = logging.DEBUG if options.debug else logging.INFO
+    console_level = logging.DEBUG if options.is_debug else logging.INFO
     logger.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
@@ -181,17 +187,18 @@ if __name__ == '__main__':
     # Add handler to logger.
     logger.addHandler(fh)
 
-    if OS == 'Windows':
-        ch = logging.StreamHandler()
-        ch.setFormatter(formatter)
-        logger.addHandler(ch)
-    else:
+    if OS != 'Windows' or options.is_colored_log:
         # Colored logging on Linux/Unix only.
         date_fmt = '%Y-%m-%dT%H:%M:%S'
         coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+    else:
+        # Standard output on Windows.
+        sh = logging.StreamHandler()
+        sh.setFormatter(formatter)
+        logger.addHandler(sh)
 
     # Set the hook for unhandled exceptions.
-    setup_thread_excepthook()
+    setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
     # Use a signal handler to catch ^C and quit the program gracefully.

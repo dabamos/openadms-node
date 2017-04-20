@@ -58,15 +58,18 @@ class Scheduler(Prototype):
         for schedule in schedules:
             observations = schedule.get('observations')
 
+            # Get all observations of the current observation set.
             for obs_name in observations:
-                # Get all observations of the current observation set.
                 obs = self._sensor_manager.get(sensor_name)\
-                    .get_observation(obs_name)
+                                          .get_observation(obs_name)
 
                 if not obs:
                     self.logger.error('Observation "{}" not found'
                                       .format(obs_name))
                     continue
+
+                # Add sensor name to the observation.
+                obs.set('sensorName', sensor_name)
 
                 # Create a new job.
                 job = Job(obs_name,
@@ -126,12 +129,12 @@ class Job(object):
 
     def __init__(self, name, port_name, obs, enabled, start_date, end_date,
                  weekdays, uplink):
-        self._name = name  # Name of the job.
-        self._port_name = port_name  # Name of the port.
-        self._obs = obs  # Observation object.
-        self._enabled = enabled  # Is enabled or not.
-        self._weekdays = weekdays  # The time sheet.
-        self._uplink = uplink  # Callback function.
+        self._name = name               # Name of the job.
+        self._port_name = port_name     # Name of the port.
+        self._obs = obs                 # Observation object.
+        self._enabled = enabled         # Is enabled or not.
+        self._weekdays = weekdays       # The time sheet.
+        self._uplink = uplink           # Callback function.
 
         self.logger = logging.getLogger('job')
 

@@ -544,7 +544,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 80.0
                 },
                 {
                     "description": "complete measurement of P2",
@@ -558,6 +558,7 @@
                         "returnCodeInspector",
                         "serialMeasurementProcessor",
                         "distanceCorrector",
+                        "polarTransformer",
                         "helmertTransformer",
                         "refractionCorrector",
                         "realTimePublisher",
@@ -746,7 +747,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 80.0
                 },
                 {
                     "description": "complete measurement of P3",
@@ -760,6 +761,7 @@
                         "returnCodeInspector",
                         "serialMeasurementProcessor",
                         "distanceCorrector",
+                        "polarTransformer",
                         "helmertTransformer",
                         "refractionCorrector",
                         "realTimePublisher",
@@ -948,7 +950,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 80.0
                 },
                 {
                     "description": "complete measurement of P4",
@@ -1150,7 +1152,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 80.0
                 },
                 {
                     "description": "complete measurement of P5",
@@ -1351,7 +1353,7 @@
                             "unit": "rad"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 120.0
                 },
                 {
                     "name": "wait10",
@@ -1546,7 +1548,7 @@
                         "getP2",
                         "getP3",
                         "getP4",
-                        "wait60"
+                        "wait10"
                     ]
                 }
             ]
@@ -1714,7 +1716,10 @@
                 "y": 996.2600,
                 "z": 100.0210
             }
-        }
+        },
+        "azimuthPointName": "p1",
+        "azimuthAngle": 100.00000,
+        "adjustmentEnabled": true
     },
     "realTimePublisher": {
         "enabled": true,
