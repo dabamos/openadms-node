@@ -26,10 +26,10 @@ import py2exe
 
     C:\Python34\python.exe setup.py py2exe
 
-The distribution files are stored in the sub-solder "dist". You can run the
-make file "make.bat" to create a complete OpenADMS distribution for Microsoft
-Windows."""
-setup(console=['launcher.py'],
+The distribution files are stored in the sub-folder "dist". You can run the
+make file "make-py2exe.bat" to create a complete OpenADMS distribution for
+Microsoft Windows."""
+setup(console=['openadms.py'],
       options={'py2exe': {'includes': ['modules.database',
                                        'modules.export',
                                        'modules.gpio',
