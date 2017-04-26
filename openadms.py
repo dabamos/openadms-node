@@ -2,7 +2,7 @@
 """
 Copyright (c) 2017 Hochschule Neubrandenburg an other contributors.
 
-Licensed under the EUPL, Version 1.1 or - as soon they will be approved
+Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
 "Licence");
 
@@ -45,7 +45,7 @@ Example:
 
         $ sudo service mosquitto onestart
 
-    Then start OpenADMS with a valid configuration file:
+    Then run OpenADMS with a valid configuration file:
 
         $ python3 openadms.py --config ./config/my_config.json
 
@@ -59,8 +59,8 @@ LOG_FILE = 'openadms.log'
 LOG_FILE_BACKUP_COUNT = 1
 MAX_LOG_FILE_SIZE = 10485760    # 10 MB.
 
-VERSION = 0.4
-VERSION_NAME = 'Dar es Salaam'
+VERSION = 0.5
+VERSION_NAME = 'Eindhoven'
 
 # Get the name of the operating system, to switch Windows-specific conventions.
 OS = platform.system()
@@ -90,11 +90,9 @@ def setup_thread_exception_hook():
     https://bugs.python.org/issue1230540
 
     Call once from the main thread before creating any threads."""
-
     init_original = threading.Thread.__init__
 
     def init(self, *args, **kwargs):
-
         init_original(self, *args, **kwargs)
         run_original = self.run
 
@@ -130,7 +128,7 @@ if __name__ == '__main__':
         description='OpenADMS {}'.format(VERSION),
         epilog='\nOpenADMS has been developed at the University of Applied '
                'Sciences Neubrandenburg (Germany).\n'
-               'Licenced under the European Union Public Licence (EUPL) v.1.1.'
+               'Licensed under the European Union Public Licence (EUPL) v.1.1.'
                '\nFor further information, visit https://www.dabamos.de/.\n')
 
     parser.add_option('-c', '--config',

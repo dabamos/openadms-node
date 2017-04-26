@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
-Licensed under the EUPL, Version 1.1 or - as soon they will be approved
+Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
 "Licence");
 
@@ -31,7 +31,6 @@ from modules.prototype import Prototype
 
 
 class FileRotation(Enum):
-
     """
     Enumeration of file rotation times of flat files.
     """
@@ -43,7 +42,6 @@ class FileRotation(Enum):
 
 
 class FileExporter(Prototype):
-
     """
     FileExporter writes sensor data to a flat file in CSV format.
     """
@@ -83,10 +81,10 @@ class FileExporter(Prototype):
         """Append data to a flat file in CSV format.
 
         Args:
-            obs(Observation): The input observation object.
+            obs (Observation): The input observation object.
 
         Returns:
-            obs(Observation): The output observation object.
+            obs (Observation): The output observation object.
         """
         ts = datetime.fromtimestamp(obs.get('timeStamp', 0))
 
@@ -98,7 +96,8 @@ class FileExporter(Prototype):
             # Every month a new file is created.
             FileRotation.MONTHLY: ts.strftime('%Y-%m'),
             # Every year a new file is created.
-            FileRotation.YEARLY: ts.strftime('%Y')}[self._file_rotation]
+            FileRotation.YEARLY: ts.strftime('%Y')
+        }[self._file_rotation]
 
         file_name = self._file_name
 
@@ -164,7 +163,6 @@ class FileExporter(Prototype):
 
 
 class RealTimePublisher(Prototype):
-
     """
     RealTimePublisher sends copies of `Observation` objects to a list of
     receivers.

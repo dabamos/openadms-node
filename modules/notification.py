@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
-Licensed under the EUPL, Version 1.1 or - as soon they will be approved
+Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
 "Licence");
 
@@ -38,7 +38,9 @@ from modules.prototype import Prototype
 
 
 class Alert(Prototype):
-    """Alert is used to send warning and error messages to other modules."""
+    """
+    Alert is used to send warning and error messages to other modules.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -68,10 +70,8 @@ class Alert(Prototype):
             self.fire(log)
 
     def fire(self, log):
-        header = {
-            'type': 'alertMessage'
-        }
-
+        # Set the header.
+        header = {'type': 'alertMessage'}
 
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
@@ -139,9 +139,7 @@ class AlertMessageFormatter(Prototype):
             return
 
         # Create the header of the message.
-        header = {
-            'type': self._config.get('type')
-        }
+        header = {'type': self._config.get('type')}
 
         # Parse the properties.
         properties = {}
@@ -272,8 +270,8 @@ class MailAgent(Prototype):
         msg.attach(plain_text)
 
         try:
-            # TLS.
             if self._is_tls:
+                # Use TLS encryption.
                 smtp = smtplib.SMTP_SSL(self._host, self._port)
             else:
                 smtp = smtplib.SMTP(self._host, self._port)
@@ -281,15 +279,13 @@ class MailAgent(Prototype):
             smtp.set_debuglevel(False)
             smtp.ehlo()
 
-            # StartTLS.
             if not self._is_tls and self._is_start_tls:
+                # Use TLS via StartTLS.
                 smtp.starttls()
                 smtp.ehlo()
 
             smtp.login(self._user_name, self._user_password)
-            smtp.sendmail(self._user_mail,
-                          [mail_to],
-                          msg.as_string())
+            smtp.sendmail(self._user_mail, [mail_to], msg.as_string())
             smtp.quit()
 
             self.logger.info('E-mail has been send successfully to {}'
@@ -301,6 +297,9 @@ class MailAgent(Prototype):
 
 
 class ShortMessageAgent(Prototype):
+    """
+    ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
@@ -342,7 +341,7 @@ class ShortMessageAgent(Prototype):
                              .format(self._host, self._port))
                 return
 
-                self.logger.info('Sending SMS to "{}" ...'.format(number))
+            self.logger.info('Sending SMS to "{}" ...'.format(number))
             sock.send(message.encode())
 
             self.logger.debug('Closed connection to "{}:{}"'
@@ -350,6 +349,9 @@ class ShortMessageAgent(Prototype):
 
 
 class Heartbeat(Prototype):
+    """
+    Heartbeat sends heartbeat messages ("pings") to the message broker.
+    """
 
     def __init__(self, name, config_manager, sensor_manager):
         Prototype.__init__(self, name, config_manager, sensor_manager)
