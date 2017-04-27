@@ -822,6 +822,8 @@ class PolarTransformer(Prototype):
                                                            obs.get('id')))
             return obs
 
+        hz_dist = math.sin(v) * dist
+
         if self._is_fixed_point(obs):
             # Add measured Hz and calculated Hz to the fixed point.
             self._update_fixed_point(obs)
@@ -833,7 +835,7 @@ class PolarTransformer(Prototype):
                           .format(obs.get('id'),
                                   self.rad_to_gon(hz),
                                   self.rad_to_gon(v),
-                                  dist))
+                                  hz_dist))
 
         if self._is_adjustment_enabled:
             # Add the adjustment value to the horizontal direction.
@@ -851,7 +853,7 @@ class PolarTransformer(Prototype):
                                  self._azimuth_point.get('y'),
                                  hz,
                                  v,
-                                 dist)
+                                 hz_dist)
 
         self.logger.info('Transformed target "{}" (X = {:3.4f}, Y = {:3.4f}, '
                          'Z = {:3.4f})'.format(obs.get('id'), x, y, z))
