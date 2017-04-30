@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="style.css" rel="stylesheet">
+
+        <title>OpenADMS | Local Control Server</title>
+
+    </head>
+
+    <body>
+
+        <main class="main">
+
+            <h2>OpenADMS <small>Local Control Server</small></h2>
+
+            <div class="breadcrumbs">
+                <ol>
+                    <li><a href="#system">System</a></li>
+                    <li><a href="#statistics">Statistics</a></li>
+                    <li><a href="#modules">Modules</a></li>
+                    <li><a href="#next">Next Observations</a></li>
+                    <li><a href="#log">Log Messages</a></li>
+                </ol>
+            </div>
+
+            <h4 id="system">System</h4>
+            <div class="row">
+                <div class="full col-2"><strong>Host Name:</strong></div>
+                <div class="full col-3">{hostname}</div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>Operating System:</strong></div>
+                <div class="full col-3">{system}</div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>Software Version:</strong></div>
+                <div class="full col-3">OpenADMS {openadms_version} ({openadms_version_name})</div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>Python Interpreter:</strong></div>
+                <div class="full col-3">{python_version}</div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>Configuration File:</strong></div>
+                <div class="full col-3"><code>{config_file}</code></div>
+            </div>
+
+            <h4 id="statistics">Statistics</h4>
+            <div class="row">
+                <div class="full col-2"><strong>Uptime:</strong></div>
+                <div class="full col-3">{uptime}</div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>CPU Load:</strong></div>
+                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: {cpu_load}%"><span class="progress-text">{cpu_load}%</span></div></div></div>
+            </div>
+            <div class="row">
+                <div class="full col-2"><strong>Memory Used:</strong></div>
+                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: {mem_used}%"><span class="progress-text">{mem_used}%</span></div></div></div>
+            </div>
+
+            <h4 id="modules">Modules</h4>
+            <table class="table invert">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>scheduler1</td><td>modules.schedule.Scheduler</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
+                    <tr><td>scheduler2</td><td>modules.schedule.Scheduler</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
+                    <tr><td>preProcessor</td><td>modules.processing.PreProcessor</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
+                    <tr><td>controlServer</td><td>modules.server.ControlServer</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
+                </tbody>
+            </table>
+
+            <h4 id="next">Next Observations</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Sensor</th>
+                        <th>Port</th>
+                        <th>Observation</th>
+                        <th>Starting in</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>stsDTM</td><td><code>/dev/ttyU0</code></td><td><code>getValues</code></td><td>600 s</td></tr>
+                    <tr><td>leicaTM30</td><td><code>/dev/ttyU1</code></td><td><code>getP2</code></td><td>120 s</td></tr>
+                </tbody>
+            </table>
+
+            <h4 id="log">Log Messages</h4>
+            <pre>
+2017-04-05 20:07:09,879 -    ERROR -       configurationManager - Configuration file "config/nivel210.json" not found.
+2017-04-05 21:47:40,853 -    ERROR -                       com1 - Permission denied for port "/dev/ttyU0"
+2017-04-05 21:47:40,854 -    ERROR -                       com1 - Could not write to port "/dev/ttyU0"
+2017-04-05 21:47:41,024 -    ERROR -                       com1 - Permission denied for port "/dev/ttyU0"</pre>
+            <a href="#" class="btn info sml">Show Complete Log</a>
+
+            <hr>
+
+            <footer style="text-align: center;">
+                <small><a href="https://www.dabamos.de/">OpenADMS</a> {openadms_version} ({openadms_version_name})<br>
+                Copyright &copy; 2017 Hochschule Neubrandenburg – University of Applied Sciences<br>
+                European Union Public Licence (EUPL) v.1.1.</small>
+            </footer>
+
+        </main>
+
+    </body>
+
+</html>
