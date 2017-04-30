@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -19,13 +19,13 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import logging
-
-from core import manager
-
 """Main monitoring module."""
 
-logger = logging.getLogger('monitor')
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
+from core.manager import *
 
 
 class Monitor(object):
@@ -35,21 +35,8 @@ class Monitor(object):
     """
 
     def __init__(self, config_file):
-        self._config_manager = manager.ConfigurationManager(config_file)
-        self._sensor_manager = manager.SensorManager(self._config_manager)
+        managers = Managers()
 
-        logger.info('Starting monitoring ...')
-        self._module_manager = manager.ModuleManager(self._config_manager,
-                                                     self._sensor_manager)
-
-    @property
-    def config_manager(self):
-        return self._config_manager
-
-    @property
-    def module_manager(self):
-        return self._module_manager
-
-    @property
-    def sensor_manager(self):
-        return self._sensor_manager
+        managers.config_manager = ConfigManager(config_file)
+        managers.sensor_manager = SensorManager(managers.config_manager)
+        managers.module_manager = ModuleManager(managers)
