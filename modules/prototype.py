@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -19,83 +19,15 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import json
-import logging
-import queue
-import threading
+"""Prototype class which can be used as a blueprint for other OpenADMS
+modules."""
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
+from core.manager import *
 from core.observation import Observation
-
-"""Collects prototype classes which can be used as blueprints for other
-OpenADMS modules."""
-
-
-class Module(threading.Thread):
-    """
-    Module bundles a worker with a messenger and manages the communication
-    between them.
-    """
-
-    def __init__(self, messenger, worker):
-        threading.Thread.__init__(self, name=worker.name)
-        self.logger = logging.getLogger(worker.name)
-        self.daemon = True
-
-        self._messenger = messenger
-        self._worker = worker
-
-        self._inbox = queue.Queue()
-        self._topic = self._messenger.topic
-
-        # Set the callback functions of the messenger and the worker.
-        self._messenger.downlink = self.retrieve
-        self._worker.uplink = self.publish
-
-        # Subscribe to the worker's name.
-        self._messenger.subscribe(self._topic + '/' + worker.name)
-
-    def publish(self, target, message):
-        """Sends an `Observation` object to the next receiver by using the
-        messenger."""
-        target_path = '{}/{}'.format(self._topic, target)
-        self._messenger.publish(target_path, message)
-
-    def retrieve(self, message):
-        """Callback function for the messenger. New data from the message broker
-        lands here."""
-        self._inbox.put(message)
-
-    def run(self):
-        """Checks the inbox for new messages and calls the `handle()` method of
-        the worker for further processing. Runs within a thread."""
-        self.logger.debug('Connecting module "{}" to {}:{} ...'
-                          .format(self._worker.name,
-                                  self._messenger.host,
-                                  self._messenger.port))
-
-        self._messenger.connect()
-
-        while True:
-            message = self._inbox.get()     # Blocking I/O.
-            self._worker.handle(message)    # Fire and forget.
-
-        self._messenger.disconnect()
-
-    @property
-    def messenger(self):
-        return self._messenger
-
-    @property
-    def worker(self):
-        return self._worker
-
-    @messenger.setter
-    def messenger(self, messenger):
-        self._messenger = messenger
-
-    @worker.setter
-    def worker(self, worker):
-        self._worker = worker
 
 
 class Prototype(object):
@@ -103,31 +35,70 @@ class Prototype(object):
     Prototype is used as a blueprint for OpenADMS workers.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        self._name = name
-        self.logger = logging.getLogger(self.name)
+    def __init__(self, name, type, managers):
+        self.logger = logging.getLogger(name)
 
-        self._config_manager = config_manager
-        self._sensor_manager = sensor_manager
+        self._name = name   # Module name, e.g., 'serialPort'.
+        self._type = type   # Class path, e.g., 'modules.port.SerialPort'.
+
+        self._config_manager = managers.config_manager
+        self._module_manager = managers.module_manager
+        self._sensor_manager = managers.sensor_manager
 
         self._uplink = None
-        self._is_paused = False
+        self._is_running = True
 
         # A dictionary of the various payload data types and their respective
         # callback functions.  Further callback functions can be added with the
         # `add_handler()` method.
         self._handlers = {
-            'observation': self.handle_observation,
-            'service': self.handle_service
+            'observation': self.do_handle_observation,
+            'service': self.do_handle_service
         }
 
-    def add_handler(self, name, func):
-        """Registers a callback function for handling of messages."""
-        self._handlers[name] = func
+    def add_handler(self,
+                    data_type: str,
+                    func: Callable[[Dict, Dict], None]) -> None:
+        """Registers a callback function for handling of messages.
+        
+        Args:
+            data_type (str): Name of the data type (observation, service, ...).
+            func (Callable): Callback function for handling the message.        
+        """
+        self._handlers[data_type] = func
 
-    def handle(self, message):
+    def do_handle_observation(self, header: Dict, payload: Dict) -> None:
+        """Handles an observation by forwarding it to the processing method and
+        prepares the result for publishing."""
+        obs = Observation(payload)
+
+        if self._is_running:
+            obs = self.process_observation(Observation(payload))
+
+        if obs:
+            self.publish_observation(obs)
+
+    def do_handle_service(self, header: Dict, payload: Dict) -> None:
+        """Processes service messages."""
+        sender = header.get('from', '?')
+        action = payload.get('action')
+
+        if action is 'pause':
+            self._is_running = False
+            self.logger.info('Paused module "{}" by call from "{}"'
+                             .format(self._name, sender))
+        elif action is 'start':
+            self._is_running = True
+            self.logger.info('Started module "{}" by call from "{}"'
+                             .format(self._name, sender))
+
+    def handle(self, message: List[Dict]) -> None:
         """Processes messages by calling callback functions for data
-        handling."""
+        handling.
+
+        Args:
+            message (List): Header and payload of the message, both Dict.
+        """
         if not self.is_sequence(message) or len(message) < 2:
             self.logger.warning('{}: received message is invalid'
                                 .format(self._name))
@@ -156,50 +127,50 @@ class Prototype(object):
 
         handler_func(header, payload)
 
-    def handle_observation(self, header, payload):
-        """Handles an observation by forwarding it to the processing method and
-        prepares the result for publishing."""
-        obs = Observation(payload)
-        obs = self.process_observation(obs)
-
-        if not obs:
-            return
-
-        self.publish_observation(obs)
-
-    def handle_service(self, header, payload):
-        """Processes service messages."""
-        # If `pause` is set, change status of the worker accordingly.
-        sender = header.get('from')
-        pause = payload.get('pause')
-
-        if pause is None or pause == self._is_paused:
-            return
-
-        self._is_paused = pause
-
-        if pause:
-            self.logger.info('Paused module "{}" by call from "{}"'
-                             .format(self._name, sender))
-        else:
-            self.logger.info('Started module "{}" by call from "{}"'
-                             .format(self._name, sender))
-
-    def is_sequence(self, arg):
+    def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not."""
         return (not hasattr(arg, 'strip') and
                 hasattr(arg, '__getitem__') or
                 hasattr(arg, '__iter__'))
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Observation:
+        # Will be overwritten by the worker.
         pass
 
-    def process_service(self, service):
-        pass
+    def publish(self, target: str, header: Dict, payload: Dict) -> None:
+        """Appends header and payload to a list, converts the list to a JSON
+        string and sends it to the designated target by using the callback
+        function `_uplink()`. The JSON string has the format:
 
-    def publish_observation(self, obs):
+            [ { <header> }, { <payload> } ].
+
+        Args:
+            target (str): The name of the target.
+            header (Dict): The header of the message.
+            payload (Dict): The payload of the message.
+        """
+        if not self._uplink:
+            self.logger.error('No uplink defined for module "{}"'
+                              .format(self._name))
+            return
+
+        try:
+            message = json.dumps([header, payload])
+            self._uplink(target, message)
+        except TypeError:
+            self.logger.error('Can\'t publish message '
+                              '(header or payload invalid)')
+
+    def publish_observation(self, obs: Type[Observation]) -> None:
         """Prepares the observation for publishing and forwards it to the
-        messenger."""
+        messenger.
+
+        Args:
+            obs (Observation): Observation object.
+
+        Returns:
+            Observation object.
+        """
         receivers = obs.get('receivers')
         index = obs.get('nextReceiver')
 
@@ -229,8 +200,7 @@ class Prototype(object):
 
         # Increase the receivers index.
         next_receiver = receivers[index]
-        index += 1
-        obs.set('nextReceiver', index)
+        obs.set('nextReceiver', index + 1)
 
         # Create header and payload.
         header = {
@@ -243,53 +213,30 @@ class Prototype(object):
         # Send the observation to the next module.
         self.publish(next_receiver, header, payload)
 
-    def publish_service(self, service):
-        pass
-
-    def publish(self, target, header, payload):
-        """Appends header and payload to a list, converts the list to a JSON
-        string and sends it to the designated target by using the callback
-        function `_uplink()`. The JSON string has the format:
-
-            [ { <header> }, { <payload> } ].
-
-        Args:
-            target (str): The name of the target.
-            header (Dict): The header of the message.
-            payload (Dict): The payload of the message.
-        """
-        if not self._uplink:
-            self.logger.error('No uplink defined for module "{}"'
-                              .format(self._name))
-            return
-
-        try:
-            message = json.dumps([header, payload])
-            self._uplink(target, message)
-        except TypeError:
-            self.logger.error('Can\'t publish message '
-                              '(header or payload invalid)')
+    @property
+    def is_running(self) -> bool:
+        return self._is_running
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def config_manager(self):
-        return self._config_manager
+    def type(self) -> str:
+        return self._type
 
     @property
-    def is_paused(self):
-        return self._is_paused
-
-    @property
-    def sensor_manager(self):
-        return self._sensor_manager
-
-    @property
-    def uplink(self):
+    def uplink(self) -> Callable[[str, str], None]:
         return self._uplink
 
+    @is_running.setter
+    def is_running(self, is_running: bool) -> None:
+        self._is_running = is_running
+
+    @type.setter
+    def type(self, type: str) -> None:
+        self._type = type
+
     @uplink.setter
-    def uplink(self, uplink):
+    def uplink(self, uplink: Callable[[str, str], None]) -> None:
         self._uplink = uplink
