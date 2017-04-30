@@ -34,8 +34,8 @@ class VirtualSensor(Prototype):
     VirtualSensor is a prototype class for virtual sensors.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
         self.patterns = {}
 
     def process_observation(self, obs):
@@ -86,18 +86,18 @@ class VirtualSensor(Prototype):
 
 class VirtualTotalStationTM30(VirtualSensor):
     """
-    VirtualTotalStationTM30 simulates a Leica TM30 totalstation by processing GeoCOM
-    commands.
+    VirtualTotalStationTM30 simulates a Leica TM30 totalstation by processing
+    GeoCOM commands.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        VirtualSensor.__init__(self, name, config_manager,
-                               sensor_manager)
+    def __init__(self, name, type, managers):
+        VirtualSensor.__init__(self, name, type, managers)
 
         self.patterns = {
             '%R1Q,5003:\\r\\n': self.get_sensor_id,
             '%R1Q,5004:\\r\\n': self.get_sensor_name,
-            '%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n': self.set_direction,
+            '%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n':
+                self.set_direction,
             '%R1Q,2008:1,1\\r\\n': self.measure_distance,
             '%R1Q,2167:5000,1\\r\\n': self.do_complete_measurement
         }
@@ -156,9 +156,8 @@ class VirtualDTM(VirtualSensor):
     VirtualDTM simulates an STS DTM meteorological sensor.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        VirtualSensor.__init__(self, name, config_manager,
-                               sensor_manager)
+    def __init__(self, name, type, managers):
+        VirtualSensor.__init__(self, name, type, managers)
 
         self.patterns = {
             'A\\r': self.power_on,
@@ -201,11 +200,8 @@ class VirtualIndicatorOne(VirtualSensor):
     indicator/extensometer.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        VirtualSensor.__init__(self,
-                               name,
-                               config_manager,
-                               sensor_manager)
+    def __init__(self, name, type, managers):
+        VirtualSensor.__init__(self, name, type, managers)
 
         self._current_value = 0.0
         self.patterns = {

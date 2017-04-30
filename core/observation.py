@@ -19,10 +19,20 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (C) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import json
 import logging
 
-logger = logging.getLogger('openadms')
+from typing import *
+
+# Type definition for the value inside a response set of an observation.
+# `ResponseValue` can either be of type float, int, or str.
+ResponseValue = TypeVar('ResponseValue', float, int, str)
+
+logger = logging.getLogger('observation')
 
 
 class Observation(object):
@@ -50,42 +60,91 @@ class Observation(object):
         else:
             self._data = data
 
-    @property
-    def data(self):
-        return self._data
-
-    @data.setter
-    def data(self, data):
-        """Sets the observation data set. Kindly note that the data won't be
-        validated.
-
-        Args:
-            data (Dict): The data set dictionary.
-        """
-        self._data = data
-
-    def get(self, key, default=None):
+    def get(self, key: str, default=None) -> Any:
         """Returns the value to a given key.
 
         Args:
             key (str): The key of the value.
-            default: Default return value.
+            default (optional): Default return value.
 
         Returns:
-            Returns a value from the observation data.
+            Single value from the observation data.
         """
         return self._data.get(key, default)
 
-    def get_value(self, *args):
+    def get_response_type(self, name: str) -> str:
+        """Returns the type of a given response set.
+
+        Args:
+            name (str): Name of the response set.
+
+        Returns:
+            Type of the response set.
+        """
+        try:
+            t = self._data.get('responseSets').get(name).get('type')
+        except AttributeError:
+            logger.warning('Type of response set "{}" is missing in '
+                           'observation "{}" with ID "{}"'
+                           .format(name,
+                                   self.get('name'),
+                                   self.get('id')))
+            return
+
+        return t
+
+    def get_response_unit(self, name: str) -> str:
+        """Returns the unit of a given response set.
+
+        Args:
+            name (str): Name of the response set.
+
+        Returns:
+            Unit of the response set.
+        """
+        try:
+            u = self._data.get('responseSets').get(name).get('value')
+        except AttributeError:
+            logger.warning('Unit of response set "{}" is missing in '
+                           'observation "{}" with ID "{}"'
+                           .format(name,
+                                   self.get('name'),
+                                   self.get('id')))
+            return
+
+        return u
+
+    def get_response_value(self, name: str) -> ResponseValue:
+        """Returns the value of a given response set.
+        
+        Args:
+            name (str): Name of the response set.
+            
+        Returns:
+            Value of the response set.
+        """
+        try:
+            v = self._data.get('responseSets').get(name).get('value')
+        except AttributeError:
+            logger.warning('Value of response set "{}" is missing in '
+                           'observation "{}" with ID "{}"'
+                           .format(name,
+                                   self.get('name'),
+                                   self.get('id')))
+            return
+
+        return v
+
+    def get_value(self, *args: str) -> ResponseValue:
         """Returns the value of a set of keys.
 
         Args:
             *args (str): The keys.
 
         Returns:
-            Returns a value from the observation data.
+            Single value from the observation data.
         """
-        ref = self.data
+        ref = self._data
 
         for x in args:
             try:
@@ -95,7 +154,7 @@ class Observation(object):
 
         return ref
 
-    def set(self, key, value):
+    def set(self, key: str, value: Any) -> None:
         """Sets key and value in the data set.
 
         Args:
@@ -104,10 +163,43 @@ class Observation(object):
         """
         self._data[key] = value
 
-    def to_json(self):
+    def to_json(self) -> str:
         """Returns a dump of the data set in JSON format.
 
         Returns:
             str: Data in JSON format.
         """
         return json.dumps(self._data)
+
+    @property
+    def data(self) -> Dict:
+        return self._data
+
+    @data.setter
+    def data(self, data: Dict) -> None:
+        """Sets the observation data set. Kindly note that the data won't be
+        validated.
+
+        Args:
+            data (Dict): The data set dictionary.
+        """
+        self._data = data
+
+    @staticmethod
+    def create_response_set(type: str, unit: str, value: ResponseValue)\
+            -> Dict[str, Any]:
+        """Creates a response set containing type, unit, and value.
+        
+        Args:
+            type (str): Type of the response (e.g., 'float').
+            unit (str): Unit of the response (e.g., 'm').
+            value (Value): The value of the response (e.g., '17.53').
+            
+        Returns:
+            Dictionary with type, unit, and value.
+        """
+        return {
+            'type': type,
+            'unit': unit,
+            'value': value
+        }

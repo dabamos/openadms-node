@@ -19,23 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-import logging.handlers
-import optparse
-import platform
-import signal
-import sys
-import threading
-import time
-import traceback
-
-import coloredlogs
-
-from core.monitor import Monitor
-
 """OpenADMS - Open Automatic Deformation Monitoring System
 
 OpenADMS is an open source automatic deformation monitoring system for permanent
-measurements. It can be used to monitor buildings, terrain, and other objects
+observations. It can be used to monitor buildings, terrain, and other objects
 with the help of geodetical or geotechnical sensors.
 
 Example:
@@ -52,22 +39,34 @@ Example:
     The monitoring will begin automatically.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
+import logging.handlers
+import optparse
+import signal
+import sys
+import threading
+import time
+import traceback
+
+import coloredlogs
+
+from core.monitor import Monitor
+from core.util import System
+
+
 # Get root logger.
 logger = logging.getLogger()
 
 LOG_FILE = 'openadms.log'
 LOG_FILE_BACKUP_COUNT = 1
-MAX_LOG_FILE_SIZE = 10485760    # 10 MB.
+MAX_LOG_FILE_SIZE = 10485760  # 10 MB.
 
-VERSION = 0.5
-VERSION_NAME = 'Eindhoven'
-
-# Get the name of the operating system, to switch Windows-specific conventions.
-OS = platform.system()
 
 def main(config_file):
-    # v = 'v.{} ({})'.format(VERSION, VERSION_NAME)
-    v = 'v.{}'.format(VERSION)
+    v = 'v.{}'.format(System.get_openadms_version())
 
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
     logger.info(' _____             _____ ____  _____ _____')
@@ -84,6 +83,7 @@ def main(config_file):
     Monitor(config_file)
     # Run to infinity and beyond (probably not).
     stay_alive()
+
 
 def setup_thread_exception_hook():
     """Workaround for `sys.excepthook` thread bug from:
@@ -106,14 +106,18 @@ def setup_thread_exception_hook():
 
     threading.Thread.__init__ = init
 
+
 def exception_hook(type, value, tb):
-    fmt_exception = ''.join(traceback.format_exception(type, value, tb)).replace('\n', '')
+    fmt_exception = ''.join(
+        traceback.format_exception(type, value, tb)).replace('\n', '')
     logger.critical('Unhandled exception: {}'
                     .format(''.join(fmt_exception.split())))
+
 
 def signal_handler(signal, frame):
     logger.info('Exiting ...')
     sys.exit(0)
+
 
 def stay_alive():
     while True:
@@ -125,7 +129,7 @@ if __name__ == '__main__':
     optparse.OptionParser.format_epilog = lambda self, formatter: self.epilog
     parser = optparse.OptionParser(
         usage='%prog [options]',
-        description='OpenADMS {}'.format(VERSION),
+        description='OpenADMS {}'.format(System.get_openadms_version()),
         epilog='\nOpenADMS has been developed at the University of Applied '
                'Sciences Neubrandenburg (Germany).\n'
                'Licensed under the European Union Public Licence (EUPL) v.1.1.'
@@ -185,7 +189,7 @@ if __name__ == '__main__':
     # Add handler to logger.
     logger.addHandler(fh)
 
-    if OS != 'Windows' or options.is_colored_log:
+    if not System.is_windows() or options.is_colored_log:
         # Colored logging on Linux/Unix only.
         date_fmt = '%Y-%m-%dT%H:%M:%S'
         coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)

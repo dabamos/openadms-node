@@ -1735,6 +1735,8 @@
             "./data"
         ],
         "separator": ",",
-        "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
+        "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f",
+        "compress": true,
+        "zipFile": "observations.zip"
     }
 }

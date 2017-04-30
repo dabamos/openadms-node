@@ -32,6 +32,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 
+from core.version import *
 from modules.prototype import Prototype
 
 """Module for alerting."""
@@ -42,16 +43,16 @@ class Alert(Prototype):
     Alert is used to send warning and error messages to other modules.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._is_enabled = config.get('enabled')
         self._queue = queue.Queue(-1)
 
         # Add logging handler to the root logger.
         qh = logging.handlers.QueueHandler(self._queue)
-        qh.setLevel(logging.WARNING)    # Get WARNING, ERROR, and CRITICAL.
+        qh.setLevel(logging.WARNING)    # Only get WARNING, ERROR, and CRITICAL.
         root = logging.getLogger()
         root.addHandler(qh)
 
@@ -99,9 +100,9 @@ class Alert(Prototype):
 
 class AlertMessageFormatter(Prototype):
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        self._config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        self._config = self._config_manager.get(self._name)
 
         # Configuration.
         self._msg_collection_enabled =\
@@ -221,9 +222,9 @@ class AlertMessageFormatter(Prototype):
 
 class MailAgent(Prototype):
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._charset = config.get('charset')
         self._default_subject = config.get('defaultSubject',
@@ -236,7 +237,7 @@ class MailAgent(Prototype):
         self._user_mail = config.get('userMail')
         self._user_name = config.get('userName')
         self._user_password = config.get('userPassword')
-        self._x_mailer = 'OpenADMS Mail Agent'
+        self._x_mailer = 'OpenADMS {} Mail Agent'.format(OPENADMS_VERSION)
 
         self.add_handler('email', self.handle_mail)
 
@@ -253,7 +254,7 @@ class MailAgent(Prototype):
 
     def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
         if self._is_tls and self._is_start_tls:
-            self.logger.error('TLS and StartTLS can\'t be used together')
+            self.logger.critical('TLS and StartTLS can\'t be used together')
             return
 
         msg = MIMEMultipart('alternative')
@@ -301,14 +302,14 @@ class ShortMessageAgent(Prototype):
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
         self._port = config.get('port')
 
-        # Capture messages of type "sms".
+        # Capture messages of type 'sms'.
         self.add_handler('sms', self.handle_short_message)
 
     def handle_short_message(self, header, payload):
@@ -353,9 +354,9 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._receivers = config.get('receivers')
         self._interval = config.get('interval')
@@ -401,11 +402,11 @@ class Heartbeat(Prototype):
 
 class HeartbeatMonitor(Prototype):
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
-        # Capture messages of type "heartbeat".
+        # Capture messages of type 'heartbeat'.
         self.add_handler('heartbeat', self.handle_heartbeat)
 
     def handle_heartbeat(self, header, payload):

@@ -32,8 +32,9 @@ class SerialPort(Prototype):
     SerialPort does I/O on a given serial port.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        self._config = self._config_manager.get(self._name)
 
         self._serial = None     # Pyserial object.
         self._serial_port_config = None
@@ -142,12 +143,13 @@ class SerialPort(Prototype):
     def close(self):
         self.logger.info('Closing port "{}" ...'
                          .format(self._serial_port_config.port))
-        self._serial.close()
+        if self._serial:
+            self._serial.close()
 
     def _get_port_config(self):
-        p = self._config_manager.config.get('ports')\
-                                       .get('serial')\
-                                       .get(self.name)
+        p = self.monitor.config_manager.config.get('ports')\
+                                              .get('serial')\
+                                              .get(self.name)
 
         if not p:
             self.logger.debug('No port "{}" defined in configuration'

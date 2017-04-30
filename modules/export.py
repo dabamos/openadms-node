@@ -46,9 +46,9 @@ class FileExporter(Prototype):
     FileExporter writes sensor data to a flat file in CSV format.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._file_extension = config.get('fileExtension')
         self._file_name = config.get('fileName')
@@ -168,9 +168,10 @@ class RealTimePublisher(Prototype):
     receivers.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
+
         self._receivers = config.get('receivers')
         self._is_enabled = config.get('enabled')
 

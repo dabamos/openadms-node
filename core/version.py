@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -19,21 +19,9 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-from tinydb import TinyDB, Query
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
 
-from modules.prototype import Prototype
-
-
-class TinyDBConnectivity(Prototype):
-
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
-        config = self._config_manager.get(self._name)
-
-        self._path = config.get('path')
-        self._db = TinyDB(self._path)
-
-        self.add_handler('tinyQuery', self.process_query)
-
-    def process_query(self, header, payload):
-        pass
+OPENADMS_VERSION = 0.5
+OPENADMS_VERSION_NAME = 'Eindhoven'

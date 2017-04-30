@@ -22,6 +22,8 @@ limitations under the Licence.
 import json
 import logging
 
+from typing import *
+
 import paho.mqtt.client as mqtt
 
 
@@ -31,15 +33,14 @@ class MQTTMessenger(object):
     """
 
     def __init__(self, config_manager):
-        self.logger = logging.getLogger('mqttMessenger')
-        self._config_manager = config_manager
-        config = self._config_manager.get('intercom').get('mqtt')
+        self.logger = logging.getLogger('mqtt')
+        self._config = config_manager.get('intercom').get('mqtt')
 
         self._client_id = None
-        self._host = config.get('host')
-        self._port = config.get('port')
-        self._keep_alive = config.get('keepAlive')
-        self._topic = config.get('topic')
+        self._host = self._config.get('host')
+        self._port = self._config.get('port')
+        self._keep_alive = self._config.get('keepAlive')
+        self._topic = self._config.get('topic')
 
         # Function to send received messages to.
         self._downlink = None
@@ -56,7 +57,7 @@ class MQTTMessenger(object):
     def _on_connect(self, client, userdata, flags, rc):
         """Callback method is called after a connection has been
         established."""
-        # logger.debug('Connected to {}:{}'.format(self._host, self._port))
+        #self.logger.debug('Connected to {}:{}'.format(self._host, self._port))
         self._client.subscribe(self._topic)
 
     def _on_disconnect(self, client, userdata, rc):
@@ -81,8 +82,13 @@ class MQTTMessenger(object):
 
     def connect(self):
         """Connect to the message broker."""
-        self._client.connect_async(self._host, self._port, self._keep_alive)
-        self._client.loop_start()
+        if self._client:
+            self._client.connect_async(self._host,
+                                       self._port,
+                                       self._keep_alive)
+            self._client.loop_start()
+        else:
+            self.logger.error('Can\'t create connection to MQTT message broker')
 
     def disconnect(self):
         """Disconnect from the message broker."""
@@ -90,7 +96,7 @@ class MQTTMessenger(object):
             self._client.loop_stop()
             self._client.disconnect()
 
-    def publish(self, topic, message):
+    def publish(self, topic: str, message: str) -> None:
         """Send message to the message broker."""
         self._client.publish(topic, message)
 

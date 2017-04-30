@@ -10,8 +10,11 @@
         "realTimePublisher": "modules.export.RealTimePublisher",
         "refractionCorrector": "modules.totalstation.RefractionCorrector",
         "returnCodeInspector": "modules.processing.ReturnCodeInspector",
+        "scheduler1": "modules.schedule.Scheduler",
         "scheduler2": "modules.schedule.Scheduler",
-        "virtualTotalStationTM30": "modules.virtual.VirtualTotalStationTM30"
+        "virtualDTM": "modules.virtual.VirtualDTM",
+        "virtualTotalStationTM30": "modules.virtual.VirtualTotalStationTM30",
+        "localControlServer": "modules.server.LocalControlServer"
     },
     "project": {
         "name": "Virtual Project",
@@ -137,7 +140,7 @@
                             "unit": "mbar"
                         }
                     },
-                    "sleepTime": 300.0
+                    "sleepTime": 60.0
                 }
             ]
         },
@@ -1367,7 +1370,7 @@
     },
     "schedulers": {
         "scheduler1": {
-            "port": "com1",
+            "port": "virtualDTM",
             "sensor": "stsDTM",
             "schedules": [
                 {
@@ -1387,7 +1390,7 @@
             "sensor": "leicaTM30",
             "schedules": [
                 {
-                    "enabled": true,
+                    "enabled": false,
                     "startDate": "2016-02-01",
                     "endDate": "2017-07-30",
                     "weekdays": {
@@ -1427,7 +1430,7 @@
                 }
             },
             "mailFormatter": {
-                "enabled": true,
+                "enabled": false,
                 "receivers": {
                     "error": ["monitoring@example.com"]
                 }
@@ -1435,8 +1438,8 @@
         }
     },
     "mailFormatter": {
-        "messageCollectionEnabled": true,
-        "messageCollectionTime": 10,
+        "messageCollectionEnabled": false,
+        "messageCollectionTime": 0,
         "type": "email",
         "templates": {
             "header": "The following incident(s) occurred:\n\n",
@@ -1505,15 +1508,31 @@
         ]
     },
     "polarTransformer": {
-        "sensorPosition": {
+        "viewPoint": {
             "x": 2000.0000,
             "y": 992.5100,
             "z": 100.0000
         },
-        "azimuthPosition": {
-            "x": 2000.0000,
-            "y": 1000.0000
-        }
+        "fixedPoints": {
+            "p1": {
+                "x": 2000.0000,
+                "y": 1000.0000,
+                "z": 100.0000
+            },
+            "p2": {
+                "x": 1995.4880,
+                "y": 1003.7680,
+                "z": 100.0080
+            },
+            "p3": {
+                "x": 1994.4900,
+                "y": 996.2600,
+                "z": 100.0210
+            }
+        },
+        "azimuthPointName": "p1",
+        "azimuthAngle": 100.00000,
+        "adjustmentEnabled": true
     },
     "realTimePublisher": {
         "enabled": true,
@@ -1530,5 +1549,9 @@
         ],
         "separator": ",",
         "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
+    },
+    "localControlServer": {
+        "host": "127.0.0.1",
+        "port": 8080
     }
 }

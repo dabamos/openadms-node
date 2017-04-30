@@ -31,17 +31,16 @@ class Sensor(object):
     observations.
     """
 
-    def __init__(self, name, config_manager):
+    def __init__(self, name, config):
+        self.logger = logging.getLogger(name)
+
         self._name = name
-        self._config_manager = config_manager
+        self._config = config
+        self._type = self._config.get('type')
 
-        self.logger = logging.getLogger(self.name)
-
-        config = self._config_manager.config.get('sensors').get(self._name)
-        self._type = config.get('type')
         self._observations = {}
 
-        for data in config.get('observations'):
+        for data in self._config.get('observations'):
             obs = self.create_observation(data)
             self._observations[obs.get('name')] = obs
 
@@ -54,8 +53,8 @@ class Sensor(object):
         data['sensorType'] = self._type
         data['type'] = 'observation'
 
-        # Character '\' is escaped in the JSON configuration file. We have to
-        # decode the encoded bytes.
+        # Character '\' is escaped in the JSON configuration file. Encoded
+        # bytes have to be decoded.
         for set_name, request_set in data.get('requestSets').items():
             request_set['request'] = codecs.decode(
                 request_set['request'],

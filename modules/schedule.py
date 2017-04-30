@@ -36,8 +36,14 @@ class Scheduler(Prototype):
     separate scheduler is necessary for each serial port.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get('schedulers').get(self._name)
+
+        self._port_name = config.get('port')
+        self._sensor_name = config.get('sensor')
+        self._schedules = config.get('schedules')
+
         self._jobs = []
         self._load_jobs()
 
@@ -49,18 +55,13 @@ class Scheduler(Prototype):
     def _load_jobs(self):
         """Loads all observation sets from the configurations and creates jobs
         to put into the jobs list."""
-        config = self._config_manager.config.get('schedulers').get(self._name)
-        port_name = config.get('port')
-        sensor_name = config.get('sensor')
-        schedules = config.get('schedules')
-
         # Run through the schedules and create jobs.
-        for schedule in schedules:
+        for schedule in self._schedules:
             observations = schedule.get('observations')
 
             # Get all observations of the current observation set.
             for obs_name in observations:
-                obs = self._sensor_manager.get(sensor_name)\
+                obs = self._sensor_manager.get(self._sensor_name)\
                                           .get_observation(obs_name)
 
                 if not obs:
@@ -69,11 +70,11 @@ class Scheduler(Prototype):
                     continue
 
                 # Add sensor name to the observation.
-                obs.set('sensorName', sensor_name)
+                obs.set('sensorName', self._sensor_name)
 
                 # Create a new job.
                 job = Job(obs_name,
-                          port_name,
+                          self._port_name,
                           obs,
                           schedule.get('enabled'),
                           schedule.get('startDate'),
@@ -98,7 +99,7 @@ class Scheduler(Prototype):
             time.sleep(0.1)
 
         while True:
-            if self._is_paused:
+            if not self._is_running:
                 time.sleep(0.1)
                 continue
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -33,8 +33,8 @@ class PreProcessor(Prototype):
     converts them to the defined types.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
 
     def process_observation(self, obs):
         """Extracts the values from the raw responses of the observation
@@ -168,7 +168,7 @@ class PreProcessor(Prototype):
 class ReturnCodes(object):
     """
     ReturnCodes stores a dictionary of return codes of sensors of Leica
-    Geosystems. The dictionary is static and has the following structure:
+    Geosystems. The dictionary is server and has the following structure:
 
         {
             return code: [ log level, retry measurement, log message ]
@@ -215,9 +215,9 @@ class ReturnCodeInspector(Prototype):
     sensors of Leica Geosystems and creates an appropriate log message.
     """
 
-    def __init__(self, name, config_manager, sensor_manager):
-        Prototype.__init__(self, name, config_manager, sensor_manager)
-        config = self._config_manager.config.get(self._name)
+    def __init__(self, name, type, managers):
+        Prototype.__init__(self, name, type, managers)
+        config = self._config_manager.get(self._name)
 
         self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')
