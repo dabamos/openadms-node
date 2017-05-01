@@ -19,6 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import math
 import time
 
@@ -26,8 +30,8 @@ from core.observation import Observation
 from core.sensor import SensorType
 from modules.prototype import Prototype
 
-"""Module for the processing of observations of total stations (pre-processing,
-atmospheric corrections, transformations)."""
+"""Module for the processing of observations of total station positioning
+systems (pre-processing, atmospheric corrections, transformations)."""
 
 
 class DistanceCorrector(Prototype):
@@ -36,8 +40,8 @@ class DistanceCorrector(Prototype):
     data.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         # Maximum age of atmospheric data, before a warning will be generated.
@@ -98,18 +102,18 @@ class DistanceCorrector(Prototype):
                                                 self._humidity)
             d_dist_1 = dist * c * math.pow(10, -6)
 
-            response_set = self.get_response_set('float',
-                                                 'none',
-                                                 round(c, 5))
+            response_set = Observation.get_response_set('float',
+                                                        'none',
+                                                        round(c, 5))
             response_sets['atmosphericPpm'] = response_set
 
         # Calculate the sea level reduction of the distance.
         if self._is_sea_level_correction:
             d_dist_2 = self.get_sea_level_correction(self._sensor_height)
 
-            response_set = self.get_response_set('float',
-                                                 'm',
-                                                 round(d_dist_2, 5))
+            response_set = Observation.get_response_set('float',
+                                                        'm',
+                                                        round(d_dist_2, 5))
             response_sets['seaLevelDelta'] = response_set
 
         # Add reduced distance to the observation set.
@@ -120,9 +124,9 @@ class DistanceCorrector(Prototype):
                              '(correction value: {:0.5f} m)'
                              .format(dist, r_dist, d_dist_1 + d_dist_2))
 
-            response_set = self.get_response_set('float',
-                                                 'm',
-                                                 round(r_dist, 5))
+            response_set = Observation.get_response_set('float',
+                                                        'm',
+                                                        round(r_dist, 5))
 
             response_sets[self._distance_name + 'Raw'] =\
                 response_sets.get(self._distance_name)
@@ -176,9 +180,6 @@ class DistanceCorrector(Prototype):
 
         if h is not None and u is not None:
             self.humidity = h / 100 if u == '%' else h
-
-    def get_response_set(self, t, u, v):
-        return {'type': t, 'unit': u, 'value': v}
 
     @property
     def temperature(self):
@@ -247,8 +248,8 @@ class HelmertTransformer(Prototype):
     using the Helmert transformation.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._is_residual = config.get('residualMismatchTransformationEnabled')
@@ -556,7 +557,7 @@ class HelmertTransformer(Prototype):
 
         # Create response sets for the view point.
         response_sets = {
-            'x': Observation.create_response_set('float','m',
+            'x': Observation.create_response_set('float', 'm',
                                                  self._view_point['x']),
             'y': Observation.create_response_set('float', 'm',
                                                  self._view_point['y']),
@@ -599,7 +600,7 @@ class HelmertTransformer(Prototype):
             return False
 
     def _is_ready(self):
-        """Checks whether all fixed points have been measured already or not."""
+        """Checks whether all fixed points have been measured at least once."""
         for fixed_point_id, fixed_point in self._fixed_points.items():
             if fixed_point.get('lastUpdate') is None:
                 # Tie point has not been measured yet.
@@ -651,7 +652,8 @@ class HelmertTransformer(Prototype):
         self.logger.debug('Updated fixed point with ID "{}"'
                           .format(obs.get('id')))
 
-        # Add global Cartesian coordinates of the fixed point to the observation.
+        # Add global Cartesian coordinates of the fixed point to the
+        # observation.
         response_sets = obs.get('responseSets')
         response_sets['x'] = Observation.create_response_set('float', 'm', x)
         response_sets['y'] = Observation.create_response_set('float', 'm', y)
@@ -670,8 +672,8 @@ class PolarTransformer(Prototype):
     accuracy of the horizontal directions ('Abriss' in German).
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._view_point = config.get('viewPoint')
@@ -793,7 +795,7 @@ class PolarTransformer(Prototype):
         if None in [hz, v, dist]:
             return obs
 
-        # Calculate horizontal distance.
+        # Calculate the horizontal distance.
         dist_hz = math.sin(v) * dist
 
         if self._is_fixed_point(obs):
@@ -832,14 +834,22 @@ class PolarTransformer(Prototype):
 
         # Add to observation data set.
         response_sets = obs.get('responseSets')
-        response_sets['x'] = self.get_response_set('float', 'm', round(x, 5))
-        response_sets['y'] = self.get_response_set('float', 'm', round(y, 5))
-        response_sets['z'] = self.get_response_set('float', 'm', round(z, 5))
+        response_sets['x'] = Observation.get_response_set('float',
+                                                          'm',
+                                                          round(x, 5))
+        response_sets['y'] = Observation.get_response_set('float',
+                                                          'm',
+                                                          round(y, 5))
+        response_sets['z'] = Observation.get_response_set('float',
+                                                          'm',
+                                                          round(z, 5))
 
         if self._is_adjustment_enabled:
-            response_sets['hzAdjusted'] = self.get_response_set('float',
-                                                                'rad',
-                                                                round(hz, 16))
+            response_sets['hzAdjusted'] = Observation.get_response_set(
+                'float',
+                'rad',
+                round(hz, 16)
+            )
 
         return obs
 
@@ -870,9 +880,6 @@ class PolarTransformer(Prototype):
 
         return x, y, z
 
-    def get_response_set(self, t, u, v):
-        return {'type': t, 'unit': u, 'value': v}
-
     def gon_to_rad(self, a):
         """Converts from gon (grad) to radiant."""
         return a * math.pi / 200
@@ -888,8 +895,8 @@ class RefractionCorrector(Prototype):
     distance and corrects the Z value of an observed target.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
 
     def process_observation(self, obs):
         z = obs.get_response_value('z')
@@ -936,8 +943,8 @@ class SerialMeasurementProcessor(Prototype):
     averaged and stored in a new response set.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
 
     def process_observation(self, obs):
         # Calculate the serial measurement of an observation in two faces.

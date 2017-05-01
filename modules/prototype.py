@@ -35,18 +35,18 @@ class Prototype(object):
     Prototype is used as a blueprint for OpenADMS workers.
     """
 
-    def __init__(self, name, type, managers):
+    def __init__(self, name, type, manager):
         self.logger = logging.getLogger(name)
 
         self._name = name   # Module name, e.g., 'serialPort'.
         self._type = type   # Class path, e.g., 'modules.port.SerialPort'.
 
-        self._config_manager = managers.config_manager
-        self._module_manager = managers.module_manager
-        self._sensor_manager = managers.sensor_manager
+        self._config_manager = manager.config_manager
+        self._module_manager = manager.module_manager
+        self._sensor_manager = manager.sensor_manager
 
         self._uplink = None
-        self._is_running = True
+        self._is_running = False
 
         # A dictionary of the various payload data types and their respective
         # callback functions.  Further callback functions can be added with the
@@ -213,6 +213,16 @@ class Prototype(object):
         # Send the observation to the next module.
         self.publish(next_receiver, header, payload)
 
+    def start(self):
+        self.logger.info('Starting worker of module "{}" ...'
+                         .format(self._name))
+        self._is_running = True
+
+    def stop(self):
+        self.logger.info('Stopping worker of module "{}" ...'
+                         .format(self._name))
+        self._is_running = False
+
     @property
     def is_running(self) -> bool:
         return self._is_running
@@ -228,10 +238,6 @@ class Prototype(object):
     @property
     def uplink(self) -> Callable[[str, str], None]:
         return self._uplink
-
-    @is_running.setter
-    def is_running(self, is_running: bool) -> None:
-        self._is_running = is_running
 
     @type.setter
     def type(self, type: str) -> None:

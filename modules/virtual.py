@@ -19,6 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import math
 import random
 import re
@@ -34,8 +38,8 @@ class VirtualSensor(Prototype):
     VirtualSensor is a prototype class for virtual sensors.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         self.patterns = {}
 
     def process_observation(self, obs):
@@ -90,8 +94,8 @@ class VirtualTotalStationTM30(VirtualSensor):
     GeoCOM commands.
     """
 
-    def __init__(self, name, type, managers):
-        VirtualSensor.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
             '%R1Q,5003:\\r\\n': self.get_sensor_id,
@@ -156,8 +160,8 @@ class VirtualDTM(VirtualSensor):
     VirtualDTM simulates an STS DTM meteorological sensor.
     """
 
-    def __init__(self, name, type, managers):
-        VirtualSensor.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
             'A\\r': self.power_on,
@@ -200,8 +204,8 @@ class VirtualIndicatorOne(VirtualSensor):
     indicator/extensometer.
     """
 
-    def __init__(self, name, type, managers):
-        VirtualSensor.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        VirtualSensor.__init__(self, name, type, manager)
 
         self._current_value = 0.0
         self.patterns = {

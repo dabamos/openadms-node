@@ -79,8 +79,6 @@ class Module(threading.Thread):
     def run(self) -> None:
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
-        self._worker.is_running = True
-
         self.logger.debug('Connecting module "{}" to {}:{} ...'
                           .format(self._worker.name,
                                   self._messenger.host,
@@ -94,10 +92,10 @@ class Module(threading.Thread):
         self._messenger.disconnect()
 
     def start_worker(self) -> None:
-        self._worker.is_running = True
+        self._worker.start()
 
     def stop_worker(self) -> None:
-        self._worker.is_running = False
+        self._worker.stop()
 
     @property
     def messenger(self) -> Any:

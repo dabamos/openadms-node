@@ -19,6 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import logging
 import queue
 import smtplib
@@ -43,8 +47,8 @@ class Alert(Prototype):
     Alert is used to send warning and error messages to other modules.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._is_enabled = config.get('enabled')
@@ -100,8 +104,8 @@ class Alert(Prototype):
 
 class AlertMessageFormatter(Prototype):
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.get(self._name)
 
         # Configuration.
@@ -222,8 +226,8 @@ class AlertMessageFormatter(Prototype):
 
 class MailAgent(Prototype):
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._charset = config.get('charset')
@@ -302,8 +306,8 @@ class ShortMessageAgent(Prototype):
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
@@ -354,8 +358,8 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._receivers = config.get('receivers')
@@ -402,8 +406,8 @@ class Heartbeat(Prototype):
 
 class HeartbeatMonitor(Prototype):
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         # Capture messages of type 'heartbeat'.

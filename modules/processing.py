@@ -19,12 +19,16 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for data processing (pre-processing, atmospheric corrections,
+transformations, and so on)."""
+
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import re
 
 from modules.prototype import Prototype
-
-"""Module for data processing (pre-precessing, atmospheric corrections,
-transformations)."""
 
 
 class PreProcessor(Prototype):
@@ -33,8 +37,8 @@ class PreProcessor(Prototype):
     converts them to the defined types.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
 
     def process_observation(self, obs):
         """Extracts the values from the raw responses of the observation
@@ -76,7 +80,7 @@ class PreProcessor(Prototype):
                 return obs
 
             # Convert the type of the parsed raw values from string to the
-            # actual data type.
+            # actual data type (float, int).
             response_sets = obs.get('responseSets')
 
             for group_name, raw_value in match.groupdict().items():
@@ -100,15 +104,15 @@ class PreProcessor(Prototype):
 
                 response_type = response_set.get('type').lower()
 
-                # Convert raw value to float.
                 if response_type == 'float':
+                    # Convert raw value to float.
                     # Replace comma by dot.
                     response_value = self.to_float(raw_value)
-                # Convert raw value to int.
                 elif response_type == 'integer':
+                    # Convert raw value to int.
                     response_value = self.to_int(raw_value)
-                # "Convert" raw value to string.
                 else:
+                    # "Convert" raw value to string.
                     response_value = raw_value
 
                 if response_value is not None:
@@ -215,8 +219,8 @@ class ReturnCodeInspector(Prototype):
     sensors of Leica Geosystems and creates an appropriate log message.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._response_sets = config.get('responseSets')

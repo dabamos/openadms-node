@@ -19,12 +19,17 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Tests the OpenADMS the classes of the totalstation module."""
+
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import pytest
 
 from modules.totalstation import *
 from core.observation import Observation
 
-"""Tests the OpenADMS the classes of the totalstation module."""
 
 data = {
     'id': 'Test',

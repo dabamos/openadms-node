@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -19,12 +19,17 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Tests the OpenADMS the classes of the processing module."""
+
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import pytest
 
 from modules.processing import *
 from core.observation import Observation
 
-"""Tests the OpenADMS the classes of the processing module."""
 
 data = {
     'id': 'Test',

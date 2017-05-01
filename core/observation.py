@@ -29,8 +29,8 @@ import logging
 from typing import *
 
 # Type definition for the value inside a response set of an observation.
-# `ResponseValue` can either be of type float, int, or str.
-ResponseValue = TypeVar('ResponseValue', float, int, str)
+# `ResponseType` can either be of type float, int, or str.
+ResponseType = TypeVar('ResponseType', float, int, str)
 
 logger = logging.getLogger('observation')
 
@@ -114,7 +114,7 @@ class Observation(object):
 
         return u
 
-    def get_response_value(self, name: str) -> ResponseValue:
+    def get_response_value(self, name: str) -> ResponseType:
         """Returns the value of a given response set.
         
         Args:
@@ -135,7 +135,7 @@ class Observation(object):
 
         return v
 
-    def get_value(self, *args: str) -> ResponseValue:
+    def get_value(self, *args: str) -> ResponseType:
         """Returns the value of a set of keys.
 
         Args:
@@ -186,14 +186,14 @@ class Observation(object):
         self._data = data
 
     @staticmethod
-    def create_response_set(type: str, unit: str, value: ResponseValue)\
-            -> Dict[str, Any]:
+    def create_response_set(type: str, unit: str, value: ResponseType)\
+            -> Dict[str, ResponseType]:
         """Creates a response set containing type, unit, and value.
         
         Args:
             type (str): Type of the response (e.g., 'float').
             unit (str): Unit of the response (e.g., 'm').
-            value (Value): The value of the response (e.g., '17.53').
+            value (ResponseType): The value of the response (e.g., '17.53').
             
         Returns:
             Dictionary with type, unit, and value.

@@ -35,8 +35,8 @@ class Monitor(object):
     """
 
     def __init__(self, config_file):
-        managers = Managers()
+        manager = Manager()
 
-        managers.config_manager = ConfigManager(config_file)
-        managers.sensor_manager = SensorManager(managers.config_manager)
-        managers.module_manager = ModuleManager(managers)
+        manager.config_manager = ConfigManager(config_file)
+        manager.sensor_manager = SensorManager(manager.config_manager)
+        ModuleManager(manager)

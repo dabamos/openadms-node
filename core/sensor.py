@@ -37,6 +37,7 @@ class Sensor(object):
         self._name = name
         self._config = config
         self._type = self._config.get('type')
+        self._description = self._config.get('description', '')
 
         self._observations = {}
 
@@ -77,8 +78,16 @@ class Sensor(object):
         return self._observations
 
     @property
+    def description(self):
+        return self._description
+
+    @property
     def name(self):
         return self._name
+
+    @property
+    def type(self):
+        return self._type
 
 
 class SensorType(object):

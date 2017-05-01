@@ -19,6 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import copy
 import datetime as dt
 import logging
@@ -36,21 +40,17 @@ class Scheduler(Prototype):
     separate scheduler is necessary for each serial port.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get('schedulers').get(self._name)
 
         self._port_name = config.get('port')
         self._sensor_name = config.get('sensor')
         self._schedules = config.get('schedules')
 
+        self._thread = None
         self._jobs = []
         self._load_jobs()
-
-        # Run the method self.run_jobs() within a thread.
-        self._thread = threading.Thread(target=self.run_jobs)
-        self._thread.daemon = True
-        self._thread.start()
 
     def _load_jobs(self):
         """Loads all observation sets from the configurations and creates jobs
@@ -100,8 +100,7 @@ class Scheduler(Prototype):
 
         while True:
             if not self._is_running:
-                time.sleep(0.1)
-                continue
+                break
 
             for job in self._jobs:
                 if job.has_expired():
@@ -120,6 +119,19 @@ class Scheduler(Prototype):
                 self.logger.debug('Deleting expired job "{}" ...'
                                   .format(zombie.name))
                 self._jobs.remove(zombie)
+
+            time.sleep(0.01)
+
+    def start(self):
+        if not self._is_running:
+            self.logger.info('Starting worker of module "{}" ...'
+                             .format(self._name))
+            self._is_running = True
+
+            # Run the method self.run_jobs() within a thread.
+            self._thread = threading.Thread(target=self.run_jobs)
+            self._thread.daemon = True
+            self._thread.start()
 
 
 class Job(object):

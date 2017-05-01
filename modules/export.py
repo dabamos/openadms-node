@@ -19,6 +19,10 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import copy
 import os
 
@@ -46,8 +50,8 @@ class FileExporter(Prototype):
     FileExporter writes sensor data to a flat file in CSV format.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._file_extension = config.get('fileExtension')
@@ -168,8 +172,8 @@ class RealTimePublisher(Prototype):
     receivers.
     """
 
-    def __init__(self, name, type, managers):
-        Prototype.__init__(self, name, type, managers)
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._receivers = config.get('receivers')

@@ -37,7 +37,7 @@ from core.module import Module
 from core.sensor import Sensor
 
 
-class Managers(object):
+class Manager(object):
 
     def __init__(self):
         self._config_manager = None
@@ -133,31 +133,35 @@ class ModuleManager(object):
     ModuleManager loads and manages OpenADMS modules.
     """
 
-    def __init__(self, managers):
+    def __init__(self, manager):
         self.logger = logging.getLogger('moduleManager')
-        self._managers = managers
-        self._config = self._managers.config_manager.get('modules')
+        self._manager = manager
+        self._manager.module_manager = self
+
+        self._config = self._manager.config_manager.get('modules')
         self._modules = {}
 
         for module_name, class_path in self._config.items():
             self.add(module_name, class_path)
+            self.start(module_name)
 
     def add(self, module_name, class_path):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary."""
         worker = self.get_worker(module_name, class_path)
-        messenger = MQTTMessenger(self._managers.config_manager)
+        messenger = MQTTMessenger(self._manager.config_manager)
         module = Module(messenger, worker)
         module.start()
 
         # Add the module to the modules dictionary.
         self._modules[module_name] = module
-        # Start the threaded module.
-        self.logger.debug('Starting module "{}" ...'.format(module_name))
 
     def delete(self, module_name):
         """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
+
+    def get_modules_list(self):
+        return self._modules.keys()
 
     def get_worker(self, module_name, class_path):
         """Loads a Python class from a given path and returns the instance."""
@@ -171,7 +175,7 @@ class ModuleManager(object):
         try:
             worker_class = getattr(importlib.import_module(module_path),
                                    class_name)
-            worker = worker_class(module_name, class_path, self._managers)
+            worker = worker_class(module_name, class_path, self._manager)
         except AttributeError as e:
             self.logger.error(e)
             return
@@ -179,13 +183,13 @@ class ModuleManager(object):
         return worker
 
     def start(self, module_name: str) -> None:
-        self._modules.get(module_name).start()
+        self._modules.get(module_name).start_worker()
 
     def stop(self, module_name: str) -> None:
-        self._modules.get(module_name).stop()
+        self._modules.get(module_name).stop_worker()
 
     @property
-    def modules(self):
+    def modules(self) -> Dict:
         return self._modules
 
 

@@ -86,6 +86,16 @@ class System(object):
                               platform.python_version())
 
     @staticmethod
+    def get_openadms_string():
+        """Returns a string with OpenADMS version and version name:
+
+        Returns:
+            Complete OpenADMS version string.
+        """
+        return 'OpenADMS {} ({})'.format(OPENADMS_VERSION,
+                                         OPENADMS_VERSION_NAME)
+
+    @staticmethod
     def get_openadms_version():
         """Returns the current version of OpenADMS:
         
