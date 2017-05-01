@@ -20,11 +20,10 @@
 
             <div class="breadcrumbs">
                 <ol>
-                    <li><a href="#system">System</a></li>
-                    <li><a href="#statistics">Statistics</a></li>
-                    <li><a href="#modules">Modules</a></li>
-                    <li><a href="#next">Next Observations</a></li>
-                    <li><a href="#log">Log Messages</a></li>
+                    <li><a href="/#system">System</a></li>
+                    <li><a href="/#statistics">Statistics</a></li>
+                    <li><a href="/#modules">Modules</a></li>
+                    <li><a href="/#sensors">Sensors</a></li>
                 </ol>
             </div>
 
@@ -39,7 +38,7 @@
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Software Version:</strong></div>
-                <div class="full col-3">OpenADMS {openadms_version} ({openadms_version_name})</div>
+                <div class="full col-3">{openadms_string}</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Python Interpreter:</strong></div>
@@ -68,6 +67,7 @@
             <table class="table invert">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Name</th>
                         <th>Type</th>
                         <th>Status</th>
@@ -75,41 +75,29 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>scheduler1</td><td>modules.schedule.Scheduler</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
-                    <tr><td>scheduler2</td><td>modules.schedule.Scheduler</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
-                    <tr><td>preProcessor</td><td>modules.processing.PreProcessor</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
-                    <tr><td>controlServer</td><td>modules.server.ControlServer</td><td><span style="color: #52c652">running</span></td><td><button class="btn warn sml">pause</button></td></tr>
+{modules_list}
                 </tbody>
             </table>
 
-            <h4 id="next">Next Observations</h4>
-            <table class="table">
+            <h4 id="sensors">Sensors</h4>
+            <table class="table invert">
                 <thead>
                     <tr>
-                        <th>Sensor</th>
-                        <th>Port</th>
-                        <th>Observation</th>
-                        <th>Starting in</th>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><td>stsDTM</td><td><code>/dev/ttyU0</code></td><td><code>getValues</code></td><td>600 s</td></tr>
-                    <tr><td>leicaTM30</td><td><code>/dev/ttyU1</code></td><td><code>getP2</code></td><td>120 s</td></tr>
+{sensors_list}
                 </tbody>
             </table>
-
-            <h4 id="log">Log Messages</h4>
-            <pre>
-2017-04-05 20:07:09,879 -    ERROR -       configurationManager - Configuration file "config/nivel210.json" not found.
-2017-04-05 21:47:40,853 -    ERROR -                       com1 - Permission denied for port "/dev/ttyU0"
-2017-04-05 21:47:40,854 -    ERROR -                       com1 - Could not write to port "/dev/ttyU0"
-2017-04-05 21:47:41,024 -    ERROR -                       com1 - Permission denied for port "/dev/ttyU0"</pre>
-            <a href="#" class="btn info sml">Show Complete Log</a>
 
             <hr>
 
             <footer style="text-align: center;">
-                <small><a href="https://www.dabamos.de/">OpenADMS</a> {openadms_version} ({openadms_version_name})<br>
+                <small><a href="https://www.dabamos.de/">{openadms_string}</a><br>
                 Copyright &copy; 2017 Hochschule Neubrandenburg – University of Applied Sciences<br>
                 European Union Public Licence (EUPL) v.1.1.</small>
             </footer>
