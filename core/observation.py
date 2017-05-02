@@ -154,6 +154,63 @@ class Observation(object):
 
         return ref
 
+    def has_response_type(self, name: str) -> bool:
+        """Returns weather the type of a given response set exists or not.
+
+        Args:
+            name (str): Name of the response set.
+
+        Returns:
+            True if type exists, else if not.
+        """
+        try:
+            if self._data.get('responseSets')\
+                         .get(name)\
+                         .get('type') is not None:
+                return True
+        except AttributeError:
+            return False
+
+        return False
+
+    def has_response_unit(self, name: str) -> bool:
+        """Returns weather the unit of a given response set exists or not.
+
+        Args:
+            name (str): Name of the response set.
+
+        Returns:
+            True if unit exists, else if not.
+        """
+        try:
+            if self._data.get('responseSets')\
+                         .get(name)\
+                         .get('unit') is not None:
+                return True
+        except AttributeError:
+            return False
+
+        return False
+
+    def has_response_value(self, name: str) -> bool:
+        """Returns weather the value of a given response set exists or not.
+
+        Args:
+            name (str): Name of the response set.
+
+        Returns:
+            True if value exists, else if not.
+        """
+        try:
+            if self._data.get('responseSets')\
+                         .get(name)\
+                         .get('value') is not None:
+                return True
+        except AttributeError:
+            return False
+
+        return False
+
     def set(self, key: str, value: Any) -> None:
         """Sets key and value in the data set.
 

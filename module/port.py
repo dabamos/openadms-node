@@ -151,9 +151,9 @@ class SerialPort(Prototype):
             self._serial.close()
 
     def _get_port_config(self):
-        p = self.monitor.config_manager.config.get('ports')\
-                                              .get('serial')\
-                                              .get(self.name)
+        p = self._config_manager.config.get('ports')\
+                                            .get('serial')\
+                                            .get(self.name)
 
         if not p:
             self.logger.debug('No port "{}" defined in configuration'

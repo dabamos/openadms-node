@@ -57,7 +57,6 @@ class MQTTMessenger(object):
     def _on_connect(self, client, userdata, flags, rc):
         """Callback method is called after a connection has been
         established."""
-        #self.logger.debug('Connected to {}:{}'.format(self._host, self._port))
         self._client.subscribe(self._topic)
 
     def _on_disconnect(self, client, userdata, rc):

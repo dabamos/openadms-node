@@ -150,6 +150,7 @@ class ModuleManager(object):
         to a module. The module will be added to the modules dictionary."""
         messenger = MQTTMessenger(self._manager.config_manager)
         worker = self.get_worker(module_name, class_path)
+
         self._modules[module_name] = Module(messenger, worker)
         self.logger.info('Loaded module "{}"'.format(module_name))
 
@@ -191,9 +192,10 @@ class ModuleManager(object):
             return False
 
     def start(self, name: str) -> None:
-        self._modules.get(name).start_worker()
+        self._modules.get(name).start()         # Start the module thread.
+        self._modules.get(name).start_worker()  # Let worker run.
 
-    def stop(self, module_name: str) -> None:
+    def stop(self, name: str) -> None:
         self._modules.get(name).stop_worker()
 
     @property

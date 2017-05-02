@@ -102,18 +102,18 @@ class DistanceCorrector(Prototype):
                                                 self._humidity)
             d_dist_1 = dist * c * math.pow(10, -6)
 
-            response_set = Observation.get_response_set('float',
-                                                        'none',
-                                                        round(c, 5))
+            response_set = Observation.create_response_set('float',
+                                                           'none',
+                                                           round(c, 5))
             response_sets['atmosphericPpm'] = response_set
 
         # Calculate the sea level reduction of the distance.
         if self._is_sea_level_correction:
             d_dist_2 = self.get_sea_level_correction(self._sensor_height)
 
-            response_set = Observation.get_response_set('float',
-                                                        'm',
-                                                        round(d_dist_2, 5))
+            response_set = Observation.create_response_set('float',
+                                                           'm',
+                                                           round(d_dist_2, 5))
             response_sets['seaLevelDelta'] = response_set
 
         # Add reduced distance to the observation set.
@@ -124,9 +124,9 @@ class DistanceCorrector(Prototype):
                              '(correction value: {:0.5f} m)'
                              .format(dist, r_dist, d_dist_1 + d_dist_2))
 
-            response_set = Observation.get_response_set('float',
-                                                        'm',
-                                                        round(r_dist, 5))
+            response_set = Observation.create_response_set('float',
+                                                           'm',
+                                                           round(r_dist, 5))
 
             response_sets[self._distance_name + 'Raw'] =\
                 response_sets.get(self._distance_name)
@@ -175,10 +175,11 @@ class DistanceCorrector(Prototype):
             self.pressure = p
 
         # Humidity.
-        h = obs.get_response_value('humidity')
-        u = obs.get_response_unit('humidity')
+        if obs.has_response_value('humidity') and\
+            obs.has_response_type('humidity'):
+            h = obs.get_response_value('humidity')
+            u = obs.get_response_unit('humidity')
 
-        if h is not None and u is not None:
             self.humidity = h / 100 if u == '%' else h
 
     @property
@@ -834,18 +835,18 @@ class PolarTransformer(Prototype):
 
         # Add to observation data set.
         response_sets = obs.get('responseSets')
-        response_sets['x'] = Observation.get_response_set('float',
-                                                          'm',
-                                                          round(x, 5))
-        response_sets['y'] = Observation.get_response_set('float',
-                                                          'm',
-                                                          round(y, 5))
-        response_sets['z'] = Observation.get_response_set('float',
-                                                          'm',
-                                                          round(z, 5))
+        response_sets['x'] = Observation.create_response_set('float',
+                                                             'm',
+                                                             round(x, 5))
+        response_sets['y'] = Observation.create_response_set('float',
+                                                             'm',
+                                                             round(y, 5))
+        response_sets['z'] = Observation.create_response_set('float',
+                                                             'm',
+                                                             round(z, 5))
 
         if self._is_adjustment_enabled:
-            response_sets['hzAdjusted'] = Observation.get_response_set(
+            response_sets['hzAdjusted'] = Observation.create_response_set(
                 'float',
                 'rad',
                 round(hz, 16)
@@ -980,7 +981,7 @@ class SerialMeasurementProcessor(Prototype):
                                                               hz)
         response_sets['v'] = Observation.create_response_set('float',
                                                              'rad',
-                                                             v)
+                                                              v)
         response_sets['slopeDist'] = Observation.create_response_set('float',
                                                                      'm',
                                                                      dist)

@@ -99,10 +99,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         action_value = query.get('action')[0]
 
         if action_value == 'stop' and module.worker.is_running:
-            module.stop_worker()
+            module.worker.stop()
 
         if action_value == 'start' and not module.worker.is_running:
-            module.start_worker()
+            module.worker.start()
 
     def get_404(self) -> str:
         html = ('<!DOCTYPE html><html lang="en">\n'
