@@ -19,6 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for virtual sensors."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -29,8 +31,6 @@ import re
 import time
 
 from modules.prototype import Prototype
-
-"""Module for virtual sensors."""
 
 
 class VirtualSensor(Prototype):

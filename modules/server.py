@@ -98,7 +98,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         module = self._module_manager.get(module_name)
         action_value = query.get('action')[0]
 
-        if action_value == 'pause' and module.worker.is_running:
+        if action_value == 'stop' and module.worker.is_running:
             module.stop_worker()
 
         if action_value == 'start' and not module.worker.is_running:
@@ -145,7 +145,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         template = ('<tr><td>{number}</td>'
                     '<td><code>{module_name}</code></td>'
                     '<td><code>{module_type}</code></td>'
-                    '<td><span style="color: {color}">{is_running}</span></td>'
+                    '<td><span style="color: {color}">{status}</span></td>'
                     '<td><a href="/?module={module_name}&action='
                     '{button_action}" class="btn {button_class} sml">'
                     '{button_action}</a></td></tr>\n')
@@ -160,13 +160,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             }
 
             if module.worker.is_running:
-                data['is_running'] = 'running'
+                data['status'] = 'running'
                 data['color'] = '#52c652'
-                data['button_class'] = 'warn'
-                data['button_action'] = 'pause'
+                data['button_class'] = 'error'
+                data['button_action'] = 'stop'
             else:
-                data['is_running'] = 'paused'
-                data['color'] = '#f5ad1e'
+                data['status'] = 'stopped'
+                data['color'] = '#e93f3c'
                 data['button_class'] = 'success'
                 data['button_action'] = 'start'
 

@@ -19,6 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for alerting."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -39,8 +41,6 @@ from email.utils import formatdate
 from core.version import *
 from modules.prototype import Prototype
 
-"""Module for alerting."""
-
 
 class Alert(Prototype):
     """
@@ -52,6 +52,7 @@ class Alert(Prototype):
         config = self._config_manager.get(self._name)
 
         self._is_enabled = config.get('enabled')
+        self._thread = None
         self._queue = queue.Queue(-1)
 
         # Add logging handler to the root logger.
@@ -61,18 +62,6 @@ class Alert(Prototype):
         root.addHandler(qh)
 
         self._modules = config.get('modules')
-
-        # Check the logging queue continuously for messages and proceed them to
-        # the alert agents.
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
-    def run(self):
-        while True:
-            log = self._queue.get()         # Blocking I/O.
-            self.logger.info('Processing alert message ...')
-            self.fire(log)
 
     def fire(self, log):
         # Set the header.
@@ -101,12 +90,31 @@ class Alert(Prototype):
 
                 self.publish(module_name, header, payload)
 
+    def run(self):
+        while self.is_running:
+            log = self._queue.get()         # Blocking I/O.
+            self.logger.info('Processing alert message ...')
+            self.fire(log)
+
+    def start(self):
+        if not self._is_running:
+            self.logger.info('Starting worker of module "{}" ...'
+                             .format(self._name))
+            self._is_running = True
+
+            # Check the logging queue continuously for messages and proceed
+            # them to the alert agents.
+            self._thread = threading.Thread(target=self.run)
+            self._thread.daemon = True
+            self._thread.start()
+
 
 class AlertMessageFormatter(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.get(self._name)
+        self._thread = None
 
         # Configuration.
         self._msg_collection_enabled =\
@@ -120,13 +128,6 @@ class AlertMessageFormatter(Prototype):
 
         # Queue for alert message collection.
         self._queue = queue.Queue(-1)
-
-        # Threading for alert message collection.
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-
-        if self._msg_collection_enabled:
-            self._thread.start()
 
     def handle_alert_message(self, header, payload):
         if self._msg_collection_enabled:
@@ -189,7 +190,7 @@ class AlertMessageFormatter(Prototype):
         # '<receiver_name>': [<msg_1>, <msg_2>, ..., <msg_n>]
         cache = {}
 
-        while True:
+        while self._is_running:
             try:
                 # Get a message from the queue.
                 msg = self._queue.get_nowait()
@@ -216,12 +217,24 @@ class AlertMessageFormatter(Prototype):
                         self.process_alert_messages(receiver, messages)
 
                 # Sleep some time.
-                self.logger.debug('Waiting {} s to collect new alert messages ...'
+                self.logger.debug('Waiting {} s to collect new alert messages'
                                   .format(self._msg_collection_time))
                 time.sleep(self._msg_collection_time)
 
                 # Clear the messages cache.
                 cache.clear()
+
+    def start(self):
+        if not self._is_running:
+            self.logger.info('Starting worker of module "{}" ...'
+                             .format(self._name))
+            self._is_running = True
+
+            if self._msg_collection_enabled:
+                # Threading for alert message collection.
+                self._thread = threading.Thread(target=self.run)
+                self._thread.daemon = True
+                self._thread.start()
 
 
 class MailAgent(Prototype):

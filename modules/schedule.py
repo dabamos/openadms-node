@@ -91,7 +91,7 @@ class Scheduler(Prototype):
         self.logger.debug('Added job "{}" to scheduler "{}"'
                           .format(job.name, self._name))
 
-    def run_jobs(self):
+    def run(self):
         """Threaded method to process the jobs queue."""
         zombies = []
 
@@ -99,7 +99,7 @@ class Scheduler(Prototype):
         while not self._uplink:
             time.sleep(0.1)
 
-        while True:
+        while self.is_running:
             t1 = time.time()
 
             if not self._is_running:
@@ -136,7 +136,7 @@ class Scheduler(Prototype):
             self._is_running = True
 
             # Run the method self.run_jobs() within a thread.
-            self._thread = threading.Thread(target=self.run_jobs)
+            self._thread = threading.Thread(target=self.run)
             self._thread.daemon = True
             self._thread.start()
 
