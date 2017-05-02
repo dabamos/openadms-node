@@ -77,7 +77,7 @@ class ConfigManager(object):
     def __init__(self, path: str):
         self.logger = logging.getLogger('configurationManager')
         self._config = {}   # The actual configuration.
-        self._path = path   # Path of the configuration file.
+        self._path = path   # Path to the configuration file.
 
         if self._path:
             self.load(self._path)
@@ -117,7 +117,7 @@ class ConfigManager(object):
     @property
     def path(self) -> str:
         """Path to the configuration file.
-        
+
         Returns:
             String with path.
         """
@@ -148,22 +148,21 @@ class ModuleManager(object):
     def add(self, module_name, class_path):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary."""
-        worker = self.get_worker(module_name, class_path)
         messenger = MQTTMessenger(self._manager.config_manager)
-        module = Module(messenger, worker)
-        module.start()
-
-        # Add the module to the modules dictionary.
-        self._modules[module_name] = module
+        worker = self.get_worker(module_name, class_path)
+        self._modules[module_name] = Module(messenger, worker)
+        self.logger.info('Loaded module "{}"'.format(module_name))
 
     def delete(self, module_name):
         """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
 
     def get(self, name: str) -> Type[Module]:
+        """Returns a specific module."""
         return self._modules.get(name)
 
     def get_modules_list(self):
+        """Returns a list with all names of all modules."""
         return self._modules.keys()
 
     def get_worker(self, module_name, class_path):
@@ -191,11 +190,11 @@ class ModuleManager(object):
         else:
             return False
 
-    def start(self, module_name: str) -> None:
-        self._modules.get(module_name).start_worker()
+    def start(self, name: str) -> None:
+        self._modules.get(name).start_worker()
 
     def stop(self, module_name: str) -> None:
-        self._modules.get(module_name).stop_worker()
+        self._modules.get(name).stop_worker()
 
     @property
     def modules(self) -> Dict:
@@ -220,7 +219,7 @@ class SensorManager(object):
         for sensor_name, sensor_config in self._sensor_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
             self.add(sensor_name, sensor_obj)
-            self.logger.info('Created sensor {}'.format(sensor_name))
+            self.logger.info('Created sensor "{}"'.format(sensor_name))
 
     def add(self, name, sensor):
         """Adds a sensor to the sensors dictionary."""
@@ -235,6 +234,7 @@ class SensorManager(object):
         return self._sensors.get(name)
 
     def get_sensors_names(self):
+        """Returns a list with all sensor names."""
         return self._sensors.keys()
 
     @property

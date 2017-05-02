@@ -97,16 +97,18 @@ class Alert(Prototype):
             self.fire(log)
 
     def start(self):
-        if not self._is_running:
-            self.logger.info('Starting worker of module "{}" ...'
-                             .format(self._name))
-            self._is_running = True
+        if self._is_running:
+            return
 
-            # Check the logging queue continuously for messages and proceed
-            # them to the alert agents.
-            self._thread = threading.Thread(target=self.run)
-            self._thread.daemon = True
-            self._thread.start()
+        self.logger.debug('Starting worker of module "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+
+        # Check the logging queue continuously for messages and proceed
+        # them to the alert agents.
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
 
 class AlertMessageFormatter(Prototype):
@@ -225,16 +227,18 @@ class AlertMessageFormatter(Prototype):
                 cache.clear()
 
     def start(self):
-        if not self._is_running:
-            self.logger.info('Starting worker of module "{}" ...'
-                             .format(self._name))
-            self._is_running = True
+        if self._is_running:
+            return
 
-            if self._msg_collection_enabled:
-                # Threading for alert message collection.
-                self._thread = threading.Thread(target=self.run)
-                self._thread.daemon = True
-                self._thread.start()
+        self.logger.debug('Starting worker of module "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+
+        if self._msg_collection_enabled:
+            # Threading for alert message collection.
+            self._thread = threading.Thread(target=self.run)
+            self._thread.daemon = True
+            self._thread.start()
 
 
 class MailAgent(Prototype):
@@ -378,11 +382,8 @@ class Heartbeat(Prototype):
         self._receivers = config.get('receivers')
         self._interval = config.get('interval')
 
+        self._thread = None
         self._header = {'type': 'heartbeat'}
-
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
 
         self.add_handler('heartbeat', self.process_heartbeat)
 
@@ -415,6 +416,17 @@ class Heartbeat(Prototype):
                 self.publish(target, self._header, payload)
 
             time.sleep(self._interval)
+
+    def start(self):
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker of module "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
 
 class HeartbeatMonitor(Prototype):

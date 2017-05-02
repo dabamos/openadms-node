@@ -97,7 +97,8 @@ class Scheduler(Prototype):
 
         # Wait until we have a communication uplink to the messenger.
         while not self._uplink:
-            time.sleep(0.1)
+            self.logger.debug('Waiting for uplink ...')
+            time.sleep(1.0)
 
         while self.is_running:
             t1 = time.time()
@@ -130,15 +131,17 @@ class Scheduler(Prototype):
                 time.sleep(0.1 - dt)
 
     def start(self):
-        if not self._is_running:
-            self.logger.info('Starting worker of module "{}" ...'
-                             .format(self._name))
-            self._is_running = True
+        if self._is_running:
+            return
 
-            # Run the method self.run_jobs() within a thread.
-            self._thread = threading.Thread(target=self.run)
-            self._thread.daemon = True
-            self._thread.start()
+        self.logger.debug('Starting worker of module "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+
+        # Run the method self.run_jobs() within a thread.
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
 
 class Job(object):

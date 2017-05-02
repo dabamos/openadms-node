@@ -60,10 +60,10 @@ class Prototype(object):
                     data_type: str,
                     func: Callable[[Dict, Dict], None]) -> None:
         """Registers a callback function for handling of messages.
-        
+
         Args:
             data_type (str): Name of the data type (observation, service, ...).
-            func (Callable): Callback function for handling the message.        
+            func (Callable): Callback function for handling the message.
         """
         self._handlers[data_type] = func
 
@@ -85,12 +85,12 @@ class Prototype(object):
 
         if action is 'pause':
             self._is_running = False
-            self.logger.info('Paused module "{}" by call from "{}"'
-                             .format(self._name, sender))
+            self.logger.debug('Paused module "{}" by call from "{}"'
+                              .format(self._name, sender))
         elif action is 'start':
             self._is_running = True
-            self.logger.info('Started module "{}" by call from "{}"'
-                             .format(self._name, sender))
+            self.logger.debug('Started module "{}" by call from "{}"'
+                              .format(self._name, sender))
 
     def handle(self, message: List[Dict]) -> None:
         """Processes messages by calling callback functions for data
@@ -214,13 +214,13 @@ class Prototype(object):
         self.publish(next_receiver, header, payload)
 
     def start(self):
-        self.logger.info('Starting worker of module "{}" ...'
-                         .format(self._name))
+        self.logger.debug('Starting worker of module "{}" ...'
+                          .format(self._name))
         self._is_running = True
 
     def stop(self):
-        self.logger.info('Stopping worker of module "{}" ...'
-                         .format(self._name))
+        self.logger.debug('Stopping worker of module "{}" ...'
+                          .format(self._name))
         self._is_running = False
 
     @property

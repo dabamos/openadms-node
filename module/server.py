@@ -41,7 +41,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
 
-        self._root_dir = '{}/{}'.format(os.getcwd(), 'module/server')
+        self._root_dir = 'module/server'
         self._template = self.get_file_contents(
             self.get_complete_path('/index.html')
         )
@@ -119,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return Path('{}/{}'.format(self._root_dir, path))
 
     def get_file_contents(self, path) -> str:
-        with open(path, 'r', encoding='utf-8') as fh:
+        with open(str(path), 'r', encoding='utf-8') as fh:
             file_contents = fh.read()
 
         return file_contents

@@ -42,7 +42,7 @@ class System(object):
     def get_cpu_load():
         """Returns the current CPU load in percent. Please note, that calling
         this method is blocking.
-        
+
         Returns:
             Float with the CPU load (between 0.0 and 100.0).
         """
@@ -51,7 +51,7 @@ class System(object):
     @staticmethod
     def get_host_name():
         """Returns the host name of the system.
-        
+
         Returns:
             String containing the host name.
         """
@@ -59,8 +59,8 @@ class System(object):
 
     @staticmethod
     def get_machine():
-        """Returns the hardware architecture.        
-        
+        """Returns the hardware architecture.
+
         Returns:
             String with the hardware architecture.
         """
@@ -79,7 +79,7 @@ class System(object):
     @staticmethod
     def get_openadms_version():
         """Returns the current version of OpenADMS:
-        
+
         Returns:
             Version number.
         """
@@ -88,7 +88,7 @@ class System(object):
     @staticmethod
     def get_openadms_version_name():
         """Returns the code name of the current OpenADMS version.
-        
+
         Returns:
             String with the version name.
         """
@@ -97,7 +97,7 @@ class System(object):
     @staticmethod
     def get_os_name():
         """Returns the name of the operating system.
-        
+
         Returns:
             String with the OS name.
         """
@@ -106,7 +106,7 @@ class System(object):
     @staticmethod
     def get_os_version():
         """Returns the version of the operating system.
-        
+
         Returns:
             Release number of the OS.
         """
@@ -126,7 +126,7 @@ class System(object):
     def get_system_string():
         """Returns a string containing operating system and hardware
         architecture (e.g., 'Windows 7 (AMD64)').
-        
+
         Returns:
             String with OS name and architecture.
         """
@@ -138,7 +138,7 @@ class System(object):
     @staticmethod
     def get_uptime():
         """Returns the system uptime in seconds.
-        
+
         Returns:
             Uptime in seconds.
         """
@@ -148,7 +148,7 @@ class System(object):
     def get_uptime_string():
         """Returns the system uptime as a formatted string (days, hours,
         minutes, seconds).
-        
+
         Returns:
             String with the uptime.
         """
@@ -172,9 +172,9 @@ class System(object):
     def is_windows():
         """Returns whether the current operating system is a version of
         Microsoft Windows or not.
-        
+
         Returns:
-            True if Windows, false if not. 
+            True if Windows, false if not.
         """
         if System.get_os_name() == 'Windows':
             return True
