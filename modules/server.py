@@ -41,8 +41,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
 
-        root = '/modules/server'
-        self._root_dir = '{}{}'.format(os.getcwd(), root)
+        self._root_dir = '{}/{}'.format(os.getcwd(), 'modules/server')
+        self._template = self.get_file_contents(
+            self.get_complete_path('/index.html')
+        )
 
         BaseHTTPRequestHandler.__init__(self, *args)
 
@@ -51,20 +53,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         file_path = self.get_complete_path(parsed_path.path)
 
         status = 200
-        mime_type = 'text/html'
-
-        self.do_query()
+        mime = 'text/html'
 
         if self.path.endswith('.css'):
-            mime_type = 'text/css'
+            mime = 'text/css'
         elif self.path.endswith('.txt'):
-            mime_type = 'text/plain'
+            mime = 'text/plain'
 
         if parsed_path.path == '/' or parsed_path.path == '/index.html':
-            content = self.get_index()
+            self.do_action_query(parse.parse_qs(parsed_path.query))
+            content = self.get_index(self._template)
         else:
             if file_path.exists():
-                content = self.get_file_content(file_path)
+                content = self.get_file_contents(file_path)
             else:
                 content = self.get_404()
                 status = 404
@@ -72,7 +73,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.respond(
             {
                 'status': status,
-                'mime': mime_type,
+                'mime': mime,
                 'content': content
             }
         )
@@ -82,39 +83,26 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-    def _has_attribute(self, query, name):
-        if len(query) > 0:
-            if query.get(name) or len(query.get(name) > 0):
-                return True
-
-        return False
-
-    def do_action(self, query):
+    def do_action_query(self, query):
         if not self._has_attribute(query, 'action'):
             return
 
         if not self._has_attribute(query, 'module'):
             return
 
-        # Get module name.
-        module = self._module_manager.modules.get(query.get('module')[0])
+        module_name = query.get('module')[0]
 
-        if not module:
-            # Module does not exist.
+        if not self._module_manager.has_module(module_name):
             return
 
-        # Get action.
+        module = self._module_manager.get(module_name)
         action_value = query.get('action')[0]
 
-        if action_value == 'pause':
+        if action_value == 'pause' and module.worker.is_running:
             module.stop_worker()
 
-        if action_value == 'start':
+        if action_value == 'start' and not module.worker.is_running:
             module.start_worker()
-
-    def do_query(self):
-        query = parse.parse_qs(parse.urlparse(self.path).query)
-        self.do_action(query)
 
     def get_404(self) -> str:
         html = ('<!DOCTYPE html><html lang="en">\n'
@@ -130,13 +118,13 @@ class RequestHandler(BaseHTTPRequestHandler):
     def get_complete_path(self, path) -> Type[Path]:
         return Path('{}/{}'.format(self._root_dir, path))
 
-    def get_file_content(self, path) -> str:
+    def get_file_contents(self, path) -> str:
         with open(path, 'r', encoding='utf-8') as fh:
-            file_content = fh.read()
+            file_contents = fh.read()
 
-        return file_content
+        return file_contents
 
-    def get_index(self) -> str:
+    def get_index(self, template) -> str:
         data = {
             'config_file': self._config_manager.path,
             'cpu_load': round(System.get_cpu_load()),
@@ -151,19 +139,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             'uptime': System.get_uptime_string()
         }
 
-        file_path = self.get_complete_path('/index.html')
-
-        if file_path.exists():
-            template_file = self.get_file_content(file_path)
-            content = template_file.format(**data)
-        else:
-            content = self.get_404()
-
-        return content
+        return template.format(**data)
 
     def get_modules_list(self) -> str:
         template = ('<tr><td>{number}</td>'
-                    '<td>{module_name}</td>'
+                    '<td><code>{module_name}</code></td>'
                     '<td><code>{module_type}</code></td>'
                     '<td><span style="color: {color}">{is_running}</span></td>'
                     '<td><a href="/?module={module_name}&action='
@@ -186,8 +166,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 data['button_action'] = 'pause'
             else:
                 data['is_running'] = 'paused'
-                data['color'] = '#e93f3c'
-                data['button_class'] = 'info'
+                data['color'] = '#f5ad1e'
+                data['button_class'] = 'success'
                 data['button_action'] = 'start'
 
             content += template.format(**data)
@@ -197,7 +177,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def get_sensors_list(self) -> str:
         template = ('<tr><td>{number}</td>'
-                    '<td>{sensor_name}</td>'
+                    '<td><code>{sensor_name}</code></td>'
                     '<td><code>{sensor_type}</code></td>'
                     '<td>{sensor_description}</td></tr>\n')
         content = ''
@@ -215,6 +195,13 @@ class RequestHandler(BaseHTTPRequestHandler):
             i += 1
 
         return content
+
+    def _has_attribute(self, query, name):
+        if len(query) > 0:
+            if query.get(name) or len(query.get(name) > 0):
+                return True
+
+        return False
 
     def log_message(self, format, *args) -> None:
         return

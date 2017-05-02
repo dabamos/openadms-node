@@ -160,6 +160,9 @@ class ModuleManager(object):
         """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
 
+    def get(self, name: str) -> Type[Module]:
+        return self._modules.get(name)
+
     def get_modules_list(self):
         return self._modules.keys()
 
@@ -181,6 +184,12 @@ class ModuleManager(object):
             return
 
         return worker
+
+    def has_module(self, name: str) -> bool:
+        if self.modules.get(name):
+            return True
+        else:
+            return False
 
     def start(self, module_name: str) -> None:
         self._modules.get(module_name).start_worker()

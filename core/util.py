@@ -67,25 +67,6 @@ class System(object):
         return platform.machine()
 
     @staticmethod
-    def get_used_memory():
-        """Returns the currently used memory in percent.
-        
-        Returns:
-            Memory currently in use (between 0.0 and 100.0).
-        """
-        return psutil.virtual_memory().percent
-
-    @staticmethod
-    def get_python_version():
-        """Returns Python implementation and version (e.g., 'CPython 3.5.1').
-        
-        Returns:
-            String with name and version number.
-        """
-        return '{} {}'.format(platform.python_implementation(),
-                              platform.python_version())
-
-    @staticmethod
     def get_openadms_string():
         """Returns a string with OpenADMS version and version name:
 
@@ -132,6 +113,16 @@ class System(object):
         return platform.release()
 
     @staticmethod
+    def get_python_version():
+        """Returns Python implementation and version (e.g., 'CPython 3.5.1').
+
+        Returns:
+            String with name and version number.
+        """
+        return '{} {}'.format(platform.python_implementation(),
+                              platform.python_version())
+
+    @staticmethod
     def get_system_string():
         """Returns a string containing operating system and hardware
         architecture (e.g., 'Windows 7 (AMD64)').
@@ -167,6 +158,15 @@ class System(object):
         d, h = divmod(h, 24)
 
         return '{}d {}h {}m {}s'.format(d, h, m, s)
+
+    @staticmethod
+    def get_used_memory():
+        """Returns the currently used memory in percent.
+
+        Returns:
+            Memory currently in use (between 0.0 and 100.0).
+        """
+        return psutil.virtual_memory().percent
 
     @staticmethod
     def is_windows():

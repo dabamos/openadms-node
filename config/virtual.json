@@ -140,7 +140,7 @@
                             "unit": "mbar"
                         }
                     },
-                    "sleepTime": 60.0
+                    "sleepTime": 10.0
                 }
             ]
         },
