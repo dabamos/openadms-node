@@ -198,7 +198,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def _has_attribute(self, query, name):
         if len(query) > 0:
-            if query.get(name) or len(query.get(name) > 0):
+            if query.get(name) and len(query.get(name) > 0):
                 return True
 
         return False
