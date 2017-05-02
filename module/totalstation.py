@@ -28,7 +28,7 @@ import time
 
 from core.observation import Observation
 from core.sensor import SensorType
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 """Module for the processing of observations of total station positioning
 systems (pre-processing, atmospheric corrections, transformations)."""

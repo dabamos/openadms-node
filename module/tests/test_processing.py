@@ -27,7 +27,7 @@ __license__ = 'EUPL'
 
 import pytest
 
-from modules.processing import *
+from module.processing import *
 from core.observation import Observation
 
 

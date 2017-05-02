@@ -26,7 +26,7 @@ __license__ = 'EUPL'
 import time
 
 import serial
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 """Module for sensor communication."""
 

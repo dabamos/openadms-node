@@ -130,7 +130,7 @@ class ConfigManager(object):
 
 class ModuleManager(object):
     """
-    ModuleManager loads and manages OpenADMS modules.
+    ModuleManager loads and manages OpenADMS module.
     """
 
     def __init__(self, manager):

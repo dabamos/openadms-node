@@ -31,7 +31,7 @@ from typing import *
 from urllib import parse
 
 from core.util import System
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -41,7 +41,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
 
-        self._root_dir = '{}/{}'.format(os.getcwd(), 'modules/server')
+        self._root_dir = '{}/{}'.format(os.getcwd(), 'module/server')
         self._template = self.get_file_contents(
             self.get_complete_path('/index.html')
         )

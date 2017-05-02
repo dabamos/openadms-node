@@ -39,7 +39,7 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 
 from core.version import *
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class Alert(Prototype):

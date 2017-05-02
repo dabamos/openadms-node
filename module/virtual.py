@@ -30,7 +30,7 @@ import random
 import re
 import time
 
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class VirtualSensor(Prototype):

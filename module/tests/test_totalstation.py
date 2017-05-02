@@ -27,7 +27,7 @@ __license__ = 'EUPL'
 
 import pytest
 
-from modules.totalstation import *
+from module.totalstation import *
 from core.observation import Observation
 
 

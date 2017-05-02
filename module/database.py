@@ -25,7 +25,7 @@ __license__ = 'EUPL'
 
 from tinydb import TinyDB, Query
 
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class TinyDBConnectivity(Prototype):

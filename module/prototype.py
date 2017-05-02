@@ -39,7 +39,7 @@ class Prototype(object):
         self.logger = logging.getLogger(name)
 
         self._name = name   # Module name, e.g., 'serialPort'.
-        self._type = type   # Class path, e.g., 'modules.port.SerialPort'.
+        self._type = type   # Class path, e.g., 'module.port.SerialPort'.
 
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager

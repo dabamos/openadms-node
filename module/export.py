@@ -29,7 +29,7 @@ import os
 from datetime import datetime
 from enum import Enum
 
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 """Module for the export of sensor data to files and databases."""
 

@@ -30,7 +30,7 @@ import time
 
 from datetime import datetime
 
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class Scheduler(Prototype):

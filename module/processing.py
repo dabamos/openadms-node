@@ -28,7 +28,7 @@ __license__ = 'EUPL'
 
 import re
 
-from modules.prototype import Prototype
+from module.prototype import Prototype
 
 
 class PreProcessor(Prototype):
