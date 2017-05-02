@@ -24,10 +24,11 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import copy
-import datetime as dt
 import logging
 import threading
 import time
+
+from datetime import datetime
 
 from modules.prototype import Prototype
 
@@ -99,6 +100,8 @@ class Scheduler(Prototype):
             time.sleep(0.1)
 
         while True:
+            t1 = time.time()
+
             if not self._is_running:
                 break
 
@@ -120,7 +123,11 @@ class Scheduler(Prototype):
                                   .format(zombie.name))
                 self._jobs.remove(zombie)
 
-            time.sleep(0.01)
+            t2 = time.time()
+            dt = t2 - t1
+
+            if dt < 0.1:
+                time.sleep(0.1 - dt)
 
     def start(self):
         if not self._is_running:
@@ -161,11 +168,11 @@ class Job(object):
 
     def get_datetime(self, dt_str, dt_fmt):
         """Converts a date string to a time stamp."""
-        return dt.datetime.strptime(dt_str, dt_fmt)
+        return datetime.strptime(dt_str, dt_fmt)
 
     def has_expired(self):
         """Checks if the job has expired."""
-        now = dt.datetime.now()
+        now = datetime.now()
 
         if now > self._end_date:
             self.logger.debug('Job "{}" has expired'.format(self._name))
@@ -179,7 +186,7 @@ class Job(object):
         if not self._enabled:
             return False
 
-        now = dt.datetime.now()
+        now = datetime.now()
 
         # Are we within the date range of the job?
         if self._start_date <= now < self._end_date:
