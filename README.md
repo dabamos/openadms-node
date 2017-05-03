@@ -22,8 +22,9 @@ Some additional modules are used by OpenADMS:
 
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
+* [psutil](https://pypi.python.org/pypi/psutil) (BSD-3-Clause)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
-
+* [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause)
 
 ## Message Broker
 The MQTT protocol is used for the internal and external message exchange in
@@ -49,16 +50,15 @@ $ python3 openadms.py --config ./config/myconfig.json --debug
 
 ## Virtual Environment
 The Python tool `pyvenv` can be used to set-up a virtual environment for
-development:
+development (with `csh`/`tcsh` on Unix):
 
 ```
-$ pyvenv-3.5 ~/virtual-environment
-$ bash
-$ source ~/virtual-environment/bin/activate
-$ cd ~/virtual-environment
+$ python3 -m venv virtual-environment
+$ source ./virtual-environment/bin/activate.csh
+$ cd ./virtual-environment
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
-$ pip install -r requirements.txt
+$ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py
 ```
 
