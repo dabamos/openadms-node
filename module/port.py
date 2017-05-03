@@ -23,12 +23,165 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import re
+import socket
 import time
 
 import serial
+
+from core.util import System
 from module.prototype import Prototype
 
 """Module for sensor communication."""
+
+
+class BluetoothPort(Prototype):
+
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
+        self._config = self._config_manager.get('ports')\
+                                           .get('bluetooth')\
+                                           .get(self._name)
+
+        self._port = self._config.get('port')
+        self._server_mac_address = None
+        self._sock = None
+
+        valid_mac = self.get_mac_address(self._config.get('serverMacAddress'))
+
+        if not valid_mac:
+            self.logger.error('Invalid MAC address "{}"'
+                              .format(self._config.get('serverMacAddress')))
+        else:
+            self._server_mac_address = valid_mac
+
+    def __del__(self):
+        self.close()
+
+    def close(self):
+        if self._sock:
+            self.logger.info('Closing port "{}" ...'.format(self._port))
+            self._sock.close()
+
+    def get_mac_address(self, s):
+        if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
+            return s
+        elif re.match(r'^[a-fA-F0-9]{12}$', s):
+            l = re.findall('..', s)
+            return '{}:{}:{}:{}:{}:{}'.format(*l)
+        else:
+            return
+
+    def process_observation(self, obs):
+        if System.is_windows():
+            self.logger.critical('Operating system not supported (no '
+                                 'socket.AF_BLUETOOTH on Microsoft Windows)')
+            return obs
+
+        if not self._sock:
+            self._open()
+
+        # Add the name of this Bluetooth port to the observation.
+        obs.set('portName', self.name)
+
+        requests_order = obs.get('requestsOrder', [])
+        request_sets = obs.get('requestSets')
+
+        if len(requests_order) == 0:
+            self.logger.info('No requests order defined in observation "{}" '
+                             'with ID "{}"'.format(obs.get('name'),
+                                                   obs.get('id')))
+
+        # Send requests one by one to the sensor.
+        for request_name in requests_order:
+            request_set = request_sets.get(request_name)
+
+            if not request_set:
+                self.logger.error('Request set "{}" not found in observation '
+                                  '"{}" with ID "{}"'.format(request_name,
+                                                             obs.get('name'),
+                                                             obs.get('id')))
+                return
+
+            # The response of the sensor.
+            response = ''
+            response_delimiter = request_set.get('responseDelimiter')
+
+            # Data of the request set.
+            request = request_set.get('request')
+            sleep_time = request_set.get('sleepTime')
+            timeout = request_set.get('timeout')
+
+            # Send the request of the observation to the attached sensor.
+            self.logger.info('Sending request "{}" of observation "{}" to '
+                             'sensor "{}"'.format(request_name,
+                                                  obs.get('name'),
+                                                  obs.get('sensorName')))
+            # Write to the Bluetooth port.
+            self._send(request)
+
+            # Get the response of the sensor.
+            response = self._receive(response_delimiter, timeout)
+
+            self.logger.debug('Received response "{}" for request "{}" '
+                              'of observation "{}" from sensor "{}"'
+                              .format(self._sanitize(response),
+                                      request_name,
+                                      obs.get('name'),
+                                      obs.get('sensorName')))
+            # Add the raw response of the sensor to the observation set.
+            request_set['response'] = response
+
+            # Add the timestamp to the observation.
+            obs.set('timeStamp', time.time())
+
+            # Sleep until the next request.
+            time.sleep(sleep_time)
+
+        return obs
+
+    def _open(self):
+        if not self._server_mac_address:
+            self.logger.error('MAC address of server not set')
+            return False
+
+        self._sock = socket.socket(socket.AF_BLUETOOTH,
+                                   socket.SOCK_STREAM,
+                                   socket.BTPROTO_RFCOMM)
+        self._sock.connect((self._server_mac_address, self._port))
+
+    def _receive(self, eol, timeout=30.0):
+        """Reads from Bluetooth connection."""
+        response = ''
+        start_time = time.time()
+
+        # Read from Bluetooth port until delimiter occurs.
+        while True:
+            try:
+                rxd = self._sock.recv(1).decode()
+                response += rxd
+
+                # Did we get an end of line (e.g., '\r' or '\n')?
+                i = len(eol)
+
+                if len(response) >= len(eol) and response[-i:] == eol:
+                    break
+            except UnicodeDecodeError:
+                self.logger.error('No sensor on port "{}"'
+                                  .format(self._port))
+                break
+
+            if time.time() - start_time > timeout:
+                self.logger.warning('Timeout on port "{}" after {} s'
+                                    .format(self._port,
+                                            timeout))
+                break
+
+        return response
+
+    def _send(self, data):
+        """Sends command to sensor."""
+        self._sock.send(bytes(data, 'UTF-8'))
 
 
 class SerialPort(Prototype):
@@ -45,9 +198,14 @@ class SerialPort(Prototype):
         self._max_attempts = 1  # TODO: Move to configuration file.
 
     def __del__(self):
-        #if self._serial is not None:
-        #    self.close()
+        # self.close()
         pass
+
+    def close(self):
+        if self._serial:
+            self.logger.info('Closing port "{}" ...'
+                             .format(self._serial_port_config.port))
+            self._serial.close()
 
     def process_observation(self, obs):
         if not self._serial:
@@ -143,12 +301,6 @@ class SerialPort(Prototype):
             time.sleep(sleep_time)
 
         return obs
-
-    def close(self):
-        self.logger.info('Closing port "{}" ...'
-                         .format(self._serial_port_config.port))
-        if self._serial:
-            self._serial.close()
 
     def _get_port_config(self):
         p = self._config_manager.config.get('ports')\
