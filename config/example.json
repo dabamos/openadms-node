@@ -1,23 +1,15 @@
 {
     "modules": {
-        "alert": "module.notification.Alert",
-        "com1": "module.port.SerialPort",
-        "com2": "module.port.SerialPort",
+        "bluetooth3": "module.port.BluetoothPort",
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
         "helmertTransformer": "module.totalstation.HelmertTransformer",
-        "mailAgent": "module.notification.MailAgent",
-        "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
         "preProcessor": "module.processing.PreProcessor",
-        "realTimePublisher": "module.export.RealTimePublisher",
         "refractionCorrector": "module.totalstation.RefractionCorrector",
         "returnCodeInspector": "module.processing.ReturnCodeInspector",
-        "scheduler1": "module.schedule.Scheduler",
         "scheduler2": "module.schedule.Scheduler",
-        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor",
-        "shortMessageAgent": "module.notification.ShortMessageAgent",
-        "shortMessageFormatter": "module.notification.AlertMessageFormatter"
+        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor"
     },
     "project": {
         "name": "projectX",
@@ -33,6 +25,12 @@
         }
     },
     "ports": {
+        "bluetooth": {
+            "bluetooth3": {
+                "port": 3,
+                "serverMacAddress": "5c:c5:d4:1d:16:26"
+            }
+        },
         "serial": {
             "com1": {
                 "port": "COM1",
@@ -1520,7 +1518,7 @@
             ]
         },
         "scheduler2": {
-            "port": "com2",
+            "port": "bluetooth3",
             "sensor": "leicaTM30",
             "schedules": [
                 {
@@ -1738,5 +1736,9 @@
         "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f",
         "compress": true,
         "zipFile": "observations.zip"
+    },
+    "localControlServer": {
+        "host": "127.0.0.1",
+        "port": 8080
     }
 }

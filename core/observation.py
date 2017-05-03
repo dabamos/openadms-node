@@ -155,7 +155,7 @@ class Observation(object):
         return ref
 
     def has_response_type(self, name: str) -> bool:
-        """Returns weather the type of a given response set exists or not.
+        """Returns whether the type of a given response set exists or not.
 
         Args:
             name (str): Name of the response set.
@@ -174,7 +174,7 @@ class Observation(object):
         return False
 
     def has_response_unit(self, name: str) -> bool:
-        """Returns weather the unit of a given response set exists or not.
+        """Returns whether the unit of a given response set exists or not.
 
         Args:
             name (str): Name of the response set.
@@ -193,7 +193,7 @@ class Observation(object):
         return False
 
     def has_response_value(self, name: str) -> bool:
-        """Returns weather the value of a given response set exists or not.
+        """Returns whether the value of a given response set exists or not.
 
         Args:
             name (str): Name of the response set.
