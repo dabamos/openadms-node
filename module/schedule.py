@@ -134,7 +134,7 @@ class Scheduler(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker of module "{}" ...'
+        self.logger.debug('Starting worker "{}" ...'
                           .format(self._name))
         self._is_running = True
 

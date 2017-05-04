@@ -25,10 +25,14 @@ __license__ = 'EUPL'
 
 import re
 import socket
+import threading
 import time
 
 import serial
 
+from enum import Enum
+
+from core.observation import Observation
 from core.util import System
 from module.prototype import Prototype
 
@@ -42,7 +46,6 @@ class BluetoothPort(Prototype):
         self._config = self._config_manager.get('ports')\
                                            .get('bluetooth')\
                                            .get(self._name)
-
         self._port = self._config.get('port')
         self._server_mac_address = None
         self._sock = None
@@ -191,6 +194,15 @@ class BluetoothPort(Prototype):
         self._sock.send(bytes(data, 'UTF-8'))
 
 
+class ConnectionMode(Enum):
+    """
+    Enumeration of file rotation times of flat files.
+    """
+
+    ACTIVE = 0
+    PASSIVE = 1
+
+
 class SerialPort(Prototype):
     """
     SerialPort does I/O on a given serial port.
@@ -198,14 +210,38 @@ class SerialPort(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        self._config = self._config_manager.get(self._name)
+        self._config = self._config_manager.config.get('ports')\
+                                                  .get('serial')\
+                                                  .get(self.name)
+        if self._config.get('mode') == 'passive':
+            self._mode = ConnectionMode.PASSIVE
+        else:
+            self._mode = ConnectionMode.ACTIVE
 
+        self._thread = None
         self._serial = None     # Pyserial object.
         self._serial_port_config = None
         self._max_attempts = 1  # TODO: Move to configuration file.
 
     def __del__(self):
         # self.close()
+        pass
+
+    def start(self):
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+
+        # Run the method self.run_jobs() within a thread.
+        if self.is_passive():
+            self._thread = threading.Thread(target=self.run)
+            self._thread.daemon = True
+            self._thread.start()
+
+    def run(self):
         pass
 
     def close(self):
@@ -215,6 +251,9 @@ class SerialPort(Prototype):
             self._serial.close()
 
     def process_observation(self, obs):
+        if self.is_passive():
+            return
+
         if not self._serial:
             self._create()
 
@@ -310,23 +349,19 @@ class SerialPort(Prototype):
         return obs
 
     def _get_port_config(self):
-        p = self._config_manager.config.get('ports')\
-                                            .get('serial')\
-                                            .get(self.name)
-
-        if not p:
+        if not self._config:
             self.logger.debug('No port "{}" defined in configuration'
                               .format(self.name))
 
         return SerialPortConfiguration(
-            port=p.get('port'),
-            baudrate=p.get('baudRate'),
-            bytesize=p.get('byteSize'),
-            stopbits=p.get('stopBits'),
-            parity=p.get('parity'),
-            timeout=p.get('timeout'),
-            xonxoff=p.get('softwareFlowControl'),
-            rtscts=p.get('hardwareFlowControl'))
+            port=self._config.get('port'),
+            baudrate=self._config.get('baudRate'),
+            bytesize=self._config.get('byteSize'),
+            stopbits=self._config.get('stopBits'),
+            parity=self._config.get('parity'),
+            timeout=self._config.get('timeout'),
+            xonxoff=self._config.get('softwareFlowControl'),
+            rtscts=self._config.get('hardwareFlowControl'))
 
     def _create(self):
         """Opens a serial port."""
@@ -389,6 +424,18 @@ class SerialPort(Prototype):
     def _write(self, data):
         """Sends command to sensor."""
         self._serial.write(data.encode())
+
+    def is_active(self):
+        if self._mode == ConnectionMode.ACTIVE:
+            return True
+        else:
+            return False
+
+    def is_passive(self):
+        if self._mode == ConnectionMode.PASSIVE:
+            return True
+        else:
+            return False
 
 
 class SerialPortConfiguration(object):

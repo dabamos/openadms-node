@@ -214,12 +214,12 @@ class Prototype(object):
         self.publish(next_receiver, header, payload)
 
     def start(self):
-        self.logger.debug('Starting Worker "{}" ...'
+        self.logger.debug('Starting worker "{}" ...'
                           .format(self._name))
         self._is_running = True
 
     def stop(self):
-        self.logger.debug('Stopping Worker "{}" ...'
+        self.logger.debug('Stopping worker "{}" ...'
                           .format(self._name))
         self._is_running = False
 

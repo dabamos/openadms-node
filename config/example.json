@@ -41,6 +41,7 @@
         "serial": {
             "com1": {
                 "port": "COM1",
+                "mode": "active",
                 "baudRate": 4800,
                 "byteSize": 8,
                 "stopBits": 1,
@@ -51,6 +52,7 @@
             },
             "com5": {
                 "port": "COM5",
+                "mode": "passive",
                 "baudRate": 19200,
                 "byteSize": 8,
                 "stopBits": 1,
