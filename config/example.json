@@ -1,15 +1,22 @@
 {
     "modules": {
-        "bluetooth3": "module.port.BluetoothPort",
+        "alert": "module.notification.Alert",
+        "com5": "module.port.SerialPort",
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
         "helmertTransformer": "module.totalstation.HelmertTransformer",
+        "mailAgent": "module.notification.MailAgent",
+        "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
         "preProcessor": "module.processing.PreProcessor",
+        "realTimePublisher": "module.export.RealTimePublisher",
         "refractionCorrector": "module.totalstation.RefractionCorrector",
         "returnCodeInspector": "module.processing.ReturnCodeInspector",
         "scheduler2": "module.schedule.Scheduler",
-        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor"
+        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor",
+        "shortMessageAgent": "module.notification.ShortMessageAgent",
+        "shortMessageFormatter": "module.notification.AlertMessageFormatter",
+        "localControlServer": "module.server.LocalControlServer"
     },
     "project": {
         "name": "projectX",
@@ -26,9 +33,9 @@
     },
     "ports": {
         "bluetooth": {
-            "bluetooth3": {
+            "port3": {
                 "port": 3,
-                "serverMacAddress": "5c:c5:d4:1d:16:26"
+                "serverMacAddress": ""
             }
         },
         "serial": {
@@ -42,9 +49,9 @@
                 "softwareFlowControl": false,
                 "hardwareFlowControl": false
             },
-            "com2": {
-                "port": "COM2",
-                "baudRate": 115200,
+            "com5": {
+                "port": "COM5",
+                "baudRate": 19200,
                 "byteSize": 8,
                 "stopBits": 1,
                 "parity": "none",
@@ -1518,7 +1525,7 @@
             ]
         },
         "scheduler2": {
-            "port": "bluetooth3",
+            "port": "com5",
             "sensor": "leicaTM30",
             "schedules": [
                 {

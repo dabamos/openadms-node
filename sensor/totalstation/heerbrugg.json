@@ -1,0 +1,120 @@
+{
+    "beepOn": {
+        "request": "%R1Q,20001:50\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "beepOff": {
+        "request": "%R1Q,20000:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "doBeep": {
+        "request": "%R1Q,11004:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "enableAngleCorrection": {
+        "request": "%R1Q,2016:1,1,1,1\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "changeFace": {
+        "request": "%R1Q,9028:1,1,0\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcChangeFace>\\d+)",
+        "sleepTime": 10.0,
+        "timeout": 2.0
+    },
+    "getFace0": {
+        "request": "%R1Q,2026:\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace0>\\d+)(?:,(?P<face0>\\d+))?",
+        "timeout": 2.0
+    },
+    "getFace1": {
+        "request": "%R1Q,2026:\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcGetFace1>\\d+)(?:,(?P<face1>\\d+))?",
+        "timeout": 2.0
+    },
+    "getInternalTemperature": {
+        "request": "%R1Q,5011:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<internalTemperature>-?[\\d+\\.]+))?",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "getSensorId": {
+        "request": "%R1Q,5003:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<sensorId>\\d+))?",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "getSensorName": {
+        "request": "%R1Q,5004:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<sensorName>\"[\\w\\W]+\"))?",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "getSoftwareVersion": {
+        "request": "%R1Q,5034:\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)(?:,(?P<release>\\d+),(?P<version>\\d+),(?P<subversion>\\d+))?",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "getValuesFace0": {
+        "request": "%R1Q,2167:5000,1\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues0>\\d+)(?:,(?P<hz0>\\d*\\.?\\d+),(?P<v0>\\d*\\.?\\d+),(?P<accuracyAngle0>-?\\d*\\.?\\d+),(?P<crossInclination0>-?\\d*\\.?\\d*),(?P<lengthInclination0>-?\\d*\\.?\\d*),(?P<accuracyInclination0>-?\\d*\\.?\\d*),(?P<slopeDist0>\\d*\\.?\\d*),(?P<distTime0>-?\\d*))?",
+        "sleepTime": 10.0,
+        "timeout": 2.0
+    },
+    "getValuesFace1": {
+        "request": "%R1Q,2167:5000,1\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+        "sleepTime": 10.0,
+        "timeout": 2.0
+    },
+    "measureDistanceFace0": {
+        "request": "%R1Q,2008:1,1\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+        "timeout": 2.0
+    },
+    "measureDistanceFace1": {
+        "request": "%R1Q,2008:1,1\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+        "timeout": 2.0
+    },
+    "setAtmosphericPpm": {
+        "request": "%R1Q,2148:0\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "setDirection": {
+        "request": "%R1Q,9027:{hz},{v},2,1,0\r\n",
+        "responseDelimiter": "\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+        "sleepTime": 10.0,
+        "timeout": 2.0
+    },
+    "setEdmType": {
+        "request": "%R1Q,17021:0\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    },
+    "setGeometricPpmCorrectionFaction": {
+        "request": "%R1Q,2153:0,0,0,0,0\r\n",
+        "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
+        "responseDelimiter": "\r\n",
+        "timeout": 2.0
+    }
+}
