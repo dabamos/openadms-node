@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Copyright (c) 2016 Hochschule Neubrandenburg.
+Copyright (c) 2017 Hochschule Neubrandenburg.
 
 Licenced under the EUPL, Version 1.1 or - as soon they will be approved
 by the European Commission - subsequent versions of the EUPL (the
@@ -76,10 +76,12 @@ class BluetoothPort(Prototype):
         if System.is_windows():
             self.logger.critical('Operating system not supported (no '
                                  'socket.AF_BLUETOOTH on Microsoft Windows)')
-            return obs
+            return
 
         if not self._sock:
-            self._open()
+            # Open socket connection.
+            if not self._open():
+                return
 
         # Add the name of this Bluetooth port to the observation.
         obs.set('portName', self.name)
@@ -145,10 +147,15 @@ class BluetoothPort(Prototype):
             self.logger.error('MAC address of server not set')
             return False
 
-        self._sock = socket.socket(socket.AF_BLUETOOTH,
-                                   socket.SOCK_STREAM,
-                                   socket.BTPROTO_RFCOMM)
-        self._sock.connect((self._server_mac_address, self._port))
+        try:
+            self._sock = socket.socket(socket.AF_BLUETOOTH,
+                                       socket.SOCK_STREAM,
+                                       socket.BTPROTO_RFCOMM)
+            self._sock.connect((self._server_mac_address, self._port))
+        except OSError as e:
+            self.logger.error(e)
+        except TimeoutError as e:
+            self.logger.error(e)
 
     def _receive(self, eol, timeout=30.0):
         """Reads from Bluetooth connection."""
