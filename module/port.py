@@ -23,6 +23,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import copy
 import re
 import socket
 import threading
@@ -196,7 +197,7 @@ class BluetoothPort(Prototype):
 
 class ConnectionMode(Enum):
     """
-    Enumeration of file rotation times of flat files.
+    Enumeration of serial port connection mode.
     """
 
     ACTIVE = 0
@@ -205,7 +206,10 @@ class ConnectionMode(Enum):
 
 class SerialPort(Prototype):
     """
-    SerialPort does I/O on a given serial port.
+    SerialPort does I/O on a given serial port. The port can be used in either
+    active or passive mode. In active mode, the communication with the sensor is
+    based on request/response. In passive mode, the port just listens for
+    incoming data.
     """
 
     def __init__(self, name, type, manager):
@@ -215,6 +219,7 @@ class SerialPort(Prototype):
                                                   .get(self.name)
         if self._config.get('mode') == 'passive':
             self._mode = ConnectionMode.PASSIVE
+            self._obs_prototype = None
         else:
             self._mode = ConnectionMode.ACTIVE
 
@@ -231,18 +236,60 @@ class SerialPort(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
-                          .format(self._name))
+        self.logger.debug('Starting worker "{}" ...'.format(self._name))
         self._is_running = True
 
-        # Run the method self.run_jobs() within a thread.
-        if self.is_passive():
+        if self.is_passive_mode():
             self._thread = threading.Thread(target=self.run)
             self._thread.daemon = True
             self._thread.start()
 
     def run(self):
-        pass
+        if self.is_active_mode() or self._obs_prototype is None:
+            self.logger.warning('Not in passive mode')
+            return
+
+        while self._is_running:
+            if not self._serial:
+                self._create()
+
+            if self._serial is None:
+                self.logger.error('Could not access port "{}"'
+                                  .format(self._serial_port_config.port))
+                return
+
+            if not self._serial.is_open:
+                self.logger.info('Re-opening port "{}" ...'
+                                 .format(self._serial_port_config.port))
+                self._serial.open()
+                self._serial.reset_output_buffer()
+                self._serial.reset_input_buffer()
+
+            obs = copy.deepcopy(self._obs_prototype)
+            obs.set('portName', self.name)
+
+            response = ''
+            request_set = obs.get('requestSets').get('default')
+            timeout = request_set.get('timeout')
+
+            response_delimiter = None
+
+            if request_set.get('responseDelimiter'):
+                response_delimiter = request_set.get('responseDelimiter')
+
+            length = 0
+
+            if request_set.get('responseLength'):
+                length = request_set.get('responseLength')
+
+            response = self._read(eol=response_delimiter,
+                                  length=length,
+                                  timeout=timeout)
+
+            if response != '':
+                request_set['response'] = response
+                obs.set('timeStamp', time.time())
+                self._publish_observation(obs)
 
     def close(self):
         if self._serial:
@@ -251,14 +298,16 @@ class SerialPort(Prototype):
             self._serial.close()
 
     def process_observation(self, obs):
-        if self.is_passive():
+        if self.is_passive_mode():
+            # Set observation prototype for passive mode.
+            self._obs_prototype = obs
             return
 
         if not self._serial:
             self._create()
 
         if self._serial is None:
-            self.logger.error('Could not write to port "{}"'
+            self.logger.error('Could not access port "{}"'
                               .format(self._serial_port_config.port))
             return
 
@@ -316,7 +365,9 @@ class SerialPort(Prototype):
                 self._write(request)
 
                 # Get the response of the sensor.
-                response = self._read(response_delimiter, timeout)
+                response = self._read(eol=response_delimiter,
+                                      length=0,
+                                      timeout=timeout)
 
                 self._serial.reset_output_buffer()
                 self._serial.reset_input_buffer()
@@ -385,16 +436,24 @@ class SerialPort(Prototype):
             self.logger.error('Permission denied for port "{}"'
                               .format(self._serial_port_config.port))
 
-    def _read(self, eol, timeout=30.0):
+    def _read(self, eol=None, length=0, timeout=30.0):
         """Reads from serial port."""
         response = ''
         start_time = time.time()
+        c = 0
 
         # Read from serial port until delimiter occurs.
         while True:
             try:
                 rxd = self._serial.read(1).decode()
                 response += rxd
+
+                if not eol and length > 0:
+                    c += 1
+
+                    if c == length - 1:
+                        c = 0
+                        return response
 
                 # Did we get an end of line (e.g., '\r' or '\n')?
                 i = len(eol)
@@ -425,13 +484,13 @@ class SerialPort(Prototype):
         """Sends command to sensor."""
         self._serial.write(data.encode())
 
-    def is_active(self):
+    def is_active_mode(self):
         if self._mode == ConnectionMode.ACTIVE:
             return True
         else:
             return False
 
-    def is_passive(self):
+    def is_passive_mode(self):
         if self._mode == ConnectionMode.PASSIVE:
             return True
         else:
