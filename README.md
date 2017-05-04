@@ -6,7 +6,7 @@ and should run on Python 3.5 upwards. So far, it has been tested with CPython
 3.5/3.6 on:
 
 * Windows 7 (x86, x86-64)
-* FreeBSD 10/11 (x86-64, ARMv7)
+* FreeBSD 11 (x86-64, ARMv7)
 * NetBSD 7 (ARMv7)
 * Debian 9 (ARMv7)
 * Fedora 25 (x86-64)
