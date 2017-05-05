@@ -11,7 +11,8 @@ and should run on Python 3.5 upwards. So far, it has been tested with CPython
 * Debian 9 (ARMv7)
 * Fedora 25 (x86-64)
 
-The PyPy3.5 interpreter can be used instead of CPython.
+Instead of CPython, a recent PyPy3.5 interpreter can be used with smaller
+restrictions.
 
 The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.

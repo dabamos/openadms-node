@@ -152,6 +152,10 @@ class System(object):
         Returns:
             String with the uptime.
         """
+        if not System.get_uptime():
+            # Doesn't work with PyPy3.5 v5.7.1.
+            return 0
+
         s = int(System.get_uptime())
         m, s = divmod(s, 60)
         h, m = divmod(m, 60)
