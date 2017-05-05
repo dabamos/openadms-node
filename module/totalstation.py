@@ -682,8 +682,12 @@ class PolarTransformer(Prototype):
 
         self._azimuth_point_name = config.get('azimuthPointName')
         self._azimuth_point = self._fixed_points.get(self._azimuth_point_name)
-        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle'))
 
+        if not self._azimuth_point:
+            self.logger.error('Azimuth point "{}" doesn\'t exist'
+                              .format(self._azimuth_point_name))
+
+        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle'))
         self._is_adjustment_enabled = config.get('adjustmentEnabled')
 
     def _get_adjustment_value(self):

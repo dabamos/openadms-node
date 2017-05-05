@@ -84,8 +84,8 @@ class BluetoothPort(Prototype):
 
     def process_observation(self, obs):
         if System.is_windows():
-            self.logger.critical('Operating system not supported (no '
-                                 'socket.AF_BLUETOOTH on Microsoft Windows)')
+            self.logger.error('Operating system not supported (no '
+                              'socket.AF_BLUETOOTH on Microsoft Windows)')
             return
 
         if not self._sock:
@@ -235,8 +235,10 @@ class SerialPort(Prototype):
         self._max_attempts = 1  # TODO: Move to configuration file.
 
     def __del__(self):
-        # self.close()
-        pass
+        self._is_running = False
+
+        if self._serial:
+            self.close()
 
     def close(self):
         if self._serial:
@@ -356,11 +358,16 @@ class SerialPort(Prototype):
         """Threaded method for passive mode. Reads incoming data from serial
         port. Used for sensors which start streaming data without prior
         request."""
-        if self.is_active_mode() or self._obs_template is None:
+        if self.is_active_mode():
             self.logger.warning('Module not in passive mode')
             return
 
         while self._is_running:
+            if self._obs_template is None:
+                self.logger.warning('No observation template set')
+                time.sleep(1)
+                continue
+
             if not self._serial:
                 self._create()
 
@@ -373,23 +380,22 @@ class SerialPort(Prototype):
                 self.logger.info('Re-opening port "{}" ...'
                                  .format(self._serial_port_config.port))
                 self._serial.open()
-                self._serial.reset_output_buffer()
                 self._serial.reset_input_buffer()
 
             obs = copy.deepcopy(self._obs_template)
             obs.set('portName', self.name)
 
-            request_set = obs.get('requestSets').get('default')
-            timeout = request_set.get('timeout')
-            response_delimiter = request_set.get('responseDelimiter')
-            length = request_set.get('responseLength')
+            default = obs.get('requestSets').get('default')
+            timeout = default.get('timeout')
+            response_delimiter = default.get('responseDelimiter')
+            length = default.get('responseLength')
 
             response = self._read(eol=response_delimiter,
                                   length=length,
                                   timeout=timeout)
 
             if response != '':
-                request_set['response'] = response
+                default['response'] = response
                 obs.set('timeStamp', time.time())
                 self._publish_observation(obs)
 
@@ -448,7 +454,8 @@ class SerialPort(Prototype):
         start_time = time.time()
         c = 0                       # Character index.
 
-        # Read from serial port until delimiter occurs.
+        # Read from serial port until delimiter occurs or maximum length of
+        # response is reached.
         while True:
             try:
                 rxd = self._serial.read(1).decode()
@@ -460,7 +467,7 @@ class SerialPort(Prototype):
                     if c == length - 1:
                         break
 
-                if eol:
+                if eol and len(eol) > 0:
                     # Did we get an end of line (e.g., '\r' or '\n')?
                     i = len(eol)
 

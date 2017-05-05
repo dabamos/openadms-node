@@ -27,10 +27,9 @@ import os
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from string import Template
 from typing import *
 from urllib import parse
-
-from string import Template
 
 from core.util import System
 from module.prototype import Prototype
@@ -52,6 +51,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         BaseHTTPRequestHandler.__init__(self, *args)
 
     def do_GET(self) -> None:
+        """Creates the response to a GET request."""
         parsed_path = parse.urlparse(self.path)
         file_path = self.get_complete_path(parsed_path.path)
 
@@ -94,12 +94,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
 
         module_name = query.get('module')[0]
+        action_value = query.get('action')[0]
 
         if not self._module_manager.has_module(module_name):
             return
 
         module = self._module_manager.get(module_name)
-        action_value = query.get('action')[0]
 
         if action_value == 'stop' and module.worker.is_running:
             module.worker.stop()
@@ -108,7 +108,12 @@ class RequestHandler(BaseHTTPRequestHandler):
             module.worker.start()
 
     def get_404(self) -> str:
-        html = ('<!DOCTYPE html><html lang="en">\n'
+        """Returns a file not found page (error 404).
+
+        Returns:
+            String with HTML page.
+        """
+        return ('<!DOCTYPE html><html lang="en">\n'
                 '<head><meta charset="utf-8"><title>404</title></head>\n'
                 '<body style="background: Linen; font-family: sans-serif;">\n'
                 '<h1>Zonk! <small>File not found</small></h1>\n'
@@ -116,12 +121,19 @@ class RequestHandler(BaseHTTPRequestHandler):
                 '<p><small>{openadms_version}</small></p>\n</body></html>'
                 .format(openadms_version=System.get_openadms_string())
         )
-        return html
 
     def get_complete_path(self, path) -> Type[Path]:
         return Path('{}/{}'.format(self._root_dir, path))
 
     def get_file_contents(self, path) -> str:
+        """Opens a file and returns the contents.
+
+        Args:
+            path (str): File path.
+
+        Returns:
+            String with file contents.
+        """
         with open(str(path), 'r', encoding='utf-8') as fh:
             file_contents = fh.read()
 
@@ -138,9 +150,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         vars = {
             'config_file': self._config_manager.path,
-            'cpu_load': round(System.get_cpu_load()),
             'hostname': System.get_host_name(),
-            'mem_used': round(System.get_used_memory()),
             'modules_list': self.get_modules_list(),
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
@@ -168,15 +178,15 @@ class RequestHandler(BaseHTTPRequestHandler):
                     '$button_action" class="btn $button_class sml">'
                     '$button_action</a></td></tr>\n')
         content = ''
-        no = 0
+        number = 0
 
         for module_name, module in self._module_manager.modules.items():
-            no += 1
+            number += 1
 
             vars = {
                 'module_name': module_name,
                 'module_type': module.worker.type,
-                'number': no
+                'number': number
             }
 
             if module.worker.is_running:
@@ -198,7 +208,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Returns table rows with all sensors of the current configuration in
         HTML format. Rather quick and dirty with hard-coded template, but does
         the job.
-        
+
         Returns:
             String with sensors as HTML table rows.
         """
@@ -207,13 +217,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                     '<td><code>$sensor_type</code></td>'
                     '<td>$sensor_description</td></tr>\n')
         content = ''
-        no = 0
+        number = 0
 
         for sensor_name, sensor in self._sensor_manager.sensors.items():
-            no += 1
+            number += 1
 
             vars = {
-                'number': no,
+                'number': number,
                 'sensor_name': sensor.name,
                 'sensor_type': sensor.type,
                 'sensor_description': sensor.description
@@ -224,6 +234,14 @@ class RequestHandler(BaseHTTPRequestHandler):
         return content
 
     def _has_attribute(self, query, name):
+        """Checks a GET query for a given argument.
+
+        Args:
+            name (str): Name of the GET argument.
+
+        Returns:
+            True if argument exists, else false.
+        """
         if len(query) > 0:
             if query.get(name) and len(query.get(name) > 0):
                 return True
@@ -236,17 +254,22 @@ class RequestHandler(BaseHTTPRequestHandler):
     def parse(self, template: str, vars: Dict[str, str]) -> str:
         """Substitudes placeholders in the template with variables from the
         given dictionary.
-        
+
         Args:
             template (str): The (HTML) template.
             vars (Dict): The variables.
-            
+
         Returns:
             String with parsed template.
         """
         return str(Template(template).safe_substitute(**vars))
 
     def respond(self, opts: Dict[str, str]) -> None:
+        """Responds to an HTTP request.
+
+        Args:
+            opts (Dict): Status code, mime type, return data.
+        """
         self.send_response(opts.get('status'))
         self.send_header('Content-type', opts.get('mime'))
         self.end_headers()

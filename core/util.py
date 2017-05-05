@@ -27,7 +27,7 @@ import platform
 import socket
 
 import uptime
-import psutil
+#import psutil
 
 from core.version import *
 
@@ -38,15 +38,15 @@ class System(object):
     platform and system resources.
     """
 
-    @staticmethod
-    def get_cpu_load():
-        """Returns the current CPU load in percent. Please note, that calling
-        this method is blocking.
-
-        Returns:
-            Float with the CPU load (between 0.0 and 100.0).
-        """
-        return psutil.cpu_percent(interval=0.1)
+#    @staticmethod
+#    def get_cpu_load():
+#        """Returns the current CPU load in percent. Please note, that calling
+#        this method is blocking.
+#
+#        Returns:
+#            Float with the CPU load (between 0.0 and 100.0).
+#        """
+#        return psutil.cpu_percent(interval=0.1)
 
     @staticmethod
     def get_host_name():
@@ -159,14 +159,14 @@ class System(object):
 
         return '{}d {}h {}m {}s'.format(d, h, m, s)
 
-    @staticmethod
-    def get_used_memory():
-        """Returns the currently used memory in percent.
-
-        Returns:
-            Memory currently in use (between 0.0 and 100.0).
-        """
-        return psutil.virtual_memory().percent
+#    @staticmethod
+#    def get_used_memory():
+#        """Returns the currently used memory in percent.
+#
+#        Returns:
+#            Memory currently in use (between 0.0 and 100.0).
+#        """
+#        return psutil.virtual_memory().percent
 
     @staticmethod
     def is_windows():

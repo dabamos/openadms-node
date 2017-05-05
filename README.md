@@ -11,8 +11,7 @@ and should run on Python 3.5 upwards. So far, it has been tested with CPython
 * Debian 9 (ARMv7)
 * Fedora 25 (x86-64)
 
-PyPy3.5 is currently not supported, due to incompatibilities with the `psutil`
-module.
+The PyPy3.5 interpreter can be used instead of CPython.
 
 The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.
@@ -23,7 +22,7 @@ To run OpenADMS, clone the branch and execute `openadms.py`:
 ```
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
-$ pip install -U -r requirements.txt
+$ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
@@ -31,12 +30,8 @@ Some additional modules are used by OpenADMS:
 
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
-* [psutil](https://pypi.python.org/pypi/psutil) (BSD-3-Clause)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause)
-
-On Linux, you need to install the development headers for Python 3 in order to
-build the module `psutil`.
 
 ## Message Broker
 The MQTT protocol is used for the internal and external message exchange in
