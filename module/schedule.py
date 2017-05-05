@@ -30,6 +30,7 @@ import time
 
 from datetime import datetime
 
+from core.observation import Observation
 from module.prototype import Prototype
 
 
@@ -258,7 +259,7 @@ class Job(object):
 
         # Create target, header, and payload in order to send the observation.
         target = self._port_name
-        header = {'type': 'observation'}
+        header = Observation.get_header()
         payload = obs_copy.data
 
         # Fire and forget the observation.

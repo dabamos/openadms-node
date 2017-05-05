@@ -35,6 +35,9 @@ Some additional modules are used by OpenADMS:
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause)
 
+On Linux, you need to install the development headers for Python 3 in order to
+build the module `psutil`.
+
 ## Message Broker
 The MQTT protocol is used for the internal and external message exchange in
 OpenADMS. An MQTT message broker, like [Eclipse Mosquitto](https://mosquitto.org/)
@@ -70,8 +73,6 @@ $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py
 ```
-
-On Linux, you need to install the development headers for Python 3.
 
 ## Licence
 OpenADMS is licenced under the [European Union Public

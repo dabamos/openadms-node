@@ -30,37 +30,37 @@
             <h4 id="system">System</h4>
             <div class="row">
                 <div class="full col-2"><strong>Host Name:</strong></div>
-                <div class="full col-3">{hostname}</div>
+                <div class="full col-3">$hostname</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Operating System:</strong></div>
-                <div class="full col-3">{system}</div>
+                <div class="full col-3">$system</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Software Version:</strong></div>
-                <div class="full col-3">{openadms_string}</div>
+                <div class="full col-3">$openadms_string</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Python Interpreter:</strong></div>
-                <div class="full col-3">{python_version}</div>
+                <div class="full col-3">$python_version</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Configuration File:</strong></div>
-                <div class="full col-3"><code>{config_file}</code></div>
+                <div class="full col-3"><code>$config_file</code></div>
             </div>
 
             <h4 id="statistics">Statistics</h4>
             <div class="row">
                 <div class="full col-2"><strong>Uptime:</strong></div>
-                <div class="full col-3">{uptime}</div>
+                <div class="full col-3">$uptime</div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>CPU Load:</strong></div>
-                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: {cpu_load}%"><span class="progress-text">{cpu_load}%</span></div></div></div>
+                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: $cpu_load%"><span class="progress-text">$cpu_load%</span></div></div></div>
             </div>
             <div class="row">
                 <div class="full col-2"><strong>Memory Used:</strong></div>
-                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: {mem_used}%"><span class="progress-text">{mem_used}%</span></div></div></div>
+                <div class="full col-3"><div class="progress"><div class="progress-bar info" style="width: $mem_used%"><span class="progress-text">$mem_used%</span></div></div></div>
             </div>
 
             <h4 id="modules">Modules</h4>
@@ -75,7 +75,7 @@
                     </tr>
                 </thead>
                 <tbody>
-{modules_list}
+$modules_list
                 </tbody>
             </table>
 
@@ -90,14 +90,14 @@
                     </tr>
                 </thead>
                 <tbody>
-{sensors_list}
+$sensors_list
                 </tbody>
             </table>
 
             <hr>
 
             <footer style="text-align: center;">
-                <small><a href="https://www.dabamos.de/">{openadms_string}</a><br>
+                <small><a href="https://www.dabamos.de/">$openadms_string</a><br>
                 Copyright &copy; 2017 Hochschule Neubrandenburg – University of Applied Sciences<br>
                 European Union Public Licence (EUPL) v.1.1.</small>
             </footer>

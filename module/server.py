@@ -30,6 +30,8 @@ from pathlib import Path
 from typing import *
 from urllib import parse
 
+from string import Template
+
 from core.util import System
 from module.prototype import Prototype
 
@@ -42,6 +44,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._sensor_manager = manager.sensor_manager
 
         self._root_dir = 'module/server'
+
         self._template = self.get_file_contents(
             self.get_complete_path('/index.html')
         )
@@ -125,7 +128,15 @@ class RequestHandler(BaseHTTPRequestHandler):
         return file_contents
 
     def get_index(self, template) -> str:
-        data = {
+        """Returns the index page of this module in HTML format.
+
+        Args:
+            template (str): The template.
+
+        Returns:
+            String with the parsed index page.
+        """
+        vars = {
             'config_file': self._config_manager.path,
             'cpu_load': round(System.get_cpu_load()),
             'hostname': System.get_host_name(),
@@ -139,60 +150,76 @@ class RequestHandler(BaseHTTPRequestHandler):
             'uptime': System.get_uptime_string()
         }
 
-        return template.format(**data)
+        return self.parse(template, vars)
 
     def get_modules_list(self) -> str:
-        template = ('<tr><td>{number}</td>'
-                    '<td><code>{module_name}</code></td>'
-                    '<td><code>{module_type}</code></td>'
-                    '<td><span style="color: {color}">{status}</span></td>'
-                    '<td><a href="/?module={module_name}&action='
-                    '{button_action}" class="btn {button_class} sml">'
-                    '{button_action}</a></td></tr>\n')
+        """Returns table rows with all modules of the current configuration in
+        HTML format. Rather quick and dirty with hard-coded template, but does
+        the job.
+
+        Returns:
+            String with modules as HTML table rows.
+        """
+        template = ('<tr><td>$number</td>'
+                    '<td><code>$module_name</code></td>'
+                    '<td><code>$module_type</code></td>'
+                    '<td><span style="color: $color">$status</span></td>'
+                    '<td><a href="/?module=$module_name&action='
+                    '$button_action" class="btn $button_class sml">'
+                    '$button_action</a></td></tr>\n')
         content = ''
-        i = 1
+        no = 0
 
         for module_name, module in self._module_manager.modules.items():
-            data = {
+            no += 1
+
+            vars = {
                 'module_name': module_name,
                 'module_type': module.worker.type,
-                'number': i
+                'number': no
             }
 
             if module.worker.is_running:
-                data['status'] = 'running'
-                data['color'] = '#52c652'
-                data['button_class'] = 'error'
-                data['button_action'] = 'stop'
+                vars['status'] = 'running'
+                vars['color'] = '#52c652'
+                vars['button_class'] = 'error'
+                vars['button_action'] = 'stop'
             else:
-                data['status'] = 'stopped'
-                data['color'] = '#e93f3c'
-                data['button_class'] = 'success'
-                data['button_action'] = 'start'
+                vars['status'] = 'stopped'
+                vars['color'] = '#e93f3c'
+                vars['button_class'] = 'success'
+                vars['button_action'] = 'start'
 
-            content += template.format(**data)
-            i += 1
+            content += self.parse(template, vars)
 
         return content
 
     def get_sensors_list(self) -> str:
-        template = ('<tr><td>{number}</td>'
-                    '<td><code>{sensor_name}</code></td>'
-                    '<td><code>{sensor_type}</code></td>'
-                    '<td>{sensor_description}</td></tr>\n')
+        """Returns table rows with all sensors of the current configuration in
+        HTML format. Rather quick and dirty with hard-coded template, but does
+        the job.
+        
+        Returns:
+            String with sensors as HTML table rows.
+        """
+        template = ('<tr><td>$number</td>'
+                    '<td><code>$sensor_name</code></td>'
+                    '<td><code>$sensor_type</code></td>'
+                    '<td>$sensor_description</td></tr>\n')
         content = ''
-        i = 1
+        no = 0
 
         for sensor_name, sensor in self._sensor_manager.sensors.items():
-            data = {
-                'number': i,
+            no += 1
+
+            vars = {
+                'number': no,
                 'sensor_name': sensor.name,
                 'sensor_type': sensor.type,
                 'sensor_description': sensor.description
             }
 
-            content += template.format(**data)
-            i += 1
+            content += self.parse(template, vars)
 
         return content
 
@@ -205,6 +232,19 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args) -> None:
         return
+
+    def parse(self, template: str, vars: Dict[str, str]) -> str:
+        """Substitudes placeholders in the template with variables from the
+        given dictionary.
+        
+        Args:
+            template (str): The (HTML) template.
+            vars (Dict): The variables.
+            
+        Returns:
+            String with parsed template.
+        """
+        return str(Template(template).safe_substitute(**vars))
 
     def respond(self, opts: Dict[str, str]) -> None:
         self.send_response(opts.get('status'))

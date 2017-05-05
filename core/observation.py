@@ -60,6 +60,25 @@ class Observation(object):
         else:
             self._data = data
 
+    @staticmethod
+    def create_response_set(type: str, unit: str, value: ResponseType) \
+            -> Dict[str, ResponseType]:
+        """Creates a response set containing type, unit, and value.
+
+        Args:
+            type (str): Type of the response (e.g., 'float').
+            unit (str): Unit of the response (e.g., 'm').
+            value (ResponseType): The value of the response (e.g., '17.53').
+
+        Returns:
+            Dictionary with type, unit, and value.
+        """
+        return {
+            'type': type,
+            'unit': unit,
+            'value': value
+        }
+
     def get(self, key: str, default=None) -> Any:
         """Returns the value to a given key.
 
@@ -71,6 +90,17 @@ class Observation(object):
             Single value from the observation data.
         """
         return self._data.get(key, default)
+
+    @staticmethod
+    def get_header() -> Dict[str, str]:
+        """Returns the header of an observation message.
+        
+        Returns:
+            Dictionary with header information.
+        """
+        return {
+            'type': 'observation'
+        }
 
     def get_response_type(self, name: str) -> str:
         """Returns the type of a given response set.
@@ -241,22 +271,3 @@ class Observation(object):
             data (Dict): The data set dictionary.
         """
         self._data = data
-
-    @staticmethod
-    def create_response_set(type: str, unit: str, value: ResponseType)\
-            -> Dict[str, ResponseType]:
-        """Creates a response set containing type, unit, and value.
-        
-        Args:
-            type (str): Type of the response (e.g., 'float').
-            unit (str): Unit of the response (e.g., 'm').
-            value (ResponseType): The value of the response (e.g., '17.53').
-            
-        Returns:
-            Dictionary with type, unit, and value.
-        """
-        return {
-            'type': type,
-            'unit': unit,
-            'value': value
-        }

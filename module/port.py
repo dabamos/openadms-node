@@ -41,6 +41,12 @@ from module.prototype import Prototype
 
 
 class BluetoothPort(Prototype):
+    """
+    BluetoothPort is used for RFCOMM serial communication. It initiates a
+    socket connection to a sensor by using the native Bluetooth support of
+    Python 3.3. At the moment, the class is not very useful and needs further
+    testing.
+    """
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
@@ -219,11 +225,11 @@ class SerialPort(Prototype):
                                                   .get(self.name)
         if self._config.get('mode') == 'passive':
             self._mode = ConnectionMode.PASSIVE
-            self._obs_prototype = None
+            self._obs_template = None
         else:
             self._mode = ConnectionMode.ACTIVE
 
-        self._thread = None
+        self._thread = None     # Thread for passive mode.
         self._serial = None     # Pyserial object.
         self._serial_port_config = None
         self._max_attempts = 1  # TODO: Move to configuration file.
@@ -232,75 +238,22 @@ class SerialPort(Prototype):
         # self.close()
         pass
 
-    def start(self):
-        if self._is_running:
-            return
-
-        self.logger.debug('Starting worker "{}" ...'.format(self._name))
-        self._is_running = True
-
-        if self.is_passive_mode():
-            self._thread = threading.Thread(target=self.run)
-            self._thread.daemon = True
-            self._thread.start()
-
-    def run(self):
-        if self.is_active_mode() or self._obs_prototype is None:
-            self.logger.warning('Not in passive mode')
-            return
-
-        while self._is_running:
-            if not self._serial:
-                self._create()
-
-            if self._serial is None:
-                self.logger.error('Could not access port "{}"'
-                                  .format(self._serial_port_config.port))
-                return
-
-            if not self._serial.is_open:
-                self.logger.info('Re-opening port "{}" ...'
-                                 .format(self._serial_port_config.port))
-                self._serial.open()
-                self._serial.reset_output_buffer()
-                self._serial.reset_input_buffer()
-
-            obs = copy.deepcopy(self._obs_prototype)
-            obs.set('portName', self.name)
-
-            response = ''
-            request_set = obs.get('requestSets').get('default')
-            timeout = request_set.get('timeout')
-
-            response_delimiter = None
-
-            if request_set.get('responseDelimiter'):
-                response_delimiter = request_set.get('responseDelimiter')
-
-            length = 0
-
-            if request_set.get('responseLength'):
-                length = request_set.get('responseLength')
-
-            response = self._read(eol=response_delimiter,
-                                  length=length,
-                                  timeout=timeout)
-
-            if response != '':
-                request_set['response'] = response
-                obs.set('timeStamp', time.time())
-                self._publish_observation(obs)
-
     def close(self):
         if self._serial:
             self.logger.info('Closing port "{}" ...'
                              .format(self._serial_port_config.port))
             self._serial.close()
 
+    def is_passive_mode(self):
+        if self._mode == ConnectionMode.PASSIVE:
+            return True
+        else:
+            return False
+
     def process_observation(self, obs):
         if self.is_passive_mode():
-            # Set observation prototype for passive mode.
-            self._obs_prototype = obs
+            # Set observation template for passive mode.
+            self._obs_template = obs
             return
 
         if not self._serial:
@@ -399,6 +352,59 @@ class SerialPort(Prototype):
 
         return obs
 
+    def run(self):
+        """Threaded method for passive mode. Reads incoming data from serial
+        port. Used for sensors which start streaming data without prior
+        request."""
+        if self.is_active_mode() or self._obs_template is None:
+            self.logger.warning('Module not in passive mode')
+            return
+
+        while self._is_running:
+            if not self._serial:
+                self._create()
+
+            if self._serial is None:
+                self.logger.error('Could not access port "{}"'
+                                  .format(self._serial_port_config.port))
+                return
+
+            if not self._serial.is_open:
+                self.logger.info('Re-opening port "{}" ...'
+                                 .format(self._serial_port_config.port))
+                self._serial.open()
+                self._serial.reset_output_buffer()
+                self._serial.reset_input_buffer()
+
+            obs = copy.deepcopy(self._obs_template)
+            obs.set('portName', self.name)
+
+            request_set = obs.get('requestSets').get('default')
+            timeout = request_set.get('timeout')
+            response_delimiter = request_set.get('responseDelimiter')
+            length = request_set.get('responseLength')
+
+            response = self._read(eol=response_delimiter,
+                                  length=length,
+                                  timeout=timeout)
+
+            if response != '':
+                request_set['response'] = response
+                obs.set('timeStamp', time.time())
+                self._publish_observation(obs)
+
+    def start(self):
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker "{}" ...'.format(self._name))
+        self._is_running = True
+
+        if self.is_passive_mode():
+            self._thread = threading.Thread(target=self.run)
+            self._thread.daemon = True
+            self._thread.start()
+
     def _get_port_config(self):
         if not self._config:
             self.logger.debug('No port "{}" defined in configuration'
@@ -440,7 +446,7 @@ class SerialPort(Prototype):
         """Reads from serial port."""
         response = ''
         start_time = time.time()
-        c = 0
+        c = 0                       # Character index.
 
         # Read from serial port until delimiter occurs.
         while True:
@@ -448,18 +454,18 @@ class SerialPort(Prototype):
                 rxd = self._serial.read(1).decode()
                 response += rxd
 
-                if not eol and length > 0:
+                if length and length > 0:
                     c += 1
 
                     if c == length - 1:
-                        c = 0
-                        return response
+                        break
 
-                # Did we get an end of line (e.g., '\r' or '\n')?
-                i = len(eol)
+                if eol:
+                    # Did we get an end of line (e.g., '\r' or '\n')?
+                    i = len(eol)
 
-                if len(response) >= len(eol) and response[-i:] == eol:
-                    break
+                    if len(response) >= len(eol) and response[-i:] == eol:
+                        break
             except UnicodeDecodeError:
                 self.logger.error('No sensor on port "{}"'
                                   .format(self._serial_port_config.port))
@@ -486,12 +492,6 @@ class SerialPort(Prototype):
 
     def is_active_mode(self):
         if self._mode == ConnectionMode.ACTIVE:
-            return True
-        else:
-            return False
-
-    def is_passive_mode(self):
-        if self._mode == ConnectionMode.PASSIVE:
             return True
         else:
             return False
