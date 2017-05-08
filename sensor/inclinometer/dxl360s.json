@@ -4,7 +4,7 @@
     "description": "Dual-axis level box with RS-232/Bluetooth interface.",
     "observations": {
         "default": {
-            "description": "Prototype observation for passive communication with sensor.",
+            "description": "Observation template for passive communication with sensor.",
             "requestSets": {
                 "default": {
                   "responsePattern": "X(?P<x>[+-]?\\d{4})Y(?P<y>[+-]?\\d{4})",
@@ -13,13 +13,13 @@
                   "timeout": 2.0
                 }
             },
-            "responseSet": {
+            "responseSets": {
                 "x": {
-                    "type": "integer",
+                    "type": "float",
                     "unit": "none"
                 },
                 "y": {
-                    "type": "integer",
+                    "type": "float",
                     "unit": "none"
                 }
             }
