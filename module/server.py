@@ -243,7 +243,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             True if argument exists, else false.
         """
         if len(query) > 0:
-            if query.get(name) and len(query.get(name) > 0):
+            if query.get(name) and len(query.get(name)) > 0:
                 return True
 
         return False
