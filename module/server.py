@@ -23,11 +23,14 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import os
+import logging
 
+from collections import deque
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
+from queue import Queue
 from string import Template
+from threading import Thread
 from typing import *
 from urllib import parse
 
@@ -35,15 +38,74 @@ from core.util import System
 from module.prototype import Prototype
 
 
+class RingBufferLogHandler(object):
+
+    def __init__(self, max_length):
+        self._buffer = RingBuffer(max_length)
+        self._queue = Queue(max_length)
+
+        self._handler = logging.handlers.QueueHandler(self._queue)
+        self._handler.setLevel(logging.INFO)
+
+        fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
+        formatter = logging.Formatter(fmt)
+        self._handler.setFormatter(formatter)
+
+        root = logging.getLogger()
+        root.addHandler(self._handler)
+
+        self._is_running = True
+        self._thread = Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+    def __del__(self):
+        self._is_running = False
+
+    def run(self):
+        while self._is_running:
+            log_record = self._queue.get()  # Blocking I/O.
+            s = '{} - {} - {}'.format(log_record.asctime,
+                                      log_record.levelname,
+                                      log_record.message)
+            self._buffer.append(s)
+
+    def get_buffer(self):
+        return self._buffer.to_string()
+
+
+class LocalControlServer(Prototype):
+
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
+        config = self._config_manager.get(self._name)
+
+        self._host = config.get('host')
+        self._port = config.get('port')
+
+        log_handler = RingBufferLogHandler(50)
+
+        def handler(*args):
+            RequestHandler(manager, log_handler, *args)
+
+        self._httpd = HTTPServer((self._host, self._port), handler)
+        self._httpd.serve_forever()
+
+    def __del__(self):
+        if self._httpd:
+            self._httpd.server_close()
+
+
 class RequestHandler(BaseHTTPRequestHandler):
 
-    def __init__(self, manager, *args):
+    def __init__(self, manager, log_handler, *args):
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
 
-        self._root_dir = 'module/server'
+        self._log_handler = log_handler
 
+        self._root_dir = 'module/server'
         self._template = self.get_file_contents(
             self.get_complete_path('/index.html')
         )
@@ -151,6 +213,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         vars = {
             'config_file': self._config_manager.path,
             'hostname': System.get_host_name(),
+            'log': self._log_handler.get_buffer(),
             'modules_list': self.get_modules_list(),
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
@@ -278,20 +341,19 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(response)
 
 
-class LocalControlServer(Prototype):
+class RingBuffer(object):
 
-    def __init__(self, name, type, manager):
-        Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+    def __init__(self, max_length):
+        self._deque = deque(maxlen=max_length)
 
-        self._host = config.get('host')
-        self._port = config.get('port')
+    def append(self, x):
+        self._deque.append(x)
 
-        def handler(*args): RequestHandler(manager, *args)
+    def pop(self):
+        return self._deque.popleft()
 
-        self._httpd = HTTPServer((self._host, self._port), handler)
-        self._httpd.serve_forever()
+    def get(self):
+        return list(self._deque)
 
-    def __del__(self):
-        if self._httpd:
-            self._httpd.server_close()
+    def to_string(self):
+        return '\n'.join(self.get())
