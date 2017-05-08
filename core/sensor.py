@@ -57,15 +57,23 @@ class Sensor(object):
         # Character '\' is escaped in the JSON configuration file. Encoded
         # bytes have to be decoded.
         for set_name, request_set in data.get('requestSets').items():
-            request_set['request'] = codecs.decode(
-                request_set['request'],
-                'unicode_escape')
-            request_set['responseDelimiter'] = codecs.decode(
-                request_set['responseDelimiter'],
-                'unicode_escape')
-            request_set['responsePattern'] = codecs.decode(
-                request_set['responsePattern'],
-                'unicode_escape')
+            if request_set.get('request'):
+                request_set['request'] = codecs.decode(
+                        request_set.get('request'),
+                        'unicode_escape'
+                )
+
+            if request_set.get('responseDelimiter'):
+                request_set['responseDelimiter'] = codecs.decode(
+                        request_set.get('responseDelimiter'),
+                        'unicode_escape'
+                )
+
+            if request_set.get('responsePattern'):
+                request_set['responsePattern'] = codecs.decode(
+                        request_set.get('responsePattern'),
+                        'unicode_escape'
+                )
 
         return Observation(data)
 

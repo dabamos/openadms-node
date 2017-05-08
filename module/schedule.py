@@ -96,10 +96,8 @@ class Scheduler(Prototype):
         """Threaded method to process the jobs queue."""
         zombies = []
 
-        # Wait until we have a communication uplink to the messenger.
-        while not self._uplink:
-            self.logger.debug('Waiting for uplink ...')
-            time.sleep(1.0)
+        # Wait for uplink.
+        time.sleep(1.0)
 
         while self.is_running:
             t1 = time.time()
