@@ -152,18 +152,18 @@ class System(object):
         Returns:
             String with the uptime.
         """
-        s = '{}d {}h {}m {}s'
+        uptime = '{}d {}h {}m {}s'
 
         if not System.get_uptime():
             # Doesn't work with PyPy3.5 v5.7.1.
-            return s.format(0, 0, 0, 0)
+            return uptime.format(0, 0, 0, 0)
 
         u = int(System.get_uptime())
         m, s = divmod(u, 60)
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
 
-        return s.format(d, h, m, s)
+        return uptime.format(d, h, m, s)
 
 #    @staticmethod
 #    def get_used_memory():
