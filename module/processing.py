@@ -277,3 +277,65 @@ class ReturnCodeInspector(Prototype):
             return obs
 
         return obs
+
+
+class UnitConverter(Prototype):
+    """
+    UnitConverter can be used to convert response values of arbitrary
+    observations. For instance, a response in centimeters can be converted to
+    meters by setting a scale factor.
+    """
+
+    def __init__(self, name, type, manager):
+        Prototype.__init__(self, name, type, manager)
+        config = self._config_manager.get(self._name)
+        self._conversion_table = config.get('conversionTable')
+
+    def process_observation(self, obs):
+        for name, entry in self._conversion_table.items():
+            response_set = obs.get('responseSets').get(name)
+
+            if not response_set:
+                continue
+
+            src_value = response_set.get('value')
+            src_unit = response_set.get('unit')
+
+            if not src_value or not src_unit:
+                continue
+
+            if src_unit != entry.get('sourceUnit'):
+                continue
+
+            if entry.get('conversionType') == 'scale':
+                dgn_value = self._scale(float(src_value),
+                                        entry.get('scalingValue'))
+                dgn_unit = entry.get('designatedUnit')
+
+                self.logger.debug('Converted response "{}" of observation "{}" '
+                                  'with ID "{}" from {:.4f} {} to {:.4f} {}'
+                                  .format(name,
+                                          obs.get('name'),
+                                          obs.get('id'),
+                                          src_value,
+                                          src_unit,
+                                          dgn_value,
+                                          dgn_unit))
+
+                response_set['value'] = dgn_value
+                response_set['unit'] = dgn_unit
+                response_set['type'] = 'float'
+
+        return obs
+
+    def _scale(self, value: float, factor: float) -> float:
+        """Scales value by factor.
+        
+        Args:
+            value (float): Value to scale.
+            factor (float): scaling factor.
+            
+        Returns:
+            Scaled value.
+        """
+        return value * factor
