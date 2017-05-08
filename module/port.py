@@ -223,11 +223,9 @@ class SerialPort(Prototype):
         self._config = self._config_manager.config.get('ports')\
                                                   .get('serial')\
                                                   .get(self.name)
-        if self._config.get('mode') == 'passive':
-            self._mode = ConnectionMode.PASSIVE
-            self._obs_template = None
-        else:
-            self._mode = ConnectionMode.ACTIVE
+
+        self._is_passive = self._config.get('passive')
+        self._obs_template = None
 
         self._thread = None     # Thread for passive mode.
         self._serial = None     # Pyserial object.
@@ -246,14 +244,8 @@ class SerialPort(Prototype):
                              .format(self._serial_port_config.port))
             self._serial.close()
 
-    def is_passive_mode(self):
-        if self._mode == ConnectionMode.PASSIVE:
-            return True
-        else:
-            return False
-
     def process_observation(self, obs):
-        if self.is_passive_mode():
+        if self.is_passive:
             # Set observation template for passive mode.
             self._obs_template = obs
             return
@@ -358,8 +350,8 @@ class SerialPort(Prototype):
         """Threaded method for passive mode. Reads incoming data from serial
         port. Used for sensors which start streaming data without prior
         request."""
-        if self.is_active_mode():
-            self.logger.warning('Module not in passive mode')
+        if not self.is_passive:
+            self.logger.warning('Serial port not in passive mode')
             return
 
         while self._is_running:
@@ -395,9 +387,13 @@ class SerialPort(Prototype):
                                   timeout=timeout)
 
             if response != '':
+                self.logger.debug('Received "{}" from sensor "{}" on port "{}"'
+                                  .format(self._sanitize(response),
+                                          obs.get('sensorName'),
+                                          self._name))
                 default['response'] = response
                 obs.set('timeStamp', time.time())
-                self._publish_observation(obs)
+                self.publish_observation(obs)
 
     def start(self):
         if self._is_running:
@@ -406,7 +402,7 @@ class SerialPort(Prototype):
         self.logger.debug('Starting worker "{}" ...'.format(self._name))
         self._is_running = True
 
-        if self.is_passive_mode():
+        if self.is_passive:
             self._thread = threading.Thread(target=self.run)
             self._thread.daemon = True
             self._thread.start()
@@ -464,7 +460,7 @@ class SerialPort(Prototype):
                 if length and length > 0:
                     c += 1
 
-                    if c == length - 1:
+                    if c == length:
                         break
 
                 if eol and len(eol) > 0:
@@ -497,11 +493,10 @@ class SerialPort(Prototype):
         """Sends command to sensor."""
         self._serial.write(data.encode())
 
-    def is_active_mode(self):
-        if self._mode == ConnectionMode.ACTIVE:
-            return True
-        else:
-            return False
+    @property
+    def is_passive(self):
+        """Returns whether or not the port is in passive mode."""
+        return self._is_passive
 
 
 class SerialPortConfiguration(object):
