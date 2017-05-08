@@ -28,6 +28,7 @@ __license__ = 'EUPL'
 
 import re
 
+from core.observation import Observation
 from module.prototype import Prototype
 
 
@@ -305,6 +306,13 @@ class UnitConverter(Prototype):
                 continue
 
             if src_unit != entry.get('sourceUnit'):
+                self.logger.warning('Unit "{}" of response "{}" of observation '
+                                    '"{}" with ID "{}" does not match "{}"'
+                                    .format(src_unit,
+                                            name,
+                                            obs.get('name'),
+                                            obs.get('id'),
+                                            entry.get('sourceUnit')))
                 continue
 
             if entry.get('conversionType') == 'scale':
@@ -322,9 +330,13 @@ class UnitConverter(Prototype):
                                           dgn_value,
                                           dgn_unit))
 
-                response_set['value'] = dgn_value
-                response_set['unit'] = dgn_unit
-                response_set['type'] = 'float'
+                response_set = Observation.create_response_set(
+                    'float',
+                    dgn_unit,
+                    round(dgn_value, 5)
+                )
+
+                obs.data['responseSets'][name] = response_set
 
         return obs
 
