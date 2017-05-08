@@ -155,8 +155,8 @@ if __name__ == '__main__':
                       help='print debug messages',
                       default=False)
 
-    parser.add_option('-f', '--force-colored-log',
-                      dest='is_colored_log',
+    parser.add_option('-f', '--force-colored-output',
+                      dest='is_colored_output',
                       action='store_true',
                       help='force colored output of log messages',
                       default=False)
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     # Add handler to logger.
     logger.addHandler(fh)
 
-    if not System.is_windows() or options.is_colored_log:
+    if not System.is_windows() or options.is_colored_output:
         # Colored logging on Linux/Unix only.
         date_fmt = '%Y-%m-%dT%H:%M:%S'
         coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)

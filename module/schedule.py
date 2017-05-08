@@ -96,8 +96,8 @@ class Scheduler(Prototype):
         """Threaded method to process the jobs queue."""
         zombies = []
 
-        # Wait for uplink.
-        time.sleep(1.0)
+        # Wait for uplink connection.
+        time.sleep(5.0)
 
         while self.is_running:
             t1 = time.time()

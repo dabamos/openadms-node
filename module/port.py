@@ -356,8 +356,8 @@ class SerialPort(Prototype):
 
         while self._is_running:
             if self._obs_template is None:
-                self.logger.warning('No observation template set')
-                time.sleep(1)
+                self.logger.debug('No observation template set')
+                time.sleep(1.0)
                 continue
 
             if not self._serial:

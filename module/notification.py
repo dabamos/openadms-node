@@ -53,7 +53,7 @@ class Alert(Prototype):
 
         self._is_enabled = config.get('enabled')
         self._thread = None
-        self._queue = queue.Queue(-1)
+        self._queue = queue.Queue(1000)
 
         # Add logging handler to the root logger.
         qh = logging.handlers.QueueHandler(self._queue)
