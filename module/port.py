@@ -34,7 +34,7 @@ import serial
 from enum import Enum
 
 from core.observation import Observation
-from core.util import System
+from core.system import System
 from module.prototype import Prototype
 
 """Module for sensor communication."""
@@ -225,7 +225,7 @@ class SerialPort(Prototype):
                                                   .get(self.name)
 
         self._is_passive = self._config.get('passive')
-        self._obs_template = None
+        self._obs_draft = None
 
         self._thread = None     # Thread for passive mode.
         self._serial = None     # Pyserial object.
@@ -247,7 +247,7 @@ class SerialPort(Prototype):
     def process_observation(self, obs):
         if self.is_passive:
             # Set observation template for passive mode.
-            self._obs_template = obs
+            self._obs_draft = obs
             return
 
         if not self._serial:
@@ -355,8 +355,8 @@ class SerialPort(Prototype):
             return
 
         while self._is_running:
-            if self._obs_template is None:
-                self.logger.debug('No observation template set')
+            if self._obs_draft is None:
+                self.logger.debug('No observation draft set')
                 time.sleep(1.0)
                 continue
 
@@ -374,13 +374,13 @@ class SerialPort(Prototype):
                 self._serial.open()
                 self._serial.reset_input_buffer()
 
-            obs = copy.deepcopy(self._obs_template)
+            obs = copy.deepcopy(self._obs_draft)
             obs.set('portName', self.name)
 
-            default = obs.get('requestSets').get('default')
-            timeout = default.get('timeout')
-            response_delimiter = default.get('responseDelimiter')
-            length = default.get('responseLength')
+            draft = obs.get('requestSets').get('draft')
+            timeout = draft.get('timeout')
+            response_delimiter = draft.get('responseDelimiter')
+            length = draft.get('responseLength')
 
             response = self._read(eol=response_delimiter,
                                   length=length,
@@ -391,7 +391,7 @@ class SerialPort(Prototype):
                                   .format(self._sanitize(response),
                                           obs.get('sensorName'),
                                           self._name))
-                default['response'] = response
+                draft['response'] = response
                 obs.set('timeStamp', time.time())
                 self.publish_observation(obs)
 
