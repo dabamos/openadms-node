@@ -25,7 +25,6 @@ __license__ = 'EUPL'
 
 import logging
 
-from collections import deque
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from queue import Queue
@@ -34,44 +33,9 @@ from threading import Thread
 from typing import *
 from urllib import parse
 
-from core.util import System
+from core.logging import RingBufferLogHandler
+from core.system import System
 from module.prototype import Prototype
-
-
-class RingBufferLogHandler(object):
-
-    def __init__(self, max_length):
-        self._buffer = RingBuffer(max_length)
-        self._queue = Queue(max_length)
-
-        self._handler = logging.handlers.QueueHandler(self._queue)
-        self._handler.setLevel(logging.INFO)
-
-        fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
-        formatter = logging.Formatter(fmt)
-        self._handler.setFormatter(formatter)
-
-        root = logging.getLogger()
-        root.addHandler(self._handler)
-
-        self._is_running = True
-        self._thread = Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
-    def __del__(self):
-        self._is_running = False
-
-    def run(self):
-        while self._is_running:
-            log_record = self._queue.get()  # Blocking I/O.
-            s = '{} - {} - {}'.format(log_record.asctime,
-                                      log_record.levelname,
-                                      log_record.message)
-            self._buffer.append(s)
-
-    def get_buffer(self):
-        return self._buffer.to_string()
 
 
 class LocalControlServer(Prototype):
@@ -213,19 +177,20 @@ class RequestHandler(BaseHTTPRequestHandler):
         vars = {
             'config_file': self._config_manager.path,
             'hostname': System.get_host_name(),
-            'log': self._log_handler.get_buffer(),
-            'modules_list': self.get_modules_list(),
+            'log': self._log_handler.get_logs(),
+            'log_size': self._log_handler.size,
+            'modules_table': self.get_modules_table(),
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
             'python_version': System.get_python_version(),
-            'sensors_list': self.get_sensors_list(),
+            'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
             'uptime': System.get_uptime_string()
         }
 
         return self.parse(template, vars)
 
-    def get_modules_list(self) -> str:
+    def get_modules_table(self) -> str:
         """Returns table rows with all modules of the current configuration in
         HTML format. Rather quick and dirty with hard-coded template, but does
         the job.
@@ -267,7 +232,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return content
 
-    def get_sensors_list(self) -> str:
+    def get_sensors_table(self) -> str:
         """Returns table rows with all sensors of the current configuration in
         HTML format. Rather quick and dirty with hard-coded template, but does
         the job.
@@ -296,7 +261,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return content
 
-    def _has_attribute(self, query, name):
+    def _has_attribute(self, query, name) -> bool:
         """Checks a GET query for a given argument.
 
         Args:
@@ -339,21 +304,3 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         response = bytes(opts.get('content'), 'UTF-8')
         self.wfile.write(response)
-
-
-class RingBuffer(object):
-
-    def __init__(self, max_length):
-        self._deque = deque(maxlen=max_length)
-
-    def append(self, x):
-        self._deque.append(x)
-
-    def pop(self):
-        return self._deque.popleft()
-
-    def get(self):
-        return list(self._deque)
-
-    def to_string(self):
-        return '\n'.join(self.get())
