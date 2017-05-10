@@ -320,15 +320,15 @@ class UnitConverter(Prototype):
                                         entry.get('scalingValue'))
                 dgn_unit = entry.get('designatedUnit')
 
-                self.logger.debug('Converted response "{}" of observation "{}" '
-                                  'with ID "{}" from {:.4f} {} to {:.4f} {}'
-                                  .format(name,
-                                          obs.get('name'),
-                                          obs.get('id'),
-                                          src_value,
-                                          src_unit,
-                                          dgn_value,
-                                          dgn_unit))
+                self.logger.info('Converted response "{}" of observation "{}" '
+                                 'with ID "{}" from {:.4f} {} to {:.4f} {}'
+                                 .format(name,
+                                         obs.get('name'),
+                                         obs.get('id'),
+                                         src_value,
+                                         src_unit,
+                                         dgn_value,
+                                         dgn_unit))
 
                 response_set = Observation.create_response_set(
                     'float',

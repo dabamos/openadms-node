@@ -77,7 +77,7 @@
                     </tr>
                 </thead>
                 <tbody>
-$modules_list
+$modules_table
                 </tbody>
             </table>
 
@@ -92,12 +92,13 @@ $modules_list
                     </tr>
                 </thead>
                 <tbody>
-$sensors_list
+$sensors_table
                 </tbody>
             </table>
 
             <h4 id="log">Log Messages</h4>
-            <textarea style="font-family: monospace; height: 15em; width: 100%;">$log</textarea>
+            <p>Last $log_size log messages:</p>
+            <code style="background-color: #5f5f5f; color: #ffffff; font-family: monospace; height: 25em; overflow: scroll; white-space: pre; width: 100%;">$log</code>
 
             <hr>
 
