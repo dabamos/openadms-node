@@ -3,10 +3,10 @@
     "type": "inclinometer",
     "description": "Dual-axis level box with RS-232/Bluetooth interface.",
     "observations": {
-        "default": {
+        "getXY": {
             "description": "Observation template for passive communication with sensor.",
             "requestSets": {
-                "default": {
+                "draft": {
                   "responsePattern": "X(?P<x>[+-]?\\d{4})Y(?P<y>[+-]?\\d{4})",
                   "responseDelimiter": "",
                   "responseLength": 12,
@@ -15,12 +15,12 @@
             },
             "responseSets": {
                 "x": {
-                    "type": "float",
-                    "unit": "none"
+                    "type": "int",
+                    "unit": "mdeg"
                 },
                 "y": {
-                    "type": "float",
-                    "unit": "none"
+                    "type": "int",
+                    "unit": "mdeg"
                 }
             }
         }
