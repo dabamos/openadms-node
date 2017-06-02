@@ -57,13 +57,22 @@ class RingBufferLogHandler(object):
     length.
     """
 
-    def __init__(self, size: int):
+    def __init__(self, size: int, log_level: int):
         self._size = size
         self._buffer = RingBuffer(self._size)
         self._queue = Queue(self._size)
 
         self._handler = logging.handlers.QueueHandler(self._queue)
-        self._handler.setLevel(logging.INFO)
+
+        level = {
+            1: logging.CRITICAL,
+            2: logging.ERROR,
+            3: logging.WARNING,
+            4: logging.INFO,
+            5: logging.DEBUG
+        }.get(log_level, 4)
+
+        self._handler.setLevel(level)
 
         fmt = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
         formatter = logging.Formatter(fmt)

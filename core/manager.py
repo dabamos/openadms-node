@@ -30,6 +30,7 @@ import json
 import logging
 import os
 
+from pathlib import Path
 from typing import *
 
 from core.intercom import MQTTMessenger
@@ -135,6 +136,7 @@ class ModuleManager(object):
 
     def __init__(self, manager):
         self.logger = logging.getLogger('moduleManager')
+
         self._manager = manager
         self._manager.module_manager = self
 
@@ -165,6 +167,10 @@ class ModuleManager(object):
     def get_modules_list(self):
         """Returns a list with all names of all modules."""
         return self._modules.keys()
+
+    def get_root_dir(self) -> Path:
+        """Returns the root directory of OpenADMS."""
+        return Path(__file__).parent.parent
 
     def get_worker(self, module_name, class_path):
         """Loads a Python class from a given path and returns the instance."""

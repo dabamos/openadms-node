@@ -47,7 +47,7 @@ class LocalControlServer(Prototype):
         self._host = config.get('host')
         self._port = config.get('port')
 
-        log_handler = RingBufferLogHandler(50)
+        log_handler = RingBufferLogHandler(size=50, log_level=4)
 
         def handler(*args):
             RequestHandler(manager, log_handler, *args)
@@ -183,6 +183,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
             'python_version': System.get_python_version(),
+            'root_dir': self._module_manager.get_root_dir(),
             'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
             'uptime': System.get_uptime_string()
