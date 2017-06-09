@@ -47,16 +47,45 @@ class LocalControlServer(Prototype):
         self._host = config.get('host')
         self._port = config.get('port')
 
+        # Thread for the HTTP server.
+        self._thread = Thread(target=self.run)
+        self._thread.daemon = True
+
+        # Store the last 50 log messages of level 4 ("INFO").
         log_handler = RingBufferLogHandler(size=50, log_level=4)
 
+        # Custom request handler of the HTTP server.
         def handler(*args):
             RequestHandler(manager, log_handler, *args)
 
         self._httpd = HTTPServer((self._host, self._port), handler)
-        self._httpd.serve_forever()
 
     def __del__(self):
         if self._httpd:
+            self._httpd.server_close()
+
+    def run(self):
+        """Runs HTTPServer within a thread to avoid blocking."""
+        self._httpd.serve_forever()
+
+    def start(self):
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker "{}" ...'
+                          .format(self._name))
+        self._is_running = True
+
+        # Run HTTP server in thread to avoid blocking.
+        self._thread.start()
+
+    def stop(self):
+        self.logger.debug('Stopping worker "{}" ...'
+                          .format(self._name))
+        self._is_running = False
+
+        if self._httpd:
+            # Close the HTTP server.
             self._httpd.server_close()
 
 
@@ -68,11 +97,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._sensor_manager = manager.sensor_manager
 
         self._log_handler = log_handler
-
         self._root_dir = 'module/server'
-        self._template = self.get_file_contents(
-            self.get_complete_path('/index.html')
-        )
+
+        index_file = self.get_complete_path('/index.html')
+        self._template = self.get_file_contents(index_file)
 
         BaseHTTPRequestHandler.__init__(self, *args)
 

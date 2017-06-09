@@ -153,14 +153,14 @@ class ModuleManager(object):
         messenger = MQTTMessenger(self._manager.config_manager)
         worker = self.get_worker(module_name, class_path)
 
+        self.logger.info('Loading module "{}" ...'.format(module_name))
         self._modules[module_name] = Module(messenger, worker)
-        self.logger.info('Loaded module "{}"'.format(module_name))
 
     def delete(self, module_name):
         """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
 
-    def get(self, name: str) -> Type[Module]:
+    def get(self, name: str):
         """Returns a specific module."""
         return self._modules.get(name)
 
