@@ -116,4 +116,16 @@ $sensors_table
 
     </body>
 
+    <script type="text/javascript">
+    <!--
+        var elems = document.getElementsByClassName('confirm');
+        var confirmIt = function (e) {
+            if (!confirm('Are you sure to stop this module?')) e.preventDefault();
+        };
+        for (var i = 0, l = elems.length; i < l; i++) {
+            elems[i].addEventListener('click', confirmIt, false);
+        }
+    //-->
+    </script>
+
 </html>
