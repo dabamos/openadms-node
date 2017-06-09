@@ -232,8 +232,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                     '<td><code>$module_type</code></td>'
                     '<td><span style="color: $color">$status</span></td>'
                     '<td><a href="/?module=$module_name&action='
-                    '$button_action" class="btn $button_class sml">'
-                    '$button_action</a></td></tr>\n')
+                    '$button_action" class="btn $button_class sml"'
+                    'onclick="return confirm(\'Are you sure to stop module '
+                    '$module_name?\')">$button_action</a></td></tr>\n')
         content = ''
         number = 0
 
