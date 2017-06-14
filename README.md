@@ -18,7 +18,7 @@ The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.
 
 ## Installation
-To run OpenADMS, clone the branch and execute `openadms.py`:
+To run OpenADMS, clone the master branch and execute `openadms.py`:
 
 ```
 $ git clone https://github.com/dabamos/openadms.git
@@ -29,6 +29,7 @@ $ python3 openadms.py --config ./config/myconfig.json --debug
 
 Some additional modules are used by OpenADMS:
 
+* [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
@@ -38,7 +39,13 @@ Some additional modules are used by OpenADMS:
 The MQTT protocol is used for the internal and external message exchange in
 OpenADMS. An MQTT message broker, like [Eclipse Mosquitto](https://mosquitto.org/)
 or [HBMQTT](https://github.com/beerfactory/hbmqtt), must be installed and
-running before starting OpenADMS.
+running before starting OpenADMS. To install HBMQTT, run:
+
+```
+$ python3 -m pip install hbmqtt
+```
+
+The message broker can be started simply with `hbmqtt`.
 
 For testing only, the public sandbox broker of
 [Eclipse IoT](https://iot.eclipse.org/getting-started) can be used. The server
@@ -50,7 +57,7 @@ using the hostname `iot.eclipse.org` and port `1883`. For encryption, use port
 The configuration of OpenADMS is done by using a JSON-based text file, located
 in the directory `./config`. Please define modules, serial ports, sensors, and
 so on there. OpenADMS takes the file name of your custom configuration as an
-argument. Run:
+argument. For instance, run:
 
 ```
 $ python3 openadms.py --config ./config/myconfig.json --debug
