@@ -204,6 +204,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         vars = {
             'config_file': self._config_manager.path,
+            'datetime': System.get_date_time(),
             'hostname': System.get_host_name(),
             'log': self._log_handler.get_logs(),
             'log_size': self._log_handler.size,
@@ -214,7 +215,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             'root_dir': self._module_manager.get_root_dir(),
             'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
-            'uptime': System.get_uptime_string()
+            'uptime': System.get_uptime_string(),
+            'year': System.get_current_year()
         }
 
         return self.parse(template, vars)

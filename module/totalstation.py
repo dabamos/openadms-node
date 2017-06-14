@@ -229,7 +229,7 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if humidity is not None:
-            self.logger.info('Updated humidity to {}'
+            self.logger.info('Updated humidity to {} %'
                              .format(round(humidity, 2)))
 
     @last_update.setter

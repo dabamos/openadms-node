@@ -20,11 +20,11 @@
 
             <div class="breadcrumbs">
                 <ol>
-                    <li><a href="/#system">System</a></li>
-                    <li><a href="/#statistics">Statistics</a></li>
-                    <li><a href="/#modules">Modules</a></li>
-                    <li><a href="/#sensors">Sensors</a></li>
-                    <li><a href="/#log">Log Messages</a></li>
+                    <li><a href="#system">System</a></li>
+                    <li><a href="#statistics">Statistics</a></li>
+                    <li><a href="#modules">Modules</a></li>
+                    <li><a href="#sensors">Sensors</a></li>
+                    <li><a href="#log">Log Messages</a></li>
                 </ol>
             </div>
 
@@ -53,10 +53,14 @@
                 <div class="full col-2"><strong>Configuration File:</strong></div>
                 <div class="full col-3"><code>$config_file</code></div>
             </div>
+            <div class="row">
+                <div class="full col-2"><strong>Local Date &amp; Time:</strong></div>
+                <div class="full col-3">$datetime</div>
+            </div>
 
             <h4 id="statistics">Statistics</h4>
             <div class="row">
-                <div class="full col-2"><strong>Uptime:</strong></div>
+                <div class="full col-2"><strong>System Uptime:</strong></div>
                 <div class="full col-3">$uptime</div>
             </div>
 <!--
@@ -108,7 +112,7 @@ $sensors_table
 
             <footer style="text-align: center;">
                 <small><a href="https://www.dabamos.de/">$openadms_string</a><br>
-                Copyright &copy; 2017 Hochschule Neubrandenburg – University of Applied Sciences<br>
+                Copyright &copy; $year Hochschule Neubrandenburg – University of Applied Sciences<br>
                 European Union Public Licence (EUPL) v.1.1.</small>
             </footer>
 
@@ -120,7 +124,8 @@ $sensors_table
     <!--
         var elems = document.getElementsByClassName('confirm');
         var confirmIt = function (e) {
-            if (!confirm('Are you sure to stop this module?')) e.preventDefault();
+            if (!confirm('Are you sure to stop this module?'))
+                e.preventDefault();
         };
         for (var i = 0, l = elems.length; i < l; i++) {
             elems[i].addEventListener('click', confirmIt, false);

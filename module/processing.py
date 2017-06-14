@@ -342,11 +342,11 @@ class UnitConverter(Prototype):
 
     def _scale(self, value: float, factor: float) -> float:
         """Scales value by factor.
-        
+
         Args:
             value (float): Value to scale.
-            factor (float): scaling factor.
-            
+            factor (float): Scaling factor.
+
         Returns:
             Scaled value.
         """
