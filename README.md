@@ -2,8 +2,7 @@
 
 OpenADMS is an open source automatic deformation monitoring system for
 geodetical and geotechnical observations. The software is written in Python 3
-and should run on Python 3.5 upwards. So far, it has been tested with CPython
-3.5/3.6 on:
+and has been tested on:
 
 * Windows 7 (x86, x86-64)
 * FreeBSD 11 (x86-64, ARMv7)
@@ -11,8 +10,7 @@ and should run on Python 3.5 upwards. So far, it has been tested with CPython
 * Debian 9 (ARMv7)
 * Fedora 25 (x86-64)
 
-Instead of CPython, a recent PyPy3.5 interpreter can be used with smaller
-restrictions.
+OpenADMS can either be used with CPython 3.6 or PyPy3.5.
 
 The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.
