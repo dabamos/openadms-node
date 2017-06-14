@@ -173,15 +173,15 @@ class PreProcessor(Prototype):
 class ReturnCodes(object):
     """
     ReturnCodes stores a dictionary of return codes of sensors of Leica
-    Geosystems. The dictionary is server and has the following structure:
+    Geosystems. The dictionary is static and has the following structure:
 
         {
             return code: [ log level, retry measurement, log message ]
         }
 
-    The return code numbers and messages are take from the GeoCOM reference
-    manual of the Leica TPS 1200, TS 30, and TM 30 total stations. The log
-    level can be set to these values:
+    The return code numbers and messages are take from the official GeoCOM
+    reference manual of the Leica TPS1200, TS30, and TM30 total stations. The
+    log level can be set to these values:
 
         5: CRITICAL,
         4: ERROR,
