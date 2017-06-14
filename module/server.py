@@ -156,10 +156,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         module = self._module_manager.get(module_name)
 
         if action_value == 'stop' and module.worker.is_running:
-            module.worker.stop()
+            module.stop_worker()
 
         if action_value == 'start' and not module.worker.is_running:
-            module.worker.start()
+            module.start_worker()
 
     def get_404(self) -> str:
         """Returns a file not found page (error 404).

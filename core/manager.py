@@ -197,12 +197,12 @@ class ModuleManager(object):
         else:
             return False
 
-    def start(self, name: str) -> None:
-        self._modules.get(name).start()         # Start the module thread.
-        self._modules.get(name).start_worker()  # Let worker run.
+    def start(self, module_name: str):
+        self._modules.get(module_name).start()
+        self._modules.get(module_name).start_worker()
 
-    def stop(self, name: str) -> None:
-        self._modules.get(name).stop_worker()
+    def stop(self, module_name: str):
+        self._modules.get(module_name).stop_worker()
 
     @property
     def modules(self) -> Dict:
