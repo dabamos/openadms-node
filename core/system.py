@@ -26,6 +26,7 @@ __license__ = 'EUPL'
 import platform
 import socket
 
+import arrow
 import uptime
 #import psutil
 
@@ -47,6 +48,15 @@ class System(object):
 #            Float with the CPU load (between 0.0 and 100.0).
 #        """
 #        return psutil.cpu_percent(interval=0.1)
+
+    @staticmethod
+    def get_date_time():
+        """Returns local date and time.
+
+        Returns:
+            String containing date and time.
+        """
+        return arrow.now().format()
 
     @staticmethod
     def get_host_name():
@@ -164,6 +174,15 @@ class System(object):
         d, h = divmod(h, 24)
 
         return uptime.format(d, h, m, s)
+
+    @staticmethod
+    def get_current_year():
+        """Returns the current year.
+
+        Returns:
+            Current year.
+        """
+        return arrow.now().year
 
 #    @staticmethod
 #    def get_used_memory():
