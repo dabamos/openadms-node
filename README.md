@@ -31,7 +31,7 @@ Some additional modules are used by OpenADMS:
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
-* [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause)
+* [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
 
 ## Message Broker
 The MQTT protocol is used for the internal and external message exchange in
