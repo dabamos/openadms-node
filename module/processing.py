@@ -290,10 +290,10 @@ class UnitConverter(Prototype):
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
-        self._conversion_table = config.get('conversionTable')
+        self._conversions = config.get('conversions')
 
     def process_observation(self, obs):
-        for name, entry in self._conversion_table.items():
+        for name, conversion in self._conversions.items():
             response_set = obs.get('responseSets').get(name)
 
             if not response_set:
@@ -305,20 +305,20 @@ class UnitConverter(Prototype):
             if not src_value or not src_unit:
                 continue
 
-            if src_unit != entry.get('sourceUnit'):
+            if src_unit != conversion.get('sourceUnit'):
                 self.logger.warning('Unit "{}" of response "{}" of observation '
                                     '"{}" with ID "{}" does not match "{}"'
                                     .format(src_unit,
                                             name,
                                             obs.get('name'),
                                             obs.get('id'),
-                                            entry.get('sourceUnit')))
+                                            conversion.get('sourceUnit')))
                 continue
 
-            if entry.get('conversionType') == 'scale':
+            if conversion.get('conversionType') == 'scale':
                 dgn_value = self._scale(float(src_value),
-                                        entry.get('scalingValue'))
-                dgn_unit = entry.get('designatedUnit')
+                                        conversion.get('scalingValue'))
+                dgn_unit = conversion.get('designatedUnit')
 
                 self.logger.info('Converted response "{}" of observation "{}" '
                                  'with ID "{}" from {:.4f} {} to {:.4f} {}'
