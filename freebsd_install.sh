@@ -11,6 +11,8 @@ create_dirs() {
 
 copy_files() {
   cp -r . $OPENADMS_PATH
+  rm -r $OPENADMS_PATH/config
+  rm -r $OPENADMS_PATH/data
   chown -R $OPENADMS_USER $OPENADMS_PATH
 
   cp -r ./config/ $OPENADMS_CONFIG_PATH
