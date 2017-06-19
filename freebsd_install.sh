@@ -51,5 +51,5 @@ copy_rc
 echo "100"
 echo "XXX"; echo "Done." ; echo "XXX"; sleep 2
 ) |
-$DIALOG --title "Installation of OpenADMS" --gauge "Please wait ...." 8 60
+$DIALOG --title "Installation of OpenADMS" --gauge "Please wait ..." 8 60
 $DIALOG --clear

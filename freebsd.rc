@@ -17,8 +17,6 @@ load_rc_config $name
 : ${openadms_log="/tmp/openadms.log"}
 
 pidfile="/var/run/${name}.pid"
-procname="/usr/local/sbin/${name}/${name}.py"
-
 command="python3.6 ${openadms_path}"
 command_args="--config ${openadms_config} --log ${openadms_log}"
 
