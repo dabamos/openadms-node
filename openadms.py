@@ -60,7 +60,6 @@ from core.system import System
 # Get root logger.
 logger = logging.getLogger()
 
-LOG_FILE = 'openadms.log'
 LOG_FILE_BACKUP_COUNT = 1
 MAX_LOG_FILE_SIZE = 10485760  # 10 MB.
 
@@ -139,7 +138,7 @@ if __name__ == '__main__':
                       dest='config_file',
                       action='store',
                       type='string',
-                      help='path to the configuration file',
+                      help='path to configuration file',
                       default='config/config.json')
 
     parser.add_option('-v', '--verbosity',
@@ -155,11 +154,18 @@ if __name__ == '__main__':
                       help='print debug messages',
                       default=False)
 
-    parser.add_option('-f', '--force-colored-output',
-                      dest='is_colored_output',
+    parser.add_option('-G', '--colorized',
+                      dest='is_colorized',
                       action='store_true',
-                      help='force colored output of log messages',
+                      help='force colorized output',
                       default=False)
+
+    parser.add_option('-l', '--log-file',
+                      dest='log_file',
+                      action='store',
+                      type='string',
+                      help='path to log file',
+                      default='openadms.log')
 
     (options, args) = parser.parse_args()
 
@@ -179,7 +185,7 @@ if __name__ == '__main__':
         5: logging.DEBUG
     }.get(options.verbosity, 3)
 
-    fh = logging.handlers.RotatingFileHandler(LOG_FILE,
+    fh = logging.handlers.RotatingFileHandler(options.log_file,
                                               maxBytes=MAX_LOG_FILE_SIZE,
                                               backupCount=LOG_FILE_BACKUP_COUNT,
                                               encoding='utf8')
@@ -189,12 +195,12 @@ if __name__ == '__main__':
     # Add handler to logger.
     logger.addHandler(fh)
 
-    if not System.is_windows() or options.is_colored_output:
-        # Colored logging on Linux/Unix only.
+    if not System.is_windows() or options.is_colorized:
+        # Colorized output of log messages on Linux/Unix.
         date_fmt = '%Y-%m-%dT%H:%M:%S'
         coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
     else:
-        # Standard output on Windows.
+        # Standard output on Microsoft Windows.
         sh = logging.StreamHandler()
         sh.setFormatter(formatter)
         logger.addHandler(sh)
