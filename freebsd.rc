@@ -1,0 +1,45 @@
+#!/bin/sh
+
+# PROVIDE: openadms
+# REQUIRE: networking mosquitto
+# KEYWORD:
+
+. /etc/rc.subr
+
+name="openadms"
+rcvar="openadms_enable"
+
+load_rc_config $name
+: ${openadms_enable:=no}
+: ${openadms_user="openadms"}
+: ${openadms_path="/usr/local/sbin/openadms/openadms.py"}
+: ${openadms_config="/usr/local/sbin/openadms/config/openadms.json"}
+: ${openadms_log="/tmp/openadms.log"}
+
+pidfile="/var/run/${name}.pid"
+procname="/usr/local/sbin/${name}/${name}.py"
+
+command="python3.6 ${openadms_path}"
+command_args="--config ${openadms_config} --log ${openadms_log}"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+
+openadms_start() {
+    touch ${pidfile}
+    chown ${openadms_user} ${pidfile}
+    echo $$ > ${pidfile}
+
+    echo "Starting OpenADMS."
+    /usr/sbin/daemon -f -p ${pidfile} -u ${openadms_user} ${command} ${command_args}
+}
+
+openadms_stop() {
+    echo "Stopping OpenADMS."
+    pid=`cat ${pidfile}`
+    echo "Waiting for PID: ${pid}."
+    kill ${pid}
+    rm ${pidfile}
+}
+
+run_rc_command "$1"
