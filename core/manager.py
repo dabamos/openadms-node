@@ -25,11 +25,10 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import importlib
 import json
 import logging
-import os
 
+from importlib import *
 from pathlib import Path
 from typing import *
 
@@ -87,7 +86,7 @@ class ConfigManager(object):
 
     def load(self, config_path: str) -> bool:
         """Loads configuration from JSON file."""
-        if not os.path.exists(config_path):
+        if not Path(config_path).exists():
             self.logger.error('Configuration file "{}" not found.'
                               .format(config_path))
             return False
@@ -151,7 +150,11 @@ class ModuleManager(object):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary."""
         messenger = MQTTMessenger(self._manager.config_manager)
-        worker = self.get_worker(module_name, class_path)
+
+        if self.module_exists(class_path):
+            worker = self.get_worker(module_name, class_path)
+        else:
+            self.logger.error('Module "{}" not found'.format(class_path))
 
         self.logger.info('Loading module "{}" ...'.format(module_name))
         self._modules[module_name] = Module(messenger, worker)
@@ -175,14 +178,10 @@ class ModuleManager(object):
     def get_worker(self, module_name, class_path):
         """Loads a Python class from a given path and returns the instance."""
         module_path, class_name = class_path.rsplit('.', 1)
-        file_path = module_path.replace('.', '/') + '.py'
-
-        if not os.path.isfile(file_path):
-            self.logger.error('File "{}" not found'.format(file_path))
-            return
+        file_path = './' + module_path.replace('.', '/') + '.py'
 
         try:
-            worker_class = getattr(importlib.import_module(module_path),
+            worker_class = getattr(import_module(module_path),
                                    class_name)
             worker = worker_class(module_name, class_path, self._manager)
         except AttributeError as e:
@@ -196,6 +195,15 @@ class ModuleManager(object):
             return True
         else:
             return False
+
+    def module_exists(self, class_path):
+        module_path, class_name = class_path.rsplit('.', 1)
+        file_path = module_path.replace('.', '/') + '.py'
+
+        if not Path(file_path).exists():
+            return False
+
+        return True
 
     def start(self, module_name: str):
         self._modules.get(module_name).start()
