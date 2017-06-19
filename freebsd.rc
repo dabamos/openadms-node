@@ -14,7 +14,7 @@ load_rc_config $name
 : ${openadms_user="openadms"}
 : ${openadms_path="/usr/local/sbin/openadms/openadms.py"}
 : ${openadms_config="/usr/local/sbin/openadms/config/openadms.json"}
-: ${openadms_log="/tmp/openadms.log"}
+: ${openadms_log="/var/log/openadms.log"}
 
 pidfile="/var/run/${name}.pid"
 command="python3.6 ${openadms_path}"
