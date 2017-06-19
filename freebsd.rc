@@ -13,7 +13,7 @@ load_rc_config $name
 : ${openadms_enable:=no}
 : ${openadms_user="openadms"}
 : ${openadms_path="/usr/local/sbin/openadms/openadms.py"}
-: ${openadms_config="/usr/local/sbin/openadms/config/openadms.json"}
+: ${openadms_config="/usr/local/etc/openadms/openadms.json"}
 : ${openadms_log="/var/log/openadms.log"}
 
 pidfile="/var/run/${name}.pid"

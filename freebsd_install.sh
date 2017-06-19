@@ -1,15 +1,20 @@
 #!/bin/sh
 
 OPENADMS_PATH=/usr/local/sbin/openadms
+OPENADMS_CONFIG_PATH=/usr/local/etc/openadms
 OPENADMS_USER="openadms"
 
-create_path() {
+create_dirs() {
   mkdir -p $OPENADMS_PATH
+  mkdir -p $OPENADMS_CONFIG_PATH
 }
 
 copy_files() {
   cp -r . $OPENADMS_PATH
   chown -R $OPENADMS_USER $OPENADMS_PATH
+
+  cp -r ./config/ $OPENADMS_CONFIG_PATH
+  chown -R $OPENADMS_USER $OPENADMS_CONFIG_PATH
 }
 
 install_pip() {
@@ -17,7 +22,7 @@ install_pip() {
 }
 
 install_modules() {
-   python3.6 -m pip install -U -r $OPENADMS_PATH/requirements.txt
+  python3.6 -m pip install -U -r $OPENADMS_PATH/requirements.txt
 }
 
 copy_rc() {
@@ -29,8 +34,8 @@ clear
 DIALOG=dialog
 (
 echo "10" ; sleep 1
-echo "XXX"; echo "Creating $OPENADMS_PATH ..." ; echo "XXX"
-create_path
+echo "XXX"; echo "Creating directories ..." ; echo "XXX"
+create_dirs
 
 echo "30" ; sleep 1
 echo "XXX"; echo "Copying files ..." ; echo "XXX"
@@ -53,3 +58,4 @@ echo "XXX"; echo "Done." ; echo "XXX"; sleep 2
 ) |
 $DIALOG --title "Installation of OpenADMS" --gauge "Please wait ..." 8 60
 $DIALOG --clear
+
