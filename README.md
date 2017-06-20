@@ -16,7 +16,8 @@ The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.
 
 ## Installation
-To run OpenADMS, clone the master branch and execute `openadms.py`:
+To run OpenADMS, clone the master branch, install the dependencies and execute
+`openadms.py`:
 
 ```
 $ git clone https://github.com/dabamos/openadms.git
@@ -25,7 +26,8 @@ $ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
-Some additional modules are used by OpenADMS:
+### Dependencies
+The following dependencies are used by OpenADMS:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
