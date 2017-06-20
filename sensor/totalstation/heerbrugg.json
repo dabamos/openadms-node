@@ -1,5 +1,4 @@
 {
-
     "name": "LeicaTX30",
     "type": "totalstation",
     "description": "Leica TM30/TS30 robotic total station.",
@@ -43,6 +42,7 @@
                     "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
                     "responseDelimiter": "\r\n",
                     "timeout": 2.0
+                }
             },
             "responseSets": {
                 "returnCode": {
@@ -50,7 +50,6 @@
                     "unit": "none"
                 }
             }
-
         },
         "enableAngleCorrection": {
             "requestSets": {
@@ -103,7 +102,7 @@
                     "unit": "none"
                 }
             }
-       },
+        },
         "getFace1": {
             "requestSets": {
                 "getFace1": {
@@ -123,7 +122,7 @@
                     "unit": "none"
                 }
             }
-       ,
+        },
         "getInternalTemperature": {
             "requestSets": {
                 "getInternalTemperature": {
@@ -143,7 +142,7 @@
                     "unit": "C"
                 }
             }
-        ,
+        },
         "getSensorId": {
             "requestSets": {
                 "getSensorId": {
@@ -259,7 +258,7 @@
                     "unit": "rad"
                 }
             }
-        ,
+        },
         "getValuesFace0": {
             "requestSets": {
                 "getValuesFace0": {
@@ -313,7 +312,8 @@
                 "getValuesFace1": {
                     "request": "%R1Q,2167:5000,1\r\n",
                     "responseDelimiter": "\r\n",
-                    "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?"
+                    "responsePattern": "(?:%R1P,0,0:)(?P<rcGetValues1>\\d+)(?:,(?P<hz1>\\d*\\.?\\d+),(?P<v1>\\d*\\.?\\d+),(?P<accuracyAngle1>-?\\d*\\.?\\d+),(?P<crossInclination1>-?\\d*\\.?\\d*),(?P<lengthInclination1>-?\\d*\\.?\\d*),(?P<accuracyInclination1>-?\\d*\\.?\\d*),(?P<slopeDist1>\\d*\\.?\\d*),(?P<distTime1>-?\\d*))?",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -353,15 +353,15 @@
                     "type": "float",
                     "unit": "rad"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "measureDistance": {
             "requestSets": {
                 "measureDistance": {
                     "request": "%R1Q,2008:1,1\r\n",
                     "responseDelimiter": "\r\n",
-                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance>\\d+)"
+                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance>\\d+)",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -369,15 +369,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "measureDistanceFace0": {
             "requestSets": {
                 "measureDistanceFace0": {
                     "request": "%R1Q,2008:1,1\r\n",
                     "responseDelimiter": "\r\n",
-                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)"
+                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance0>\\d+)",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -385,15 +385,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "measureDistanceFace1": {
             "requestSets": {
                 "measureDistanceFace1": {
                     "request": "%R1Q,2008:1,1\r\n",
                     "responseDelimiter": "\r\n",
-                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)"
+                    "responsePattern": "(?:%R1P,0,0:)(?P<rcMeasureDistance1>\\d+)",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -401,15 +401,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "setAtmosphericPpm": {
             "requestSets": {
                 "setAtmosphericPpm": {
                     "request": "%R1Q,2148:0\r\n",
                     "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
-                    "responseDelimiter": "\r\n"
+                    "responseDelimiter": "\r\n",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -417,15 +417,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "setDirection": {
             "requestSets": {
                 "setDirection": {
                     "request": "%R1Q,9027:{hz},{v},2,1,0\r\n",
                     "responseDelimiter": "\r\n",
-                    "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)"
+                    "responsePattern": "(?:%R1P,0,0:)(?P<rcSetDirection>\\d+)",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -433,15 +433,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "setEdmType": {
             "requestSets": {
                 "setEdmType": {
                     "request": "%R1Q,17021:0\r\n",
                     "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
-                    "responseDelimiter": "\r\n"
+                    "responseDelimiter": "\r\n",
+                    "timeout": 2.0
                 }
             },
             "responseSets": {
@@ -449,15 +449,15 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         },
         "setGeometricPpmCorrectionFaction": {
             "requestSets": {
                 "setGeometricPpmCorrectionFaction": {
                     "request": "%R1Q,2153:0,0,0,0,0\r\n",
                     "responsePattern": "(?:%R1P,0,0:)(?P<returnCode>\\d+)",
-                    "responseDelimiter": "\r\n"
+                    "responseDelimiter": "\r\n",
+                    "timeout": 2.0
                 }
             },
             "returnCode": {
@@ -465,8 +465,7 @@
                     "type": "integer",
                     "unit": "none"
                 }
-            },
-            "timeout": 2.0
+            }
         }
     }
 }
