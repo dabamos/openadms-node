@@ -1,7 +1,7 @@
 {
-    "name": "LeicaTX30",
+    "name": "LeicaTPS",
     "type": "totalstation",
-    "description": "Leica TM30/TS30 robotic total station.",
+    "description": "Leica Geosystems robotic total stations.",
     "observations": {
         "beepOn": {
             "requestSets": {
