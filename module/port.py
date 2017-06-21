@@ -201,21 +201,12 @@ class BluetoothPort(Prototype):
         self._sock.send(bytes(data, 'UTF-8'))
 
 
-class ConnectionMode(Enum):
-    """
-    Enumeration of serial port connection mode.
-    """
-
-    ACTIVE = 0
-    PASSIVE = 1
-
-
 class SerialPort(Prototype):
     """
     SerialPort does I/O on a given serial port. The port can be used in either
     active or passive mode. In active mode, the communication with the sensor is
     based on request/response. In passive mode, the port just listens for
-    incoming data.
+    incoming data without sending any requests.
     """
 
     def __init__(self, name, type, manager):
@@ -224,13 +215,16 @@ class SerialPort(Prototype):
                                                   .get('serial')\
                                                   .get(self.name)
 
-        self._is_passive = self._config.get('passive')
-        self._obs_draft = None
+        if self._config.get('mode') == 'passive':
+            self._is_passive = True
+            self._obs_draft = None
+            self._thread = None     # Thread for passive mode.
+        else:
+            self._is_passive = False
 
-        self._thread = None     # Thread for passive mode.
-        self._serial = None     # Pyserial object.
+        self._serial = None         # Pyserial object.
         self._serial_port_config = None
-        self._max_attempts = 1  # TODO: Move to configuration file.
+        self._max_attempts = 1      # TODO: Move to configuration file.
 
     def __del__(self):
         self._is_running = False
@@ -245,7 +239,7 @@ class SerialPort(Prototype):
             self._serial.close()
 
     def process_observation(self, obs):
-        if self.is_passive:
+        if self._is_passive:
             # Set observation template for passive mode.
             self._obs_draft = obs
             return
