@@ -4,6 +4,16 @@ OPENADMS_PATH=/usr/local/sbin/openadms
 OPENADMS_CONFIG_PATH=/usr/local/etc/openadms
 OPENADMS_USER="openadms"
 
+create_user() {
+  if pw group show $OPENADMS_USER | grep -qv "^$OPENADMS_USER" ; then
+    pw groupadd $OPENADMS_USER -g 5000
+  fi
+
+  if pw user show $OPENADMS_USER | grep -qv "^$OPENADMS_USER" ; then
+    pw useradd -n $OPENADMS_USER -c OpenADMS Owner -g $OPENADMS_USER -s /usr/sbin/nologin -d /nonexistent
+  fi
+}
+
 create_dirs() {
   mkdir -p $OPENADMS_PATH
   mkdir -p $OPENADMS_CONFIG_PATH
@@ -20,44 +30,57 @@ copy_files() {
 }
 
 install_pip() {
-  python3.6 -m ensurepip
+  if pip3 --version | grep -qv "python 3.6" ; then
+    python3.6 -m ensurepip
+  fi
 }
 
 install_modules() {
-  python3.6 -m pip install -U -r $OPENADMS_PATH/requirements.txt
+  pip3 -q install -U -r $OPENADMS_PATH/requirements.txt
 }
 
 copy_rc() {
   cp freebsd.rc /usr/local/etc/rc.d/openadms
 }
 
-clear
+install() {
+  echo
+  echo -n "Creating user ...                  "
+  create_user
+  sleep 0.25 ; echo "[OK]"
 
-DIALOG=dialog
-(
-echo "10" ; sleep 1
-echo "XXX"; echo "Creating directories ..." ; echo "XXX"
-create_dirs
+  echo -n "Creating directories ...           "
+  create_dirs
+  sleep 0.25 ; echo "[OK]"
 
-echo "30" ; sleep 1
-echo "XXX"; echo "Copying files ..." ; echo "XXX"
-copy_files
+  echo -n "Copying files ...                  "
+  copy_files
+  sleep 0.25 ; echo "[OK]"
 
-echo "50" ; sleep 1
-echo "XXX"; echo "Installing pip for Python 3.6 ..." ; echo "XXX"
-install_pip
+  echo -n "Installing pip for Python 3.6 ...  "
+  install_pip
+  sleep 0.25 ; echo "[OK]"
 
-echo "70" ; sleep 1
-echo "XXX"; echo "Installing Python dependencies ..." ; echo "XXX"
-install_modules
+  echo -n "Installing Python dependencies ... "
+  install_modules
+  sleep 0.25 ; echo "[OK]"
 
-echo "80" ; sleep 1
-echo "XXX"; echo "Installing rc.d script ..." ; echo "XXX"
-copy_rc
+  echo -n "Installing rc.d script ...         "
+  copy_rc
+  sleep 0.25 ; echo "[OK]"
 
-echo "100"
-echo "XXX"; echo "Done." ; echo "XXX"; sleep 2
-) |
-$DIALOG --title "Installation of OpenADMS" --gauge "Please wait ..." 8 60
-$DIALOG --clear
+  echo ; echo "Add the following line to /etc/rc.conf:" ; echo
+  echo "    openadms_enable=\"YES\"" ; echo
+}
 
+if uname | grep -qv "FreeBSD" ; then
+  echo "You are not running FreeBSD"
+  exit
+fi
+
+echo -n "Install OpenADMS? [y/n] "
+read answer
+
+if echo "$answer" | grep -iq "^y" ; then
+  install
+fi
