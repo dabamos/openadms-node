@@ -1,8 +1,18 @@
 ![OpenADMS](https://www.dabamos.de/github/openadms.png)
 
 OpenADMS is an open source automatic deformation monitoring system for
-geodetical and geotechnical observations. The software is written in Python 3
-and has been tested on:
+geodetical and geotechnical observations in the Internet of Things.  The
+software obtaines the measured data of arbitrary sensors, like total stations,
+digital levels, inclinometers, weather stations, or GNSS receivers. The raw
+sensor data is then processed, analysed, stored, and transmitted. OpenADMS
+can be used to observe objects like:
+
+* bridges, tunnels, dams;
+* landslides, cliffs, glaciers;
+* construction sites, mining areas;
+* churches, monasteries, and other historic buildings.
+
+The software is written in Python 3 and has been tested on:
 
 * Microsoft Windows 7 (x86, x86-64)
 * Debian 9 (ARMv7)
