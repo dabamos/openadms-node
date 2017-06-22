@@ -2,6 +2,7 @@
     "name": "Leica Nivel210",
     "type": "inclinometer",
     "description": "Dual-axis inclinometer with RS-232 interface.",
+    "mode": "active",
     "observations": {
         "getXYTemperature": {
             "description": "Returns temperature and inclination in two axis.",

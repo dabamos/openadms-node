@@ -2,6 +2,7 @@
     "name": "LeicaTPS",
     "type": "totalstation",
     "description": "Leica Geosystems robotic total stations.",
+    "mode": "active",
     "observations": {
         "beepOn": {
             "requestSets": {
