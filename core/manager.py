@@ -38,6 +38,10 @@ from core.sensor import Sensor
 
 
 class Manager(object):
+    """
+    Manager is a container class for the configuration manager, the sensor
+    manager, and the module manager.
+    """
 
     def __init__(self):
         self._config_manager = None
