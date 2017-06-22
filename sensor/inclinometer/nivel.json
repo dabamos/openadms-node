@@ -1,0 +1,32 @@
+{
+    "name": "Leica Nivel210",
+    "type": "inclinometer",
+    "description": "Dual-axis inclinometer with RS-232 interface.",
+    "observations": {
+        "getXYTemperature": {
+            "description": "Returns temperature and inclination in two axis.",
+            "requestSets": {
+                "getXYTemperature": {
+                  "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
+                  "responsePattern": "X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
+                  "responseDelimiter": "\\x03",
+                  "timeout": 2.0
+                }
+            },
+            "responseSets": {
+                "temperature": {
+                    "type": "float",
+                    "unit": "C"
+                },
+                "x": {
+                    "type": "float",
+                    "unit": "mrad"
+                },
+                "y": {
+                    "type": "float",
+                    "unit": "mrad"
+                }
+            }
+        }
+    }
+}
