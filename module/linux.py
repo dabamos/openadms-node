@@ -27,6 +27,7 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import time
+import threading
 
 import RPi.GPIO as GPIO
 
@@ -36,33 +37,100 @@ from module.prototype import Prototype
 
 class InterruptCounter(Prototype):
     """
-    Counts GPIO interrupts of a Raspberry Pi single-board computer.
-    """
+    Counts GPIO interrupts on a single pin of a Raspberry Pi single-board
+    computer. Works on Linux only."""
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
-        self._pin = config.get('pin')
+        self._gpio = config.get('gpio')
         self._bounce_time = config.get('bounceTime')
-        self._count = 0
+        self._count_time = config.get('countTime')
+        self._receiver = config.get('receiver')
+        self._sensor_name = config.get('sensorName')
 
+        self._counter = 0
+        self._thread = None
+        self._lock = threading.Lock()
+
+        self.init_gpio()
+
+    def __del__(self):
+        GPIO.cleanup()
+
+    def init_gpio(self):
         # Set SoC as reference.
         GPIO.setmode(GPIO.BCM)
         # Set pin as input and activate pull-down resistor.
-        GPIO.setup(self._pin,
+        GPIO.setup(self._gpio,
                    GPIO.IN,
                    pull_up_down=GPIO.PUD_DOWN)
         # Add interrupt event.
-        GPIO.add_event_detect(self._pin,
+        GPIO.add_event_detect(self._gpio,
                               GPIO.RISING,
                               callback=self._interrupt,
                               bouncetime=self._bounce_time)
 
-    def process_observation(self, obs):
+    def _interrupt(self, channel):
+        self._lock.acquire()
 
-    def _interrupt(chan):
-        self._count += 1
+        try:
+            self._counter += 1
+            self.logger.debug('Counted interrupt {} on GPIO pin {}'
+                              .format(self._counter, self._gpio))
+        finally:
+            self._lock.release()
 
+    def run(self):
+        t1 = time.time()
+        t2 = t1
 
+        while self._is_running:
+            dt = t2 - t1
+            time.sleep(self._count_time - dt)
+            t1 = time.time()
+            counter = 0
+
+            self._lock.acquire()
+
+            try:
+                counter = self._counter
+                self._counter = 0
+            finally:
+                self._lock.release()
+
+            self._fire(counter)
+            t2 = time.time()
+
+    def _fire(self, c: int) -> None:
+        obs = Observation()
+
+        response_sets = {
+            'GPIO{}'.format(self._gpio):
+                Observation.create_response_set('int', 'none', c)
+        }
+
+        obs.set('id', 'GPIO{}'.format(self._gpio))
+        obs.set('name', 'interrupts')
+        obs.set('nextReceiver', 0)
+        obs.set('portName', 'GPIO{}'.format(self._gpio))
+        obs.set('receivers', [self._receiver])
+        obs.set('responseSets', response_sets)
+        obs.set('sensorName', self._sensor_name) 
+        obs.set('timeStamp', time.time())
+
+        self.publish_observation(obs)
+
+    def start(self):
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker "{}" ...'.format(self._name))
+        self._is_running = True
+
+        # Run the method self.run() within a thread.
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 

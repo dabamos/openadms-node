@@ -236,6 +236,10 @@ class SensorManager(object):
     def load(self):
         """Creates the sensors defined in the configuration."""
         # Create sensor objects.
+        if not self._sensor_config:
+            self.logger.info('No sensors defined')
+            return
+
         for sensor_name, sensor_config in self._sensor_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
             self.add(sensor_name, sensor_obj)
