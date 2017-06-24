@@ -19,8 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-"""Module for data processing (pre-processing, atmospheric corrections,
-transformations, and so on)."""
+"""Module for Linux-specific features, which are not available on other
+operating systems."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -38,7 +38,8 @@ from module.prototype import Prototype
 class InterruptCounter(Prototype):
     """
     Counts GPIO interrupts on a single pin of a Raspberry Pi single-board
-    computer. Works on Linux only."""
+    computer. Works on Linux only.
+    """
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
@@ -117,7 +118,7 @@ class InterruptCounter(Prototype):
         obs.set('portName', 'GPIO{}'.format(self._gpio))
         obs.set('receivers', [self._receiver])
         obs.set('responseSets', response_sets)
-        obs.set('sensorName', self._sensor_name) 
+        obs.set('sensorName', self._sensor_name)
         obs.set('timeStamp', time.time())
 
         self.publish_observation(obs)
