@@ -1,0 +1,78 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {},
+    "id": "observation.json",
+    "properties": {
+        "description": {
+            "id": "/properties/description",
+            "type": "string"
+        },
+        "enabled": {
+            "id": "/properties/enabled",
+            "type": "boolean"
+        },
+        "id": {
+            "id": "/properties/id",
+            "type": "string"
+        },
+        "name": {
+            "id": "/properties/name",
+            "type": "string"
+        },
+        "nextReceiver": {
+            "id": "/properties/nextReceiver",
+            "type": "integer"
+        },
+        "onetime": {
+            "id": "/properties/onetime",
+            "type": "boolean"
+        },
+        "portName": {
+            "id": "/properties/portName",
+            "type": "string"
+        },
+        "receivers": {
+            "id": "/properties/receivers",
+            "items": {
+                "id": "/properties/receivers/items",
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "requestSets": {
+            "id": "/properties/requestSets",
+            "properties": {},
+            "type": "object"
+        },
+        "requestsOrder": {
+            "id": "/properties/requestsOrder",
+            "items": {
+                "id": "/properties/requestsOrder/items",
+                "type": "string"
+            },
+            "type": "array"
+        },
+        "responseSets": {
+            "id": "/properties/responseSets",
+            "properties": {},
+            "type": "object"
+        },
+        "sensorName": {
+            "id": "/properties/sensorName",
+            "type": "string"
+        },
+        "sensorType": {
+            "id": "/properties/sensorType",
+            "type": "string"
+        },
+        "sleepTime": {
+            "id": "/properties/sleepTime",
+            "type": "number"
+        },
+        "timeStamp": {
+            "id": "/properties/timeStamp",
+            "type": "number"
+        }
+    },
+    "type": "object"
+}

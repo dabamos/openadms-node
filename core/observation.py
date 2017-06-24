@@ -54,8 +54,7 @@ class Observation(object):
                 'receivers': [],
                 'response': None,
                 'responseSets': {},
-                'timeStamp': None,
-                'type': 'observation'
+                'timeStamp': None
             }
         else:
             self._data = data
@@ -94,7 +93,7 @@ class Observation(object):
     @staticmethod
     def get_header() -> Dict[str, str]:
         """Returns the header of an observation message.
-        
+
         Returns:
             Dictionary with header information.
         """
@@ -146,10 +145,10 @@ class Observation(object):
 
     def get_response_value(self, name: str) -> ResponseType:
         """Returns the value of a given response set.
-        
+
         Args:
             name (str): Name of the response set.
-            
+
         Returns:
             Value of the response set.
         """

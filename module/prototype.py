@@ -26,6 +26,10 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import json
+import jsonschema
+import pathlib
+
 from core.manager import *
 from core.observation import Observation
 
@@ -56,6 +60,11 @@ class Prototype(object):
             'service': self.do_handle_service
         }
 
+        self._schema_root = pathlib.Path('schema')
+        self._schema = {}
+
+        self.add_schema('observation', 'observation.json')
+
     def add_handler(self,
                     data_type: str,
                     func: Callable[[Dict, Dict], None]) -> None:
@@ -66,6 +75,27 @@ class Prototype(object):
             func (Callable): Callback function for handling the message.
         """
         self._handlers[data_type] = func
+
+    def add_schema(self, data_type: str, path: str) -> None:
+        schema = None
+        schema_path = self._schema_root / path
+
+        with open(schema_path, encoding='utf-8') as data_file:
+            try:
+                schema = json.loads(data_file.read())
+                jsonschema.Draft4Validator.check_schema(schema)
+
+                self._schema[data_type] = schema
+                self.logger.debug('Loaded JSON schema "{}" from "{}"'
+                                  .format(data_type, schema_path))
+            except json.JSONDecodeError:
+                self.logger.error('Invalid JSON file "{}"'
+                                  .format(schema_path))
+                return
+            except jsonschema.SchemaError:
+                self.logger.error('Invalid JSON schema "{}"'
+                                  .format(schema_path))
+                return
 
     def do_handle_observation(self, header: Dict, payload: Dict) -> None:
         """Handles an observation by forwarding it to the processing method and
@@ -100,24 +130,33 @@ class Prototype(object):
             message (List): Header and payload of the message, both Dict.
         """
         if not self.is_sequence(message) or len(message) < 2:
-            self.logger.warning('{}: received message is invalid'
-                                .format(self._name))
+            self.logger.warning('Received message is invalid')
             return
 
         header = message[0]
         payload = message[1]
 
         if not header or not payload:
-            self.logger.warning('{}: received data is corrupted'
-                                .format(self._name))
+            self.logger.warning('Received data is corrupted')
             return
 
+        # Get payload type.
         payload_type = header.get('type')
 
         if not payload_type:
             self.logger.error('{}: no payload type defined'.format(self._name))
             return
 
+        # Validate payload.
+        if self.has_validator(payload_type):
+            if not self.validate(payload, payload_type):
+                self.logger.error('Data of type "{}" is not valid'
+                                  .format(payload_type))
+        else:
+            self.logger.warning('No validator found for type "{}"'
+                                .format(payload_type))
+
+        # Send payload to specific handler.
         handler_func = self._handlers.get(payload_type)
 
         if not handler_func:
@@ -127,6 +166,18 @@ class Prototype(object):
 
         handler_func(header, payload)
 
+    def has_validator(self, data_type: str) -> bool:
+        """Returns whether or not a JSON validator for the given data type is
+        available.
+
+        Args:
+            data_type (str): Type of data (e.g., 'observation').
+        """
+        if self._schema.get(data_type):
+            return True
+        else:
+            return False
+
     def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not."""
         return (not hasattr(arg, 'strip') and
@@ -134,7 +185,7 @@ class Prototype(object):
                 hasattr(arg, '__iter__'))
 
     def process_observation(self, obs: Type[Observation]) -> Observation:
-        # Will be overwritten by the worker.
+        # Will be overwritten by worker.
         pass
 
     def publish(self, target: str, header: Dict, payload: Dict) -> None:
@@ -222,6 +273,22 @@ class Prototype(object):
         self.logger.debug('Stopping worker "{}" ...'
                           .format(self._name))
         self._is_running = False
+
+    def validate(self, data: Dict, data_type: str) -> bool:
+        schema = self._schema.get(data_type)
+
+        if not schema:
+            self.logger.warning('JSON schema "{}" not found'
+                                .format(data_type))
+            return False
+
+        try:
+            jsonschema.validate(data, schema)
+        except jsonschema.ValidationError as e:
+            self.logger.warning(e)
+            return False
+
+        return True
 
     @property
     def is_running(self) -> bool:
