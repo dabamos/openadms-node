@@ -39,6 +39,13 @@ class InterruptCounter(Prototype):
     """
     Counts GPIO interrupts on a single pin of a Raspberry Pi single-board
     computer. Works on Linux only.
+
+    Configuration:
+        bounceTime (int): Bounce time in ms.
+        countTime (float): Observation time in s.
+        gpio (int): GPIO pin number of the Raspberry Pi.
+        receiver (str): Name of the receiving module.
+        sensorName (str): Name of the connected sensor.
     """
 
     def __init__(self, name, type, manager):

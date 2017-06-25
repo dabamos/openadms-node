@@ -40,6 +40,11 @@ class Scheduler(Prototype):
     to a sensor. Each observation is represented by a single job. Jobs are
     stored in a jobs list and will be executed at the given date and time. A
     separate scheduler is necessary for each serial port.
+
+    Configuration:
+        port (str): Name of the port module.
+        sensor (str): Name of the sensor.
+        schedules (List[Dict]): List of schedules.
     """
 
     def __init__(self, name, type, manager):
@@ -274,3 +279,4 @@ class Job(object):
     @property
     def name(self):
         return self._name
+

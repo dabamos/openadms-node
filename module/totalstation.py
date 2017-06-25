@@ -995,3 +995,4 @@ class SerialMeasurementProcessor(Prototype):
                           .format(obs.get('name'), obs.get('id')))
 
         return obs
+

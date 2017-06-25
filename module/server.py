@@ -19,6 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for network services."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -39,6 +41,17 @@ from module.prototype import Prototype
 
 
 class LocalControlServer(Prototype):
+    """
+    LocalControlServer creates a web service for the remote control of
+    OpenADMS. The server shows HTML page with system information and log
+    messages. The user can start and stop modules defined in the OpenADMS
+    configuration. It is recommended to run a reverse proxy in front of the
+    LocalControlServer.
+
+    Configuration:
+        host (str): Host name (IP or FQDN).
+        port (int): Port number.
+    """
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
@@ -335,3 +348,4 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         response = bytes(opts.get('content'), 'UTF-8')
         self.wfile.write(response)
+

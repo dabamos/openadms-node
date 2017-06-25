@@ -217,3 +217,4 @@ class VirtualIndicatorOne(VirtualSensor):
         self._current_value += 0.25
 
         return '{:7.3f}\r'.format(x)
+

@@ -19,6 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for the export of observations."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -30,8 +32,6 @@ from datetime import datetime
 from enum import Enum
 
 from module.prototype import Prototype
-
-"""Module for the export of sensor data to files and databases."""
 
 
 class FileRotation(Enum):
@@ -48,6 +48,14 @@ class FileRotation(Enum):
 class FileExporter(Prototype):
     """
     FileExporter writes sensor data to a flat file in CSV format.
+
+    Configuration:
+        dateTimeFormat (str): Format of date and time (see Python strftime).
+        fileExtension (str): The extension of the file ('.txt' or '.csv').
+        fileName (str): Placeholders are '{date}', '{id}', '{name}', '{port}'.
+        fileRotation (str): Either 'none', 'daily', 'monthly', or 'yearly'.
+        paths (list): Paths to save files to (multiple paths possible).
+        separator (str): Separator between values within the CSV file.
     """
 
     def __init__(self, name, type, manager):
@@ -170,6 +178,10 @@ class RealTimePublisher(Prototype):
     """
     RealTimePublisher sends copies of `Observation` objects to a list of
     receivers.
+
+    Configuration:
+        receivers (List[str]): List of modules to send the observation to.
+        enabled (bool): If or if not enabled.
     """
 
     def __init__(self, name, type, manager):

@@ -46,6 +46,10 @@ class BluetoothPort(Prototype):
     socket connection to a sensor by using the native Bluetooth support of
     Python 3.3. At the moment, the class is not very useful and needs further
     testing.
+
+    Configuration:
+        port (str): Port name.
+        serverMacAddress (str): MAC address of the server.
     """
 
     def __init__(self, name, type, manager):
@@ -207,6 +211,19 @@ class SerialPort(Prototype):
     active or passive mode. In active mode, the communication with the sensor is
     based on request/response. In passive mode, the port just listens for
     incoming data without sending any requests.
+
+    Configuration:
+        port (str): Name of the port (COMX or /dev/ttyX).
+        mode (str): Run serial port in 'active' or 'passive' mode.
+        maxAttemps (int): Maximum number of attempts.
+        baudRate (int): Baud rate (e.g., 4800, 9600, or 115200).
+        byteSize: (int): Start bits, either 5, 6, 7, or 8.
+        stopBits (int): Stop bits, either 1 or 2.
+        parity (str): Parity, either 'odd', 'even', or 'none'.
+        timeout (float): Timeout in seconds.
+        softwareFlowControl (bool): XON/XOFF flow control.
+        hardwareFlowControl (bool): RTS/CTS flow control.
+
     """
 
     def __init__(self, name, type, manager):
@@ -214,6 +231,8 @@ class SerialPort(Prototype):
         self._config = self._config_manager.config.get('ports')\
                                                   .get('serial')\
                                                   .get(self.name)
+
+        self._max_attempts = self._config.get('maxAttempts')
 
         if self._config.get('mode') == 'passive':
             self._is_passive = True
@@ -224,7 +243,6 @@ class SerialPort(Prototype):
 
         self._serial = None         # Pyserial object.
         self._serial_port_config = None
-        self._max_attempts = 1      # TODO: Move to configuration file.
 
     def __del__(self):
         self._is_running = False
@@ -556,3 +574,4 @@ class SerialPortConfiguration(object):
     @property
     def rtscts(self):
         return self._rtscts
+
