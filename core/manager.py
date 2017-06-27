@@ -384,7 +384,7 @@ class SchemaManager(object):
 
         try:
             schema = self._schema.get(schema_name)
-            jsonschema.validate(data, schema_schema)
+            jsonschema.validate(data, schema)
         except jsonschema.ValidationError:
             return False
 
