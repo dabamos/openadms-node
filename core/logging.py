@@ -28,26 +28,51 @@ import logging
 from collections import deque
 from queue import Queue
 from threading import Thread
+from typing import *
 
 
 class RingBuffer(object):
     """
-    RingBuffer stores strings in a deque with a maximum length.
+    RingBuffer stores strings in a deque. It is used to cache a number of log
+    messages, while older ones get overwritten automatically.
+
+    Args:
+        max_length (int): The maximum size of the deque.
     """
 
-    def __init__(self, max_length):
+    def __init__(self, max_length: int):
         self._deque = deque(maxlen=max_length)
 
-    def append(self, x):
+    def append(self, x: str) -> None:
+        """Appends a string to the deque.
+
+        Args:
+            x (Any): Element to append.
+        """
         self._deque.append(x)
 
-    def pop(self):
+    def pop(self) -> str:
+        """Pops a string element.
+
+        Returns:
+            String on the left side of the deque.
+        """
         return self._deque.popleft()
 
-    def get(self):
+    def get(self) -> List[str]:
+        """Returns a list with all strings.
+
+        Returns:
+            List with all strings in the deque.
+        """
         return list(self._deque)
 
-    def to_string(self):
+    def to_string(self) -> str:
+        """Returns the whole deque as a string.
+
+        Returns:
+            String containing all string elements in the deque.
+        """
         return '\n'.join(self.get())
 
 

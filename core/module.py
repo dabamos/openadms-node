@@ -31,14 +31,23 @@ import threading
 
 from typing import *
 
+from core.intercom import *
+from module.prototype import *
+
 
 class Module(threading.Thread):
     """
     Module bundles a worker with a messenger and manages the communication
     between them.
+
+    Args:
+        messenger (Type[MQTTMessenger]): The messenger object.
+        worker (Type[Prototype]): The worker object.
     """
 
-    def __init__(self, messenger, worker):
+    def __init__(self,
+                 messenger: Type[MQTTMessenger],
+                 worker: Type[Prototype]):
         threading.Thread.__init__(self, name=worker.name)
         self.logger = logging.getLogger(worker.name)
         self.daemon = True

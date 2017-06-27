@@ -26,10 +26,15 @@ from typing import *
 
 import paho.mqtt.client as mqtt
 
+from core.manager import *
+
 
 class MQTTMessenger(object):
     """
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
+
+    Args:
+        config_manager (Type[ConfigManager]): The configuration manager.
     """
 
     def __init__(self, config_manager):

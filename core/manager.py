@@ -87,6 +87,9 @@ class Manager(object):
 class ConfigManager(object):
     """
     ConfigurationManager loads and stores the OpenADMS configuration.
+
+    Args:
+        path (str): The path to the configuration file.
     """
 
     def __init__(self, path: str):
@@ -95,12 +98,19 @@ class ConfigManager(object):
         self._path = path   # Path to the configuration file.
 
         if self._path:
-            self.load(self._path)
+            self.load_config(self._path)
         else:
             self.logger.error('No configuration file set')
 
-    def load(self, config_path: str) -> bool:
-        """Loads configuration from JSON file."""
+    def load_config(self, config_path: str) -> bool:
+        """Loads configuration from a JSON file.
+
+        Args:
+            config_path (str): The path to the JSON file.
+
+        Returns:
+            True if file has been loaded, False if not.
+        """
         if not Path(config_path).exists():
             self.logger.error('Configuration file "{}" not found.'
                               .format(config_path))
@@ -117,12 +127,15 @@ class ConfigManager(object):
 
         return True
 
-    def dump(self) -> None:
-        """Dumps the configuration to stdout."""
-        encoded = json.dumps(self._config, sort_keys=True, indent=4)
-        print(encoded)
+    def get(self, key: str) -> Dict[str, Any]:
+        """Returns a single configuration.
 
-    def get(self, key: str) -> Any:
+        Args:
+            key (str): The name of the configuration.
+
+        Returns:
+            A dictionary with the configuration.
+        """
         return self._config.get(key)
 
     @property
@@ -140,15 +153,15 @@ class ConfigManager(object):
 
 class ModuleManager(object):
     """
-    ModuleManager loads and manages OpenADMS module.
+    ModuleManager loads and manages OpenADMS modules.
+
+    Args:
+        manager (Type[Manager]): The manager object.
     """
 
     def __init__(self, manager: Type[Manager]):
         self.logger = logging.getLogger('moduleManager')
-
         self._manager = manager
-        self._manager.module_manager = self
-
         self._config = self._manager.config_manager.get('modules')
         self._modules = {}
 
@@ -234,7 +247,7 @@ class ModuleManager(object):
             Instance of Python class or None.
         """
         module_path, class_name = class_path.rsplit('.', 1)
-        file_path = './' + module_path.replace('.', '/') + '.py'
+        file_path = Path(module_path.replace('.', '/') + '.py')
 
         try:
             worker_class = getattr(import_module(module_path),
@@ -271,9 +284,9 @@ class ModuleManager(object):
             True if module exists, False if not.
         """
         module_path, class_name = class_path.rsplit('.', 1)
-        file_path = module_path.replace('.', '/') + '.py'
+        file_path = Path(module_path.replace('.', '/') + '.py')
 
-        if not Path(file_path).exists():
+        if not file_path.exists():
             return False
 
         return True
@@ -303,6 +316,9 @@ class ModuleManager(object):
 class SensorManager(object):
     """
     SensorManager stores and manages object of type `Sensor`.
+
+    Args:
+        config_manager (Type[ConfigManager]): The configuration manager.
     """
 
     def __init__(self, config_manager: Type[ConfigManager]):
@@ -310,9 +326,9 @@ class SensorManager(object):
         self._sensor_config = config_manager.get('sensors')
         self._sensors = {}
 
-        self.load()
+        self.load_sensors()
 
-    def load(self) -> None:
+    def load_sensors(self) -> None:
         """Creates the sensors defined in the configuration."""
         if not self._sensor_config:
             self.logger.info('No sensors defined')
@@ -323,8 +339,13 @@ class SensorManager(object):
             self.add(sensor_name, sensor_obj)
             self.logger.info('Created sensor "{}"'.format(sensor_name))
 
-    def add(self, name: str, sensor: str) -> None:
-        """Adds a sensor to the sensors dictionary."""
+    def add(self, name: str, sensor: Type[Sensor]) -> None:
+        """Adds a sensor to the sensors dictionary.
+
+        Args:
+            name (str): The name of the sensor.
+            sensor (str): The sensor object.
+        """
         self._sensors[name] = sensor
 
     def delete(self, name: str) -> None:
@@ -366,6 +387,9 @@ class SchemaManager(object):
             data_type (str): The name of the data type (e.g., 'observation').
             path (str): The path to the JSON schema file.
             root (str): The root directory (default: 'schema').
+
+        Returns:
+            True if schema has been added, False if not.
         """
         schema_path = Path(root, path)
 
@@ -394,11 +418,13 @@ class SchemaManager(object):
         return True
 
     def has_schema(self, name: str) -> bool:
-        """Returns whether or not a JSON schema for the given name is
-        available.
+        """Returns whether or not a JSON schema for the given name exists.
 
         Args:
             name (str): Name of the schema (e.g., 'observation').
+
+        Returns:
+            True if schema exists, False if not.
         """
         if self._schema.get(name):
             return True

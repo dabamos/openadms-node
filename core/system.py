@@ -35,8 +35,8 @@ from core.version import *
 
 class System(object):
     """
-    System is a server helper class to retrieve information about the used
-    platform and system resources.
+    System is a helper class to retrieve information about the used platform and
+    system resources.
     """
 
 #    @staticmethod

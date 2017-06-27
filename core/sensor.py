@@ -22,6 +22,8 @@ limitations under the Licence.
 import codecs
 import logging
 
+from typing import *
+
 from core.observation import Observation
 
 
@@ -29,9 +31,13 @@ class Sensor(object):
     """
     Sensor stores the configuration of a sensor, especially, all defined
     observations.
+
+    Args:
+        name (str): The name of the sensor.
+        config (Dict[str, Any]): The configuration of the sensor.
     """
 
-    def __init__(self, name, config):
+    def __init__(self, name: str, config: Dict[str, Any]):
         self.logger = logging.getLogger(name)
 
         self._name = name
@@ -48,8 +54,12 @@ class Sensor(object):
             self.logger.debug('Loaded observation "{}" of sensor "{}"'
                               .format(obs.get('name'), self._name))
 
-    def create_observation(self, data):
-        """Creates an observation object."""
+    def create_observation(self, data: Dict[str, Any]) -> None:
+        """Creates an observation object.
+
+        Args:
+            data (Dict[str, Any]): The observation data.
+        """
         data['sensorName'] = self._name
         data['sensorType'] = self._type
         data['type'] = 'observation'
@@ -77,12 +87,20 @@ class Sensor(object):
 
         return Observation(data)
 
-    def get_observation(self, name):
-        """Returns a single observation."""
+    def get_observation(self, name: str) -> None:
+        """Returns a single observation.
+
+        Args:
+            name (str): The name of the observation.
+        """
         return self._observations.get(name)
 
-    def get_observations(self):
-        """Returns all observations."""
+    def get_observations(self) -> List:
+        """Returns all observations.
+
+        Returns:
+            List with observation objects.
+        """
         return self._observations
 
     @property
@@ -100,7 +118,7 @@ class Sensor(object):
 
 class SensorType(object):
     """
-    SensorType is used to determine the type of a sensor.
+    SensorType is a static class used to determine the type of a sensor.
     """
 
     # Acronyms of valid sensor types:
@@ -120,14 +138,24 @@ class SensorType(object):
                         'weatherstation']
 
     @staticmethod
-    def is_total_station(name):
+    def is_total_station(name: str) -> bool:
+        """Returns whether or not the given name is a total station or not.
+
+        Returns:
+            True if name is a total station, False if not.
+        """
         if name.lower() in SensorType.total_stations:
             return True
 
         return False
 
     @staticmethod
-    def is_weather_station(name):
+    def is_weather_station(name: str) -> bool:
+        """Returns whether or not the given name is a weather station or not.
+
+        Returns:
+            True if name is a weather station, False if not.
+        """
         if name.lower() in SensorType.weather_stations:
             return True
 

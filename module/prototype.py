@@ -28,17 +28,24 @@ __license__ = 'EUPL'
 
 import json
 import jsonschema
+import logging
 
-from core.manager import *
+from typing import *
+
 from core.observation import Observation
 
 
 class Prototype(object):
     """
     Prototype is used as a blueprint for OpenADMS workers.
+
+    Args:
+        name (str): The name of the module.
+        type (str): The type of the module.
+        manager (Type[Manager]): The manager objects.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Any):
         self.logger = logging.getLogger(name)
 
         self._name = name       # Module name, e.g., 'serialPort'.
@@ -114,9 +121,9 @@ class Prototype(object):
         sender = header.get('from', '?')
         action = payload.get('action')
 
-        if action is 'pause':
+        if action is 'stop':
             self._is_running = False
-            self.logger.debug('Paused module "{}" by call from "{}"'
+            self.logger.debug('Stopped module "{}" by call from "{}"'
                               .format(self._name, sender))
         elif action is 'start':
             self._is_running = True

@@ -26,10 +26,15 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import logging
 import time
 import threading
 
-import RPi.GPIO as GPIO
+try:
+    import RPi.GPIO as GPIO
+except ImportError:
+    logger = logging.getLogger()
+    logger.error('Module "RPi.GPIO" not found')
 
 from core.observation import Observation
 from module.prototype import Prototype
@@ -113,13 +118,13 @@ class InterruptCounter(Prototype):
 
     def _fire(self, c: int) -> None:
         obs = Observation()
+        gpio = 'GPIO{}'.format(self._gpio)
 
         response_sets = {
-            'GPIO{}'.format(self._gpio):
-                Observation.create_response_set('int', 'none', c)
+            gpio: Observation.create_response_set('int', 'none', c)
         }
 
-        obs.set('id', 'GPIO{}'.format(self._gpio))
+        obs.set('id', gpio)
         obs.set('name', 'interrupts')
         obs.set('nextReceiver', 0)
         obs.set('portName', 'GPIO{}'.format(self._gpio))
@@ -137,7 +142,7 @@ class InterruptCounter(Prototype):
         self.logger.debug('Starting worker "{}" ...'.format(self._name))
         self._is_running = True
 
-        # Run the method self.run() within a thread.
+        # Run the method `run()` within a thread.
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()

@@ -60,8 +60,9 @@ class Observation(object):
             self._data = data
 
     @staticmethod
-    def create_response_set(type: str, unit: str, value: ResponseType) \
-            -> Dict[str, ResponseType]:
+    def create_response_set(type: str,
+                            unit: str,
+                            value: ResponseType) -> Dict[str, ResponseType]:
         """Creates a response set containing type, unit, and value.
 
         Args:

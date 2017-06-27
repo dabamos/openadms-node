@@ -34,7 +34,7 @@ class Monitor(object):
     configuration manager, a sensor manager, and a module manager.
 
     Args:
-        config_file_path (str): Path to the configuration file.
+        config_file_path (str): The path to the configuration file.
     """
 
     def __init__(self, config_file_path: str):
@@ -42,6 +42,5 @@ class Monitor(object):
         manager.config_manager = ConfigManager(config_file_path)
         manager.sensor_manager = SensorManager(manager.config_manager)
         manager.schema_manager = SchemaManager()
-
-        module_manager = ModuleManager(manager)
+        manager.module_manager = ModuleManager(manager)
 

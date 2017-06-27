@@ -85,7 +85,7 @@ class LocalControlServer(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
 
@@ -93,7 +93,7 @@ class LocalControlServer(Prototype):
         self._thread.start()
 
     def stop(self):
-        self.logger.debug('Stopping worker "{}" ...'
+        self.logger.debug('Stopping worker "{}"'
                           .format(self._name))
         self._is_running = False
 
