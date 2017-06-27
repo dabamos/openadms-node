@@ -93,7 +93,7 @@ class Alert(Prototype):
     def run(self):
         while self.is_running:
             log = self._queue.get()         # Blocking I/O.
-            self.logger.info('Processing alert message ...')
+            self.logger.info('Processing alert message')
             self.fire(log)
 
     def start(self):

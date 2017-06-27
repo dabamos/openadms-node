@@ -1,0 +1,187 @@
+                                                      {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {},
+    "id": "http://example.com/example.json",
+    "properties": {
+        "port": {
+            "id": "/properties/port",
+            "type": "string"
+        },
+        "schedules": {
+            "id": "/properties/schedules",
+            "items": {
+                "id": "/properties/schedules/items",
+                "properties": {
+                    "enabled": {
+                        "id": "/properties/schedules/items/properties/enabled",
+                        "type": "boolean"
+                    },
+                    "endDate": {
+                        "id": "/properties/schedules/items/properties/endDate",
+                        "type": "string"
+                    },
+                    "observations": {
+                        "id": "/properties/schedules/items/properties/observations",
+                        "items": {
+                            "id": "/properties/schedules/items/properties/observations/items",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "startDate": {
+                        "id": "/properties/schedules/items/properties/startDate",
+                        "type": "string"
+                    },
+                    "weekdays": {
+                        "id": "/properties/schedules/items/properties/weekdays",
+                        "properties": {
+                            "friday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/friday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "monday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/monday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "saturday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/saturday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "sunday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/sunday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "thursday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/thursday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "tuesday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/tuesday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            },
+                            "wednesday": {
+                                "id": "/properties/schedules/items/properties/weekdays/properties/wednesday",
+                                "items": {
+                                    "id": "/properties/schedules/items/properties/weekdays/properties/monday/items",
+                                    "properties": {
+                                        "endTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/endTime",
+                                            "type": "string"
+                                        },
+                                        "startTime": {
+                                            "id": "/properties/schedules/items/properties/weekdays/properties/monday/items/properties/startTime",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "required": ["endTime", "startTime"],
+                                    "type": "object"
+                                },
+                                "type": "array"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "required": ["enabled", "endDate", "observations", "startDate", "weekdays"],
+                "type": "object"
+            },
+            "type": "array"
+        },
+        "sensor": {
+            "id": "/properties/sensor",
+            "type": "string"
+        }
+    },
+    "required": ["port", "schedules", "sensor"],
+    "type": "object"
+}

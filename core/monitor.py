@@ -32,12 +32,16 @@ class Monitor(object):
     """
     Monitor is used to manage the monitoring process by creating a
     configuration manager, a sensor manager, and a module manager.
+
+    Args:
+        config_file_path (str): Path to the configuration file.
     """
 
-    def __init__(self, config_file):
+    def __init__(self, config_file_path: str):
         manager = Manager()
-        manager.config_manager = ConfigManager(config_file)
+        manager.config_manager = ConfigManager(config_file_path)
         manager.sensor_manager = SensorManager(manager.config_manager)
+        manager.schema_manager = SchemaManager()
 
         module_manager = ModuleManager(manager)
 

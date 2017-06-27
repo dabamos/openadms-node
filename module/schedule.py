@@ -19,6 +19,8 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for the scheduling of observations."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -49,19 +51,28 @@ class Scheduler(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get('schedulers').get(self._name)
+        self._config = self._config_manager.get('schedulers').get(self._name)
+        self.set_configuration_schema('scheduler',
+                                      'module/schedule/scheduler.json')
 
-        self._port_name = config.get('port')
-        self._sensor_name = config.get('sensor')
-        self._schedules = config.get('schedules')
+        self._port_name = self._config.get('port')
+        self._sensor_name = self._config.get('sensor')
+        self._schedules = self._config.get('schedules')
 
         self._thread = None
         self._jobs = []
-        self._load_jobs()
 
-    def _load_jobs(self):
+    def add(self, job):
+        """Appends a job to the jobs list."""
+        self._jobs.append(job)
+        self.logger.debug('Added job "{}" to scheduler "{}"'
+                          .format(job.name, self._name))
+
+    def load_jobs(self):
         """Loads all observation sets from the configurations and creates jobs
         to put into the jobs list."""
+        self._jobs = []
+
         # Run through the schedules and create jobs.
         for schedule in self._schedules:
             observations = schedule.get('observations')
@@ -91,17 +102,13 @@ class Scheduler(Prototype):
                 # Add the job to the jobs list.
                 self.add(job)
 
-    def add(self, job):
-        """Appends a job to the jobs list."""
-        self._jobs.append(job)
-        self.logger.debug('Added job "{}" to scheduler "{}"'
-                          .format(job.name, self._name))
-
     def run(self):
         """Threaded method to process the jobs queue."""
+        self.load_jobs()
         zombies = []
 
         # Wait for uplink connection.
+        # FIXME
         time.sleep(5.0)
 
         while self.is_running:
@@ -142,7 +149,7 @@ class Scheduler(Prototype):
                           .format(self._name))
         self._is_running = True
 
-        # Run the method self.run_jobs() within a thread.
+        # Run the method run() within a thread.
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
@@ -279,4 +286,3 @@ class Job(object):
     @property
     def name(self):
         return self._name
-

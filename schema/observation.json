@@ -74,5 +74,6 @@
             "type": "number"
         }
     },
+    "required": ["enabled", "id", "name", "nextReceiver", "onetime", "receivers", "sensorName", "sensorType", "sleepTime"],
     "type": "object"
 }

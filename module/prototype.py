@@ -28,7 +28,6 @@ __license__ = 'EUPL'
 
 import json
 import jsonschema
-import pathlib
 
 from core.manager import *
 from core.observation import Observation
@@ -42,28 +41,26 @@ class Prototype(object):
     def __init__(self, name, type, manager):
         self.logger = logging.getLogger(name)
 
-        self._name = name   # Module name, e.g., 'serialPort'.
-        self._type = type   # Class path, e.g., 'module.port.SerialPort'.
+        self._name = name       # Module name, e.g., 'serialPort'.
+        self._type = type       # Class path, e.g., 'module.port.SerialPort'.
+        self._config = None     # Module configuration.
+        self._config_schema_name = None
 
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
+        self._schema_manager = manager.schema_manager
 
         self._uplink = None
         self._is_running = False
 
         # A dictionary of the various payload data types and their respective
-        # callback functions.  Further callback functions can be added with the
+        # callback functions. Further callback functions can be added with the
         # `add_handler()` method.
         self._handlers = {
             'observation': self.do_handle_observation,
             'service': self.do_handle_service
         }
-
-        self._schema_root = pathlib.Path('schema')
-        self._schema = {}
-
-        self.add_schema('observation', 'observation.json')
 
     def add_handler(self,
                     data_type: str,
@@ -76,26 +73,19 @@ class Prototype(object):
         """
         self._handlers[data_type] = func
 
-    def add_schema(self, data_type: str, path: str) -> None:
-        schema = None
-        schema_path = self._schema_root / path
+    def add_schema(self, name: str, path: str) -> None:
+        """Adds a JSON schema to the schema manager.
 
-        with open(schema_path, encoding='utf-8') as data_file:
-            try:
-                schema = json.loads(data_file.read())
-                jsonschema.Draft4Validator.check_schema(schema)
+        Args:
+            name (str): Name of the module.
+            path (str): Path to the schema file.
+        """
+        if not self._schema_manager.has_schema(name):
+            self._schema_manager.add_schema(name, path)
 
-                self._schema[data_type] = schema
-                self.logger.debug('Loaded JSON schema "{}" from "{}"'
-                                  .format(data_type, schema_path))
-            except json.JSONDecodeError:
-                self.logger.error('Invalid JSON file "{}"'
-                                  .format(schema_path))
-                return
-            except jsonschema.SchemaError:
-                self.logger.error('Invalid JSON schema "{}"'
-                                  .format(schema_path))
-                return
+    def set_configuration_schema(self, name: str, path: str) -> None:
+        self._config_schema_name = name
+        self.add_schema(name, path)
 
     def do_handle_observation(self, header: Dict, payload: Dict) -> None:
         """Handles an observation by forwarding it to the processing method and
@@ -144,45 +134,39 @@ class Prototype(object):
         payload_type = header.get('type')
 
         if not payload_type:
-            self.logger.error('{}: no payload type defined'.format(self._name))
+            self.logger.error('No payload type defined')
             return
 
         # Validate payload.
-        if self.has_validator(payload_type):
-            if not self.validate(payload, payload_type):
-                self.logger.error('Data of type "{}" is not valid'
-                                  .format(payload_type))
-        else:
-            self.logger.warning('No validator found for type "{}"'
-                                .format(payload_type))
+        if not self.is_valid(payload, payload_type):
+            self.logger.error('Payload of type "{}" is invalid'
+                              .format(payload_type))
+            return
 
         # Send payload to specific handler.
         handler_func = self._handlers.get(payload_type)
 
         if not handler_func:
-            self.logger.warning('{}: no handler found for payload type "{}"'
-                                .format(self._name, payload_type))
+            self.logger.warning('No handler found for payload type "{}"'
+                                .format(payload_type))
             return
 
         handler_func(header, payload)
 
-    def has_validator(self, data_type: str) -> bool:
-        """Returns whether or not a JSON validator for the given data type is
-        available.
-
-        Args:
-            data_type (str): Type of data (e.g., 'observation').
-        """
-        if self._schema.get(data_type):
+    def has_valid_configuration(self) -> bool:
+        if not self._config or not self._config_schema_name:
             return True
-        else:
-            return False
+
+        return self.is_valid(self._config, self._config_schema_name)
 
     def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not."""
         return (not hasattr(arg, 'strip') and
                 hasattr(arg, '__getitem__') or
                 hasattr(arg, '__iter__'))
+
+    def is_valid(self, data: Dict, data_type: str) -> None:
+        return self._schema_manager.is_valid(data, data_type)
 
     def process_observation(self, obs: Type[Observation]) -> Observation:
         # Will be overwritten by worker.
@@ -264,31 +248,24 @@ class Prototype(object):
         # Send the observation to the next module.
         self.publish(next_receiver, header, payload)
 
-    def start(self):
+    def start(self) -> None:
+        """Starts the worker."""
         self.logger.debug('Starting worker "{}" ...'
                           .format(self._name))
         self._is_running = True
 
-    def stop(self):
+    def stop(self) -> None:
+        """Stops the worker."""
         self.logger.debug('Stopping worker "{}" ...'
                           .format(self._name))
         self._is_running = False
 
-    def validate(self, data: Dict, data_type: str) -> bool:
-        schema = self._schema.get(data_type)
+    def validate_configuration(self, config, schema_name, schema_path):
+        self.add_schema(schema_name, schema_path)
 
-        if not schema:
-            self.logger.warning('JSON schema "{}" not found'
-                                .format(data_type))
-            return False
-
-        try:
-            jsonschema.validate(data, schema)
-        except jsonschema.ValidationError as e:
-            self.logger.warning(e)
-            return False
-
-        return True
+        if not self.is_valid(config, schema_name):
+            self.logger.error('Configuration of module "{}" is invalid'
+                              .format(schema_name))
 
     @property
     def is_running(self) -> bool:

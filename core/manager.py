@@ -26,6 +26,7 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import json
+import jsonschema
 import logging
 
 from importlib import *
@@ -40,13 +41,14 @@ from core.sensor import Sensor
 class Manager(object):
     """
     Manager is a container class for the configuration manager, the sensor
-    manager, and the module manager.
+    manager, the module manager, and the schema manager.
     """
 
     def __init__(self):
         self._config_manager = None
         self._sensor_manager = None
         self._module_manager = None
+        self._schema_manager = None
 
     @property
     def config_manager(self):
@@ -55,6 +57,10 @@ class Manager(object):
     @property
     def module_manager(self):
         return self._module_manager
+
+    @property
+    def schema_manager(self):
+        return self._schema_manager
 
     @property
     def sensor_manager(self):
@@ -67,6 +73,10 @@ class Manager(object):
     @module_manager.setter
     def module_manager(self, module_manager):
         self._module_manager = module_manager
+
+    @schema_manager.setter
+    def schema_manager(self, schema_manager):
+        self._schema_manager = schema_manager
 
     @sensor_manager.setter
     def sensor_manager(self, sensor_manager):
@@ -101,7 +111,7 @@ class ConfigManager(object):
                 self.logger.info('Loaded configuration file "{}"'
                                  .format(config_path))
             except ValueError as e:
-                self.logger.error('Invalid JSON: "{}"'.format(e))
+                self.logger.error('Invalid JSON file "{}"'.format(e))
                 return False
 
         return True
@@ -148,19 +158,34 @@ class ModuleManager(object):
 
         for module_name, class_path in self._config.items():
             self.add(module_name, class_path)
+
+            if not self.has_module(module_name):
+                self.logger.error('Module "{}" not loaded'.format(module_name))
+                continue
+
             self.start(module_name)
 
     def add(self, module_name, class_path):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary."""
+        self.logger.info('Loading module "{}"'.format(module_name))
         messenger = MQTTMessenger(self._manager.config_manager)
+        worker = None
 
-        if self.module_exists(class_path):
-            worker = self.get_worker(module_name, class_path)
-        else:
+        if not self.module_exists(class_path):
             self.logger.error('Module "{}" not found'.format(class_path))
+            return
 
-        self.logger.info('Loading module "{}" ...'.format(module_name))
+        worker = self.get_worker(module_name, class_path)
+
+        if not worker:
+            return
+
+        if not worker.has_valid_configuration():
+            self.logger.error('Configuration of module "{}" is invalid'
+                              .format(module_name))
+            return
+
         self._modules[module_name] = Module(messenger, worker)
 
     def delete(self, module_name):
@@ -264,3 +289,74 @@ class SensorManager(object):
     @property
     def sensors(self):
         return self._sensors
+
+
+class SchemaManager(object):
+
+    def __init__(self):
+        self.logger = logging.getLogger('schemaManager')
+        self._schema = {}
+
+        self.add_schema('observation', 'observation.json')
+
+    def add_schema(self, data_type: str, path: str,
+            root: str = 'schema') -> bool:
+        """Reads a JSON schema file from the given path and stores it in the
+        internal dictionary.
+
+        Args:
+            data_type (str): Name of the data type (e.g., 'observation').
+            path (str): Path to schema file.
+            root (str): Root directory (default: 'schema').
+        """
+        schema_path = Path(root, path)
+
+        if not schema_path.exists():
+            self.logger.error('Schema file "{}" not found.'
+                              .format(schema_path))
+            return False
+
+        with open(schema_path, encoding='utf-8') as data_file:
+            try:
+                schema = json.loads(data_file.read())
+                jsonschema.Draft4Validator.check_schema(schema)
+
+                self._schema[data_type] = schema
+                self.logger.debug('Loaded JSON schema "{}" from "{}"'
+                                  .format(data_type, schema_path))
+            except json.JSONDecodeError:
+                self.logger.error('Invalid JSON file "{}"'
+                                  .format(schema_path))
+                return False
+            except jsonschema.SchemaError:
+                self.logger.error('Invalid JSON schema "{}"'
+                                  .format(schema_path))
+                return False
+
+        return True
+
+    def has_schema(self, name: str) -> bool:
+        """Returns whether or not a JSON schema for the given name is
+        available.
+
+        Args:
+            name (str): Name of the schema (e.g., 'observation').
+        """
+        if self._schema.get(name):
+            return True
+        else:
+            return False
+
+    def is_valid(self, data: Dict, name: str) -> bool:
+        if not self.has_schema(name):
+            self.logger.warning('JSON schema "{}" not found'
+                                .format(name))
+            return False
+
+        try:
+            schema = self._schema.get(name)
+            jsonschema.validate(data, schema)
+        except jsonschema.ValidationError:
+            return False
+
+        return True
