@@ -36,6 +36,7 @@ from typing import *
 from core.intercom import MQTTMessenger
 from core.module import Module
 from core.sensor import Sensor
+from module.prototype import Prototype
 
 
 class Manager(object):
@@ -157,42 +158,49 @@ class ModuleManager(object):
         self._modules = {}
 
         for module_name, class_path in self._config.items():
-            self.add(module_name, class_path)
-
-            if not self.has_module(module_name):
+            if not self.add(module_name, class_path):
                 self.logger.error('Module "{}" not loaded'.format(module_name))
                 continue
 
             self.start(module_name)
 
-    def add(self, module_name, class_path):
+    def add(self, module_name: str, class_path: str) -> bool:
         """Instantiates a worker, instantiates a messenger, and bundles both
-        to a module. The module will be added to the modules dictionary."""
+        to a module. The module will be added to the modules dictionary.
+
+        Args:
+            module_name (str): Name of the module.
+            class_path (str): Path to the Python class.
+
+        Returns:
+            True of module has been added, False if not.
+        """
         self.logger.info('Loading module "{}"'.format(module_name))
         messenger = MQTTMessenger(self._manager.config_manager)
         worker = None
 
         if not self.module_exists(class_path):
             self.logger.error('Module "{}" not found'.format(class_path))
-            return
+            return False
 
         worker = self.get_worker(module_name, class_path)
 
         if not worker:
-            return
+            return False
 
         if not worker.has_valid_configuration():
             self.logger.error('Configuration of module "{}" is invalid'
                               .format(module_name))
-            return
+            return False
 
         self._modules[module_name] = Module(messenger, worker)
+        return True
 
-    def delete(self, module_name):
+    def delete(self, module_name: str) -> None:
         """Removes a module from the modules dictionary."""
         self._modules[module_name] = None
 
-    def get(self, name: str):
+    def get(self, name: str) -> None:
         """Returns a specific module."""
         return self._modules.get(name)
 
@@ -204,8 +212,16 @@ class ModuleManager(object):
         """Returns the root directory of OpenADMS."""
         return Path(__file__).parent.parent
 
-    def get_worker(self, module_name, class_path):
-        """Loads a Python class from a given path and returns the instance."""
+    def get_worker(self, module_name: str, class_path: str) -> Type[Prototype]:
+        """Loads a Python class from a given path and returns the instance.
+
+        Args:
+            module_name (str): Name of the module.
+            class_path (str): Path to the Python class.
+
+        Returns:
+            Instance of Python class.
+        """
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = './' + module_path.replace('.', '/') + '.py'
 
@@ -260,7 +276,6 @@ class SensorManager(object):
 
     def load(self):
         """Creates the sensors defined in the configuration."""
-        # Create sensor objects.
         if not self._sensor_config:
             self.logger.info('No sensors defined')
             return
@@ -292,6 +307,9 @@ class SensorManager(object):
 
 
 class SchemaManager(object):
+    """
+    SchemaManager stores JSON schema and validates given data with them.
+    """
 
     def __init__(self):
         self.logger = logging.getLogger('schemaManager')
@@ -299,8 +317,10 @@ class SchemaManager(object):
 
         self.add_schema('observation', 'observation.json')
 
-    def add_schema(self, data_type: str, path: str,
-            root: str = 'schema') -> bool:
+    def add_schema(self,
+                   data_type: str,
+                   path: str,
+                   root: str = 'schema') -> bool:
         """Reads a JSON schema file from the given path and stores it in the
         internal dictionary.
 
@@ -347,15 +367,24 @@ class SchemaManager(object):
         else:
             return False
 
-    def is_valid(self, data: Dict, name: str) -> bool:
-        if not self.has_schema(name):
+    def is_valid(self, data: Dict, schema_name: str) -> bool:
+        """Validates data with JSON schema and returns result.
+
+        Args:
+            data (Dict): The data.
+            schema_name (str): The name of the schema used for validation.
+
+        Returns:
+            True if data is valid, False if not.
+        """
+        if not self.has_schema(schema_name):
             self.logger.warning('JSON schema "{}" not found'
-                                .format(name))
+                                .format(schema_name))
             return False
 
         try:
-            schema = self._schema.get(name)
-            jsonschema.validate(data, schema)
+            schema = self._schema.get(schema_name)
+            jsonschema.validate(data, schema_schema)
         except jsonschema.ValidationError:
             return False
 
