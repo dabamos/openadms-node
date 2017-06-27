@@ -9,7 +9,7 @@
             "requestSets": {
                 "getXYTemperature": {
                     "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
-                    "responsePattern": "X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
+                    "responsePattern": "X:(?P<x>[-+]?[0-9]*\\.?[0-9]+) Y:(?P<y>[-+]?[0-9]*\\.?[0-9]+) T:(?P<temperature>[-+]?[0-9]*\\.?[0-9]+)",
                     "responseDelimiter": "\\x03",
                     "timeout": 2.0
                 }
