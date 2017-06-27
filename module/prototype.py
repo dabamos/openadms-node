@@ -202,9 +202,6 @@ class Prototype(object):
 
         Args:
             obs (Observation): Observation object.
-
-        Returns:
-            Observation object.
         """
         receivers = obs.get('receivers')
         index = obs.get('nextReceiver')
