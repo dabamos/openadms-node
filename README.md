@@ -75,7 +75,7 @@ $ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
 ## Virtual Environment
-The Python tool `pyvenv` can be used to set-up a virtual environment for
+The Python tool `venv` can be used to set-up a virtual environment for
 development (with `csh`/`tcsh` on Unix):
 
 ```
