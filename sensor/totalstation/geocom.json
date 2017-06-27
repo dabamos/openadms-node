@@ -1,7 +1,7 @@
 {
-    "name": "LeicaTPS",
+    "name": "GeoCOM",
     "type": "totalstation",
-    "description": "Leica Geosystems robotic total stations.",
+    "description": "GeoCOM commands for Leica Geosystems robotic total stations.",
     "mode": "active",
     "observations": {
         "beepOn": {
