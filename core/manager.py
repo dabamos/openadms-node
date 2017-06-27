@@ -131,11 +131,6 @@ class ConfigManager(object):
 
     @property
     def path(self) -> str:
-        """Path to the configuration file.
-
-        Returns:
-            String with path.
-        """
         return self._path
 
     @config.setter
@@ -148,7 +143,7 @@ class ModuleManager(object):
     ModuleManager loads and manages OpenADMS module.
     """
 
-    def __init__(self, manager):
+    def __init__(self, manager: Type[Manager]):
         self.logger = logging.getLogger('moduleManager')
 
         self._manager = manager
@@ -196,20 +191,36 @@ class ModuleManager(object):
         self._modules[module_name] = Module(messenger, worker)
         return True
 
-    def delete(self, module_name: str) -> None:
-        """Removes a module from the modules dictionary."""
-        self._modules[module_name] = None
+    def delete(self, name: str) -> None:
+        """Removes a module from the modules dictionary.
 
-    def get(self, name: str) -> None:
-        """Returns a specific module."""
+        Args:
+            name (str): The name of the module.
+        """
+        self._modules[name] = None
+
+    def get(self, name: str) -> Type[Module]:
+        """Returns a specific module.
+
+        Args:
+            name (str): The name of the module.
+        """
         return self._modules.get(name)
 
-    def get_modules_list(self):
-        """Returns a list with all names of all modules."""
+    def get_modules_list(self) -> List[str]:
+        """Returns a list with all names of all modules.
+
+        Returns:
+            List of module names.
+        """
         return self._modules.keys()
 
-    def get_root_dir(self) -> Path:
-        """Returns the root directory of OpenADMS."""
+    def get_root_dir(self) -> Type[Path]:
+        """Returns the root directory of OpenADMS.
+
+        Returns:
+            Path object.
+        """
         return Path(__file__).parent.parent
 
     def get_worker(self, module_name: str, class_path: str) -> Type[Prototype]:
@@ -220,7 +231,7 @@ class ModuleManager(object):
             class_path (str): Path to the Python class.
 
         Returns:
-            Instance of Python class.
+            Instance of Python class or None.
         """
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = './' + module_path.replace('.', '/') + '.py'
@@ -236,12 +247,29 @@ class ModuleManager(object):
         return worker
 
     def has_module(self, name: str) -> bool:
+        """Returns whether or not module is found.
+
+        Args:
+            name (str): The name of the module.
+
+        Returns:
+            True if module is found, False if not.
+        """
         if self.modules.get(name):
             return True
         else:
             return False
 
-    def module_exists(self, class_path):
+    def module_exists(self, class_path: str) -> bool:
+        """Returns whether or not a OpenADMS module exists in the given file
+        path.
+
+        Args:
+            class_path (str): The path to the class.
+
+        Returns:
+            True if module exists, False if not.
+        """
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = module_path.replace('.', '/') + '.py'
 
@@ -250,11 +278,21 @@ class ModuleManager(object):
 
         return True
 
-    def start(self, module_name: str):
+    def start(self, module_name: str) -> None:
+        """Starts a module.
+
+        Args:
+            module_name (str): The name of the module.
+        """
         self._modules.get(module_name).start()
         self._modules.get(module_name).start_worker()
 
-    def stop(self, module_name: str):
+    def stop(self, module_name: str) -> None:
+        """Stops a module.
+
+        Args:
+            module_name (str): The name of the module.
+        """
         self._modules.get(module_name).stop_worker()
 
     @property
@@ -267,14 +305,14 @@ class SensorManager(object):
     SensorManager stores and manages object of type `Sensor`.
     """
 
-    def __init__(self, config_manager):
+    def __init__(self, config_manager: Type[ConfigManager]):
         self.logger = logging.getLogger('sensorManager')
         self._sensor_config = config_manager.get('sensors')
         self._sensors = {}
 
         self.load()
 
-    def load(self):
+    def load(self) -> None:
         """Creates the sensors defined in the configuration."""
         if not self._sensor_config:
             self.logger.info('No sensors defined')
@@ -285,19 +323,19 @@ class SensorManager(object):
             self.add(sensor_name, sensor_obj)
             self.logger.info('Created sensor "{}"'.format(sensor_name))
 
-    def add(self, name, sensor):
+    def add(self, name: str, sensor: str) -> None:
         """Adds a sensor to the sensors dictionary."""
         self._sensors[name] = sensor
 
-    def delete(self, name):
+    def delete(self, name: str) -> None:
         """Removes a sensor from the sensors dictionary."""
         self._sensors[name] = None
 
-    def get(self, name):
+    def get(self, name: str) -> Type[Sensor]:
         """Returns the sensor object with the given name."""
         return self._sensors.get(name)
 
-    def get_sensors_names(self):
+    def get_sensors_names(self) -> List[str]:
         """Returns a list with all sensor names."""
         return self._sensors.keys()
 
@@ -325,9 +363,9 @@ class SchemaManager(object):
         internal dictionary.
 
         Args:
-            data_type (str): Name of the data type (e.g., 'observation').
-            path (str): Path to schema file.
-            root (str): Root directory (default: 'schema').
+            data_type (str): The name of the data type (e.g., 'observation').
+            path (str): The path to the JSON schema file.
+            root (str): The root directory (default: 'schema').
         """
         schema_path = Path(root, path)
 

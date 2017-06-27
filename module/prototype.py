@@ -77,13 +77,19 @@ class Prototype(object):
         """Adds a JSON schema to the schema manager.
 
         Args:
-            name (str): Name of the module.
-            path (str): Path to the schema file.
+            name (str): The name of the schema.
+            path (str): The path to the schema file.
         """
         if not self._schema_manager.has_schema(name):
             self._schema_manager.add_schema(name, path)
 
     def set_configuration_schema(self, name: str, path: str) -> None:
+        """Sets the JSON schema for the module's configuration.
+
+        Args:
+            name (str): The name of the JSON schema.
+            path (str): The path to the JSON schema file.
+        """
         self._config_schema_name = name
         self.add_schema(name, path)
 
@@ -99,7 +105,12 @@ class Prototype(object):
             self.publish_observation(obs)
 
     def do_handle_service(self, header: Dict, payload: Dict) -> None:
-        """Processes service messages."""
+        """Processes service messages.
+
+        Args:
+            header (Dict): The message header.
+            payload (Dict): The message payload.
+        """
         sender = header.get('from', '?')
         action = payload.get('action')
 
@@ -154,18 +165,35 @@ class Prototype(object):
         handler_func(header, payload)
 
     def has_valid_configuration(self) -> bool:
+        """Returns whether or not the module has a valid configuration.
+
+        Returns:
+            True if configuration is valid, False if not.
+        """
         if not self._config or not self._config_schema_name:
             return True
 
         return self.is_valid(self._config, self._config_schema_name)
 
     def is_sequence(self, arg: Any) -> bool:
-        """Checks whether the argument is a list/a tuple or not."""
+        """Checks whether the argument is a list/a tuple or not.
+
+        Returns:
+            True if argument is a sequence, False if not."""
         return (not hasattr(arg, 'strip') and
                 hasattr(arg, '__getitem__') or
                 hasattr(arg, '__iter__'))
 
-    def is_valid(self, data: Dict, data_type: str) -> None:
+    def is_valid(self, data: Dict, data_type: str) -> bool:
+        """Returns whether or not given data is valid.
+
+        Args:
+            data (Dict): The data.
+            data_type (str): The name of the data type.
+
+        Returns:
+            True if data is valid, False if not.
+        """
         return self._schema_manager.is_valid(data, data_type)
 
     def process_observation(self, obs: Type[Observation]) -> Observation:
@@ -257,7 +285,18 @@ class Prototype(object):
                           .format(self._name))
         self._is_running = False
 
-    def validate_configuration(self, config, schema_name, schema_path):
+    def validate_configuration(self,
+                               config: Dict,
+                               schema_name: str,
+                               schema_path: str) -> None:
+        """Adds given schema to the SchemaManager and validates the module
+        configuration.
+
+        Args:
+            config (Dict): The module configuration.
+            schema_name (str): The name of the JSON schema.
+            schema_path (str): The path to the JSON schema file.
+        """
         self.add_schema(schema_name, schema_path)
 
         if not self.is_valid(config, schema_name):
