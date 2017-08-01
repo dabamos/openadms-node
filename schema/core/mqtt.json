@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "additionalProperties": false,
+    "definitions": {},
+    "id": "mqtt.json",
+    "properties": {
+        "host": {
+            "id": "/properties/host",
+            "type": "string"
+        },
+        "keepAlive": {
+            "id": "/properties/keepAlive",
+            "type": "integer"
+        },
+        "port": {
+            "id": "/properties/port",
+            "type": "integer"
+        },
+        "topic": {
+            "id": "/properties/topic",
+            "type": "string"
+        }
+    },
+    "required": [
+        "topic",
+        "host",
+        "port",
+        "keepAlive"
+    ],
+    "type": "object"
+}
