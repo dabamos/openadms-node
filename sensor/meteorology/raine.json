@@ -1,0 +1,54 @@
+{
+    "name": "Lambrecht rain-e",
+    "type": "meteo",
+    "description": "Weighing precipitation sensor.",
+    "mode": "active",
+    "observations": {
+        "getValues": {
+            "description": "Returns intensity (mm/min), intensity (mm/h), relative intensity (mm/min), relative intensity (mm/h), relative amount (mm), total amount (mm), heating status (0/1), temperature (C).",
+            "requestSets": {
+                "getValues": {
+                    "request": "\\x02m\r\n",
+                    "responsePattern": ":(?P<intMin>[+-]?\\d+\\.?\\d+);(?P<intH>[+-]?\\d+\\.?\\d+);(?P<intRelMin>[+-]?\\d+\\.?\\d+);(?P<intRelH>[+-]?\\d+\\.?\\d+);(?P<amRel>[+-]?\\d+\\.?\\d+);(?P<amTot>[+-]?\\d+\\.?\\d+);(?P<statusHeat>[+-]?\\d+);(?P<tempIn>[+-]?\\d+\\.?\\d+);",
+                    "responseDelimiter": "\r\n",
+                    "timeout": 2.0
+                }
+            },
+            "responseSets": {
+                "intMin": {
+                    "type": "float",
+                    "unit": "mm/min"
+                },
+                "intH": {
+                    "type": "float",
+                    "unit": "mm/h"
+                },
+                 "intRelMin": {
+                    "type": "float",
+                    "unit": "mm/min"
+                },
+                "intRelH": {
+                    "type": "float",
+                    "unit": "mm/h"
+                },
+                 "amRel": {
+                    "type": "float",
+                    "unit": "mm"
+                },
+                "amTot": {
+                    "type": "float",
+                    "unit": "mm"
+                },
+                "statusHeat": {
+                    "type": "integer",
+                    "unit": "none"
+                },
+                "tempIn": {
+                    "type": "float",
+                    "unit": "C"
+                }
+            }
+        }
+    }
+}
+
