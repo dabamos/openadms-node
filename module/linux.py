@@ -124,7 +124,7 @@ class InterruptCounter(Prototype):
         }
 
         obs.set('id', gpio)
-        obs.set('name', 'interrupts')
+        obs.set('name', 'interruptCount')
         obs.set('enabled', False)
         obs.set('onetime', False)
         obs.set('nextReceiver', 0)
@@ -133,6 +133,7 @@ class InterruptCounter(Prototype):
         obs.set('responseSets', response_sets)
         obs.set('sensorName', self._sensor_name)
         obs.set('sensorType', 'gpio')
+        obs.set('sleepTime', 0.0)
         obs.set('timeStamp', time.time())
 
         self.publish_observation(obs)
