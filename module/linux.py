@@ -33,8 +33,7 @@ import threading
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    logger = logging.getLogger()
-    logger.error('Module "RPi.GPIO" not found')
+    logging.getLogger().error('Module "RPi.GPIO" not found')
 
 from core.observation import Observation
 from module.prototype import Prototype
@@ -126,11 +125,14 @@ class InterruptCounter(Prototype):
 
         obs.set('id', gpio)
         obs.set('name', 'interrupts')
+        obs.set('enabled', False)
+        obs.set('onetime', False)
         obs.set('nextReceiver', 0)
         obs.set('portName', 'GPIO{}'.format(self._gpio))
         obs.set('receivers', [self._receiver])
         obs.set('responseSets', response_sets)
         obs.set('sensorName', self._sensor_name)
+        obs.set('sensorType', 'gpio')
         obs.set('timeStamp', time.time())
 
         self.publish_observation(obs)

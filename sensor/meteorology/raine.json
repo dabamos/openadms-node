@@ -9,7 +9,7 @@
             "requestSets": {
                 "getValues": {
                     "request": "\\x02m\r\n",
-                    "responsePattern": ":(?P<intMin>[+-]?\\d+\\.?\\d+);(?P<intH>[+-]?\\d+\\.?\\d+);(?P<intRelMin>[+-]?\\d+\\.?\\d+);(?P<intRelH>[+-]?\\d+\\.?\\d+);(?P<amRel>[+-]?\\d+\\.?\\d+);(?P<amTot>[+-]?\\d+\\.?\\d+);(?P<statusHeat>[+-]?\\d+);(?P<tempIn>[+-]?\\d+\\.?\\d+);",
+                    "responsePattern": "(?P<intMin>[+-]?\\d+\\.?\\d+);(?P<intH>[+-]?\\d+\\.?\\d+);(?P<intRelMin>[+-]?\\d+\\.?\\d+);(?P<intRelH>[+-]?\\d+\\.?\\d+);(?P<amRel>[+-]?\\d+\\.?\\d+);(?P<amTot>[+-]?\\d+\\.?\\d+);(?P<statusHeat>[+-]?\\d+);(?P<tempIn>[+-]?\\d+\\.?\\d+);",
                     "responseDelimiter": "\r\n",
                     "timeout": 2.0
                 }

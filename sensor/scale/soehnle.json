@@ -9,8 +9,8 @@
             "requestSets": {
                 "getValue": {
                     "request": "<a>",
-                    "responsePattern": "\\d{6}N\\s+(?P<weight>\\d+[,]\\d+)\\s+kg",
-                    "responseDelimiter": "\r",
+                    "responsePattern": "\\d{6}N\\s+(?P<weight>\\d+[,]\\d+)\\s+",
+                    "responseDelimiter": "kg",
                     "timeout": 2.0
                 }
             },
