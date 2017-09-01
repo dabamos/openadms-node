@@ -22,6 +22,7 @@ limitations under the Licence.
 import asyncio
 import json
 import logging
+import uuid
 
 from threading import Thread
 from typing import *
@@ -92,7 +93,7 @@ class MQTTMessenger(object):
         if not self._config:
             return
 
-        self._client_id = None
+        self._client_id = str(uuid.uuid4())
         self._host = self._config.get('host')
         self._port = self._config.get('port')
         self._keep_alive = self._config.get('keepAlive')
