@@ -1376,7 +1376,7 @@
                 {
                     "enabled": true,
                     "startDate": "2016-02-01",
-                    "endDate": "2017-07-30",
+                    "endDate": "2019-07-30",
                     "weekdays": {},
                     "observations": [
                         "initialize",
@@ -1392,7 +1392,7 @@
                 {
                     "enabled": false,
                     "startDate": "2016-02-01",
-                    "endDate": "2017-07-30",
+                    "endDate": "2019-07-30",
                     "weekdays": {
                         "monday": [
                             {
