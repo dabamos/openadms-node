@@ -113,12 +113,12 @@ class FileExporter(Prototype):
 
         file_name = self._file_name
 
-        file_name = file_name.replace('{port}', obs.get('portName'))
-        file_name = file_name.replace('{date}', '{}'.format(date)
+        file_name = file_name.replace('{{port}}', obs.get('portName'))
+        file_name = file_name.replace('{{date}}', '{}'.format(date)
                                       if date else '')
-        file_name = file_name.replace('{id}', '{}'.format(obs.get('id'))
+        file_name = file_name.replace('{{id}}', '{}'.format(obs.get('id'))
                                       if obs.get('id') is not None else '')
-        file_name = file_name.replace('{name}', '{}'.format(obs.get('name'))
+        file_name = file_name.replace('{{name}}', '{}'.format(obs.get('name'))
                                       if obs.get('name') is not None else '')
 
         file_name += self._file_extension
