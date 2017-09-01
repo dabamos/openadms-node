@@ -33,7 +33,7 @@ To run OpenADMS, clone the master branch, install the dependencies and execute
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
-$ python3 openadms.py --config ./config/myconfig.json --debug
+$ python3 openadms.py --config ./config/myconfig.json --debug --with-mqtt-broker
 ```
 
 ### Dependencies
@@ -49,9 +49,9 @@ The following dependencies are used by OpenADMS:
 
 ## Message Broker
 The MQTT protocol is used for the internal and external message exchange in
-OpenADMS. An MQTT message broker, like [Eclipse Mosquitto](https://mosquitto.org/)
-or [HBMQTT](https://github.com/beerfactory/hbmqtt), must be installed and
-running before starting OpenADMS.
+OpenADMS. You can either use an external MQTT message broker, like
+[Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by using
+the parameter `--with-mqtt-broker`.
 
 For testing only, the public sandbox broker of
 [Eclipse IoT](https://iot.eclipse.org/getting-started) can be used. The server
@@ -70,8 +70,8 @@ $ python3 openadms.py --config ./config/myconfig.json --debug
 ```
 
 ## Virtual Environment
-The Python tool `venv` can be used to set-up a virtual environment for
-development (with `csh`/`tcsh` on Unix):
+The Python tool `venv` can create a virtual Python environment for development
+(with `csh`/`tcsh` on Unix):
 
 ```
 $ python3 -m venv virtual-environment
