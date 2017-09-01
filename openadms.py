@@ -247,17 +247,14 @@ if __name__ == '__main__':
 
     # Use internal MQTT message broker (HBMQTT).
     if options.is_mqtt_broker:
-        logger.info('Starting MQTT message broker ...')
-
-        # Add filter to logger.
         logging_filter = logging.Filter()
         logging_filter.filter = should_log
 
+        # Add filter to log handlers.
         for handler in logging.root.handlers:
             handler.addFilter(logging_filter)
 
-        broker = MQTTMessageBroker(options.host,
-                                   options.port)
+        broker = MQTTMessageBroker(options.host, options.port)
         broker.start()
 
     # Start the main program.

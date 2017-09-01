@@ -34,12 +34,16 @@ except ImportError:
     logging.getLogger().error('Module "HBMQTT" not found')
 
 
-class MQTTMessageBroker(object):
+class MQTTMessageBroker(Thread):
     """
     Wrapper class for the HBMQTT message broker.
     """
 
     def __init__(self, host, port):
+        Thread.__init__(self)
+        self.daemon = True
+        self.logger = logging.getLogger('mqtt')
+
         self._config = {
             'listeners': {
                 'default': {
@@ -51,16 +55,18 @@ class MQTTMessageBroker(object):
             }
         }
 
-    def start(self):
+    def run(self):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
-        # Create the HBMQTT message broker.
-        broker = Broker(config=self._config,
-                        loop=loop)
+        broker = Broker(config=self._config)
 
         try:
             loop.run_until_complete(broker.start())
+            self.logger.info('Started MQTT message broker')
+            loop.run_forever()
+        except KeyboardInterrupt:
+            loop.run_until_complete(broker.shutdown())
         finally:
             loop.close()
 
