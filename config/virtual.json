@@ -1542,7 +1542,7 @@
     },
     "fileExporter": {
         "fileExtension": ".csv",
-        "fileName": "{port}_{id}_{date}",
+        "fileName": "{{port}}_{{id}}_{{date}}",
         "fileRotation": "monthly",
         "paths": [
             "./data"
