@@ -48,8 +48,8 @@ The following dependencies are used by OpenADMS:
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
 
 ## Message Broker
-The MQTT protocol is used for the internal and external message exchange in
-OpenADMS. You can either use an external MQTT message broker, like
+The MQTT protocol is used for the message exchange in OpenADMS. You can either
+use an external MQTT message broker, like
 [Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by using
 the parameter `--with-mqtt-broker`.
 

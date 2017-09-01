@@ -112,7 +112,7 @@ def exception_hook(type, value, tb):
                                                        value,
                                                        tb)).replace('\n', '')
     logger.critical('Unhandled exception: {}'
-                    .format(''.join(fmt_exception.split())))
+                    .format(' '.join(fmt_exception.split())))
 
 
 def signal_handler(signal, frame):
@@ -255,5 +255,6 @@ if __name__ == '__main__':
         broker = MQTTMessageBroker(options.host, options.port)
         broker.start()
 
-    # Start the main program.
+    # Start the monitoring.
     main(options.config_file_path)
+

@@ -426,7 +426,7 @@ class SchemaManager(object):
                               .format(schema_path))
             return False
 
-        with open(schema_path, encoding='utf-8') as data_file:
+        with open(str(schema_path), encoding='utf-8') as data_file:
             try:
                 schema = json.loads(data_file.read())
                 jsonschema.Draft4Validator.check_schema(schema)
