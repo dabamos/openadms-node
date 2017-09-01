@@ -48,9 +48,9 @@ class Prototype(object):
     def __init__(self, name: str, type: str, manager: Any):
         self.logger = logging.getLogger(name)
 
-        self._name = name       # Module name, e.g., 'serialPort'.
-        self._type = type       # Class path, e.g., 'module.port.SerialPort'.
-        self._config = None     # Module configuration.
+        self._name = name                   # Module name, e.g., 'com5'.
+        self._type = type                   # Module type, e.g., 'serialPort'.
+        self._config = None                 # Module configuration.
         self._config_schema_name = None
 
         self._config_manager = manager.config_manager
@@ -79,26 +79,6 @@ class Prototype(object):
             func (Callable): Callback function for handling the message.
         """
         self._handlers[data_type] = func
-
-    def add_schema(self, name: str, path: str) -> None:
-        """Adds a JSON schema to the schema manager.
-
-        Args:
-            name (str): The name of the schema.
-            path (str): The path to the schema file.
-        """
-        if not self._schema_manager.has_schema(name):
-            self._schema_manager.add_schema(name, path)
-
-    def set_configuration_schema(self, name: str, path: str) -> None:
-        """Sets the JSON schema for the module's configuration.
-
-        Args:
-            name (str): The name of the JSON schema.
-            path (str): The path to the JSON schema file.
-        """
-        self._config_schema_name = name
-        self.add_schema(name, path)
 
     def do_handle_observation(self, header: Dict, payload: Dict) -> None:
         """Handles an observation by forwarding it to the processing method and

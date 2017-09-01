@@ -92,10 +92,11 @@ class ConfigManager(object):
         path (str): The path to the configuration file.
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str, schema_manager):
         self.logger = logging.getLogger('configurationManager')
-        self._config = {}   # The actual configuration.
+        self._schema_manager = schema_manager
         self._path = path   # Path to the configuration file.
+        self._config = {}   # The actual configuration.
 
         if self._path:
             self.load_config(self._path)
@@ -138,6 +139,27 @@ class ConfigManager(object):
         """
         return self._config.get(key)
 
+    def get_valid_config(self,
+                         schema_name: str,
+                         schema_path: str,
+                         *args: str) -> Dict[str, Any]:
+        ref = self._config
+
+        for x in args:
+            try:
+                ref = ref.get(x)
+            except AttributeError:
+                return
+
+        if not self._schema_manager.has_schema(schema_name):
+            self._schema_manager.add_schema(schema_name, schema_path)
+
+        if not self._schema_manager.is_valid(ref, schema_name):
+            self.logger.error('Configuration "{}" is invalid'
+                              .format(schema_name))
+        else:
+            return ref
+
     @property
     def config(self) -> Dict:
         return self._config
@@ -161,8 +183,14 @@ class ModuleManager(object):
 
     def __init__(self, manager: Type[Manager]):
         self.logger = logging.getLogger('moduleManager')
+
         self._manager = manager
-        self._config = self._manager.config_manager.get('modules')
+        self._config_manager = manager.config_manager
+        self._schema_manager = manager.schema_manager
+
+        self._config = self._config_manager.get('modules')
+        self._schema_manager.add_schema('modules', 'core/modules.json')
+
         self._modules = {}
 
         for module_name, class_path in self._config.items():
@@ -184,7 +212,7 @@ class ModuleManager(object):
             True of module has been added, False if not.
         """
         self.logger.info('Loading module "{}"'.format(module_name))
-        messenger = MQTTMessenger(self._manager.config_manager)
+        messenger = MQTTMessenger(self._config_manager)
         worker = None
 
         if not self.module_exists(class_path):
@@ -336,10 +364,10 @@ class SensorManager(object):
 
         for sensor_name, sensor_config in self._sensor_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
-            self.add(sensor_name, sensor_obj)
+            self.add_sensor(sensor_name, sensor_obj)
             self.logger.info('Created sensor "{}"'.format(sensor_name))
 
-    def add(self, name: str, sensor: Type[Sensor]) -> None:
+    def add_sensor(self, name: str, sensor: Type[Sensor]) -> None:
         """Adds a sensor to the sensors dictionary.
 
         Args:
@@ -416,6 +444,21 @@ class SchemaManager(object):
                 return False
 
         return True
+
+    def get_schema_path(self, class_path: str):
+        """Uses the class path of a module to generate the path to the
+        configuration schema file.
+
+        For instance, the given class path `module.schedule.Scheduler` will lead
+        to the schema path `module/schedule/scheduler.json`.
+
+        Args:
+            class_path (str): The class path of a module.
+
+        Returns:
+            The path to the schema of the module's configuration.
+        """
+        return Path(class_path.replace('.', '/').lower() + '.json')
 
     def has_schema(self, name: str) -> bool:
         """Returns whether or not a JSON schema for the given name exists.

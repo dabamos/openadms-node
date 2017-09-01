@@ -52,8 +52,6 @@ class Scheduler(Prototype):
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.get('schedulers').get(self._name)
-        self.set_configuration_schema('scheduler',
-                                      'module/schedule/scheduler.json')
 
         self._port_name = self._config.get('port')
         self._sensor_name = self._config.get('sensor')

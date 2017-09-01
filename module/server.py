@@ -130,7 +130,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         elif self.path.endswith('.txt'):
             mime = 'text/plain'
 
-        if parsed_path.path == '/' or parsed_path.path == '/index.html':
+        if parsed_path.path in ['/', '/index.html']:
             self.do_action_query(parse.parse_qs(parsed_path.query))
             content = self.get_index(self._template)
         else:
