@@ -100,7 +100,7 @@ class Alert(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
 
@@ -230,7 +230,7 @@ class AlertMessageFormatter(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
 
@@ -363,7 +363,7 @@ class ShortMessageAgent(Prototype):
                              .format(self._host, self._port))
                 return
 
-            self.logger.info('Sending SMS to "{}" ...'.format(number))
+            self.logger.info('Sending SMS to "{}"'.format(number))
             sock.send(message.encode())
 
             self.logger.debug('Closed connection to "{}:{}"'
@@ -421,7 +421,7 @@ class Heartbeat(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
         self._thread = threading.Thread(target=self.run)

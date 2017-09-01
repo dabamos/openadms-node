@@ -212,7 +212,7 @@ class ModuleManager(object):
             True of module has been added, False if not.
         """
         self.logger.info('Loading module "{}"'.format(module_name))
-        messenger = MQTTMessenger(self._config_manager)
+        messenger = MQTTMessenger(self._config_manager, module_name)
         worker = None
 
         if not self.module_exists(class_path):

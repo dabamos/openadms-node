@@ -74,7 +74,7 @@ class BluetoothPort(Prototype):
 
     def close(self):
         if self._sock:
-            self.logger.info('Closing port "{}" ...'.format(self._port))
+            self.logger.info('Closing port "{}"'.format(self._port))
             self._sock.close()
 
     def get_mac_address(self, s):
@@ -252,7 +252,7 @@ class SerialPort(Prototype):
 
     def close(self):
         if self._serial:
-            self.logger.info('Closing port "{}" ...'
+            self.logger.info('Closing port "{}"'
                              .format(self._serial_port_config.port))
             self._serial.close()
 
@@ -271,7 +271,7 @@ class SerialPort(Prototype):
             return
 
         if not self._serial.is_open:
-            self.logger.info('Re-opening port "{}" ...'
+            self.logger.info('Re-opening port "{}"'
                              .format(self._serial_port_config.port))
             self._serial.open()
             self._serial.reset_output_buffer()
@@ -316,7 +316,7 @@ class SerialPort(Prototype):
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
-                    self.logger.info('Attempt {} of {} ...'
+                    self.logger.info('Attempt {} of {}'
                                      .format(attempt + 1, self._max_attempts))
                     time.sleep(1)
 
@@ -381,7 +381,7 @@ class SerialPort(Prototype):
                 return
 
             if not self._serial.is_open:
-                self.logger.info('Re-opening port "{}" ...'
+                self.logger.info('Re-opening port "{}"'
                                  .format(self._serial_port_config.port))
                 self._serial.open()
                 self._serial.reset_input_buffer()
@@ -411,7 +411,7 @@ class SerialPort(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'.format(self._name))
+        self.logger.debug('Starting worker "{}"'.format(self._name))
         self._is_running = True
 
         if self.is_passive:
@@ -439,7 +439,7 @@ class SerialPort(Prototype):
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
 
-        self.logger.info('Opening port "{}" ...'
+        self.logger.info('Opening port "{}"'
                          .format(self._serial_port_config.port))
 
         try:

@@ -142,7 +142,7 @@ class InterruptCounter(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'.format(self._name))
+        self.logger.debug('Starting worker "{}"'.format(self._name))
         self._is_running = True
 
         # Run the method `run()` within a thread.

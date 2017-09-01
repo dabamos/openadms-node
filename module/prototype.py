@@ -262,13 +262,13 @@ class Prototype(object):
 
     def start(self) -> None:
         """Starts the worker."""
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
 
     def stop(self) -> None:
         """Stops the worker."""
-        self.logger.debug('Stopping worker "{}" ...'
+        self.logger.debug('Stopping worker "{}"'
                           .format(self._name))
         self._is_running = False
 

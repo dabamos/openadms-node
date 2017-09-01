@@ -129,7 +129,7 @@ class Scheduler(Prototype):
             # Remove expired jobs from the jobs list.
             while zombies:
                 zombie = zombies.pop()
-                self.logger.debug('Deleting expired job "{}" ...'
+                self.logger.debug('Deleting expired job "{}"'
                                   .format(zombie.name))
                 self._jobs.remove(zombie)
 
@@ -143,7 +143,7 @@ class Scheduler(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}" ...'
+        self.logger.debug('Starting worker "{}"'
                           .format(self._name))
         self._is_running = True
 
@@ -258,7 +258,7 @@ class Job(object):
         # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
-        self.logger.debug('Starting job "{}" for port "{}" ...'
+        self.logger.debug('Starting job "{}" for port "{}"'
                           .format(self._obs.get('name'),
                                   self._port_name))
 

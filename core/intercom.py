@@ -63,7 +63,7 @@ class MQTTMessageBroker(Thread):
 
         try:
             loop.run_until_complete(broker.start())
-            self.logger.info('Started MQTT message broker')
+            self.logger.info('Starting MQTT message broker')
             loop.run_forever()
         except KeyboardInterrupt:
             loop.run_until_complete(broker.shutdown())

@@ -88,7 +88,7 @@ class Module(threading.Thread):
     def run(self) -> None:
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
-        self.logger.debug('Connecting module "{}" to {}:{} ...'
+        self.logger.debug('Connecting module "{}" to {}:{}'
                           .format(self._worker.name,
                                   self._messenger.host,
                                   self._messenger.port))
