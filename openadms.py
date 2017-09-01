@@ -127,9 +127,7 @@ def stay_alive():
 
 def should_log(record):
     """Returns whether a logging.LogRecord should be logged."""
-    if record.name.startswith('hbmqtt') or \
-            record.name.startswith('passlib') or \
-            record.name.startswith('asyncio'):
+    if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
         return False
 
     return True
@@ -149,8 +147,8 @@ if __name__ == '__main__':
         usage='%prog [options]',
         description='OpenADMS {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()),
-        epilog='\nOpenADMS has been developed at the Neubrandenburg University'
-               'of Applied Sciences (Germany).\n'
+        epilog='\nOpenADMS has been developed at the Neubrandenburg '
+               'University of Applied Sciences (Germany).\n'
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
                '\nFor further information, visit https://www.dabamos.de/.\n')
 
