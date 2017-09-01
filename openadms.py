@@ -53,6 +53,7 @@ import traceback
 
 import coloredlogs
 
+from core.intercom import MQTTMessageBroker
 from core.monitor import Monitor
 from core.system import System
 
@@ -107,8 +108,9 @@ def setup_thread_exception_hook():
 
 
 def exception_hook(type, value, tb):
-    fmt_exception = ''.join(
-        traceback.format_exception(type, value, tb)).replace('\n', '')
+    fmt_exception = ''.join(traceback.format_exception(type,
+                                                       value,
+                                                       tb)).replace('\n', '')
     logger.critical('Unhandled exception: {}'
                     .format(''.join(fmt_exception.split())))
 
@@ -123,19 +125,37 @@ def stay_alive():
         time.sleep(1)
 
 
+def should_log(record):
+    """Returns whether a logging.LogRecord should be logged."""
+    if record.name.startswith('hbmqtt') or \
+            record.name.startswith('passlib') or \
+            record.name.startswith('asyncio'):
+        return False
+
+    return True
+
+
 if __name__ == '__main__':
+    # Set the hook for unhandled exceptions.
+    setup_thread_exception_hook()
+    sys.excepthook = exception_hook
+
+    # Use a signal handler to catch ^C and quit the program gracefully.
+    signal.signal(signal.SIGINT, signal_handler)
+
     # Parse command line options.
     optparse.OptionParser.format_epilog = lambda self, formatter: self.epilog
     parser = optparse.OptionParser(
         usage='%prog [options]',
-        description='OpenADMS {}'.format(System.get_openadms_version()),
-        epilog='\nOpenADMS has been developed at the University of Applied '
-               'Sciences Neubrandenburg (Germany).\n'
-               'Licensed under the European Union Public Licence (EUPL) v.1.1.'
+        description='OpenADMS {} - Open Automatic Deformation Monitoring '
+                    'System'.format(System.get_openadms_version()),
+        epilog='\nOpenADMS has been developed at the Neubrandenburg University'
+               'of Applied Sciences (Germany).\n'
+               'Licenced under the European Union Public Licence (EUPL) v.1.1.'
                '\nFor further information, visit https://www.dabamos.de/.\n')
 
     parser.add_option('-c', '--config',
-                      dest='config_file',
+                      dest='config_file_path',
                       action='store',
                       type='string',
                       help='path to configuration file',
@@ -166,6 +186,26 @@ if __name__ == '__main__':
                       type='string',
                       help='path to log file',
                       default='openadms.log')
+
+    parser.add_option('-m', '--with-mqtt-broker',
+                      dest='is_mqtt_broker',
+                      action='store_true',
+                      help='use internal MQTT message broker',
+                      default=False)
+
+    parser.add_option('-b', '--bind',
+                      dest='host',
+                      action='store',
+                      type='string',
+                      help='host of MQTT message broker (IP address or FQDN)',
+                      default='127.0.0.1')
+
+    parser.add_option('-p', '--port',
+                      dest='port',
+                      action='store',
+                      type='int',
+                      help='port of MQTT message broker',
+                      default='1883')
 
     (options, args) = parser.parse_args()
 
@@ -205,11 +245,20 @@ if __name__ == '__main__':
         sh.setFormatter(formatter)
         logger.addHandler(sh)
 
-    # Set the hook for unhandled exceptions.
-    setup_thread_exception_hook()
-    sys.excepthook = exception_hook
+    # Use internal MQTT message broker (HBMQTT).
+    if options.is_mqtt_broker:
+        logger.info('Starting MQTT message broker ...')
 
-    # Use a signal handler to catch ^C and quit the program gracefully.
-    signal.signal(signal.SIGINT, signal_handler)
+        # Add filter to logger.
+        logging_filter = logging.Filter()
+        logging_filter.filter = should_log
+
+        for handler in logging.root.handlers:
+            handler.addFilter(logging_filter)
+
+        broker = MQTTMessageBroker(options.host,
+                                   options.port)
+        broker.start()
+
     # Start the main program.
-    main(options.config_file)
+    main(options.config_file_path)

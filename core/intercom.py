@@ -19,14 +19,50 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+import asyncio
 import json
 import logging
 
+from threading import Thread
 from typing import *
 
 import paho.mqtt.client as mqtt
 
-from core.manager import *
+try:
+    from hbmqtt.broker import Broker
+except ImportError:
+    logging.getLogger().error('Module "HBMQTT" not found')
+
+
+class MQTTMessageBroker(object):
+    """
+    Wrapper class for the HBMQTT message broker.
+    """
+
+    def __init__(self, host, port):
+        self._config = {
+            'listeners': {
+                'default': {
+                    'max-connections': 5000,        # Set '0' for no limit.
+                    'type': 'tcp',                  # Set 'ws' for WebSockets.
+                    'bind': '{}:{}'.format(host,
+                                           port)
+                }
+            }
+        }
+
+    def start(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+        # Create the HBMQTT message broker.
+        broker = Broker(config=self._config,
+                        loop=loop)
+
+        try:
+            loop.run_until_complete(broker.start())
+        finally:
+            loop.close()
 
 
 class MQTTMessenger(object):
@@ -34,12 +70,21 @@ class MQTTMessenger(object):
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
 
     Args:
-        config_manager (Type[ConfigManager]): The configuration manager.
+        manager (Type[Manager]): The manager object.
     """
 
     def __init__(self, config_manager):
         self.logger = logging.getLogger('mqtt')
-        self._config = config_manager.get('intercom').get('mqtt')
+        self._config_manager = config_manager
+        self._client = None
+
+        self._config = self._config_manager.get_valid_config('mqtt',
+                                                             'core/mqtt.json',
+                                                             'intercom',
+                                                             'mqtt')
+
+        if not self._config:
+            return
 
         self._client_id = None
         self._host = self._config.get('host')
@@ -57,7 +102,8 @@ class MQTTMessenger(object):
         self._client.on_message = self._on_message
 
     def __del__(self):
-        self.disconnect()
+        if self._client:
+            self.disconnect()
 
     def _on_connect(self, client, userdata, flags, rc):
         """Callback method is called after a connection has been
