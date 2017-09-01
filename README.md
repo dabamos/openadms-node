@@ -15,7 +15,7 @@ can be used to observe objects like:
 The software is written in Python 3 and has been tested on:
 
 * Microsoft Windows 7 (x86, x86-64)
-* Debian 9 (ARMv7)
+* Debian 9, Raspbian Jessie (ARMv7)
 * Fedora 25 (x86-64)
 * FreeBSD 11 (x86-64, ARMv7)
 * NetBSD 7 (ARMv7)
@@ -41,6 +41,7 @@ The following dependencies are used by OpenADMS:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
+* [hbmqtt](https://pypi.python.org/pypi/hbmqtt) (MIT Licence)
 * [jsonschema](https://pypi.python.org/pypi/jsonschema) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
@@ -50,13 +51,7 @@ The following dependencies are used by OpenADMS:
 The MQTT protocol is used for the internal and external message exchange in
 OpenADMS. An MQTT message broker, like [Eclipse Mosquitto](https://mosquitto.org/)
 or [HBMQTT](https://github.com/beerfactory/hbmqtt), must be installed and
-running before starting OpenADMS. To install HBMQTT, run:
-
-```
-$ python3 -m pip install hbmqtt
-```
-
-The message broker can be started simply with `hbmqtt`.
+running before starting OpenADMS.
 
 For testing only, the public sandbox broker of
 [Eclipse IoT](https://iot.eclipse.org/getting-started) can be used. The server
