@@ -127,26 +127,6 @@ class PreProcessor(Prototype):
 
         return obs
 
-    def to_float(self, raw_value):
-        dot_value = raw_value.replace(',', '.')
-
-        if self.is_float(dot_value):
-            response_value = float(dot_value)
-            return response_value
-        else:
-            self.logger.warning('Value "{}" could not be converted '
-                                '(not float)'.format(raw_value))
-            return None
-
-    def to_int(self, raw_value):
-        if self.is_int(raw_value):
-            response_value = int(raw_value)
-            return response_value
-        else:
-            self.logger.warning('Value "{}" could not be converted '
-                                '(not integer)'.format(raw_value))
-            return None
-
     def is_int(self, value):
         """Returns whether a value is int or not."""
         try:
@@ -168,6 +148,26 @@ class PreProcessor(Prototype):
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')
+
+    def to_float(self, raw_value):
+        dot_value = raw_value.replace(',', '.')
+
+        if self.is_float(dot_value):
+            response_value = float(dot_value)
+            return response_value
+        else:
+            self.logger.warning('Value "{}" could not be converted '
+                                '(not float)'.format(raw_value))
+            return None
+
+    def to_int(self, raw_value):
+        if self.is_int(raw_value):
+            response_value = int(raw_value)
+            return response_value
+        else:
+            self.logger.warning('Value "{}" could not be converted '
+                                '(not integer)'.format(raw_value))
+            return None
 
 
 class ReturnCodes(object):
@@ -222,7 +222,7 @@ class ReturnCodeInspector(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')

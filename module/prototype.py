@@ -48,9 +48,9 @@ class Prototype(object):
     def __init__(self, name: str, type: str, manager: Any):
         self.logger = logging.getLogger(name)
 
-        self._name = name                   # Module name, e.g., 'com5'.
-        self._type = type                   # Module type, e.g., 'serialPort'.
-        self._config = None                 # Module configuration.
+        self._name = name       # Module name, e.g., 'com5'.
+        self._type = type       # Module type, e.g., 'module.port.SerialPort'.
+        self._config = None     # Module configuration.
         self._config_schema_name = None
 
         self._config_manager = manager.config_manager
@@ -151,16 +151,20 @@ class Prototype(object):
 
         handler_func(header, payload)
 
-    def has_valid_configuration(self) -> bool:
-        """Returns whether or not the module has a valid configuration.
+    def get_config(self, *args):
+        """Returns the validated configuration of the module.
+
+        Args:
+            args (List[str]): Key names to the configuration in the dictionary.
 
         Returns:
-            True if configuration is valid, False if not.
+            A dictionary with the module's configuration.
         """
-        if not self._config or not self._config_schema_name:
-            return True
+        schema_path = self._schema_manager.get_schema_path(self._type)
 
-        return self.is_valid(self._config, self._config_schema_name)
+        return self._config_manager.get_valid_config(self._type,
+                                                     schema_path,
+                                                     *args)
 
     def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not.

@@ -79,24 +79,21 @@ class MQTTMessenger(object):
         manager (Type[Manager]): The manager object.
     """
 
-    def __init__(self, config_manager, client_id):
+    def __init__(self, manager, client_id):
         self.logger = logging.getLogger('mqtt')
-        self._config_manager = config_manager
+
+        self._config_manager = manager.config_manager
+        self._schema_manager = manager.schema_manager
+
+        self._type = 'core.intercom.MQTTMessenger'
+        config = self.get_config('intercom', 'mqtt')
+
         self._client = None
-
-        self._config = self._config_manager.get_valid_config('mqtt',
-                                                             'core/mqtt.json',
-                                                             'intercom',
-                                                             'mqtt')
-
-        if not self._config:
-            return
-
         self._client_id = client_id
-        self._host = self._config.get('host')
-        self._port = self._config.get('port')
-        self._keep_alive = self._config.get('keepAlive')
-        self._topic = self._config.get('topic')
+        self._host = config.get('host')
+        self._port = config.get('port')
+        self._keep_alive = config.get('keepAlive')
+        self._topic = config.get('topic')
 
         # Function to send received messages to.
         self._downlink = None
@@ -151,6 +148,21 @@ class MQTTMessenger(object):
         if self._client:
             self._client.loop_stop()
             self._client.disconnect()
+
+    def get_config(self, *args: List[str]) -> Dict[str, Any]:
+        """Returns the validated configuration of the module.
+
+        Args:
+            args (List[str]): Key names to the configuration in the dictionary.
+
+        Returns:
+            A dictionary with the module's configuration.
+        """
+        schema_path = self._schema_manager.get_schema_path(self._type)
+
+        return self._config_manager.get_valid_config(self._type,
+                                                     schema_path,
+                                                     *args)
 
     def publish(self, topic: str, message: str) -> None:
         """Send message to the message broker."""

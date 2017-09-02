@@ -99,11 +99,11 @@ class ConfigManager(object):
         self._config = {}   # The actual configuration.
 
         if self._path:
-            self.load_config(self._path)
+            self.load_config_from_file(self._path)
         else:
             self.logger.error('No configuration file set')
 
-    def load_config(self, config_path: str) -> bool:
+    def load_config_from_file(self, config_path: str) -> bool:
         """Loads configuration from a JSON file.
 
         Args:
@@ -142,23 +142,39 @@ class ConfigManager(object):
     def get_valid_config(self,
                          schema_name: str,
                          schema_path: str,
-                         *args: str) -> Dict[str, Any]:
-        ref = self._config
+                         *args: List[str]) -> Dict[str, Any]:
+        """
+        Returns the validated configuration of a module. Raises a ValueError
+        exception if the configuration is invalid.
 
-        for x in args:
+        Args:
+            schema_name (str): Name of the JSON schema.
+            schema_path (str): Path to the JSON schema file.
+            args (List[str]): Key names to the module's configuration.
+
+        Returns:
+            A dictionary with the module's configuration.
+        """
+        config = self._config
+
+        # Get module's configuration from dictionary.
+        for key in args:
             try:
-                ref = ref.get(x)
+                config = config[key]
             except AttributeError:
-                return
+                break
 
+        # Add JSON schema if missing.
         if not self._schema_manager.has_schema(schema_name):
             self._schema_manager.add_schema(schema_name, schema_path)
 
-        if not self._schema_manager.is_valid(ref, schema_name):
+        # Check whether module's configuration is valid.
+        if not self._schema_manager.is_valid(config, schema_name):
             self.logger.error('Configuration "{}" is invalid'
                               .format(schema_name))
-        else:
-            return ref
+            raise ValueError
+
+        return config
 
     @property
     def config(self) -> Dict:
@@ -194,13 +210,15 @@ class ModuleManager(object):
         self._modules = {}
 
         for module_name, class_path in self._config.items():
-            if not self.add(module_name, class_path):
+            try:
+                self.add(module_name, class_path)
+            except:
                 self.logger.error('Module "{}" not loaded'.format(module_name))
                 continue
 
             self.start(module_name)
 
-    def add(self, module_name: str, class_path: str) -> bool:
+    def add(self, module_name: str, class_path: str):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary.
 
@@ -211,26 +229,13 @@ class ModuleManager(object):
         Returns:
             True of module has been added, False if not.
         """
-        self.logger.info('Loading module "{}"'.format(module_name))
-        messenger = MQTTMessenger(self._config_manager, module_name)
-        worker = None
-
         if not self.module_exists(class_path):
             self.logger.error('Module "{}" not found'.format(class_path))
-            return False
+            raise ValueError
 
+        messenger = MQTTMessenger(self._manager, module_name)
         worker = self.get_worker(module_name, class_path)
-
-        if not worker:
-            return False
-
-        if not worker.has_valid_configuration():
-            self.logger.error('Configuration of module "{}" is invalid'
-                              .format(module_name))
-            return False
-
         self._modules[module_name] = Module(messenger, worker)
-        return True
 
     def delete(self, name: str) -> None:
         """Removes a module from the modules dictionary.
@@ -275,17 +280,12 @@ class ModuleManager(object):
             Instance of Python class or None.
         """
         module_path, class_name = class_path.rsplit('.', 1)
-        file_path = Path(module_path.replace('.', '/') + '.py')
+        worker_class = getattr(import_module(module_path),
+                               class_name)
 
-        try:
-            worker_class = getattr(import_module(module_path),
-                                   class_name)
-            worker = worker_class(module_name, class_path, self._manager)
-        except AttributeError as e:
-            self.logger.error(e)
-            return
-
-        return worker
+        return worker_class(module_name,
+                            class_path,
+                            self._manager)
 
     def has_module(self, name: str) -> bool:
         """Returns whether or not module is found.
@@ -432,8 +432,8 @@ class SchemaManager(object):
                 jsonschema.Draft4Validator.check_schema(schema)
 
                 self._schema[data_type] = schema
-                self.logger.debug('Loaded JSON schema "{}" from "{}"'
-                                  .format(data_type, schema_path))
+                self.logger.debug('Loaded JSON schema "{}"'
+                                  .format(data_type))
             except json.JSONDecodeError:
                 self.logger.error('Invalid JSON file "{}"'
                                   .format(schema_path))
@@ -449,14 +449,14 @@ class SchemaManager(object):
         """Uses the class path of a module to generate the path to the
         configuration schema file.
 
-        For instance, the given class path `module.schedule.Scheduler` will lead
-        to the schema path `module/schedule/scheduler.json`.
+        For instance, the given class path `module.schedule.Scheduler` will be
+        converted to the schema path `module/schedule/scheduler.json`.
 
         Args:
             class_path (str): The class path of a module.
 
         Returns:
-            The path to the schema of the module's configuration.
+            The path to the JSON schema of the module's configuration.
         """
         return Path(class_path.replace('.', '/').lower() + '.json')
 

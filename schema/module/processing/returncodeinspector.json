@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "definitions": {},
+  "id": "module.processing.ReturnCodeInspector",
+  "properties": {
+    "responseSets": {
+      "id": "/properties/responseSets",
+      "items": {
+        "default": "returnCode",
+        "id": "/properties/responseSets/items",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "retries": {
+      "default": 1,
+      "id": "/properties/retries",
+      "type": "integer"
+    }
+  },
+  "required": ["responseSets", "retries"],
+  "type": "object"
+}

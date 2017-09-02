@@ -1494,7 +1494,6 @@
         "sensorHeight": 100.0
     },
     "returnCodeInspector": {
-        "retries": 1,
         "responseSets": [
             "returnCode",
             "rcChangeFace",
