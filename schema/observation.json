@@ -1,7 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "definitions": {},
-    "id": "observation.json",
+    "id": "schema/observation.json",
     "properties": {
         "description": {
             "id": "/properties/description",
@@ -74,6 +73,16 @@
             "type": "number"
         }
     },
-    "required": ["enabled", "id", "name", "nextReceiver", "onetime", "receivers", "sensorName", "sensorType", "sleepTime"],
+    "required": [
+        "enabled",
+        "id",
+        "name",
+        "nextReceiver",
+        "onetime",
+        "receivers",
+        "sensorName",
+        "sensorType",
+        "sleepTime"
+    ],
     "type": "object"
 }

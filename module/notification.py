@@ -49,7 +49,7 @@ class Alert(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         self._is_enabled = config.get('enabled')
         self._thread = None

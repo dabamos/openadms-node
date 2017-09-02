@@ -54,7 +54,7 @@ class InterruptCounter(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         self._gpio = config.get('gpio')
         self._bounce_time = config.get('bounceTime')

@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/export/fileexporter.json",
+    "properties": {
+        "dateTimeFormat": {
+            "id": "/properties/dateTimeFormat",
+            "type": "string"
+        },
+        "fileExtension": {
+            "id": "/properties/fileExtension",
+            "type": "string"
+        },
+        "fileName": {
+            "id": "/properties/fileName",
+            "type": "string"
+        },
+        "fileRotation": {
+            "id": "/properties/fileRotation",
+            "type": "string"
+        },
+        "paths": {
+            "id": "/properties/paths",
+            "items": {
+                "id": "/properties/paths/items",
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+        },
+        "separator": {
+            "id": "/properties/separator",
+            "type": "string"
+        }
+    },
+    "required": [
+        "dateTimeFormat",
+        "fileExtension",
+        "fileName",
+        "fileRotation",
+        "paths",
+        "separator"
+    ],
+    "type": "object"
+}

@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/export/realtimepublisher.json",
+    "properties": {
+        "enabled": {
+            "id": "/properties/enabled",
+            "type": "boolean"
+        },
+        "receivers": {
+            "id": "/properties/receivers",
+            "items": {
+                "id": "/properties/receivers/items",
+                "type": "string"
+            },
+            "minItems": 1,
+            "type": "array",
+            "uniqueItems": true
+        }
+    },
+    "required": [
+        "enabled",
+        "receivers"
+    ],
+    "type": "object"
+}

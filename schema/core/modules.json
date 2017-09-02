@@ -1,8 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "additionalProperties": false,
-    "definitions": {},
-    "id": "modules.json",
+    "id": "schema/core/modules.json",
     "minProperties": 1,
     "patternProperties": {
         "^[a-zA-Z0-9]+$": {

@@ -42,7 +42,7 @@ class DistanceCorrector(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         # Maximum age of atmospheric data, before a warning will be generated.
         self._max_age = 3600
@@ -675,7 +675,7 @@ class PolarTransformer(Prototype):
 
     def __init__(self, name, type, manager):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         self._view_point = config.get('viewPoint')
         self._fixed_points = config.get('fixedPoints')

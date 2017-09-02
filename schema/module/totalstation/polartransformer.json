@@ -1,0 +1,68 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/totalstation/polartransformer.json",
+    "properties": {
+        "adjustmentEnabled": {
+            "id": "/properties/adjustmentEnabled",
+            "type": "boolean"
+        },
+        "azimuthAngle": {
+            "id": "/properties/azimuthAngle",
+            "type": "number"
+        },
+        "azimuthPointName": {
+            "id": "/properties/azimuthPointName",
+            "type": "string"
+        },
+        "fixedPoints": {
+            "id": "/properties/fixedPoints",
+            "minProperties": 1,
+            "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                    "properties": {
+                        "x": {
+                            "id": "/properties/fixedPoints/properties/id/properties/x",
+                            "type": "number"
+                        },
+                        "y": {
+                            "id": "/properties/fixedPoints/properties/id/porperties/y",
+                            "type": "number"
+                        },
+                        "z": {
+                            "id": "/properties/fixedPoints/properties/id/properties/z",
+                            "type": "number"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "viewPoint": {
+            "id": "/properties/viewPoint",
+            "properties": {
+                "x": {
+                    "id": "/properties/viewPoint/properties/x",
+                    "type": "number"
+                },
+                "y": {
+                    "id": "/properties/viewPoint/properties/y",
+                    "type": "number"
+                },
+                "z": {
+                    "id": "/properties/viewPoint/properties/z",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "adjustmentEnabled",
+        "azimuthAngle",
+        "azimuthPointName",
+        "fixedPoints",
+        "viewPoint"
+    ],
+    "type": "object"
+}

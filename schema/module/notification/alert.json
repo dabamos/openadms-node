@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/notification/alert.json",
+    "properties": {
+        "modules": {
+            "id": "/properties/modules",
+            "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                    "id": "/properties/modules/properties/id",
+                    "properties": {
+                        "enabled": {
+                            "id": "/properties/modules/properties/id/properties/enabled",
+                            "type": "boolean"
+                        },
+                        "receivers": {
+                            "id": "/properties/modules/properties/id/properties/receivers",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9]+$": {
+                                    "id": "/properties/modules/properties/id/properties/receivers/properties/id",
+                                    "items": {
+                                        "id": "/properties/modules/properties/id/properties/receivers/properties/id/items",
+                                        "type": "string"
+                                    },
+                                    "type": "array"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "required": [
+        "modules"
+    ],
+    "type": "object"
+}

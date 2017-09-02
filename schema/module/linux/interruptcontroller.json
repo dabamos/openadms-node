@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/linux/interruptcontroller.json",
+    "properties": {
+        "bounceTime": {
+            "id": "/properties/bounceTime",
+            "type": "integer"
+        },
+        "countTime": {
+            "id": "/properties/countTime",
+            "type": "integer"
+        },
+        "gpio": {
+            "id": "/properties/gpio",
+            "type": "integer"
+        },
+        "receiver": {
+            "id": "/properties/receiver",
+            "type": "string"
+        },
+        "sensorName": {
+            "id": "/properties/sensorName",
+            "type": "string"
+        }
+
+    },
+    "required": [
+        "bounceTime",
+        "countTime",
+        "gpio",
+        "receiver",
+        "sensorName"
+    ],
+    "type": "object"
+}

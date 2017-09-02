@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/totalstation/distancecorrector.json",
+    "properties": {
+        "atmosphericCorrectionEnabled": {
+            "default": false,
+            "id": "/properties/atmosphericCorrectionEnabled",
+            "type": "boolean"
+        },
+        "distanceName": {
+            "default": "slopeDist",
+            "id": "/properties/distanceName",
+            "type": "string"
+        },
+        "humidity": {
+            "default": 0.6,
+            "id": "/properties/humidity",
+            "type": "number"
+        },
+        "pressure": {
+            "default": 1010.0,
+            "id": "/properties/pressure",
+            "type": "number"
+        },
+        "sealevelCorrectionEnabled": {
+            "default": false,
+            "id": "/properties/sealevelCorrectionEnabled",
+            "type": "boolean"
+        },
+        "sensorHeight": {
+            "default": 0.0,
+            "id": "/properties/sensorHeight",
+            "type": "number"
+        },
+        "temperature": {
+            "default": 20.0,
+            "id": "/properties/temperature",
+            "type": "number"
+        }
+    },
+    "required": [
+        "atmosphericCorrectionEnabled",
+        "distanceName",
+        "humidity",
+        "pressure",
+        "sealevelCorrectionEnabled",
+        "sensorHeight",
+        "temperature"
+    ],
+    "type": "object"
+}

@@ -1,7 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "definitions": {},
-    "id": "http://example.com/example.json",
+    "id": "schema/module/schedule/scheduler.json",
     "properties": {
         "port": {
             "id": "/properties/port",
@@ -49,7 +48,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -68,7 +70,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -87,7 +92,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -106,7 +114,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -125,7 +136,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -144,7 +158,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -163,7 +180,10 @@
                                             "type": "string"
                                         }
                                     },
-                                    "required": ["endTime", "startTime"],
+                                    "required": [
+                                        "endTime",
+                                        "startTime"
+                                    ],
                                     "type": "object"
                                 },
                                 "type": "array"
@@ -172,7 +192,13 @@
                         "type": "object"
                     }
                 },
-                "required": ["enabled", "endDate", "observations", "startDate", "weekdays"],
+                "required": [
+                    "enabled",
+                    "endDate",
+                    "observations",
+                    "startDate",
+                    "weekdays"
+                ],
                 "type": "object"
             },
             "type": "array"
@@ -182,6 +208,10 @@
             "type": "string"
         }
     },
-    "required": ["port", "schedules", "sensor"],
+    "required": [
+        "port",
+        "schedules",
+        "sensor"
+    ],
     "type": "object"
 }

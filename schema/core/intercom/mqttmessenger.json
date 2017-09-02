@@ -1,8 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "additionalProperties": false,
-    "definitions": {},
-    "id": "core.intercom.MQTTMessenger",
+    "id": "schema/core/intercom/mqttmessenger.json",
     "properties": {
         "host": {
             "id": "/properties/host",

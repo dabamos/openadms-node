@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "definitions": {},
-  "id": "module.processing.ReturnCodeInspector",
+  "id": "schema/module/processing/returncodeinspector.json",
   "properties": {
     "responseSets": {
       "id": "/properties/responseSets",
@@ -18,6 +17,9 @@
       "type": "integer"
     }
   },
-  "required": ["responseSets", "retries"],
+  "required": [
+      "responseSets",
+      "retries"
+  ],
   "type": "object"
 }
