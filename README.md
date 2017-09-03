@@ -76,7 +76,6 @@ The Python tool `venv` can create a virtual Python environment for development
 ```
 $ python3 -m venv virtual-environment
 $ source ./virtual-environment/bin/activate.csh
-$ cd ./virtual-environment
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
