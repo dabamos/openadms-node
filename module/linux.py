@@ -35,7 +35,7 @@ from typing import *
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    logging.getLogger().error('Module "RPi.GPIO" not found')
+    logging.getLogger().error('Importing Python module "RPi.GPIO" failed')
 
 from core.observation import Observation
 from core.manager import Manager

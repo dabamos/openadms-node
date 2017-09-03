@@ -222,7 +222,7 @@ class Prototype(object):
             message = json.dumps([header, payload])
             self._uplink(target, message)
         except TypeError:
-            self.logger.error('Can\'t publish message '
+            self.logger.error('Message could not be published'
                               '(header or payload invalid)')
 
     def publish_observation(self, obs: Type[Observation]) -> None:

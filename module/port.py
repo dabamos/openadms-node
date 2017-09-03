@@ -235,7 +235,7 @@ class SerialPort(Prototype):
 
         self._max_attempts = self._config.get('maxAttempts')
 
-        if self._config.get('mode') == SerialPortMode.PASSIVE:
+        if self._config.get('mode') == 'passive':
             self._is_passive = True
             self._obs_draft = None
             self._thread = None     # Thread for passive mode.
@@ -585,12 +585,3 @@ class SerialPortConfiguration(object):
     @property
     def rtscts(self):
         return self._rtscts
-
-
-class SerialPortMode(Enum):
-    """
-    Enumeration of file rotation times of flat files.
-    """
-
-    ACTIVE = 'active'
-    PASSIVE = 'passive'

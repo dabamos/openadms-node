@@ -264,7 +264,16 @@ class MailAgent(Prototype):
 
         self.add_handler('email', self.handle_mail)
 
-    def handle_mail(self, header, payload):
+    def handle_mail(self,
+                    header: Dict[str, Any],
+                    payload: Dict[str, Any]) -> None:
+        """Handles messages of type`email` and forwards them to the
+        `process_mail()` method.
+
+        Args:
+            header (Dict[str, Any]): The message header.
+            payload (Dict[str, Any]): The message payload.
+        """
         mail_subject = payload.get('subject') or self._default_subject
         mail_from = payload.get('from') or self._user_mail
         mail_to = payload.get('to') or ''
@@ -275,9 +284,22 @@ class MailAgent(Prototype):
                           mail_subject,
                           mail_message)
 
-    def process_mail(self, mail_from, mail_to, mail_subject, mail_message):
+    def process_mail(self,
+                     mail_from: str,
+                     mail_to: str,
+                     mail_subject: str,
+                     mail_message: str) -> None:
+        """Sends emails by SMTP.
+
+        Args:
+            mail_from (str): The sender of the email.
+            mail_to (str): The recipient of the email.
+            mail_subject (str): The subject of the email.
+            mail_message (str): The body test of the email.
+        """
         if self._is_tls and self._is_start_tls:
-            self.logger.critical('TLS and StartTLS can\'t be used together')
+            self.logger.critical('Invalid SSL configuration '
+                                 '(select TLS or StartTLS)')
             return
 
         msg = MIMEMultipart('alternative')
@@ -335,7 +357,15 @@ class ShortMessageAgent(Prototype):
         # Capture messages of type 'sms'.
         self.add_handler('sms', self.handle_short_message)
 
-    def handle_short_message(self, header, payload):
+    def handle_short_message(self,
+                             header: Dict[str, Any],
+                             payload: Dict[str, Any]) -> None:
+        """Handles messages of type `sms`.
+
+        Args:
+            header (Dict[str, Any]): The message header.
+            payload (Dict[str, Any]): The message payload.
+        """
         number = payload.get('number')
         message = payload.get('message')
 
@@ -349,7 +379,13 @@ class ShortMessageAgent(Prototype):
 
         self.process_short_message(number, message)
 
-    def process_short_message(self, number, message):
+    def process_short_message(self, number: str, message: str) -> None:
+        """Sends an SMS to a socket server.
+
+        Args:
+            number (str): The number of the recipient (e.g., "+49 176 123456").
+            message (str): The message text.
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
                 sock.connect((self._host, self._port))
@@ -389,12 +425,14 @@ class Heartbeat(Prototype):
 
         self.add_handler('heartbeat', self.process_heartbeat)
 
-    def process_heartbeat(self, header, payload):
+    def process_heartbeat(self,
+                          header: Dict[str, Any],
+                          payload: Dict[str, Any]) -> None:
         self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
                          .format(payload.get('dt'),
                                  payload.get('projectId')))
 
-    def run(self, sleep_time=0.5):
+    def run(self, sleep_time: float = 0.5) -> None:
         project_id = self._config_manager.config.get('project').get('id')
 
         if not project_id:
@@ -419,7 +457,7 @@ class Heartbeat(Prototype):
 
             time.sleep(self._interval)
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 
@@ -439,5 +477,7 @@ class HeartbeatMonitor(Prototype):
         # Capture messages of type 'heartbeat'.
         self.add_handler('heartbeat', self.handle_heartbeat)
 
-    def handle_heartbeat(self, header, payload):
+    def handle_heartbeat(self,
+                         header: Dict[str, Any],
+                         payload: Dict[str, Any]) -> None:
         pass
