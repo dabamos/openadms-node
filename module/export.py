@@ -27,10 +27,9 @@ __license__ = 'EUPL'
 
 import arrow
 import copy
-import os
 
-from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import *
 
 from core.manager import Manager
@@ -76,24 +75,8 @@ class FileExporter(Prototype):
             'yearly': FileRotation.YEARLY}.get(config.get('fileRotation'))
         self._date_time_format = config.get('dateTimeFormat')
         self._separator = config.get('separator')
-        self._paths = self._revise_paths(config.get('paths'))
+        self._paths = config.get('paths')
         self._save_observation_id = config.get('saveObservationId')
-
-    def _revise_paths(self, paths: List[str]) -> List[str]:
-        """Checks whether the paths in a given list end with ``\``. Adds the
-        character if it is missing.
-
-        Args:
-            paths (List[str]): The list of paths to check.
-
-        Returns:
-            List[str]: The revised list of paths.
-        """
-        for i, p in enumerate(paths):
-            if p != '' and not p.endswith('/'):
-                paths[i] += '/'
-
-        return paths
 
     def process_observation(self, obs: Type[Observation]) -> Observation:
         """Append data to a flat file in CSV format.
@@ -118,7 +101,6 @@ class FileExporter(Prototype):
         }[self._file_rotation]
 
         file_name = self._file_name
-
         file_name = file_name.replace('{{port}}', obs.get('portName'))
         file_name = file_name.replace('{{date}}', '{}'.format(file_date)
                                       if file_date else '')
@@ -127,25 +109,26 @@ class FileExporter(Prototype):
                                       if obs.get('target') is not None else '')
         file_name = file_name.replace('{{name}}', '{}'.format(obs.get('name'))
                                       if obs.get('name') is not None else '')
-
         file_name += self._file_extension
 
         for path in self._paths:
-            if not os.path.isdir(path):
+            if not Path(path).exists():
                 self.logger.error('Path "{}" does not exist'.format(path))
                 continue
 
             # Create a header if a new file has to be touched.
             header = None
 
-            if not os.path.isfile(path + file_name):
+            file_path = Path(path, file_name)
+
+            if not Path(file_path).is_file():
                 header = '# Target "{}" of "{}" on "{}"\n' \
                          .format(obs.get('target'),
                                  obs.get('sensorName'),
                                  obs.get('portName'))
 
             # Open a file for every path.
-            with open(path + file_name, 'a') as fh:
+            with open(str(file_path), 'a') as fh:
                 # Add the header if necessary.
                 if header:
                     fh.write(header)

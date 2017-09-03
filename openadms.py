@@ -41,6 +41,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import coloredlogs
 import logging.handlers
 import optparse
 import signal
@@ -49,7 +50,7 @@ import threading
 import time
 import traceback
 
-import coloredlogs
+from typing import *
 
 from core.intercom import MQTTMessageBroker
 from core.monitor import Monitor
@@ -63,7 +64,7 @@ LOG_FILE_BACKUP_COUNT = 1
 MAX_LOG_FILE_SIZE = 10485760  # 10 MB.
 
 
-def main(config_file):
+def main(config_file: str) -> None:
     v = 'v.{}'.format(System.get_openadms_version())
 
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
@@ -83,7 +84,7 @@ def main(config_file):
     stay_alive()
 
 
-def setup_thread_exception_hook():
+def setup_thread_exception_hook() -> None:
     """Workaround for `sys.excepthook` thread bug from:
     https://bugs.python.org/issue1230540
 
@@ -105,7 +106,7 @@ def setup_thread_exception_hook():
     threading.Thread.__init__ = init
 
 
-def exception_hook(type, value, tb):
+def exception_hook(type, value, tb) -> None:
     fmt_exception = ''.join(traceback.format_exception(type,
                                                        value,
                                                        tb)).replace('\n', '')
@@ -113,17 +114,17 @@ def exception_hook(type, value, tb):
                     .format(' '.join(fmt_exception.split())))
 
 
-def signal_handler(signal, frame):
+def signal_handler(signal, frame) -> None:
     logger.info('Exiting ...')
     sys.exit(0)
 
 
-def stay_alive():
+def stay_alive() -> None:
     while True:
         time.sleep(1)
 
 
-def should_log(record):
+def should_log(record: Type[logging.LogRecord]) -> bool:
     """Returns whether a logging.LogRecord should be logged."""
     if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
         return False
@@ -255,4 +256,3 @@ if __name__ == '__main__':
 
     # Start the monitoring.
     main(options.config_file_path)
-

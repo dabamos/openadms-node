@@ -215,8 +215,6 @@ class Scheduler(Prototype):
     def load_jobs(self) -> None:
         """Loads all observation sets from the configurations and creates jobs
         to put into the jobs list."""
-        self._jobs = []
-
         # Run through the schedules and create jobs.
         for schedule in self._schedules:
             observations = schedule.get('observations')
@@ -251,8 +249,7 @@ class Scheduler(Prototype):
         self.load_jobs()
         zombies = []
 
-        # Wait for uplink connection.
-        # FIXME
+        # FIXME: Wait for uplink connection.
         sleep_time = 5.0
         self.logger.info('Starting jobs in {:3.1f} seconds'.format(sleep_time))
         time.sleep(sleep_time)
