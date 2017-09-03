@@ -49,12 +49,12 @@ class BluetoothPort(Prototype):
     testing.
 
     Configuration:
-        port (str): Port name.
-        serverMacAddress (str): MAC address of the server.
+        port: Port name.
+        serverMacAddress: MAC address of the server.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         self._config = self._config_manager.get('ports')\
                                            .get('bluetooth')\
                                            .get(self._name)
@@ -87,7 +87,7 @@ class BluetoothPort(Prototype):
         else:
             return
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         if System.is_windows():
             self.logger.error('Operating system not supported (no '
                               'socket.AF_BLUETOOTH on Microsoft Windows)')
@@ -214,21 +214,21 @@ class SerialPort(Prototype):
     incoming data without sending any requests.
 
     Configuration:
-        port (str): Name of the port (COMX or /dev/ttyX).
-        mode (str): Run serial port in 'active' or 'passive' mode.
-        maxAttemps (int): Maximum number of attempts.
-        baudRate (int): Baud rate (e.g., 4800, 9600, or 115200).
-        byteSize: (int): Start bits, either 5, 6, 7, or 8.
-        stopBits (int): Stop bits, either 1 or 2.
-        parity (str): Parity, either 'odd', 'even', or 'none'.
-        timeout (float): Timeout in seconds.
-        softwareFlowControl (bool): XON/XOFF flow control.
-        hardwareFlowControl (bool): RTS/CTS flow control.
+        port: Name of the port (COMX or /dev/ttyX).
+        mode: Run serial port in 'active' or 'passive' mode.
+        maxAttemps: Maximum number of attempts.
+        baudRate: Baud rate (e.g., 4800, 9600, or 115200).
+        byteSize:: Start bits, either 5, 6, 7, or 8.
+        stopBits: Stop bits, either 1 or 2.
+        parity: Parity, either 'odd', 'even', or 'none'.
+        timeout: Timeout in seconds.
+        softwareFlowControl: XON/XOFF flow control.
+        hardwareFlowControl: RTS/CTS flow control.
 
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         self._config = self._config_manager.config.get('ports')\
                                                   .get('serial')\
                                                   .get(self.name)
@@ -257,7 +257,7 @@ class SerialPort(Prototype):
                              .format(self._serial_port_config.port))
             self._serial.close()
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         if self._is_passive:
             # Set observation template for passive mode.
             self._obs_draft = obs

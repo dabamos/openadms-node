@@ -44,8 +44,8 @@ class DistanceCorrector(Prototype):
     data.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         # Maximum age of atmospheric data, before a warning will be generated.
@@ -64,7 +64,7 @@ class DistanceCorrector(Prototype):
         self._sensor_height = config.get('sensorHeight')
         self._last_update = time.time()
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         sensor_type = obs.get('sensorType')
 
         # Update atmospheric data if sensor is a weather station.
@@ -138,7 +138,10 @@ class DistanceCorrector(Prototype):
 
         return obs
 
-    def get_atmospheric_correction(self, temperature, pressure, humidity):
+    def get_atmospheric_correction(self,
+                                   temperature: float,
+                                   pressure: float,
+                                   humidity: float) -> float:
         """Calculates the atmospheric correction value in parts per million
         (ppm) for the reduction of distances gained by electronic distance
         measurement (EDM).
@@ -157,13 +160,13 @@ class DistanceCorrector(Prototype):
 
         return c
 
-    def get_sea_level_correction(self, sensor_height):
+    def get_sea_level_correction(self, sensor_height: float) -> float:
         earth_radius = 6.378 * math.pow(10, 6)
         c = -1 * (sensor_height / earth_radius)
 
         return c
 
-    def _update_meteorological_data(self, obs):
+    def _update_meteorological_data(self, obs: Observation) -> None:
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
         # Temperature.
@@ -187,27 +190,27 @@ class DistanceCorrector(Prototype):
             self.humidity = h / 100 if u == '%' else h
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         return self._temperature
 
     @property
-    def pressure(self):
+    def pressure(self) -> float:
         return self._pressure
 
     @property
-    def humidity(self):
+    def humidity(self) -> float:
         return self._humidity
 
     @property
-    def last_update(self):
+    def last_update(self) -> int:
         return self._last_update
 
     @property
-    def sensor_height(self):
+    def sensor_height(self) -> float:
         return self._sensor_height
 
     @temperature.setter
-    def temperature(self, temperature):
+    def temperature(self, temperature: float) -> None:
         """Sets the temperature."""
         self._temperature = temperature
         self._last_update = time.time()
@@ -217,7 +220,7 @@ class DistanceCorrector(Prototype):
                              .format(round(temperature, 2)))
 
     @pressure.setter
-    def pressure(self, pressure):
+    def pressure(self, pressure: float) -> None:
         """Sets the air pressure."""
         self._pressure = pressure
         self._last_update = time.time()
@@ -227,7 +230,7 @@ class DistanceCorrector(Prototype):
                              .format(round(pressure, 2)))
 
     @humidity.setter
-    def humidity(self, humidity):
+    def humidity(self, humidity: float) -> None:
         """Sets the humidity."""
         self._humidity = humidity
         self._last_update = time.time()
@@ -237,12 +240,12 @@ class DistanceCorrector(Prototype):
                              .format(round(humidity, 2)))
 
     @last_update.setter
-    def last_update(self, last_update):
+    def last_update(self, last_update: int) -> None:
         """Sets the timestamp of the last update."""
         self._last_update = last_update
 
     @sensor_height.setter
-    def sensor_height(self, sensor_height):
+    def sensor_height(self, sensor_height: float) -> None:
         """Sets the height of the sensor."""
         self._sensor_height = sensor_height
 
@@ -253,8 +256,8 @@ class HelmertTransformer(Prototype):
     using the Helmert transformation.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._is_residual = config.get('residualMismatchTransformationEnabled')
@@ -270,7 +273,7 @@ class HelmertTransformer(Prototype):
         self._a = None
         self._o = None
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
         either be of a fixed point or of a target point.
@@ -304,10 +307,30 @@ class HelmertTransformer(Prototype):
         return obs
 
     def calculate_point_coordinates(self,
-                                    hz, v, dist,
-                                    view_point_x, view_point_y, view_point_z,
-                                    a, o):
-        # Calculate Cartesian coordinates out of polar coordinates.
+                                    hz: float,
+                                    v: float,
+                                    dist: float,
+                                    view_point_x: float,
+                                    view_point_y: float,
+                                    view_point_z: float,
+                                    a: float,
+                                    o: float) -> List[float]:
+        """Calculates Cartesian coordinates out of polar coordinates.
+
+        Args:
+            hz: Horizontal direction.
+            v: Vertical angle.
+            dist: Horizontal direction.
+            view_point_x: X coordinate of the view point.
+            view_point_y: Y coordinate of the view point.
+            view_point_z: Z coordinate of the view point.
+            a: Transformation parameter a.
+            o: Transformation parameter o.
+
+        Returns:
+            X, Y, and Z coordinates.
+
+        """
         local_x, local_y, local_z = self.get_cartesian_coordinates(hz,
                                                                    v,
                                                                    dist)
@@ -318,7 +341,9 @@ class HelmertTransformer(Prototype):
 
         return x, y, z
 
-    def _calculate_residual_mismatches(self, global_x, global_y):
+    def _calculate_residual_mismatches(self,
+                                       global_x: float,
+                                       global_y: float) -> List[float]:
         sum_p = 0
         sum_p_vx = 0
         sum_p_vy = 0
@@ -353,7 +378,7 @@ class HelmertTransformer(Prototype):
 
         return vx, vy
 
-    def _calculate_target_point(self, obs):
+    def _calculate_target_point(self, obs: Observation) -> Observation:
         hz = obs.get_response_value('hz')
         v = obs.get_response_value('v')
         dist = obs.get_response_value('slopeDist')
@@ -402,7 +427,7 @@ class HelmertTransformer(Prototype):
 
         return obs
 
-    def _calculate_view_point(self, obs):
+    def _calculate_view_point(self, obs: Observation) -> Observation:
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
         num_fixed_points = len(self._fixed_points)      # n.
@@ -587,7 +612,8 @@ class HelmertTransformer(Prototype):
         # Return the Observation object of the view point.
         return view_point
 
-    def get_cartesian_coordinates(self, hz, v, slope_dist):
+    def get_cartesian_coordinates(self, hz: float, v: float, slope_dist: float)\
+            -> List[float]:
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
@@ -596,7 +622,7 @@ class HelmertTransformer(Prototype):
 
         return x, y, z
 
-    def _is_fixed_point(self, obs):
+    def _is_fixed_point(self, obs: Observation) -> bool:
         """Checks if the given observation equals one of the defined fixed
         points."""
         if self._fixed_points.get(obs.get('target')):
@@ -604,7 +630,7 @@ class HelmertTransformer(Prototype):
         else:
             return False
 
-    def _is_ready(self):
+    def _is_ready(self) -> bool:
         """Checks whether all fixed points have been measured at least once."""
         for fixed_point_id, fixed_point in self._fixed_points.items():
             if fixed_point.get('lastUpdate') is None:
@@ -613,7 +639,7 @@ class HelmertTransformer(Prototype):
 
         return True
 
-    def _update_fixed_point(self, obs):
+    def _update_fixed_point(self, obs: Observation) -> None:
         """Adds horizontal direction, vertical angle, and slope distance
         of the observation to a fixed point."""
         hz = obs.get_response_value('hz')
@@ -677,8 +703,8 @@ class PolarTransformer(Prototype):
     accuracy of the horizontal directions ('Abriss' in German).
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._view_point = config.get('viewPoint')
@@ -792,7 +818,7 @@ class PolarTransformer(Prototype):
 
         return azimuth
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         if not self._is_valid_sensor_type(obs):
             # Only total stations are supported.
             return obs
@@ -904,10 +930,10 @@ class RefractionCorrector(Prototype):
     distance and corrects the Z value of an observed target.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         z = obs.get_response_value('z')
 
         if not z:
@@ -952,10 +978,10 @@ class SerialMeasurementProcessor(Prototype):
     averaged and stored in a new response set.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         # Calculate the serial measurement of an observation in two faces.
         hz_0 = obs.get_response_value('hz0')
         hz_1 = obs.get_response_value('hz1')

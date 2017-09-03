@@ -32,6 +32,7 @@ from typing import *
 # Type definition for the value inside a response set of an observation.
 # `ResponseType` can either be of type float, int, or str.
 ResponseType = TypeVar('ResponseType', float, int, str)
+ValueType = TypeVar('ValueType', float, int, str, List, Dict)
 
 logger = logging.getLogger('observation')
 
@@ -68,9 +69,9 @@ class Observation(object):
         """Creates a response set containing type, unit, and value.
 
         Args:
-            type (str): Type of the response (e.g., 'float').
-            unit (str): Unit of the response (e.g., 'm').
-            value (ResponseType): The value of the response (e.g., '17.53').
+            type: Type of the response (e.g., 'float').
+            unit: Unit of the response (e.g., 'm').
+            value: The value of the response (e.g., '17.53').
 
         Returns:
             Dictionary with type, unit, and value.
@@ -81,12 +82,12 @@ class Observation(object):
             'value': value
         }
 
-    def get(self, key: str, default=None) -> Any:
+    def get(self, key: str, default: Any = None) -> ValueType:
         """Returns the value to a given key.
 
         Args:
-            key (str): The key of the value.
-            default (optional): Default return value.
+            key: The key of the value.
+            default: Default return value.
 
         Returns:
             Single value from the observation data.
@@ -108,7 +109,7 @@ class Observation(object):
         """Returns the type of a given response set.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             Type of the response set.
@@ -121,7 +122,6 @@ class Observation(object):
                            .format(name,
                                    self.get('name'),
                                    self.get('target')))
-            return
 
         return t
 
@@ -129,11 +129,13 @@ class Observation(object):
         """Returns the unit of a given response set.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             Unit of the response set.
         """
+        u = ''
+
         try:
             u = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
@@ -142,7 +144,6 @@ class Observation(object):
                            .format(name,
                                    self.get('name'),
                                    self.get('target')))
-            return
 
         return u
 
@@ -150,11 +151,13 @@ class Observation(object):
         """Returns the value of a given response set.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             Value of the response set.
         """
+        v = None
+
         try:
             v = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
@@ -163,7 +166,6 @@ class Observation(object):
                            .format(name,
                                    self.get('name'),
                                    self.get('target')))
-            return
 
         return v
 
@@ -171,7 +173,7 @@ class Observation(object):
         """Returns the value of a set of keys.
 
         Args:
-            *args (str): The keys.
+            *args: The keys.
 
         Returns:
             Single value from the observation data.
@@ -190,7 +192,7 @@ class Observation(object):
         """Returns whether the type of a given response set exists or not.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             True if type exists, else if not.
@@ -209,7 +211,7 @@ class Observation(object):
         """Returns whether the unit of a given response set exists or not.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             True if unit exists, else if not.
@@ -228,7 +230,7 @@ class Observation(object):
         """Returns whether the value of a given response set exists or not.
 
         Args:
-            name (str): Name of the response set.
+            name: Name of the response set.
 
         Returns:
             True if value exists, else if not.
@@ -247,7 +249,7 @@ class Observation(object):
         """Sets key and value in the data set.
 
         Args:
-            key (str): The key of the data set value.
+            key: The key of the data set value.
             value: The data set value.
         """
         self._data[key] = value
@@ -270,6 +272,6 @@ class Observation(object):
         validated.
 
         Args:
-            data (Dict[str, Any]): The data set dictionary.
+            data: The data set dictionary.
         """
         self._data = data

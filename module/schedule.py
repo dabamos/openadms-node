@@ -48,7 +48,7 @@ class Job(object):
     def __init__(self,
                  name: str,
                  port_name: str,
-                 obs: Type[Observation],
+                 obs: Observation,
                  is_enabled: bool,
                  start_date: str,
                  end_date: str,
@@ -67,7 +67,7 @@ class Job(object):
         self._date_fmt = '%Y-%m-%d'
         self._time_fmt = '%H:%M:%S'
 
-        # Convert date to date and time (00:00:00).
+        # Convert date to date and time (00: 00: 00).
         self._start_date = self.get_datetime(start_date, self._date_fmt)
         self._end_date = self.get_datetime(end_date, self._date_fmt)
 
@@ -190,13 +190,13 @@ class Scheduler(Prototype):
     separate scheduler is necessary for each serial port.
 
     Configuration:
-        port (str): Name of the port module.
-        sensor (str): Name of the sensor.
-        schedules (List[Dict]): List of schedules.
+        port: Name of the port module.
+        sensor: Name of the sensor.
+        schedules: List of schedules.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         self._config = self.get_config('schedulers', self._name)
 
         self._port_name = self._config.get('port')
@@ -206,7 +206,7 @@ class Scheduler(Prototype):
         self._thread = None
         self._jobs = []
 
-    def add(self, job: Type[Job]) -> None:
+    def add(self, job: Job) -> None:
         """Appends a job to the jobs list."""
         self._jobs.append(job)
         self.logger.debug('Added job "{}" to scheduler "{}"'

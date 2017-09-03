@@ -24,14 +24,16 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 from tinydb import TinyDB, Query
+from typing import *
 
+from core.manager import Manager
 from module.prototype import Prototype
 
 
 class TinyDBConnectivity(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._path = config.get('path')

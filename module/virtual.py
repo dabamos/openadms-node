@@ -43,11 +43,11 @@ class VirtualSensor(Prototype):
     VirtualSensor is a prototype class for virtual sensors.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         self.patterns = {}
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         request_sets = obs.get('requestSets')
 
         for set_name, request_set in request_sets.items():
@@ -89,7 +89,7 @@ class VirtualSensor(Prototype):
         """Converts some non-printable characters of a given string.
 
         Args:
-            s (str): The string to sanitize.
+            s: The string to sanitize.
 
         Returns:
             The sanitized string.
@@ -106,7 +106,7 @@ class VirtualTotalStationTM30(VirtualSensor):
     GeoCOM commands.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
+    def __init__(self, name: str, type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -114,8 +114,8 @@ class VirtualTotalStationTM30(VirtualSensor):
             '%R1Q,5004:\\r\\n': self.get_sensor_name,
             '%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n':
                 self.set_direction,
-            '%R1Q,2008:1,1\\r\\n': self.measure_distance,
-            '%R1Q,2167:5000,1\\r\\n': self.do_complete_measurement
+            '%R1Q,2008: 1,1\\r\\n': self.measure_distance,
+            '%R1Q,2167: 5000,1\\r\\n': self.do_complete_measurement
         }
 
     def do_complete_measurement(self, request: str) -> str:
@@ -172,7 +172,7 @@ class VirtualDTM(VirtualSensor):
     VirtualDTM simulates an STS DTM meteorological sensor.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
+    def __init__(self, name: str, type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -216,7 +216,7 @@ class VirtualIndicatorOne(VirtualSensor):
     indicator/extensometer.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
+    def __init__(self, name: str, type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self._current_value = 0.0

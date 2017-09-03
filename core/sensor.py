@@ -36,13 +36,14 @@ class Sensor(object):
     """
     Sensor stores the configuration of a sensor, especially, all defined
     observations.
-
-    Args:
-        name (str): The name of the sensor.
-        config (Dict[str, Any]): The configuration of the sensor.
     """
 
     def __init__(self, name: str, config: Dict[str, Any]):
+        """
+        Args:
+            name: The name of the sensor.
+            config: The configuration of the sensor.
+        """
         self.logger = logging.getLogger(name)
 
         self._name = name
@@ -63,7 +64,7 @@ class Sensor(object):
         """Creates an observation object.
 
         Args:
-            data (Dict[str, Any]): The observation data.
+            data: The observation data.
         """
         data['id'] = str(uuid.uuid4())
         data['sensorName'] = self._name
@@ -96,11 +97,11 @@ class Sensor(object):
         """Returns a single observation.
 
         Args:
-            name (str): The name of the observation.
+            name: The name of the observation.
         """
         return self._observations.get(name)
 
-    def get_observations(self) -> Dict[str, Type[Observation]]:
+    def get_observations(self) -> Dict[str, Observation]:
         """Returns all observations.
 
         Returns:

@@ -37,14 +37,15 @@ from core.observation import Observation
 class Prototype(object):
     """
     Prototype is used as a blueprint for OpenADMS workers.
-
-    Args:
-        name (str): The name of the module.
-        type (str): The type of the module.
-        manager (Type[Manager]): The manager objects.
     """
 
     def __init__(self, name: str, type: str, manager: Any):
+        """
+        Args:
+            name: The name of the module.
+            type: The type of the module.
+            manager: The manager objects.
+        """
         self.logger = logging.getLogger(name)
 
         self._name = name       # Module name, e.g., 'com5'.
@@ -73,8 +74,8 @@ class Prototype(object):
         """Registers a callback function for handling of messages.
 
         Args:
-            data_type (str): Name of the data type (observation, service, ...).
-            func (Callable): Callback function for handling the message.
+            data_type: Name of the data type (observation, service, ...).
+            func: Callback function for handling the message.
         """
         self._handlers[data_type] = func
 
@@ -93,8 +94,8 @@ class Prototype(object):
         """Processes service messages.
 
         Args:
-            header (Dict): The message header.
-            payload (Dict): The message payload.
+            header: The message header.
+            payload: The message payload.
         """
         sender = header.get('from', '?')
         action = payload.get('action')
@@ -113,7 +114,7 @@ class Prototype(object):
         handling.
 
         Args:
-            message (List): Header and payload of the message, both Dict.
+            message: Header and payload of the message, both Dict.
         """
         if not self.is_sequence(message) or len(message) < 2:
             self.logger.warning('Received message is invalid')
@@ -154,7 +155,7 @@ class Prototype(object):
         is available, the function just returns an unchecked configuration.
 
         Args:
-            args (List[str]): Key names to the configuration in the dictionary.
+            *args: Key names to the configuration in the dictionary.
 
         Returns:
             A dictionary with the module's configuration.
@@ -181,20 +182,20 @@ class Prototype(object):
         JSON schema.
 
         Args:
-            data (Dict): The data.
-            data_type (str): The name of the data type.
+            data: The data.
+            data_type: The name of the data type.
 
         Returns:
             True if data is valid, False if not.
         """
         return self._schema_manager.is_valid(data, data_type)
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         """Processes an observation object. Will be overridden by actual
         worker.
 
         Args:
-            obs (Observation): The observation object.
+            obs: The observation object.
 
         Returns:
             The processed observation object.
@@ -209,9 +210,9 @@ class Prototype(object):
             [ { <header> }, { <payload> } ].
 
         Args:
-            target (str): The name of the target.
-            header (Dict): The header of the message.
-            payload (Dict): The payload of the message.
+            target: The name of the target.
+            header: The header of the message.
+            payload: The payload of the message.
         """
         if not self._uplink:
             self.logger.error('No uplink defined for module "{}"'
@@ -225,12 +226,12 @@ class Prototype(object):
             self.logger.error('Message could not be published '
                               '(header or payload invalid): {}'.format(e))
 
-    def publish_observation(self, obs: Type[Observation]) -> None:
+    def publish_observation(self, obs: Observation) -> None:
         """Prepares the observation for publishing and forwards it to the
         messenger.
 
         Args:
-            obs (Observation): Observation object.
+            obs: Observation object.
         """
         receivers = obs.get('receivers')
         index = obs.get('nextReceiver')

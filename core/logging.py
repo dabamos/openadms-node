@@ -33,37 +33,38 @@ from typing import *
 
 class RingBuffer(object):
     """
-    RingBuffer stores strings in a deque. It is used to cache a number of log
-    messages, while older ones get overwritten automatically.
-
-    Args:
-        max_length (int): The maximum size of the deque.
+    RingBuffer stores elements in a deque. It is used to cache a number of
+    elements, while older ones get overwritten automatically.
     """
 
     def __init__(self, max_length: int):
+        """
+        Args:
+            max_length: The maximum size of the deque.
+        """
         self._deque = deque(maxlen=max_length)
 
-    def append(self, x: str) -> None:
-        """Appends a string to the deque.
+    def append(self, x: Any) -> None:
+        """Appends an element to the deque.
 
         Args:
-            x (Any): Element to append.
+            x: Element to append.
         """
         self._deque.append(x)
 
-    def pop(self) -> str:
-        """Pops a string element.
+    def pop(self) -> Any:
+        """Pops an element.
 
         Returns:
             String on the left side of the deque.
         """
         return self._deque.popleft()
 
-    def get(self) -> List[str]:
-        """Returns a list with all strings.
+    def get(self) -> List[Any]:
+        """Returns a list with all elements.
 
         Returns:
-            List with all strings in the deque.
+            List with all elements in the deque.
         """
         return list(self._deque)
 

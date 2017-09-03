@@ -49,8 +49,8 @@ class Alert(Prototype):
     Alert is used to send warning and error messages to other modules.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._is_enabled = config.get('enabled')
@@ -115,8 +115,8 @@ class Alert(Prototype):
 
 class AlertMessageFormatter(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         self._config = self._config_manager.get(self._name)
         self._thread = None
 
@@ -140,8 +140,8 @@ class AlertMessageFormatter(Prototype):
         them to the `process_alert_messages()` method.
 
         Args:
-            header (Dict[str, Any]): The alert header.
-            payload (Dict[str, Any]): The alert payload.
+            header: The alert header.
+            payload: The alert payload.
         """
         if self._msg_collection_enabled:
             # Add the alert message to the collection queue. It will be
@@ -157,8 +157,8 @@ class AlertMessageFormatter(Prototype):
                                messages: List[str]) -> None:
         """
         Args:
-            receiver (str): The receiver of the alert.
-            messages (List[str]): The list of alert messages.
+            receiver: The receiver of the alert.
+            messages: The list of alert messages.
         """
         if not receiver or receiver == '':
             self.logger.warning('No receiver defined for alert message')
@@ -261,8 +261,8 @@ class AlertMessageFormatter(Prototype):
 
 class MailAgent(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._charset = config.get('charset')
@@ -287,8 +287,8 @@ class MailAgent(Prototype):
         `process_mail()` method.
 
         Args:
-            header (Dict[str, Any]): The message header.
-            payload (Dict[str, Any]): The message payload.
+            header: The message header.
+            payload: The message payload.
         """
         mail_subject = payload.get('subject') or self._default_subject
         mail_from = payload.get('from') or self._user_mail
@@ -308,10 +308,10 @@ class MailAgent(Prototype):
         """Sends emails by SMTP.
 
         Args:
-            mail_from (str): The sender of the email.
-            mail_to (str): The recipient of the email.
-            mail_subject (str): The subject of the email.
-            mail_message (str): The body test of the email.
+            mail_from: The sender of the email.
+            mail_to: The recipient of the email.
+            mail_subject: The subject of the email.
+            mail_message: The body test of the email.
         """
         if self._is_tls and self._is_start_tls:
             self.logger.critical('Invalid SSL configuration '
@@ -363,8 +363,8 @@ class ShortMessageAgent(Prototype):
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
@@ -379,8 +379,8 @@ class ShortMessageAgent(Prototype):
         """Handles messages of type `sms`.
 
         Args:
-            header (Dict[str, Any]): The message header.
-            payload (Dict[str, Any]): The message payload.
+            header: The message header.
+            payload: The message payload.
         """
         number = payload.get('number')
         message = payload.get('message')
@@ -399,8 +399,8 @@ class ShortMessageAgent(Prototype):
         """Sends an SMS to a socket server.
 
         Args:
-            number (str): The number of the recipient (e.g., "+49 176 123456").
-            message (str): The message text.
+            number: The number of the recipient (e.g., "+49 176 123456").
+            message: The message text.
         """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
@@ -429,8 +429,8 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._receivers = config.get('receivers')
@@ -487,8 +487,8 @@ class Heartbeat(Prototype):
 
 class HeartbeatMonitor(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
 
         # Capture messages of type 'heartbeat'.
         self.add_handler('heartbeat', self.handle_heartbeat)

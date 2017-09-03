@@ -53,17 +53,17 @@ class FileExporter(Prototype):
     FileExporter writes sensor data to a flat file in CSV format.
 
     Configuration:
-        dateTimeFormat (str): Format of date and time (see Python strftime).
-        fileExtension (str): The extension of the file (`.txt` or `.csv`).
-        fileName (str): Placeholders are `{{date}}`, `{{target}}`, `{{name}}`,
+        dateTimeFormat: Format of date and time (see Python strftime).
+        fileExtension: The extension of the file (`.txt` or `.csv`).
+        fileName: Placeholders are `{{date}}`, `{{target}}`, `{{name}}`,
                         `{{port}}`.
-        fileRotation (str): Either `none`, `daily`, `monthly`, or `yearly`.
-        paths (list): Paths to save files to (multiple paths possible).
-        separator (str): Separator between values within the CSV file.
+        fileRotation: Either `none`, `daily`, `monthly`, or `yearly`.
+        paths: Paths to save files to (multiple paths possible).
+        separator: Separator between values within the CSV file.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._file_extension = config.get('fileExtension')
@@ -78,14 +78,14 @@ class FileExporter(Prototype):
         self._paths = config.get('paths')
         self._save_observation_id = config.get('saveObservationId')
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         """Append data to a flat file in CSV format.
 
         Args:
-            obs (Observation): The input observation object.
+            obs: The input observation object.
 
         Returns:
-            obs (Observation): The output observation object.
+            obs: The output observation object.
         """
         ts = arrow.get(obs.get('timeStamp', 0))
 
@@ -116,10 +116,10 @@ class FileExporter(Prototype):
                 self.logger.error('Path "{}" does not exist'.format(path))
                 continue
 
+            file_path = Path(path, file_name)
+
             # Create a header if a new file has to be touched.
             header = None
-
-            file_path = Path(path, file_name)
 
             if not Path(file_path).is_file():
                 header = '# Target "{}" of "{}" on "{}"\n' \
@@ -166,7 +166,7 @@ class FileExporter(Prototype):
                                  .format(obs.get('name'),
                                          obs.get('target'),
                                          obs.get('portName'),
-                                         path + file_name))
+                                         str(file_path)))
 
         return obs
 
@@ -177,18 +177,18 @@ class RealTimePublisher(Prototype):
     receivers.
 
     Configuration:
-        receivers (List[str]): List of modules to send the observation to.
-        enabled (bool): If or if not enabled.
+        receivers: List of modules to send the observation to.
+        enabled: If or if not enabled.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._receivers = config.get('receivers')
         self._is_enabled = config.get('enabled')
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         if not self._is_enabled:
             return obs
 

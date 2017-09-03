@@ -31,20 +31,21 @@ import paho.mqtt.client as mqtt
 try:
     from hbmqtt.broker import Broker
 except ImportError:
-    logging.getLogger().error('Module "HBMQTT" not found')
+    logging.getLogger().error('Importing Python module "HBMQTT" failed')
 
 
 class MQTTMessageBroker(Thread):
     """
     Wrapper class for the HBMQTT message broker.
-
-    Args:
-        host (str): The host name (IP or FQDN).
-        port (int): The port number.
     """
 
     def __init__(self, host: str, port: int):
-        Thread.__init__(self)
+        """
+        Args:
+            host: The host name (IP or FQDN).
+            port: The port number.
+        """
+        super().__init__()
         self.daemon = True
         self.logger = logging.getLogger('mqtt')
 
@@ -78,13 +79,14 @@ class MQTTMessageBroker(Thread):
 class MQTTMessenger(object):
     """
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
-
-    Args:
-        manager (Type[Manager]): The manager object.
-        client_id (str): The MQTT client id.
     """
 
     def __init__(self, manager: Any, client_id: str):
+        """
+        Args:
+            manager: The manager object.
+            client_id: The MQTT client id.
+        """
         self.logger = logging.getLogger('mqtt')
 
         self._config_manager = manager.config_manager
@@ -168,7 +170,7 @@ class MQTTMessenger(object):
         """Returns the validated configuration of the module.
 
         Args:
-            args (List[str]): Key names to the configuration in the dictionary.
+            *args: Key names to the configuration in the dictionary.
 
         Returns:
             A dictionary with the module's configuration.
@@ -214,6 +216,6 @@ class MQTTMessenger(object):
         been received.
 
         Args:
-            downlink (Callable[[List[Dict]], None]): The downlink function.
+            downlink: The downlink function.
         """
         self._downlink = downlink

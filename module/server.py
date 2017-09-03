@@ -49,12 +49,12 @@ class LocalControlServer(Prototype):
     LocalControlServer.
 
     Configuration:
-        host (str): Host name (IP or FQDN).
-        port (int): Port number.
+        host: Host name (IP or FQDN).
+        port: Port number.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
@@ -108,7 +108,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     """
 
     def __init__(self,
-                 manager: Type[Manager],
+                 manager: Manager,
                  log_handler: Type[logging.Handler],
                  *args):
         self._config_manager = manager.config_manager
@@ -121,7 +121,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         index_file = self.get_complete_path('/index.html')
         self._template = self.get_file_contents(index_file)
 
-        BaseHTTPRequestHandler.__init__(self, *args)
+        super().__init__(*args)
 
     def do_GET(self) -> None:
         """Creates the response to a GET request."""
@@ -203,7 +203,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Opens a file and returns the contents.
 
         Args:
-            path (str): File path.
+            path: File path.
 
         Returns:
             String with file contents.
@@ -217,7 +217,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Returns the index page of this module in HTML format.
 
         Args:
-            template (str): The template.
+            template: The template.
 
         Returns:
             String with the parsed index page.
@@ -316,7 +316,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Checks a GET query for a given argument.
 
         Args:
-            name (str): Name of the GET argument.
+            name: Name of the GET argument.
 
         Returns:
             True if argument exists, else false.
@@ -335,8 +335,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         given dictionary.
 
         Args:
-            template (str): The (HTML) template.
-            vars (Dict): The variables.
+            template: The (HTML) template.
+            vars: The variables.
 
         Returns:
             String with parsed template.
@@ -347,7 +347,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         """Responds to an HTTP request.
 
         Args:
-            opts (Dict): Status code, mime type, return data.
+            opts: Status code, mime type, return data.
         """
         self.send_response(opts.get('status'))
         self.send_header('Content-type', opts.get('mime'))

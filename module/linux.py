@@ -49,15 +49,15 @@ class InterruptCounter(Prototype):
     computer. Works on Linux only.
 
     Configuration:
-        bounceTime (int): Bounce time in ms.
-        countTime (float): Observation time in s.
-        gpio (int): GPIO pin number of the Raspberry Pi.
-        receiver (str): Name of the receiving module.
-        sensorName (str): Name of the connected sensor.
+        bounceTime: Bounce time in ms.
+        countTime: Observation time in s.
+        gpio: GPIO pin number of the Raspberry Pi.
+        receiver: Name of the receiving module.
+        sensorName: Name of the connected sensor.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._gpio = config.get('gpio')

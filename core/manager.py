@@ -87,12 +87,13 @@ class Manager(object):
 class ConfigManager(object):
     """
     ConfigurationManager loads and stores the OpenADMS configuration.
-
-    Args:
-        path (str): The path to the configuration file.
     """
 
     def __init__(self, path: str, schema_manager):
+        """
+        Args:
+            path: The path to the configuration file.
+        """
         self.logger = logging.getLogger('configurationManager')
         self._schema_manager = schema_manager
         self._path = path   # Path to the configuration file.
@@ -107,7 +108,7 @@ class ConfigManager(object):
         """Loads configuration from a JSON file.
 
         Args:
-            config_path (str): The path to the JSON file.
+            config_path: The path to the JSON file.
 
         Returns:
             True if file has been loaded, False if not.
@@ -132,7 +133,7 @@ class ConfigManager(object):
         """Returns a single configuration.
 
         Args:
-            key (str): The name of the configuration.
+            key: The name of the configuration.
 
         Returns:
             A dictionary with the configuration.
@@ -148,12 +149,15 @@ class ConfigManager(object):
         exception if the configuration is invalid.
 
         Args:
-            schema_name (str): Name of the JSON schema.
-            schema_path (str): Path to the JSON schema file.
-            args (List[str]): Key names to the module's configuration.
+            schema_name: Name of the JSON schema.
+            schema_path: Path to the JSON schema file.
+            *args: Key names to the module's configuration.
 
         Returns:
             A dictionary with the module's configuration.
+
+        Raises:
+            ValueError: If module configuration is invalid.
         """
         config = self._config
 
@@ -192,12 +196,13 @@ class ConfigManager(object):
 class ModuleManager(object):
     """
     ModuleManager loads and manages OpenADMS modules.
-
-    Args:
-        manager (Type[Manager]): The manager object.
     """
 
-    def __init__(self, manager: Type[Manager]):
+    def __init__(self, manager: Manager):
+        """
+        Args:
+            manager: The manager object.
+        """
         self.logger = logging.getLogger('moduleManager')
 
         self._manager = manager
@@ -212,8 +217,8 @@ class ModuleManager(object):
         for module_name, class_path in self._config.items():
             try:
                 self.add(module_name, class_path)
-            except:
-                self.logger.error('Module "{}" not loaded'.format(module_name))
+            except Exception as e:
+                self.logger.error('Module "{}" not loaded {}'.format(module_name, e))
                 continue
 
             self.start(module_name)
@@ -223,11 +228,14 @@ class ModuleManager(object):
         to a module. The module will be added to the modules dictionary.
 
         Args:
-            module_name (str): Name of the module.
-            class_path (str): Path to the Python class.
+            module_name: Name of the module.
+            class_path: Path to the Python class.
 
         Returns:
             True of module has been added, False if not.
+
+        Raises:
+            ValueError: If module file not exists.
         """
         if not self.module_exists(class_path):
             self.logger.error('Module "{}" not found'.format(class_path))
@@ -241,7 +249,7 @@ class ModuleManager(object):
         """Removes a module from the modules dictionary.
 
         Args:
-            name (str): The name of the module.
+            name: The name of the module.
         """
         self._modules[name] = None
 
@@ -249,7 +257,7 @@ class ModuleManager(object):
         """Returns a specific module.
 
         Args:
-            name (str): The name of the module.
+            name: The name of the module.
         """
         return self._modules.get(name)
 
@@ -273,8 +281,8 @@ class ModuleManager(object):
         """Loads a Python class from a given path and returns the instance.
 
         Args:
-            module_name (str): Name of the module.
-            class_path (str): Path to the Python class.
+            module_name: Name of the module.
+            class_path: Path to the Python class.
 
         Returns:
             Instance of Python class or None.
@@ -291,7 +299,7 @@ class ModuleManager(object):
         """Returns whether or not module is found.
 
         Args:
-            name (str): The name of the module.
+            name: The name of the module.
 
         Returns:
             True if module is found, False if not.
@@ -306,7 +314,7 @@ class ModuleManager(object):
         path.
 
         Args:
-            class_path (str): The path to the class.
+            class_path: The path to the class.
 
         Returns:
             True if module exists, False if not.
@@ -323,7 +331,7 @@ class ModuleManager(object):
         """Starts a module.
 
         Args:
-            module_name (str): The name of the module.
+            module_name: The name of the module.
         """
         self._modules.get(module_name).start()
         self._modules.get(module_name).start_worker()
@@ -332,24 +340,25 @@ class ModuleManager(object):
         """Stops a module.
 
         Args:
-            module_name (str): The name of the module.
+            module_name: The name of the module.
         """
         self._modules.get(module_name).stop_worker()
 
     @property
-    def modules(self) -> Dict[str, Type[Module]]:
+    def modules(self) -> Dict[str, Module]:
         return self._modules
 
 
 class SensorManager(object):
     """
     SensorManager stores and manages object of type `Sensor`.
-
-    Args:
-        config_manager (Type[ConfigManager]): The configuration manager.
     """
 
-    def __init__(self, config_manager: Type[ConfigManager]):
+    def __init__(self, config_manager: ConfigManager):
+        """
+        Args:
+            config_manager: The configuration manager.
+        """
         self.logger = logging.getLogger('sensorManager')
         self._sensor_config = config_manager.get('sensors')
         self._sensors = {}
@@ -367,12 +376,12 @@ class SensorManager(object):
             self.add_sensor(sensor_name, sensor_obj)
             self.logger.info('Created sensor "{}"'.format(sensor_name))
 
-    def add_sensor(self, name: str, sensor: Type[Sensor]) -> None:
+    def add_sensor(self, name: str, sensor: Sensor) -> None:
         """Adds a sensor to the sensors dictionary.
 
         Args:
-            name (str): The name of the sensor.
-            sensor (str): The sensor object.
+            name: The name of the sensor.
+            sensor: The sensor object.
         """
         self._sensors[name] = sensor
 
@@ -389,7 +398,7 @@ class SensorManager(object):
         return self._sensors.keys()
 
     @property
-    def sensors(self) -> Dict[str, Type[Sensor]]:
+    def sensors(self) -> Dict[str, Sensor]:
         return self._sensors
 
 
@@ -412,9 +421,9 @@ class SchemaManager(object):
         internal dictionary.
 
         Args:
-            data_type (str): The name of the data type (e.g., 'observation').
-            path (str): The path to the JSON schema file.
-            root (str): The root directory (default: 'schema').
+            data_type: The name of the data type (e.g., 'observation').
+            path: The path to the JSON schema file.
+            root: The root directory (default: 'schema').
 
         Returns:
             True if schema has been added, False if not.
@@ -453,7 +462,7 @@ class SchemaManager(object):
         converted to the schema path `module/schedule/scheduler.json`.
 
         Args:
-            class_path (str): The class path of a module.
+            class_path: The class path of a module.
 
         Returns:
             The path to the JSON schema of the module's configuration.
@@ -464,7 +473,7 @@ class SchemaManager(object):
         """Returns whether or not a JSON schema for the given name exists.
 
         Args:
-            name (str): Name of the schema (e.g., 'observation').
+            name: Name of the schema (e.g., 'observation').
 
         Returns:
             True if schema exists, False if not.
@@ -478,8 +487,8 @@ class SchemaManager(object):
         """Validates data with JSON schema and returns result.
 
         Args:
-            data (Dict): The data.
-            schema_name (str): The name of the schema used for validation.
+            data: The data.
+            schema_name: The name of the schema used for validation.
 
         Returns:
             True if data is valid, False if not.

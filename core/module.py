@@ -39,16 +39,18 @@ class Module(threading.Thread):
     """
     Module bundles a worker with a messenger and manages the communication
     between them.
-
-    Args:
-        messenger (Type[MQTTMessenger]): The messenger object.
-        worker (Type[Prototype]): The worker object.
     """
 
     def __init__(self,
-                 messenger: Type[MQTTMessenger],
-                 worker: Type[Prototype]):
-        threading.Thread.__init__(self, name=worker.name)
+                 messenger: MQTTMessenger,
+                 worker: Prototype):
+        """
+        Args:
+            messenger: The messenger object.
+            worker: The worker object.
+        """
+        super().__init__(name=worker.name)
+
         self.logger = logging.getLogger(worker.name)
         self.daemon = True
 
@@ -70,8 +72,8 @@ class Module(threading.Thread):
         messenger.
 
         Args:
-            target (str): Name of the topic.
-            message (str): Message in JSON format.
+            target: Name of the topic.
+            message: Message in JSON format.
         """
         target_path = '{}/{}'.format(self._topic, target)
         self._messenger.publish(target_path, message)
@@ -81,7 +83,7 @@ class Module(threading.Thread):
         lands here.
 
         Args:
-            message (List): Header and payload of the message, both Dict.
+            message: Header and payload of the message, both Dict.
         """
         self._inbox.put(message)
 
@@ -119,10 +121,10 @@ class Module(threading.Thread):
         return self._worker
 
     @messenger.setter
-    def messenger(self, messenger: Type[MQTTMessenger]) -> None:
+    def messenger(self, messenger: MQTTMessenger) -> None:
         self._messenger = messenger
 
     @worker.setter
-    def worker(self, worker: Type[Prototype]) -> None:
+    def worker(self, worker: Prototype) -> None:
         self._worker = worker
 

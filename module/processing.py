@@ -41,10 +41,10 @@ class PreProcessor(Prototype):
     converts them to the defined types.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('requestSets').items():
@@ -227,14 +227,14 @@ class ReturnCodeInspector(Prototype):
     sensors of Leica Geosystems and creates an appropriate log message.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self.get_config(self._name)
 
         self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         for response_set in self._response_sets:
             return_code = obs.get_value('responseSets', response_set, 'value')
 
@@ -294,12 +294,12 @@ class UnitConverter(Prototype):
     meters by setting a scale factor.
     """
 
-    def __init__(self, name: str, type: str, manager: Type[Manager]):
-        Prototype.__init__(self, name, type, manager)
+    def __init__(self, name: str, type: str, manager: Manager):
+        super().__init__(name, type, manager)
         config = self._config_manager.get(self._name)
         self._conversions = config.get('conversions')
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
+    def process_observation(self, obs: Observation) -> Observation:
         for name, conversion in self._conversions.items():
             response_set = obs.get('responseSets').get(name)
 
@@ -351,8 +351,8 @@ class UnitConverter(Prototype):
         """Scales value by factor.
 
         Args:
-            value (float): Value to scale.
-            factor (float): Scaling factor.
+            value: Value to scale.
+            factor: Scaling factor.
 
         Returns:
             Scaled value.
