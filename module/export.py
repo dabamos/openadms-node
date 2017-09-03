@@ -76,6 +76,7 @@ class FileExporter(Prototype):
         self._date_time_format = config.get('dateTimeFormat')
         self._separator = config.get('separator')
         self._paths = self._revise_paths(config.get('paths'))
+        self._save_observation_id = config.get('saveObservationId')
 
     def _revise_paths(self, paths: List[str]) -> List[str]:
         """Checks whether the paths in a given list end with ``\``. Adds the
@@ -149,6 +150,9 @@ class FileExporter(Prototype):
                 # Convert Unix time stamp to date and time.
                 dt = datetime.fromtimestamp(obs.get('timeStamp', 0))
                 line = dt.strftime(self._date_time_format)
+
+                if self._save_observation_id:
+                    line += self._separator + obs.get('id')
 
                 if obs.get('target') is not None:
                     line += self._separator + obs.get('target')

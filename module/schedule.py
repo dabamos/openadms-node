@@ -29,6 +29,7 @@ import copy
 import logging
 import threading
 import time
+import uuid
 
 from datetime import datetime
 from typing import *
@@ -140,6 +141,9 @@ class Job(object):
         # Make a deep copy, since we don't want to do any changes to the
         # observation in our observation set.
         obs_copy = copy.deepcopy(self._obs)
+
+        # Generate a new UUID4.
+        obs_copy.set('id', str(uuid.uuid4()))
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
