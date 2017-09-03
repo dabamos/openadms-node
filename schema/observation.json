@@ -68,6 +68,10 @@
             "id": "/properties/sleepTime",
             "type": "number"
         },
+        "target": {
+            "id": "/properties/target",
+            "type": "string"
+        },
         "timeStamp": {
             "id": "/properties/timeStamp",
             "type": "number"
@@ -82,7 +86,8 @@
         "receivers",
         "sensorName",
         "sensorType",
-        "sleepTime"
+        "sleepTime",
+        "target"
     ],
     "type": "object"
 }

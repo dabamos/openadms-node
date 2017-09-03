@@ -28,6 +28,10 @@
             "type": "array",
             "uniqueItems": true
         },
+        "saveObservationId": {
+            "id": "/properties/saveObservationId",
+            "type": "boolean"
+        },
         "separator": {
             "id": "/properties/separator",
             "type": "string"
@@ -39,6 +43,7 @@
         "fileName",
         "fileRotation",
         "paths",
+        "saveObservationId",
         "separator"
     ],
     "type": "object"
