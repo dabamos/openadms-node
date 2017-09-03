@@ -127,5 +127,9 @@ class RingBufferLogHandler(object):
         return self._buffer.to_string()
 
     @property
+    def is_running(self) -> bool:
+        return self._is_running
+
+    @property
     def size(self) -> int:
         return self._size

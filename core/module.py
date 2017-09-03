@@ -107,7 +107,7 @@ class Module(threading.Thread):
         self._worker.stop()
 
     @property
-    def messenger(self) -> Any:
+    def messenger(self) -> Type[MQTTMessenger]:
         return self._messenger
 
     @property
@@ -115,14 +115,14 @@ class Module(threading.Thread):
         return self._topic
 
     @property
-    def worker(self) -> Any:
+    def worker(self) -> Type[Prototype]:
         return self._worker
 
     @messenger.setter
-    def messenger(self, messenger: Any) -> None:
+    def messenger(self, messenger: Type[MQTTMessenger]) -> None:
         self._messenger = messenger
 
     @worker.setter
-    def worker(self, worker: Any) -> None:
+    def worker(self, worker: Type[Prototype]) -> None:
         self._worker = worker
 

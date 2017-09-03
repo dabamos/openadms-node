@@ -37,9 +37,13 @@ except ImportError:
 class MQTTMessageBroker(Thread):
     """
     Wrapper class for the HBMQTT message broker.
+
+    Args:
+        host (str): The host name (IP or FQDN).
+        port (int): The port number.
     """
 
-    def __init__(self, host, port):
+    def __init__(self, host: str, port: int):
         Thread.__init__(self)
         self.daemon = True
         self.logger = logging.getLogger('mqtt')
@@ -55,7 +59,7 @@ class MQTTMessageBroker(Thread):
             }
         }
 
-    def run(self):
+    def run(self) -> None:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
 
@@ -77,9 +81,10 @@ class MQTTMessenger(object):
 
     Args:
         manager (Type[Manager]): The manager object.
+        client_id (str): The MQTT client id.
     """
 
-    def __init__(self, manager, client_id):
+    def __init__(self, manager: Any, client_id: str):
         self.logger = logging.getLogger('mqtt')
 
         self._config_manager = manager.config_manager
@@ -112,7 +117,7 @@ class MQTTMessenger(object):
                     client: Type[mqtt.Client],
                     userdata: Any,
                     flags: Dict[str, int],
-                    rc: int):
+                    rc: int) -> None:
         """Callback method is called after a connection has been
         established."""
         self._client.subscribe(self._topic)
@@ -120,7 +125,7 @@ class MQTTMessenger(object):
     def _on_disconnect(self,
                        client: Type[mqtt.Client],
                        userdata: Any,
-                       rc: int):
+                       rc: int) -> None:
         """Callback method is called after disconnection."""
         if rc != 0:
             self.logger.error('Unexpected disconnection from {}:{}'
@@ -132,7 +137,7 @@ class MQTTMessenger(object):
     def _on_message(self,
                     client: Type[mqtt.Client],
                     userdata: Any,
-                    msg: Type[mqtt.MQTTMessage]):
+                    msg: Type[mqtt.MQTTMessage]) -> None:
         """Callback method for incoming messages. Converts the JSON-based
         message to its real data type and then forwards it to the downlink
         function."""
@@ -143,7 +148,7 @@ class MQTTMessenger(object):
             self.logger.error('Message from client "{}" is corrupted '
                               '(invalid JSON)'.format(client))
 
-    def connect(self):
+    def connect(self) -> None:
         """Connect to the message broker."""
         if self._client:
             self._client.connect_async(self._host,
@@ -153,7 +158,7 @@ class MQTTMessenger(object):
         else:
             self.logger.error('Can\'t create connection to MQTT message broker')
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect from the message broker."""
         if self._client:
             self._client.loop_stop()
@@ -178,33 +183,37 @@ class MQTTMessenger(object):
         """Send message to the message broker."""
         self._client.publish(topic, message)
 
-    def subscribe(self, topic):
+    def subscribe(self, topic) -> None:
         """Set the topic the client should subscribe from the message
         broker."""
         self._topic = topic
 
     @property
-    def client(self):
+    def client(self) -> Type[mqtt.Client]:
         return self._client
 
     @property
-    def downlink(self):
+    def downlink(self) -> Callable[[List[Dict]], None]:
         return self._downlink
 
     @property
-    def host(self):
+    def host(self) -> str:
         return self._host
 
     @property
-    def port(self):
+    def port(self) -> int:
         return self._port
 
     @property
-    def topic(self):
+    def topic(self) -> str:
         return self._topic
 
     @downlink.setter
-    def downlink(self, downlink):
+    def downlink(self, downlink: Callable[[List[Dict]], None]):
         """Register a callback function which is called after a message has
-        been received."""
+        been received.
+
+        Args:
+            downlink (Callable[[List[Dict]], None]): The downlink function.
+        """
         self._downlink = downlink

@@ -52,19 +52,19 @@ class Manager(object):
         self._schema_manager = None
 
     @property
-    def config_manager(self):
+    def config_manager(self) -> Any:
         return self._config_manager
 
     @property
-    def module_manager(self):
+    def module_manager(self) -> Any:
         return self._module_manager
 
     @property
-    def schema_manager(self):
+    def schema_manager(self) -> Any:
         return self._schema_manager
 
     @property
-    def sensor_manager(self):
+    def sensor_manager(self) -> Any:
         return self._sensor_manager
 
     @config_manager.setter
@@ -177,7 +177,7 @@ class ConfigManager(object):
         return config
 
     @property
-    def config(self) -> Dict:
+    def config(self) -> Dict[str, Any]:
         return self._config
 
     @property
@@ -185,7 +185,7 @@ class ConfigManager(object):
         return self._path
 
     @config.setter
-    def config(self, config: Dict) -> None:
+    def config(self, config: Dict[str, Any]) -> None:
         self._config = config
 
 
@@ -337,7 +337,7 @@ class ModuleManager(object):
         self._modules.get(module_name).stop_worker()
 
     @property
-    def modules(self) -> Dict:
+    def modules(self) -> Dict[str, Type[Module]]:
         return self._modules
 
 
@@ -389,7 +389,7 @@ class SensorManager(object):
         return self._sensors.keys()
 
     @property
-    def sensors(self):
+    def sensors(self) -> Dict[str, Type[Sensor]]:
         return self._sensors
 
 
@@ -445,7 +445,7 @@ class SchemaManager(object):
 
         return True
 
-    def get_schema_path(self, class_path: str):
+    def get_schema_path(self, class_path: str) -> Type[Path]:
         """Uses the class path of a module to generate the path to the
         configuration schema file.
 

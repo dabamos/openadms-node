@@ -259,15 +259,15 @@ class Observation(object):
         return json.dumps(self._data)
 
     @property
-    def data(self) -> Dict:
+    def data(self) -> Dict[str, Any]:
         return self._data
 
     @data.setter
-    def data(self, data: Dict) -> None:
+    def data(self, data: Dict[str, Any]) -> None:
         """Sets the observation data set. Kindly note that the data won't be
         validated.
 
         Args:
-            data (Dict): The data set dictionary.
+            data (Dict[str, Any]): The data set dictionary.
         """
         self._data = data

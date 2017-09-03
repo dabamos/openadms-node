@@ -85,7 +85,14 @@ class VirtualSensor(Prototype):
         return obs
 
     def sanitize(self, s: str) -> str:
-        """Converts some non-printable characters of a given string."""
+        """Converts some non-printable characters of a given string.
+
+        Args:
+            s (str): The string to sanitize.
+
+        Returns:
+            The sanitized string.
+        """
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')\

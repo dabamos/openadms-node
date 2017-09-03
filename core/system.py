@@ -50,7 +50,7 @@ class System(object):
 #        return psutil.cpu_percent(interval=0.1)
 
     @staticmethod
-    def get_date_time():
+    def get_date_time() -> str:
         """Returns local date and time.
 
         Returns:
@@ -59,7 +59,7 @@ class System(object):
         return arrow.now().format()
 
     @staticmethod
-    def get_host_name():
+    def get_host_name() -> str:
         """Returns the host name of the system.
 
         Returns:
@@ -68,7 +68,7 @@ class System(object):
         return socket.gethostname()
 
     @staticmethod
-    def get_machine():
+    def get_machine() -> str:
         """Returns the hardware architecture.
 
         Returns:
@@ -77,7 +77,7 @@ class System(object):
         return platform.machine()
 
     @staticmethod
-    def get_openadms_string():
+    def get_openadms_string() -> str:
         """Returns a string with OpenADMS version and version name:
 
         Returns:
@@ -87,7 +87,7 @@ class System(object):
                                          OPENADMS_VERSION_NAME)
 
     @staticmethod
-    def get_openadms_version():
+    def get_openadms_version() -> float:
         """Returns the current version of OpenADMS:
 
         Returns:
@@ -96,7 +96,7 @@ class System(object):
         return OPENADMS_VERSION
 
     @staticmethod
-    def get_openadms_version_name():
+    def get_openadms_version_name() -> str:
         """Returns the code name of the current OpenADMS version.
 
         Returns:
@@ -105,7 +105,7 @@ class System(object):
         return OPENADMS_VERSION_NAME
 
     @staticmethod
-    def get_os_name():
+    def get_os_name() -> str:
         """Returns the name of the operating system.
 
         Returns:
@@ -114,7 +114,7 @@ class System(object):
         return platform.system()
 
     @staticmethod
-    def get_os_version():
+    def get_os_version() -> str:
         """Returns the version of the operating system.
 
         Returns:
@@ -123,7 +123,7 @@ class System(object):
         return platform.release()
 
     @staticmethod
-    def get_python_version():
+    def get_python_version() -> str:
         """Returns Python implementation and version (e.g., 'CPython 3.5.1').
 
         Returns:
@@ -133,7 +133,7 @@ class System(object):
                               platform.python_version())
 
     @staticmethod
-    def get_system_string():
+    def get_system_string() -> str:
         """Returns a string containing operating system and hardware
         architecture (e.g., 'Windows 7 (AMD64)').
 
@@ -146,7 +146,7 @@ class System(object):
         return s
 
     @staticmethod
-    def get_uptime():
+    def get_uptime() -> float:
         """Returns the system uptime in seconds.
 
         Returns:
@@ -155,7 +155,7 @@ class System(object):
         return uptime.uptime()
 
     @staticmethod
-    def get_uptime_string():
+    def get_uptime_string() -> str:
         """Returns the system uptime as a formatted string (days, hours,
         minutes, seconds).
 
@@ -176,7 +176,7 @@ class System(object):
         return u.format(d, h, m, s)
 
     @staticmethod
-    def get_current_year():
+    def get_current_year() -> int:
         """Returns the current year.
 
         Returns:
@@ -194,7 +194,7 @@ class System(object):
 #        return psutil.virtual_memory().percent
 
     @staticmethod
-    def is_windows():
+    def is_windows() -> bool:
         """Returns whether the current operating system is a version of
         Microsoft Windows or not.
 

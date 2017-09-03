@@ -133,7 +133,16 @@ class AlertMessageFormatter(Prototype):
         # Queue for alert message collection.
         self._queue = queue.Queue(-1)
 
-    def handle_alert_message(self, header, payload):
+    def handle_alert_message(self,
+                             header: Dict[str, Any],
+                             payload: Dict[str, Any]) -> None:
+        """Handles messages of type`alert` and either caches them or forwards
+        them to the `process_alert_messages()` method.
+
+        Args:
+            header (Dict[str, Any]): The alert header.
+            payload (Dict[str, Any]): The alert payload.
+        """
         if self._msg_collection_enabled:
             # Add the alert message to the collection queue. It will be
             # processed by the threaded `run()` method later.
@@ -143,7 +152,14 @@ class AlertMessageFormatter(Prototype):
             receiver = payload.get('receiver')
             self.process_alert_messages(receiver, [payload])
 
-    def process_alert_messages(self, receiver, messages):
+    def process_alert_messages(self,
+                               receiver: str,
+                               messages: List[str]) -> None:
+        """
+        Args:
+            receiver (str): The receiver of the alert.
+            messages (List[str]): The list of alert messages.
+        """
         if not receiver or receiver == '':
             self.logger.warning('No receiver defined for alert message')
             return
@@ -189,7 +205,7 @@ class AlertMessageFormatter(Prototype):
         # Fire and forget.
         self.publish(self._receiver, header, payload)
 
-    def run(self):
+    def run(self) -> None:
         # Dictionary for caching alert messages. Stores a list of dictionaries:
         # '<receiver_name>': [<msg_1>, <msg_2>, ..., <msg_n>]
         cache = {}
@@ -228,7 +244,7 @@ class AlertMessageFormatter(Prototype):
                 # Clear the messages cache.
                 cache.clear()
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 

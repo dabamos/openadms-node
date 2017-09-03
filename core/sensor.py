@@ -54,7 +54,7 @@ class Sensor(object):
             self.logger.debug('Loaded observation "{}" of sensor "{}"'
                               .format(obs.get('name'), self._name))
 
-    def create_observation(self, data: Dict[str, Any]) -> None:
+    def create_observation(self, data: Dict[str, Any]) -> Type[Observation]:
         """Creates an observation object.
 
         Args:
@@ -95,24 +95,24 @@ class Sensor(object):
         """
         return self._observations.get(name)
 
-    def get_observations(self) -> List:
+    def get_observations(self) -> Dict[str, Type[Observation]]:
         """Returns all observations.
 
         Returns:
-            List with observation objects.
+            Dictionary with observation objects.
         """
         return self._observations
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self._description
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._name
 
     @property
-    def type(self):
+    def type(self) -> str:
         return self._type
 
 
