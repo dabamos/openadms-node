@@ -26,15 +26,13 @@ observations. It can be used to monitor buildings, terrain, and other objects
 with the help of geodetical or geotechnical sensors.
 
 Example:
-    At first, start an MQTT message broker like Eclipse Mosquitto or HBMQTT.
-    The message broker is used for the distribution of messages between the
-    OpenADMS modules. On Unix, Mosquitto can be started with:
+    You can either use the internal MQTT message broker or an external one,
+    like Eclipse Mosquitto. The external broker has to be started before
+    OpenADMS.
+    
+    Run OpenADMS with the internal broker:
 
-        $ sudo service mosquitto onestart
-
-    Then run OpenADMS with a valid configuration file:
-
-        $ python3 openadms.py --config ./config/my_config.json
+        $ python3 openadms.py -c ./config/my_config.json -m -d
 
     The monitoring will begin automatically.
 """
