@@ -126,7 +126,7 @@ class InterruptCounter(Prototype):
             gpio: Observation.create_response_set('int', 'none', c)
         }
 
-        obs.set('id', gpio)
+        obs.set('target', gpio)
         obs.set('name', 'interruptCount')
         obs.set('enabled', False)
         obs.set('onetime', False)

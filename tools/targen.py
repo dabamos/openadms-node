@@ -63,30 +63,31 @@ def main(t_file, c_file, o_file):
     result = { 'observations': [] }
 
     for target in targets:
-        t_id, t_hz, t_v = target.strip('\n').split(',')
-        logger.debug('ID: {:>5}, Hz [gon]: {:>10}, V [gon]: {:>10}'
-                     .format(t_id, t_hz, t_v))
+        t_name, t_hz, t_v = target.strip('\n').split(',')
+        logger.debug('Target: {:>5}, Hz [gon]: {:>10}, V [gon]: {:>10}'
+                     .format(t_name, t_hz, t_v))
         hz_rad = str(round(grad2rad(float(t_hz)), 5))
         v_rad = str(round(grad2rad(float(t_v)), 5))
 
-        logger.debug('ID: {:>5}, Hz [rad]: {:>10}, V [rad]: {:>10}'
-                     .format(t_id, hz_rad, v_rad))
+        logger.debug('Target: {:>5}, Hz [rad]: {:>10}, V [rad]: {:>10}'
+                     .format(t_name, hz_rad, v_rad))
 
         for command in commands:
             result['observations'].append(copy.deepcopy(command))
             l = len(result.get('observations'))
             obs_data = result.get('observations')[l - 1]
 
-            if obs_data.get('id') is not None:
-                obs_data['id'] = obs_data.get('id').replace('{{id}}', t_id)
+            if obs_data.get('target') is not None:
+                obs_data['target'] = obs_data.get('target')\
+                                             .replace('{{target}}', t_name)
 
             if obs_data.get('description') is not None:
                 obs_data['description'] = obs_data.get('description')\
-                                          .replace('{{id}}', t_id)
+                                          .replace('{{target}}', t_name)
 
             if obs_data.get('name') is not None:
                 obs_data['name'] = obs_data.get('name')\
-                                   .replace('{{id}}', t_id)
+                                           .replace('{{target}}', t_name)
 
             request_sets = obs_data['requestSets']
 

@@ -63,7 +63,7 @@ class DistanceCorrector(Prototype):
         self._sensor_height = config.get('sensorHeight')
         self._last_update = time.time()
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         sensor_type = obs.get('sensorType')
 
         # Update atmospheric data if sensor is a weather station.
@@ -269,7 +269,7 @@ class HelmertTransformer(Prototype):
         self._a = None
         self._o = None
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
         either be of a fixed point or of a target point.
@@ -279,8 +279,8 @@ class HelmertTransformer(Prototype):
 
         An `Observation` object will be created for the view point and send
         to the receivers defined in the configuration."""
-        # Update the fixed point data of the configuration (Hz, V, slope distance)
-        # by using the current observation.
+        # Update the fixed point data of the configuration (Hz, V, slope
+        # distance) by using the current observation.
         if self._is_fixed_point(obs):
             self._update_fixed_point(obs)
 
@@ -359,8 +359,8 @@ class HelmertTransformer(Prototype):
 
         if None in [hz, v, dist]:
             self.logger.warning('Hz, V, or distance is missing in observation '
-                                '"{}" with ID "{}"'.format(obs.get('name'),
-                                                           obs.get('id')))
+                                '"{}" of target "{}"'.format(obs.get('name'),
+                                                           obs.get('target')))
             return obs
 
         # Calculate the coordinates in the global system (X, Y, Z).
@@ -376,7 +376,7 @@ class HelmertTransformer(Prototype):
 
         self.logger.info('Calculated coordinates of target point "{}" '
                          '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5g})'
-                         .format(obs.get('id'), x, y, z))
+                         .format(obs.get('target'), x, y, z))
 
         # Do residual mismatch transformation.
         if self._is_residual:
@@ -384,14 +384,14 @@ class HelmertTransformer(Prototype):
 
             self.logger.debug('Calculated improvements for target point "{}" '
                               '(dX = {:4.5f} m, dY = {:4.5f} m)'
-                              .format(obs.get('id'), vx, vy))
+                              .format(obs.get('target'), vx, vy))
 
             x += vx
             y += vy
 
             self.logger.debug('Updated coordinates of target point "{}" '
                               '(X = {:4.5f}, Y = {:4.5f})'
-                              .format(obs.get('id'), x, y))
+                              .format(obs.get('target'), x, y))
 
         # Add response set.
         response_sets = obs.get('responseSets')
@@ -414,8 +414,8 @@ class HelmertTransformer(Prototype):
 
             if None in [hz, v, dist]:
                 self.logger.warning('Hz, V, or distance is missing in '
-                                    'observation "{}" with ID "{}"'
-                                    .format(obs.get('name'), obs.get('id')))
+                                    'observation "{}" of target "{}"'
+                                    .format(obs.get('name'), obs.get('target')))
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
@@ -500,7 +500,7 @@ class HelmertTransformer(Prototype):
 
         self.logger.info('Calculated coordinates of view point "{}" '
                          '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5f})'
-                         .format(self._view_point.get('id'),
+                         .format(self._view_point.get('target'),
                                  self._view_point.get('x'),
                                  self._view_point.get('y'),
                                  self._view_point.get('z')))
@@ -541,7 +541,7 @@ class HelmertTransformer(Prototype):
         if r_sum_wx != 0 or r_sum_wy != 0:
             self.logger.warning('Calculated coordinates of view point "{}" '
                                 'are inaccurate ([Wx] = {}, [Wy] = {})'
-                                .format(self._view_point.get('id'),
+                                .format(self._view_point.get('target'),
                                         r_sum_wx,
                                         r_sum_wy))
 
@@ -575,7 +575,7 @@ class HelmertTransformer(Prototype):
 
         # Create Observation instance for the view point.
         view_point = Observation()
-        view_point.set('id', self._view_point.get('id'))
+        view_point.set('target', self._view_point.get('target'))
         view_point.set('name', 'getViewPoint')
         view_point.set('nextReceiver', 0)
         view_point.set('portName', obs.get('portName'))
@@ -598,7 +598,7 @@ class HelmertTransformer(Prototype):
     def _is_fixed_point(self, obs):
         """Checks if the given observation equals one of the defined fixed
         points."""
-        if self._fixed_points.get(obs.get('id')):
+        if self._fixed_points.get(obs.get('target')):
             return True
         else:
             return False
@@ -625,7 +625,7 @@ class HelmertTransformer(Prototype):
         # Calculate the coordinates of the fixed point if the Helmert
         # transformation has been done already. Otherwise, use the datum from
         # the configuration.
-        fixed_point = self._fixed_points.get(obs.get('id'))
+        fixed_point = self._fixed_points.get(obs.get('target'))
 
         if self._is_ready():
             x, y, z = self.calculate_point_coordinates(
@@ -640,7 +640,7 @@ class HelmertTransformer(Prototype):
 
             self.logger.info('Calculated coordinates of fixed point "{}" '
                              '(X = {:3.5f}, Y = {:3.5f}, Z = {:3.5f})'
-                             .format(obs.get('id'), x, y, z))
+                             .format(obs.get('target'), x, y, z))
         else:
             # Get the coordinates of the fixed point from the configuration.
             x = fixed_point.get('x')
@@ -653,8 +653,8 @@ class HelmertTransformer(Prototype):
         fixed_point['dist'] = dist
         fixed_point['lastUpdate'] = time.time()
 
-        self.logger.debug('Updated fixed point with ID "{}"'
-                          .format(obs.get('id')))
+        self.logger.debug('Updated fixed point of target "{}"'
+                          .format(obs.get('target')))
 
         # Add global Cartesian coordinates of the fixed point to the
         # observation.
@@ -714,7 +714,7 @@ class PolarTransformer(Prototype):
     def _is_fixed_point(self, obs):
         """Checks if the given observation equals one of the defined fixed
         points."""
-        if self._fixed_points.get(obs.get('id')):
+        if self._fixed_points.get(obs.get('target')):
             return True
         else:
             return False
@@ -730,7 +730,7 @@ class PolarTransformer(Prototype):
         return True
 
     def _update_fixed_point(self, obs):
-        fixed_point = self._fixed_points.get(obs.get('id'))
+        fixed_point = self._fixed_points.get(obs.get('target'))
         hz = obs.get_response_value('hz')
 
         azimuth = self.get_azimuth_angle(self._azimuth_angle,
@@ -791,7 +791,7 @@ class PolarTransformer(Prototype):
 
         return azimuth
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         if not self._is_valid_sensor_type(obs):
             # Only total stations are supported.
             return obs
@@ -809,12 +809,12 @@ class PolarTransformer(Prototype):
         if self._is_fixed_point(obs):
             # Add measured Hz and calculated Hz to the fixed point.
             self._update_fixed_point(obs)
-            self.logger.debug('Updated fixed point with ID "{}"'
-                              .format(obs.get('id')))
+            self.logger.debug('Updated fixed point of target "{}"'
+                              .format(obs.get('target')))
 
         self.logger.debug('Starting polar transformation of target "{}" (Hz = '
                           '{:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m)'
-                          .format(obs.get('id'),
+                          .format(obs.get('target'),
                                   self.rad_to_gon(hz),
                                   self.rad_to_gon(v),
                                   dist_hz))
@@ -838,7 +838,7 @@ class PolarTransformer(Prototype):
                                  dist_hz)
 
         self.logger.info('Transformed target "{}" (X = {:3.4f}, Y = {:3.4f}, '
-                         'Z = {:3.4f})'.format(obs.get('id'), x, y, z))
+                         'Z = {:3.4f})'.format(obs.get('target'), x, y, z))
 
         # Add to observation data set.
         response_sets = obs.get('responseSets')
@@ -906,7 +906,7 @@ class RefractionCorrector(Prototype):
     def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         z = obs.get_response_value('z')
 
         if not z:
@@ -924,10 +924,10 @@ class RefractionCorrector(Prototype):
         k_r = k * k_e               # Correction of refraction.
         r = k_e - k_r
 
-        self.logger.info('Updated height of observation "{}" with ID "{}" '
+        self.logger.info('Updated height of observation "{}" of target "{}" '
                          'from {:3.4f} m to {:3.4f} m (refraction value: '
                          '{:3.5f} m)'.format(obs.get('name'),
-                                             obs.get('id'),
+                                             obs.get('target'),
                                              z,
                                              z + r,
                                              r))
@@ -954,7 +954,7 @@ class SerialMeasurementProcessor(Prototype):
     def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         # Calculate the serial measurement of an observation in two faces.
         hz_0 = obs.get_response_value('hz0')
         hz_1 = obs.get_response_value('hz1')
@@ -994,8 +994,8 @@ class SerialMeasurementProcessor(Prototype):
                                                                      dist)
 
         self.logger.debug('Calculated serial measurement with two faces for '
-                          'observation "{}" with ID "{}"'
-                          .format(obs.get('name'), obs.get('id')))
+                          'observation "{}" of target "{}"'
+                          .format(obs.get('name'), obs.get('target')))
 
         return obs
 

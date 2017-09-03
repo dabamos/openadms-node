@@ -189,7 +189,7 @@ class Prototype(object):
         """
         return self._schema_manager.is_valid(data, data_type)
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         """Processes an observation object. Will be overridden by actual
         worker.
 
@@ -221,9 +221,9 @@ class Prototype(object):
         try:
             message = json.dumps([header, payload])
             self._uplink(target, message)
-        except TypeError:
-            self.logger.error('Message could not be published'
-                              '(header or payload invalid)')
+        except TypeError as e:
+            self.logger.error('Message could not be published '
+                              '(header or payload invalid): {}'.format(e))
 
     def publish_observation(self, obs: Type[Observation]) -> None:
         """Prepares the observation for publishing and forwards it to the
@@ -238,22 +238,22 @@ class Prototype(object):
         # No receivers defined.
         if len(receivers) == 0:
             logging.debug('No receivers defined in observation "{}" '
-                          'with ID "{}"'.format(obs.get('name'),
-                                                obs.get('id')))
+                          'of target "{}"'.format(obs.get('name'),
+                                                  obs.get('target')))
             return
 
         # No index defined.
         if (index is None) or (index < 0):
-            self.logger.warning('Next receiver of observation "{}" with ID '
+            self.logger.warning('Next receiver of observation "{}" with target '
                                 '"{}" not defined'.format(obs.get('name'),
-                                                          obs.get('id')))
+                                                          obs.get('target')))
             return
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            self.logger.debug('Observation "{}" with ID "{}" has been finished'
+            self.logger.debug('Observation "{}" of target "{}" has been finished'
                               .format(obs.get('name'),
-                                      obs.get('id')))
+                                      obs.get('target')))
             return
 
         # Name of the sending module.

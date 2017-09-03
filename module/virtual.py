@@ -46,7 +46,7 @@ class VirtualSensor(Prototype):
         Prototype.__init__(self, name, type, manager)
         self.patterns = {}
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         request_sets = obs.get('requestSets')
 
         for set_name, request_set in request_sets.items():

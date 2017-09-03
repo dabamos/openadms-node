@@ -189,7 +189,7 @@ class MQTTMessenger(object):
         self._topic = topic
 
     @property
-    def client(self) -> Type[mqtt.Client]:
+    def client(self) -> mqtt.Client:
         return self._client
 
     @property

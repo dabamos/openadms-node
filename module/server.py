@@ -196,7 +196,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 .format(openadms_version=System.get_openadms_string())
         )
 
-    def get_complete_path(self, path) -> Type[Path]:
+    def get_complete_path(self, path) -> Path:
         return Path('{}/{}'.format(self._root_dir, path))
 
     def get_file_contents(self, path) -> str:

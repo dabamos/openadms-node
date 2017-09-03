@@ -26,13 +26,15 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import pytest
+import uuid
 
 from module.totalstation import *
 from core.observation import Observation
 
 
 data = {
-    'id': 'Test',
+    'id': str(uuid.uuid4()),
+    'target': 'test',
     'requestSets': {
         'getValue': {
             'response': '+0025.9\r',

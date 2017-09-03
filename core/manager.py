@@ -245,7 +245,7 @@ class ModuleManager(object):
         """
         self._modules[name] = None
 
-    def get(self, name: str) -> Type[Module]:
+    def get(self, name: str) -> Module:
         """Returns a specific module.
 
         Args:
@@ -261,7 +261,7 @@ class ModuleManager(object):
         """
         return self._modules.keys()
 
-    def get_root_dir(self) -> Type[Path]:
+    def get_root_dir(self) -> Path:
         """Returns the root directory of OpenADMS.
 
         Returns:
@@ -269,7 +269,7 @@ class ModuleManager(object):
         """
         return Path(__file__).parent.parent
 
-    def get_worker(self, module_name: str, class_path: str) -> Type[Prototype]:
+    def get_worker(self, module_name: str, class_path: str) -> Prototype:
         """Loads a Python class from a given path and returns the instance.
 
         Args:
@@ -380,7 +380,7 @@ class SensorManager(object):
         """Removes a sensor from the sensors dictionary."""
         self._sensors[name] = None
 
-    def get(self, name: str) -> Type[Sensor]:
+    def get(self, name: str) -> Sensor:
         """Returns the sensor object with the given name."""
         return self._sensors.get(name)
 
@@ -445,7 +445,7 @@ class SchemaManager(object):
 
         return True
 
-    def get_schema_path(self, class_path: str) -> Type[Path]:
+    def get_schema_path(self, class_path: str) -> Path:
         """Uses the class path of a module to generate the path to the
         configuration schema file.
 

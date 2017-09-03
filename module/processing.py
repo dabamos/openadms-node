@@ -44,7 +44,7 @@ class PreProcessor(Prototype):
     def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('requestSets').items():
@@ -52,8 +52,8 @@ class PreProcessor(Prototype):
             response_pattern = request_set.get('responsePattern')
 
             if response is None or response == '':
-                self.logger.error('No response in observation "{}" with ID "{}"'
-                                  .format(obs.get('name'), obs.get('id')))
+                self.logger.error('No response in observation "{}" of target "{}"'
+                                  .format(obs.get('name'), obs.get('target')))
                 continue
 
             pattern = re.compile(response_pattern)
@@ -61,12 +61,12 @@ class PreProcessor(Prototype):
 
             if not match:
                 self.logger.error('Response "{}" of request "{}" of '
-                                  'observation "{}" with ID "{}" from sensor '
+                                  'observation "{}" of target "{}" from sensor '
                                   '"{}" on port "{}" does not match extraction '
                                   'pattern'.format(self.sanitize(response),
                                                    set_name,
                                                    obs.get('name'),
-                                                   obs.get('id'),
+                                                   obs.get('target'),
                                                    obs.get('sensorName'),
                                                    obs.get('portName')))
                 return obs
@@ -79,8 +79,8 @@ class PreProcessor(Prototype):
             # Wrong: ".*"
             if pattern.groups == 0:
                 self.logger.error('No group(s) defined in regular expression '
-                                  'pattern of observation "{}" with ID "{}"'
-                                  .format(obs.get('name'), obs.get('id')))
+                                  'pattern of observation "{}" of target "{}"'
+                                  .format(obs.get('name'), obs.get('target')))
                 return obs
 
             # Convert the type of the parsed raw values from string to the
@@ -90,20 +90,20 @@ class PreProcessor(Prototype):
             for group_name, raw_value in match.groupdict().items():
                 if not raw_value:
                     self.logger.error('No raw value found for response set '
-                                      '"{}" of observation "{}" with ID "{}"'
+                                      '"{}" of observation "{}" of target "{}"'
                                       .format(group_name,
                                               obs.get('name'),
-                                              obs.get('id')))
+                                              obs.get('target')))
                     continue
 
                 response_set = response_sets.get(group_name)
 
                 if not response_set:
                     self.logger.error('Response set "{}" of observation "{}" '
-                                      'with ID "{}" not defined'
+                                      'of target "{}" not defined'
                                       .format(group_name,
                                               obs.get('name'),
-                                              obs.get('id')))
+                                              obs.get('target')))
                     continue
 
                 response_type = response_set.get('type').lower()
@@ -121,11 +121,11 @@ class PreProcessor(Prototype):
 
                 if response_value is not None:
                     self.logger.debug('Extracted "{}" from raw response "{}" '
-                                      'of observation "{}" with ID "{}"'
+                                      'of observation "{}" of target "{}"'
                                       .format(response_value,
                                               group_name,
                                               obs.get('name'),
-                                              obs.get('id')))
+                                              obs.get('target')))
                     response_set['value'] = response_value
 
         return obs
@@ -234,7 +234,7 @@ class ReturnCodeInspector(Prototype):
         self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         for response_set in self._response_sets:
             return_code = obs.get_value('responseSets', response_set, 'value')
 
@@ -254,10 +254,10 @@ class ReturnCodeInspector(Prototype):
                 obs.set('nextReceiver', 0)
                 obs.set('corrupted', False)
 
-                self.logger.info('Retrying observation "{}" with ID "{}" due '
+                self.logger.info('Retrying observation "{}" of target "{}" due '
                                  'to return code {} of response "{}" '
                                  '(attempt {} of {})'.format(obs.get('name'),
-                                                             obs.get('id'),
+                                                             obs.get('target'),
                                                              return_code,
                                                              response_set,
                                                              attempts + 1,
@@ -267,10 +267,10 @@ class ReturnCodeInspector(Prototype):
 
                 if error_values:
                     # Return code related log message.
-                    self.logger.log(lvl * 10, 'Observation "{}" with ID "{}": '
+                    self.logger.log(lvl * 10, 'Observation "{}" of target "{}": '
                                               '{} (code {} in response "{}")'
                                               .format(obs.get('name'),
-                                                      obs.get('id'),
+                                                      obs.get('target'),
                                                       msg,
                                                       return_code,
                                                       response_set))
@@ -299,7 +299,7 @@ class UnitConverter(Prototype):
         config = self._config_manager.get(self._name)
         self._conversions = config.get('conversions')
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         for name, conversion in self._conversions.items():
             response_set = obs.get('responseSets').get(name)
 
@@ -314,11 +314,11 @@ class UnitConverter(Prototype):
 
             if src_unit != conversion.get('sourceUnit'):
                 self.logger.warning('Unit "{}" of response "{}" of observation '
-                                    '"{}" with ID "{}" does not match "{}"'
+                                    '"{}" of target "{}" does not match "{}"'
                                     .format(src_unit,
                                             name,
                                             obs.get('name'),
-                                            obs.get('id'),
+                                            obs.get('target'),
                                             conversion.get('sourceUnit')))
                 continue
 
@@ -328,10 +328,10 @@ class UnitConverter(Prototype):
                 dgn_unit = conversion.get('designatedUnit')
 
                 self.logger.info('Converted response "{}" of observation "{}" '
-                                 'with ID "{}" from {:.4f} {} to {:.4f} {}'
+                                 'of target "{}" from {:.4f} {} to {:.4f} {}'
                                  .format(name,
                                          obs.get('name'),
-                                         obs.get('id'),
+                                         obs.get('target'),
                                          src_value,
                                          src_unit,
                                          dgn_value,

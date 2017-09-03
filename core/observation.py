@@ -25,6 +25,7 @@ __license__ = 'EUPL'
 
 import json
 import logging
+import uuid
 
 from typing import *
 
@@ -47,13 +48,14 @@ class Observation(object):
         if not data:
             self._data = {
                 'enabled': True,
-                'id': None,
+                'id': str(uuid.uuid4()),
                 'name': None,
                 'nextReceiver': 0,
                 'portName': None,
                 'receivers': [],
                 'response': None,
                 'responseSets': {},
+                'target': None,
                 'timeStamp': None
             }
         else:
@@ -115,10 +117,10 @@ class Observation(object):
             t = self._data.get('responseSets').get(name).get('type')
         except AttributeError:
             logger.warning('Type of response set "{}" is missing in '
-                           'observation "{}" with ID "{}"'
+                           'observation "{}" of target "{}"'
                            .format(name,
                                    self.get('name'),
-                                   self.get('id')))
+                                   self.get('target')))
             return
 
         return t
@@ -136,10 +138,10 @@ class Observation(object):
             u = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
             logger.warning('Unit of response set "{}" is missing in '
-                           'observation "{}" with ID "{}"'
+                           'observation "{}" of target "{}"'
                            .format(name,
                                    self.get('name'),
-                                   self.get('id')))
+                                   self.get('target')))
             return
 
         return u
@@ -157,10 +159,10 @@ class Observation(object):
             v = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
             logger.warning('Value of response set "{}" is missing in '
-                           'observation "{}" with ID "{}"'
+                           'observation "{}" of target "{}"'
                            .format(name,
                                    self.get('name'),
-                                   self.get('id')))
+                                   self.get('target')))
             return
 
         return v

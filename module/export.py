@@ -54,9 +54,10 @@ class FileExporter(Prototype):
 
     Configuration:
         dateTimeFormat (str): Format of date and time (see Python strftime).
-        fileExtension (str): The extension of the file ('.txt' or '.csv').
-        fileName (str): Placeholders are '{date}', '{id}', '{name}', '{port}'.
-        fileRotation (str): Either 'none', 'daily', 'monthly', or 'yearly'.
+        fileExtension (str): The extension of the file (`.txt` or `.csv`).
+        fileName (str): Placeholders are `{{date}}`, `{{target}}`, `{{name}}`,
+                        `{{port}}`.
+        fileRotation (str): Either `none`, `daily`, `monthly`, or `yearly`.
         paths (list): Paths to save files to (multiple paths possible).
         separator (str): Separator between values within the CSV file.
     """
@@ -92,7 +93,7 @@ class FileExporter(Prototype):
 
         return paths
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         """Append data to a flat file in CSV format.
 
         Args:
@@ -119,8 +120,8 @@ class FileExporter(Prototype):
         file_name = file_name.replace('{{port}}', obs.get('portName'))
         file_name = file_name.replace('{{date}}', '{}'.format(date)
                                       if date else '')
-        file_name = file_name.replace('{{id}}', '{}'.format(obs.get('id'))
-                                      if obs.get('id') is not None else '')
+        file_name = file_name.replace('{{target}}', '{}'.format(obs.get('target'))
+                                      if obs.get('target') is not None else '')
         file_name = file_name.replace('{{name}}', '{}'.format(obs.get('name'))
                                       if obs.get('name') is not None else '')
 
@@ -136,7 +137,7 @@ class FileExporter(Prototype):
 
             if not os.path.isfile(path + file_name):
                 header = '# Target "{}" of "{}" on "{}"\n' \
-                         .format(obs.get('id'),
+                         .format(obs.get('target'),
                                  obs.get('sensorName'),
                                  obs.get('portName'))
             # Open a file for every path.
@@ -149,8 +150,8 @@ class FileExporter(Prototype):
                 dt = datetime.fromtimestamp(obs.get('timeStamp', 0))
                 line = dt.strftime(self._date_time_format)
 
-                if obs.get('id') is not None:
-                    line += self._separator + obs.get('id')
+                if obs.get('target') is not None:
+                    line += self._separator + obs.get('target')
 
                 response_sets = obs.get('responseSets')
 
@@ -167,10 +168,10 @@ class FileExporter(Prototype):
                 # Write line to file.
                 fh.write(line + '\n')
 
-                self.logger.info('Saved observation "{}" with ID "{}" from '
+                self.logger.info('Saved observation "{}" of target "{}" from '
                                  'port "{}" to file "{}"'
                                  .format(obs.get('name'),
-                                         obs.get('id'),
+                                         obs.get('target'),
                                          obs.get('portName'),
                                          path + file_name))
 
@@ -194,22 +195,22 @@ class RealTimePublisher(Prototype):
         self._receivers = config.get('receivers')
         self._is_enabled = config.get('enabled')
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         if not self._is_enabled:
             return obs
 
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
-            target = receiver + '/' + obs_copy.get('id')
+            target = receiver + '/' + obs_copy.get('target')
 
             obs_copy.set('nextReceiver', 0)
             obs_copy.set('receivers', [target])
 
-            self.logger.debug('Publishing observation "{}" with ID "{}" to "{}"'
-                              .format(obs_copy.get('name'),
-                                      obs_copy.get('id'),
-                                      target))
+            self.logger.debug('Publishing observation "{}" of target "{}" '
+                              'to "{}"'.format(obs_copy.get('name'),
+                                               obs_copy.get('target'),
+                                               target))
 
             header = {'type': 'observation'}
             payload = obs_copy.data

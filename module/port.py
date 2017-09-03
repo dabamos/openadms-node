@@ -87,7 +87,7 @@ class BluetoothPort(Prototype):
         else:
             return
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         if System.is_windows():
             self.logger.error('Operating system not supported (no '
                               'socket.AF_BLUETOOTH on Microsoft Windows)')
@@ -106,8 +106,8 @@ class BluetoothPort(Prototype):
 
         if len(requests_order) == 0:
             self.logger.info('No requests order defined in observation "{}" '
-                             'with ID "{}"'.format(obs.get('name'),
-                                                   obs.get('id')))
+                             'of target "{}"'.format(obs.get('name'),
+                                                   obs.get('target')))
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
@@ -115,9 +115,9 @@ class BluetoothPort(Prototype):
 
             if not request_set:
                 self.logger.error('Request set "{}" not found in observation '
-                                  '"{}" with ID "{}"'.format(request_name,
+                                  '"{}" of target "{}"'.format(request_name,
                                                              obs.get('name'),
-                                                             obs.get('id')))
+                                                             obs.get('target')))
                 return
 
             # The response of the sensor.
@@ -257,7 +257,7 @@ class SerialPort(Prototype):
                              .format(self._serial_port_config.port))
             self._serial.close()
 
-    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+    def process_observation(self, obs: Type[Observation]) -> Observation:
         if self._is_passive:
             # Set observation template for passive mode.
             self._obs_draft = obs
@@ -286,8 +286,8 @@ class SerialPort(Prototype):
 
         if len(requests_order) == 0:
             self.logger.info('No requests order defined in observation "{}" '
-                             'with ID "{}"'.format(obs.get('name'),
-                                                   obs.get('id')))
+                             'of target "{}"'.format(obs.get('name'),
+                                                     obs.get('target')))
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
@@ -295,9 +295,10 @@ class SerialPort(Prototype):
 
             if not request_set:
                 self.logger.error('Request set "{}" not found in observation '
-                                  '"{}" with ID "{}"'.format(request_name,
-                                                             obs.get('name'),
-                                                             obs.get('id')))
+                                  '"{}" of target "{}"'
+                                  .format(request_name,
+                                          obs.get('name'),
+                                          obs.get('target')))
                 return
 
             # The response of the sensor.
@@ -343,10 +344,10 @@ class SerialPort(Prototype):
 
                 # Try next attempt if response is empty.
                 self.logger.warning('No response from sensor "{}" for '
-                                    'observation "{}" with ID "{}"'
+                                    'observation "{}" of target "{}"'
                                     .format(obs.get('sensorName'),
                                             obs.get('name'),
-                                            obs.get('id')))
+                                            obs.get('target')))
 
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
@@ -420,7 +421,7 @@ class SerialPort(Prototype):
             self._thread.daemon = True
             self._thread.start()
 
-    def _get_port_config(self) -> Type[SerialPortConfiguration]:
+    def _get_port_config(self) -> SerialPortConfiguration:
         if not self._config:
             self.logger.debug('No port "{}" defined in configuration'
                               .format(self.name))
@@ -433,7 +434,8 @@ class SerialPort(Prototype):
             parity=self._config.get('parity'),
             timeout=self._config.get('timeout'),
             xonxoff=self._config.get('softwareFlowControl'),
-            rtscts=self._config.get('hardwareFlowControl'))
+            rtscts=self._config.get('hardwareFlowControl')
+        )
 
     def _create(self) -> None:
         """Opens a serial port."""

@@ -19,8 +19,13 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'EUPL'
+
 import codecs
 import logging
+import uuid
 
 from typing import *
 
@@ -54,15 +59,15 @@ class Sensor(object):
             self.logger.debug('Loaded observation "{}" of sensor "{}"'
                               .format(obs.get('name'), self._name))
 
-    def create_observation(self, data: Dict[str, Any]) -> Type[Observation]:
+    def create_observation(self, data: Dict[str, Any]) -> Observation:
         """Creates an observation object.
 
         Args:
             data (Dict[str, Any]): The observation data.
         """
+        data['id'] = str(uuid.uuid4())
         data['sensorName'] = self._name
         data['sensorType'] = self._type
-        data['type'] = 'observation'
 
         # Character '\' is escaped in the JSON configuration file. Encoded
         # bytes have to be decoded.
