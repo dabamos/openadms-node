@@ -37,7 +37,7 @@
                 {
                     "description": "initialize the sensor.",
                     "enabled": true,
-                    "id": "init",
+                    "target": "init",
                     "name": "initialize",
                     "nextReceiver": 0,
                     "onetime": true,
@@ -105,7 +105,7 @@
                     "nextReceiver": 0,
                     "enabled": true,
                     "onetime": false,
-                    "id": "tp",
+                    "target": "tp",
                     "requestsOrder": [
                         "getTemperature",
                         "getPressure"
@@ -156,7 +156,7 @@
                     "enabled": true,
                     "onetime": true,
                     "sleepTime": 5.0,
-                    "id": "beep",
+                    "target": "beep",
                     "requestSets": {
                         "beepOn": {
                             "enabled": true,
@@ -198,7 +198,7 @@
                     "enabled": true,
                     "onetime": true,
                     "sleepTime": 5.0,
-                    "id": "init",
+                    "target": "init",
                     "requestSets": {
                         "getSensorId": {
                             "enabled": true,
@@ -319,7 +319,7 @@
                 {
                     "description": "complete measurement of P1",
                     "enabled": true,
-                    "id": "p1",
+                    "target": "p1",
                     "name": "getP1",
                     "nextReceiver": 0,
                     "onetime": false,
@@ -522,7 +522,7 @@
                 {
                     "description": "complete measurement of P2",
                     "enabled": true,
-                    "id": "p2",
+                    "target": "p2",
                     "name": "getP2",
                     "nextReceiver": 0,
                     "onetime": false,
@@ -724,7 +724,7 @@
                 {
                     "description": "complete measurement of P3",
                     "enabled": true,
-                    "id": "p3",
+                    "target": "p3",
                     "name": "getP3",
                     "nextReceiver": 0,
                     "onetime": false,
@@ -926,7 +926,7 @@
                 {
                     "description": "complete measurement of P4",
                     "enabled": true,
-                    "id": "p4",
+                    "target": "p4",
                     "name": "getP4",
                     "nextReceiver": 0,
                     "onetime": false,
@@ -1128,7 +1128,7 @@
                 {
                     "description": "complete measurement of P5",
                     "enabled": true,
-                    "id": "p5",
+                    "target": "p5",
                     "name": "getP5",
                     "nextReceiver": 0,
                     "onetime": false,
@@ -1334,7 +1334,7 @@
                     "enabled": true,
                     "onetime": true,
                     "sleepTime": 10.0,
-                    "id": "wait",
+                    "target": "wait",
                     "requestSets": {},
                     "requestsOrder": [],
                     "responseSets": {}
@@ -1347,7 +1347,7 @@
                     "enabled": true,
                     "onetime": false,
                     "sleepTime": 60.0,
-                    "id": "wait",
+                    "target": "wait",
                     "requestSets": {},
                     "requestsOrder": [],
                     "responseSets": {}
@@ -1360,7 +1360,7 @@
                     "enabled": true,
                     "onetime": false,
                     "sleepTime": 600.0,
-                    "id": "wait",
+                    "target": "wait",
                     "requestSets": {},
                     "requestsOrder": [],
                     "responseSets": {}
@@ -1486,14 +1486,15 @@
     },
     "distanceCorrector": {
         "distanceName": "slopeDist",
-        "temperature": null,
-        "pressure": null,
+        "temperature": 20.0,
+        "pressure": 1010.0,
         "humidity": 0.6,
         "atmosphericCorrectionEnabled": true,
         "sealevelCorrectionEnabled": false,
         "sensorHeight": 100.0
     },
     "returnCodeInspector": {
+        "retries": 1,
         "responseSets": [
             "returnCode",
             "rcChangeFace",
@@ -1541,13 +1542,14 @@
     },
     "fileExporter": {
         "fileExtension": ".csv",
-        "fileName": "{{port}}_{{id}}_{{date}}",
+        "fileName": "{{port}}_{{target}}_{{date}}",
         "fileRotation": "monthly",
         "paths": [
             "./data"
         ],
         "separator": ",",
-        "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f"
+        "dateTimeFormat": "%Y-%m-%dT%H:%M:%S.%f",
+        "saveObservationId": true
     },
     "localControlServer": {
         "host": "127.0.0.1",
