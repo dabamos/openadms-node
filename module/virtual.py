@@ -25,6 +25,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import math
 import random
 import re
@@ -80,7 +81,7 @@ class VirtualSensor(Prototype):
             time.sleep((timeout * 0.25) + sleep_time)
 
         obs.set('portName', self._name)
-        obs.set('timeStamp', time.time())
+        obs.set('timeStamp', str(arrow.utcnow()))
 
         return obs
 

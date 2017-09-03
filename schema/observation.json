@@ -74,7 +74,7 @@
         },
         "timeStamp": {
             "id": "/properties/timeStamp",
-            "type": "number"
+            "type": "string"
         }
     },
     "required": [

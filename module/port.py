@@ -25,6 +25,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import copy
 import re
 import serial
@@ -32,7 +33,6 @@ import socket
 import threading
 import time
 
-from enum import Enum
 from typing import *
 
 from core.observation import Observation
@@ -150,7 +150,7 @@ class BluetoothPort(Prototype):
             request_set['response'] = response
 
             # Add the timestamp to the observation.
-            obs.set('timeStamp', time.time())
+            obs.set('timeStamp', str(arrow.utcnow()))
 
             # Sleep until the next request.
             time.sleep(sleep_time)
@@ -353,7 +353,7 @@ class SerialPort(Prototype):
             request_set['response'] = response
 
             # Add the timestamp to the observation.
-            obs.set('timeStamp', time.time())
+            obs.set('timeStamp', str(arrow.utcnow()))
 
             # Sleep until the next request.
             time.sleep(sleep_time)
@@ -406,7 +406,7 @@ class SerialPort(Prototype):
                                           obs.get('sensorName'),
                                           self._name))
                 draft['response'] = response
-                obs.set('timeStamp', time.time())
+                obs.set('timeStamp', str(arrow.utcnow()))
                 self.publish_observation(obs)
 
     def start(self) -> None:

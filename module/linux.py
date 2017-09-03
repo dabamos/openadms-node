@@ -26,6 +26,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import logging
 import time
 import threading
@@ -137,7 +138,7 @@ class InterruptCounter(Prototype):
         obs.set('sensorName', self._sensor_name)
         obs.set('sensorType', 'gpio')
         obs.set('sleepTime', 0.0)
-        obs.set('timeStamp', time.time())
+        obs.set('timeStamp', str(arrow.utcnow()))
 
         self.publish_observation(obs)
 

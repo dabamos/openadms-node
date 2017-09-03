@@ -26,6 +26,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import math
 import time
 
@@ -581,7 +582,7 @@ class HelmertTransformer(Prototype):
         view_point.set('portName', obs.get('portName'))
         view_point.set('receivers', self._view_point.get('receivers'))
         view_point.set('responseSets', response_sets)
-        view_point.set('timeStamp', time.time())
+        view_point.set('timeStamp', str(arrow.utcnow()))
 
         # Return the Observation object of the view point.
         return view_point

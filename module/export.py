@@ -25,6 +25,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import copy
 import os
 
@@ -103,25 +104,26 @@ class FileExporter(Prototype):
         Returns:
             obs (Observation): The output observation object.
         """
-        ts = datetime.fromtimestamp(obs.get('timeStamp', 0))
+        ts = arrow.get(obs.get('timeStamp', 0))
 
-        date = {
+        file_date = {
             # No file rotation, i.e., all data is stored in a single file.
             FileRotation.NONE: None,
             # Every day a new file is created.
-            FileRotation.DAILY: ts.strftime('%Y-%m-%d'),
+            FileRotation.DAILY: ts.format('YYYY-MM-DD'),
             # Every month a new file is created.
-            FileRotation.MONTHLY: ts.strftime('%Y-%m'),
+            FileRotation.MONTHLY: ts.format('YYYY-MM'),
             # Every year a new file is created.
-            FileRotation.YEARLY: ts.strftime('%Y')
+            FileRotation.YEARLY: ts.format('YYYY')
         }[self._file_rotation]
 
         file_name = self._file_name
 
         file_name = file_name.replace('{{port}}', obs.get('portName'))
-        file_name = file_name.replace('{{date}}', '{}'.format(date)
-                                      if date else '')
-        file_name = file_name.replace('{{target}}', '{}'.format(obs.get('target'))
+        file_name = file_name.replace('{{date}}', '{}'.format(file_date)
+                                      if file_date else '')
+        file_name = file_name.replace('{{target}}', '{}'
+                                      .format(obs.get('target'))
                                       if obs.get('target') is not None else '')
         file_name = file_name.replace('{{name}}', '{}'.format(obs.get('name'))
                                       if obs.get('name') is not None else '')
@@ -141,15 +143,19 @@ class FileExporter(Prototype):
                          .format(obs.get('target'),
                                  obs.get('sensorName'),
                                  obs.get('portName'))
+
             # Open a file for every path.
             with open(path + file_name, 'a') as fh:
                 # Add the header if necessary.
                 if header:
                     fh.write(header)
 
-                # Convert Unix time stamp to date and time.
-                dt = datetime.fromtimestamp(obs.get('timeStamp', 0))
-                line = dt.strftime(self._date_time_format)
+                # Format the time stamp. For more information, see
+                # http://arrow.readthedocs.io/en/latest/#tokens
+                date_time = ts.format(self._date_time_format)
+
+                # Create the CSV line starting with date and time.
+                line = date_time
 
                 if self._save_observation_id:
                     line += self._separator + obs.get('id')
