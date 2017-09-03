@@ -30,7 +30,10 @@ import os
 
 from datetime import datetime
 from enum import Enum
+from typing import *
 
+from core.manager import Manager
+from core.observation import Observation
 from module.prototype import Prototype
 
 
@@ -58,7 +61,7 @@ class FileExporter(Prototype):
         separator (str): Separator between values within the CSV file.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
@@ -73,7 +76,7 @@ class FileExporter(Prototype):
         self._separator = config.get('separator')
         self._paths = self._revise_paths(config.get('paths'))
 
-    def _revise_paths(self, paths):
+    def _revise_paths(self, paths: List[str]) -> List[str]:
         """Checks whether the paths in a given list end with ``\``. Adds the
         character if it is missing.
 
@@ -89,7 +92,7 @@ class FileExporter(Prototype):
 
         return paths
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         """Append data to a flat file in CSV format.
 
         Args:
@@ -184,14 +187,14 @@ class RealTimePublisher(Prototype):
         enabled (bool): If or if not enabled.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
         self._receivers = config.get('receivers')
         self._is_enabled = config.get('enabled')
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         if not self._is_enabled:
             return obs
 

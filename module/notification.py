@@ -37,7 +37,9 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from typing import *
 
+from core.manager import Manager
 from core.version import *
 from module.prototype import Prototype
 
@@ -47,7 +49,7 @@ class Alert(Prototype):
     Alert is used to send warning and error messages to other modules.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
@@ -65,7 +67,7 @@ class Alert(Prototype):
 
     def fire(self, log):
         # Set the header.
-        header = {'type': 'alertMessage'}
+        header = {'type': 'alert'}
 
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
@@ -100,8 +102,8 @@ class Alert(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
         self._is_running = True
 
         # Check the logging queue continuously for messages and proceed
@@ -113,7 +115,7 @@ class Alert(Prototype):
 
 class AlertMessageFormatter(Prototype):
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.get(self._name)
         self._thread = None
@@ -126,7 +128,7 @@ class AlertMessageFormatter(Prototype):
         self._templates = self._config.get('templates')
 
         # Message handler.
-        self.add_handler('alertMessage', self.handle_alert_message)
+        self.add_handler('alert', self.handle_alert_message)
 
         # Queue for alert message collection.
         self._queue = queue.Queue(-1)
@@ -230,8 +232,8 @@ class AlertMessageFormatter(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
         self._is_running = True
 
         if self._msg_collection_enabled:
@@ -243,7 +245,7 @@ class AlertMessageFormatter(Prototype):
 
 class MailAgent(Prototype):
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
@@ -323,7 +325,7 @@ class ShortMessageAgent(Prototype):
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
@@ -360,7 +362,7 @@ class ShortMessageAgent(Prototype):
                 return
             except TimeoutError:
                 self.logger.error('Could not connect to "{}:{}" (timeout)'
-                             .format(self._host, self._port))
+                                  .format(self._host, self._port))
                 return
 
             self.logger.info('Sending SMS to "{}"'.format(number))
@@ -375,7 +377,7 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
@@ -421,8 +423,8 @@ class Heartbeat(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
         self._is_running = True
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
@@ -431,9 +433,8 @@ class Heartbeat(Prototype):
 
 class HeartbeatMonitor(Prototype):
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
-        config = self._config_manager.get(self._name)
 
         # Capture messages of type 'heartbeat'.
         self.add_handler('heartbeat', self.handle_heartbeat)

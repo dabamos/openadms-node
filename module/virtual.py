@@ -30,6 +30,10 @@ import random
 import re
 import time
 
+from typing import *
+
+from core.manager import Manager
+from core.observation import Observation
 from module.prototype import Prototype
 
 
@@ -38,11 +42,11 @@ class VirtualSensor(Prototype):
     VirtualSensor is a prototype class for virtual sensors.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         self.patterns = {}
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         request_sets = obs.get('requestSets')
 
         for set_name, request_set in request_sets.items():
@@ -80,7 +84,7 @@ class VirtualSensor(Prototype):
 
         return obs
 
-    def sanitize(self, s):
+    def sanitize(self, s: str) -> str:
         """Converts some non-printable characters of a given string."""
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
@@ -94,7 +98,7 @@ class VirtualTotalStationTM30(VirtualSensor):
     GeoCOM commands.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -106,7 +110,7 @@ class VirtualTotalStationTM30(VirtualSensor):
             '%R1Q,2167:5000,1\\r\\n': self.do_complete_measurement
         }
 
-    def do_complete_measurement(self, request):
+    def do_complete_measurement(self, request: str) -> str:
         return_code = '0'
         hz = '{:0.15f}'.format(random.uniform(0, 2 * math.pi))
         v = '{:0.15f}'.format(random.uniform(1, 2))
@@ -130,25 +134,25 @@ class VirtualTotalStationTM30(VirtualSensor):
 
         return response
 
-    def get_sensor_id(self, request):
+    def get_sensor_id(self, request: str) -> str:
         return_code = '0'
         response = '%R1P,0,0:{},999999\r\n'.format(return_code)
 
         return response
 
-    def get_sensor_name(self, request):
+    def get_sensor_name(self, request: str) -> str:
         return_code = '0'
         response = '%R1P,0,0:{},"TM30 0.5"\r\n'.format(return_code)
 
         return response
 
-    def measure_distance(self, request):
+    def measure_distance(self, request: str) -> str:
         return_code = '0'
         response = '%R1P,0,0:{}\r\n'.format(return_code)
 
         return response
 
-    def set_direction(self, request):
+    def set_direction(self, request: str) -> str:
         return_code = '0'
         response = '%R1P,0,0:{}\r\n'.format(return_code)
 
@@ -160,7 +164,7 @@ class VirtualDTM(VirtualSensor):
     VirtualDTM simulates an STS DTM meteorological sensor.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -171,13 +175,13 @@ class VirtualDTM(VirtualSensor):
             'TEMP \?\\r': self.get_temperature
         }
 
-    def get_pressure(self, request):
+    def get_pressure(self, request: str) -> str:
         high = 1150
         low = 980
 
         return '+{:06.1f}\r'.format(random.uniform(low, high))
 
-    def get_temperature(self, request):
+    def get_temperature(self, request: str) -> str:
         high = 40
         low = -20
 
@@ -188,13 +192,13 @@ class VirtualDTM(VirtualSensor):
         else:
             return '+{:06.1f}\r'.format(t)
 
-    def power_on(self, request):
+    def power_on(self, request: str) -> str:
         return '#\r'
 
-    def save(self, request):
+    def save(self, request: str) -> str:
         return '*\r'
 
-    def set_command_set(self, request):
+    def set_command_set(self, request: str) -> str:
         return '*\r'
 
 
@@ -204,7 +208,7 @@ class VirtualIndicatorOne(VirtualSensor):
     indicator/extensometer.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         VirtualSensor.__init__(self, name, type, manager)
 
         self._current_value = 0.0
@@ -212,7 +216,7 @@ class VirtualIndicatorOne(VirtualSensor):
             '\?\r': self.get_distance
         }
 
-    def get_distance(self, request):
+    def get_distance(self, request: str) -> str:
         x = (1.0 + math.sin(self._current_value)) * 12.5
         self._current_value += 0.25
 

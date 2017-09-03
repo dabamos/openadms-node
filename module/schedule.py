@@ -31,126 +31,11 @@ import threading
 import time
 
 from datetime import datetime
+from typing import *
 
+from core.manager import Manager
 from core.observation import Observation
 from module.prototype import Prototype
-
-
-class Scheduler(Prototype):
-    """
-    Scheduler is used to manage the monitoring process by sending observations
-    to a sensor. Each observation is represented by a single job. Jobs are
-    stored in a jobs list and will be executed at the given date and time. A
-    separate scheduler is necessary for each serial port.
-
-    Configuration:
-        port (str): Name of the port module.
-        sensor (str): Name of the sensor.
-        schedules (List[Dict]): List of schedules.
-    """
-
-    def __init__(self, name, type, manager):
-        Prototype.__init__(self, name, type, manager)
-        self._config = self.get_config('schedulers', self._name)
-
-        self._port_name = self._config.get('port')
-        self._sensor_name = self._config.get('sensor')
-        self._schedules = self._config.get('schedules')
-
-        self._thread = None
-        self._jobs = []
-
-    def add(self, job):
-        """Appends a job to the jobs list."""
-        self._jobs.append(job)
-        self.logger.debug('Added job "{}" to scheduler "{}"'
-                          .format(job.name, self._name))
-
-    def load_jobs(self):
-        """Loads all observation sets from the configurations and creates jobs
-        to put into the jobs list."""
-        self._jobs = []
-
-        # Run through the schedules and create jobs.
-        for schedule in self._schedules:
-            observations = schedule.get('observations')
-
-            # Get all observations of the current observation set.
-            for obs_name in observations:
-                obs = self._sensor_manager.get(self._sensor_name)\
-                                          .get_observation(obs_name)
-
-                if not obs:
-                    self.logger.error('Observation "{}" not found'
-                                      .format(obs_name))
-                    continue
-
-                # Add sensor name to the observation.
-                obs.set('sensorName', self._sensor_name)
-
-                # Create a new job.
-                job = Job(obs_name,
-                          self._port_name,
-                          obs,
-                          schedule.get('enabled'),
-                          schedule.get('startDate'),
-                          schedule.get('endDate'),
-                          schedule.get('weekdays'),
-                          self.publish)
-                # Add the job to the jobs list.
-                self.add(job)
-
-    def run(self):
-        """Threaded method to process the jobs queue."""
-        self.load_jobs()
-        zombies = []
-
-        # Wait for uplink connection.
-        # FIXME
-        time.sleep(5.0)
-
-        while self.is_running:
-            t1 = time.time()
-
-            if not self._is_running:
-                break
-
-            for job in self._jobs:
-                if job.has_expired():
-                    zombies.append(job)
-                    continue
-
-                if not job.enabled:
-                    continue
-
-                if job.is_pending():
-                    job.run()
-
-            # Remove expired jobs from the jobs list.
-            while zombies:
-                zombie = zombies.pop()
-                self.logger.debug('Deleting expired job "{}"'
-                                  .format(zombie.name))
-                self._jobs.remove(zombie)
-
-            t2 = time.time()
-            dt = t2 - t1
-
-            if dt < 0.1:
-                time.sleep(0.1 - dt)
-
-    def start(self):
-        if self._is_running:
-            return
-
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
-        self._is_running = True
-
-        # Run the method run() within a thread.
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
 
 
 class Job(object):
@@ -159,12 +44,19 @@ class Job(object):
     current date and time are within the set schedule.
     """
 
-    def __init__(self, name, port_name, obs, enabled, start_date, end_date,
-                 weekdays, uplink):
+    def __init__(self,
+                 name: str,
+                 port_name: str,
+                 obs: Type[Observation],
+                 is_enabled: bool,
+                 start_date: str,
+                 end_date: str,
+                 weekdays: Dict[str, List],
+                 uplink: Callable[[str, Dict[str, Any], Dict[str, Any]], None]):
         self._name = name               # Name of the job.
         self._port_name = port_name     # Name of the port.
         self._obs = obs                 # Observation object.
-        self._enabled = enabled         # Is enabled or not.
+        self._is_enabled = is_enabled   # Is enabled or not.
         self._weekdays = weekdays       # The time sheet.
         self._uplink = uplink           # Callback function.
 
@@ -178,11 +70,11 @@ class Job(object):
         self._start_date = self.get_datetime(start_date, self._date_fmt)
         self._end_date = self.get_datetime(end_date, self._date_fmt)
 
-    def get_datetime(self, dt_str, dt_fmt):
+    def get_datetime(self, dt_str: str, dt_fmt: str) -> str:
         """Converts a date string to a time stamp."""
         return datetime.strptime(dt_str, dt_fmt)
 
-    def has_expired(self):
+    def has_expired(self) -> bool:
         """Checks if the job has expired."""
         now = datetime.now()
 
@@ -192,10 +84,10 @@ class Job(object):
 
         return False
 
-    def is_pending(self):
+    def is_pending(self) -> bool:
         """Checks whether or not the job is within the current time frame and
         ready for processing."""
-        if not self._enabled:
+        if not self._is_enabled:
             return False
 
         now = datetime.now()
@@ -234,7 +126,7 @@ class Job(object):
 
         return False
 
-    def run(self):
+    def run(self) -> None:
         """Iterates trough the observation set and sends observations to an
         external callback function."""
         # Return if observation is disabled.
@@ -278,9 +170,126 @@ class Job(object):
         time.sleep(sleep_time)
 
     @property
-    def enabled(self):
-        return self._enabled
+    def is_enabled(self):
+        return self._is_enabled
 
     @property
     def name(self):
         return self._name
+
+
+class Scheduler(Prototype):
+    """
+    Scheduler is used to manage the monitoring process by sending observations
+    to a sensor. Each observation is represented by a single job. Jobs are
+    stored in a jobs list and will be executed at the given date and time. A
+    separate scheduler is necessary for each serial port.
+
+    Configuration:
+        port (str): Name of the port module.
+        sensor (str): Name of the sensor.
+        schedules (List[Dict]): List of schedules.
+    """
+
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
+        Prototype.__init__(self, name, type, manager)
+        self._config = self.get_config('schedulers', self._name)
+
+        self._port_name = self._config.get('port')
+        self._sensor_name = self._config.get('sensor')
+        self._schedules = self._config.get('schedules')
+
+        self._thread = None
+        self._jobs = []
+
+    def add(self, job: Type[Job]) -> None:
+        """Appends a job to the jobs list."""
+        self._jobs.append(job)
+        self.logger.debug('Added job "{}" to scheduler "{}"'
+                          .format(job.name, self._name))
+
+    def load_jobs(self) -> None:
+        """Loads all observation sets from the configurations and creates jobs
+        to put into the jobs list."""
+        self._jobs = []
+
+        # Run through the schedules and create jobs.
+        for schedule in self._schedules:
+            observations = schedule.get('observations')
+
+            # Get all observations of the current observation set.
+            for obs_name in observations:
+                obs = self._sensor_manager.get(self._sensor_name)\
+                                          .get_observation(obs_name)
+
+                if not obs:
+                    self.logger.error('Observation "{}" not found'
+                                      .format(obs_name))
+                    continue
+
+                # Add sensor name to the observation.
+                obs.set('sensorName', self._sensor_name)
+
+                # Create a new job.
+                job = Job(obs_name,
+                          self._port_name,
+                          obs,
+                          schedule.get('enabled'),
+                          schedule.get('startDate'),
+                          schedule.get('endDate'),
+                          schedule.get('weekdays'),
+                          self.publish)
+                # Add the job to the jobs list.
+                self.add(job)
+
+    def run(self) -> None:
+        """Threaded method to process the jobs queue."""
+        self.load_jobs()
+        zombies = []
+
+        # Wait for uplink connection.
+        # FIXME
+        time.sleep(5.0)
+
+        while self.is_running:
+            t1 = time.time()
+
+            if not self._is_running:
+                break
+
+            for job in self._jobs:
+                if job.has_expired():
+                    zombies.append(job)
+                    continue
+
+                if not job.is_enabled:
+                    continue
+
+                if job.is_pending():
+                    job.run()
+
+            # Remove expired jobs from the jobs list.
+            while zombies:
+                zombie = zombies.pop()
+                self.logger.debug('Deleting expired job "{}"'
+                                  .format(zombie.name))
+                self._jobs.remove(zombie)
+
+            t2 = time.time()
+            dt = t2 - t1
+
+            if dt < 0.1:
+                time.sleep(0.1 - dt)
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
+        self._is_running = True
+
+        # Run the method run() within a thread.
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()

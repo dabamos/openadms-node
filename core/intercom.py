@@ -108,12 +108,19 @@ class MQTTMessenger(object):
         if self._client:
             self.disconnect()
 
-    def _on_connect(self, client, userdata, flags, rc):
+    def _on_connect(self,
+                    client: Type[mqtt.Client],
+                    userdata: Any,
+                    flags: Dict[str, int],
+                    rc: int):
         """Callback method is called after a connection has been
         established."""
         self._client.subscribe(self._topic)
 
-    def _on_disconnect(self, client, userdata, rc):
+    def _on_disconnect(self,
+                       client: Type[mqtt.Client],
+                       userdata: Any,
+                       rc: int):
         """Callback method is called after disconnection."""
         if rc != 0:
             self.logger.error('Unexpected disconnection from {}:{}'
@@ -122,7 +129,10 @@ class MQTTMessenger(object):
                              .format(self._host, self._port))
             self.connect()
 
-    def _on_message(self, client, userdata, msg):
+    def _on_message(self,
+                    client: Type[mqtt.Client],
+                    userdata: Any,
+                    msg: Type[mqtt.MQTTMessage]):
         """Callback method for incoming messages. Converts the JSON-based
         message to its real data type and then forwards it to the downlink
         function."""

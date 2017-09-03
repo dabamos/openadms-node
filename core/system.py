@@ -162,18 +162,18 @@ class System(object):
         Returns:
             String with the uptime.
         """
-        uptime = '{}d {}h {}m {}s'
+        u = '{}d {}h {}m {}s'
 
         if not System.get_uptime():
-            # Doesn't work with PyPy3.5 v5.7.1.
-            return uptime.format(0, 0, 0, 0)
+            # Doesn't work with PyPy3.5 v5.7.1 and below.
+            return u.format(0, 0, 0, 0)
 
-        u = int(System.get_uptime())
-        m, s = divmod(u, 60)
+        t = int(System.get_uptime())
+        m, s = divmod(t, 60)
         h, m = divmod(m, 60)
         d, h = divmod(h, 24)
 
-        return uptime.format(d, h, m, s)
+        return u.format(d, h, m, s)
 
     @staticmethod
     def get_current_year():

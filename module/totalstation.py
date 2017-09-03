@@ -19,6 +19,9 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for the processing of observations of total station positioning
+systems (pre-processing, atmospheric corrections, transformations)."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -26,12 +29,12 @@ __license__ = 'EUPL'
 import math
 import time
 
+from typing import *
+
 from core.observation import Observation
+from core.manager import Manager
 from core.sensor import SensorType
 from module.prototype import Prototype
-
-"""Module for the processing of observations of total station positioning
-systems (pre-processing, atmospheric corrections, transformations)."""
 
 
 class DistanceCorrector(Prototype):
@@ -40,7 +43,7 @@ class DistanceCorrector(Prototype):
     data.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
@@ -60,7 +63,7 @@ class DistanceCorrector(Prototype):
         self._sensor_height = config.get('sensorHeight')
         self._last_update = time.time()
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         sensor_type = obs.get('sensorType')
 
         # Update atmospheric data if sensor is a weather station.
@@ -249,7 +252,7 @@ class HelmertTransformer(Prototype):
     using the Helmert transformation.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
@@ -266,7 +269,7 @@ class HelmertTransformer(Prototype):
         self._a = None
         self._o = None
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
         either be of a fixed point or of a target point.
@@ -673,7 +676,7 @@ class PolarTransformer(Prototype):
     accuracy of the horizontal directions ('Abriss' in German).
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
@@ -788,7 +791,7 @@ class PolarTransformer(Prototype):
 
         return azimuth
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         if not self._is_valid_sensor_type(obs):
             # Only total stations are supported.
             return obs
@@ -900,10 +903,10 @@ class RefractionCorrector(Prototype):
     distance and corrects the Z value of an observed target.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         z = obs.get_response_value('z')
 
         if not z:
@@ -948,10 +951,10 @@ class SerialMeasurementProcessor(Prototype):
     averaged and stored in a new response set.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         # Calculate the serial measurement of an observation in two faces.
         hz_0 = obs.get_response_value('hz0')
         hz_1 = obs.get_response_value('hz1')

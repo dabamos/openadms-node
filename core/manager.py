@@ -432,7 +432,7 @@ class SchemaManager(object):
                 jsonschema.Draft4Validator.check_schema(schema)
 
                 self._schema[data_type] = schema
-                self.logger.debug('Loaded JSON schema "{}"'
+                self.logger.debug('Loaded schema "{}"'
                                   .format(data_type))
             except json.JSONDecodeError:
                 self.logger.error('Invalid JSON file "{}"'

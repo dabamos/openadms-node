@@ -27,7 +27,6 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import json
-import jsonschema
 import logging
 
 from typing import *
@@ -50,7 +49,6 @@ class Prototype(object):
 
         self._name = name       # Module name, e.g., 'com5'.
         self._type = type       # Module type, e.g., 'module.port.SerialPort'.
-        self._config = None     # Module configuration.
         self._config_schema_name = None
 
         self._config_manager = manager.config_manager
@@ -152,7 +150,8 @@ class Prototype(object):
         handler_func(header, payload)
 
     def get_config(self, *args):
-        """Returns the validated configuration of the module.
+        """Returns the validated configuration of the module. If no JSON schema
+        is available, the function just returns an unchecked configuration.
 
         Args:
             args (List[str]): Key names to the configuration in the dictionary.
@@ -160,8 +159,10 @@ class Prototype(object):
         Returns:
             A dictionary with the module's configuration.
         """
+        # Get the name of the JSON schema.
         schema_path = self._schema_manager.get_schema_path(self._type)
 
+        # Return a valid configuration for the module or raise an exception.
         return self._config_manager.get_valid_config(self._type,
                                                      schema_path,
                                                      *args)
@@ -176,7 +177,8 @@ class Prototype(object):
                 hasattr(arg, '__iter__'))
 
     def is_valid(self, data: Dict, data_type: str) -> bool:
-        """Returns whether or not given data is valid.
+        """Returns whether or not given data is valid by checking against the
+        JSON schema.
 
         Args:
             data (Dict): The data.
@@ -187,8 +189,16 @@ class Prototype(object):
         """
         return self._schema_manager.is_valid(data, data_type)
 
-    def process_observation(self, obs: Type[Observation]) -> Observation:
-        # Will be overwritten by worker.
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
+        """Processes an observation object. Will be overridden by actual
+        worker.
+
+        Args:
+            obs (Observation): The observation object.
+
+        Returns:
+            The processed observation object.
+        """
         pass
 
     def publish(self, target: str, header: Dict, payload: Dict) -> None:
@@ -266,33 +276,15 @@ class Prototype(object):
 
     def start(self) -> None:
         """Starts the worker."""
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
         self._is_running = True
 
     def stop(self) -> None:
         """Stops the worker."""
-        self.logger.debug('Stopping worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Stopping worker "{}"'
+        #                   .format(self._name))
         self._is_running = False
-
-    def validate_configuration(self,
-                               config: Dict,
-                               schema_name: str,
-                               schema_path: str) -> None:
-        """Adds given schema to the SchemaManager and validates the module
-        configuration.
-
-        Args:
-            config (Dict): The module configuration.
-            schema_name (str): The name of the JSON schema.
-            schema_path (str): The path to the JSON schema file.
-        """
-        self.add_schema(schema_name, schema_path)
-
-        if not self.is_valid(config, schema_name):
-            self.logger.error('Configuration of module "{}" is invalid'
-                              .format(schema_name))
 
     @property
     def is_running(self) -> bool:

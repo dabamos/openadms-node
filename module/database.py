@@ -30,7 +30,7 @@ from module.prototype import Prototype
 
 class TinyDBConnectivity(Prototype):
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 

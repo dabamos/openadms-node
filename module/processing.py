@@ -28,7 +28,10 @@ __license__ = 'EUPL'
 
 import re
 
+from typing import *
+
 from core.observation import Observation
+from core.manager import Manager
 from module.prototype import Prototype
 
 
@@ -38,10 +41,10 @@ class PreProcessor(Prototype):
     converts them to the defined types.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('requestSets').items():
@@ -127,7 +130,7 @@ class PreProcessor(Prototype):
 
         return obs
 
-    def is_int(self, value):
+    def is_int(self, value: str) -> bool:
         """Returns whether a value is int or not."""
         try:
             int(value)
@@ -135,7 +138,7 @@ class PreProcessor(Prototype):
         except ValueError:
             return False
 
-    def is_float(self, value):
+    def is_float(self, value: str) -> bool:
         """Returns whether a value is float or not."""
         try:
             float(value)
@@ -143,13 +146,13 @@ class PreProcessor(Prototype):
         except ValueError:
             return False
 
-    def sanitize(self, s):
+    def sanitize(self, s: str) -> str:
         """Removes some non-printable characters from a string."""
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')
 
-    def to_float(self, raw_value):
+    def to_float(self, raw_value: str) -> float:
         dot_value = raw_value.replace(',', '.')
 
         if self.is_float(dot_value):
@@ -160,7 +163,7 @@ class PreProcessor(Prototype):
                                 '(not float)'.format(raw_value))
             return None
 
-    def to_int(self, raw_value):
+    def to_int(self, raw_value: str) -> int:
         if self.is_int(raw_value):
             response_value = int(raw_value)
             return response_value
@@ -176,7 +179,11 @@ class ReturnCodes(object):
     Geosystems. The dictionary is static and has the following structure:
 
         {
-            return code: [ log level, retry measurement, log message ]
+            return code: [
+                log level: int,
+                retry measurement: bool,
+                log message: str
+            ]
         }
 
     The return code numbers and messages are take from the official GeoCOM
@@ -220,14 +227,14 @@ class ReturnCodeInspector(Prototype):
     sensors of Leica Geosystems and creates an appropriate log message.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
         self._response_sets = config.get('responseSets')
         self._retries = config.get('retries')
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         for response_set in self._response_sets:
             return_code = obs.get_value('responseSets', response_set, 'value')
 
@@ -287,12 +294,12 @@ class UnitConverter(Prototype):
     meters by setting a scale factor.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
         self._conversions = config.get('conversions')
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         for name, conversion in self._conversions.items():
             response_set = obs.get('responseSets').get(name)
 
@@ -316,7 +323,7 @@ class UnitConverter(Prototype):
                 continue
 
             if conversion.get('conversionType') == 'scale':
-                dgn_value = self._scale(float(src_value),
+                dgn_value = self.scale(float(src_value),
                                         conversion.get('scalingValue'))
                 dgn_unit = conversion.get('designatedUnit')
 
@@ -340,7 +347,7 @@ class UnitConverter(Prototype):
 
         return obs
 
-    def _scale(self, value: float, factor: float) -> float:
+    def scale(self, value: float, factor: float) -> float:
         """Scales value by factor.
 
         Args:

@@ -19,25 +19,25 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""Module for sensor communication."""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import copy
 import re
+import serial
 import socket
 import threading
 import time
 
-import serial
-
-from enum import Enum
+from typing import *
 
 from core.observation import Observation
+from core.manager import Manager
 from core.system import System
 from module.prototype import Prototype
-
-"""Module for sensor communication."""
 
 
 class BluetoothPort(Prototype):
@@ -52,7 +52,7 @@ class BluetoothPort(Prototype):
         serverMacAddress (str): MAC address of the server.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.get('ports')\
                                            .get('bluetooth')\
@@ -72,12 +72,12 @@ class BluetoothPort(Prototype):
     def __del__(self):
         self.close()
 
-    def close(self):
+    def close(self) -> None:
         if self._sock:
             self.logger.info('Closing port "{}"'.format(self._port))
             self._sock.close()
 
-    def get_mac_address(self, s):
+    def get_mac_address(self, s: str) -> str:
         if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
             return s
         elif re.match(r'^[a-fA-F0-9]{12}$', s):
@@ -86,7 +86,7 @@ class BluetoothPort(Prototype):
         else:
             return
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         if System.is_windows():
             self.logger.error('Operating system not supported (no '
                               'socket.AF_BLUETOOTH on Microsoft Windows)')
@@ -156,7 +156,7 @@ class BluetoothPort(Prototype):
 
         return obs
 
-    def _open(self):
+    def _open(self) -> None:
         if not self._server_mac_address:
             self.logger.error('MAC address of server not set')
             return False
@@ -171,7 +171,7 @@ class BluetoothPort(Prototype):
         except TimeoutError as e:
             self.logger.error(e)
 
-    def _receive(self, eol, timeout=30.0):
+    def _receive(self, eol: str, timeout: float = 30.0) -> str:
         """Reads from Bluetooth connection."""
         response = ''
         start_time = time.time()
@@ -200,7 +200,7 @@ class BluetoothPort(Prototype):
 
         return response
 
-    def _send(self, data):
+    def _send(self, data: str) -> None:
         """Sends command to sensor."""
         self._sock.send(bytes(data, 'UTF-8'))
 
@@ -226,7 +226,7 @@ class SerialPort(Prototype):
 
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         self._config = self._config_manager.config.get('ports')\
                                                   .get('serial')\
@@ -250,13 +250,13 @@ class SerialPort(Prototype):
         if self._serial:
             self.close()
 
-    def close(self):
+    def close(self) -> None:
         if self._serial:
             self.logger.info('Closing port "{}"'
                              .format(self._serial_port_config.port))
             self._serial.close()
 
-    def process_observation(self, obs):
+    def process_observation(self, obs: Type[Observation]) -> Type[Observation]:
         if self._is_passive:
             # Set observation template for passive mode.
             self._obs_draft = obs
@@ -358,7 +358,7 @@ class SerialPort(Prototype):
 
         return obs
 
-    def run(self):
+    def run(self) -> None:
         """Threaded method for passive mode. Reads incoming data from serial
         port. Used for sensors which start streaming data without prior
         request."""
@@ -407,11 +407,11 @@ class SerialPort(Prototype):
                 obs.set('timeStamp', time.time())
                 self.publish_observation(obs)
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'.format(self._name))
+        # self.logger.debug('Starting worker "{}"'.format(self._name))
         self._is_running = True
 
         if self.is_passive:
@@ -419,7 +419,7 @@ class SerialPort(Prototype):
             self._thread.daemon = True
             self._thread.start()
 
-    def _get_port_config(self):
+    def _get_port_config(self) -> Type[SerialPortConfiguration]:
         if not self._config:
             self.logger.debug('No port "{}" defined in configuration'
                               .format(self.name))
@@ -434,7 +434,7 @@ class SerialPort(Prototype):
             xonxoff=self._config.get('softwareFlowControl'),
             rtscts=self._config.get('hardwareFlowControl'))
 
-    def _create(self):
+    def _create(self) -> None:
         """Opens a serial port."""
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
@@ -456,7 +456,10 @@ class SerialPort(Prototype):
             self.logger.error('Permission denied for port "{}"'
                               .format(self._serial_port_config.port))
 
-    def _read(self, eol=None, length=0, timeout=30.0):
+    def _read(self,
+              eol: str = None,
+              length: int = 0,
+              timeout: float = 30.0) -> str:
         """Reads from serial port."""
         response = ''
         start_time = time.time()
@@ -494,19 +497,19 @@ class SerialPort(Prototype):
 
         return response
 
-    def _sanitize(self, s):
+    def _sanitize(self, s: str) -> str:
         """Converts some non-printable characters of a given string."""
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')\
                 .strip()
 
-    def _write(self, data):
+    def _write(self, data: str) -> str:
         """Sends command to sensor."""
         self._serial.write(data.encode())
 
     @property
-    def is_passive(self):
+    def is_passive(self) -> bool:
         """Returns whether or not the port is in passive mode."""
         return self._is_passive
 
@@ -516,8 +519,15 @@ class SerialPortConfiguration(object):
     SerialPortConfiguration saves a serial port configration.
     """
 
-    def __init__(self, port, baudrate, bytesize, stopbits, parity, timeout,
-                 xonxoff, rtscts):
+    def __init__(self,
+                 port: str,
+                 baudrate: int,
+                 bytesize: int,
+                 stopbits: float,
+                 parity: str,
+                 timeout: float,
+                 xonxoff: bool,
+                 rtscts: bool):
         """Converts data from JSON style to serial.Serial style."""
         self._port = port
         self._baudrate = baudrate

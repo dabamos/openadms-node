@@ -25,17 +25,17 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import logging
+import logging.handlers
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
-from queue import Queue
 from string import Template
 from threading import Thread
 from typing import *
 from urllib import parse
 
 from core.logging import RingBufferLogHandler
+from core.manager import Manager
 from core.system import System
 from module.prototype import Prototype
 
@@ -53,7 +53,7 @@ class LocalControlServer(Prototype):
         port (int): Port number.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self._config_manager.get(self._name)
 
@@ -77,22 +77,22 @@ class LocalControlServer(Prototype):
         if self._httpd:
             self._httpd.server_close()
 
-    def run(self):
+    def run(self) -> None:
         """Runs HTTPServer within a thread to avoid blocking."""
         self._httpd.serve_forever()
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'
-                          .format(self._name))
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
         self._is_running = True
 
         # Run HTTP server in thread to avoid blocking.
         self._thread.start()
 
-    def stop(self):
+    def stop(self) -> None:
         self.logger.debug('Stopping worker "{}"'
                           .format(self._name))
         self._is_running = False
@@ -103,8 +103,14 @@ class LocalControlServer(Prototype):
 
 
 class RequestHandler(BaseHTTPRequestHandler):
+    """
+    Custom HTTP request handler.
+    """
 
-    def __init__(self, manager, log_handler, *args):
+    def __init__(self,
+                 manager: Type[Manager],
+                 log_handler: Type[logging.Handler],
+                 *args):
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
@@ -149,6 +155,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         )
 
     def do_HEAD(self) -> None:
+        """Creates HTTP header."""
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
@@ -348,4 +355,3 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         response = bytes(opts.get('content'), 'UTF-8')
         self.wfile.write(response)
-

@@ -31,8 +31,8 @@ import threading
 
 from typing import *
 
-from core.intercom import *
-from module.prototype import *
+from core.intercom import MQTTMessenger
+from module.prototype import Prototype
 
 
 class Module(threading.Thread):
@@ -62,7 +62,7 @@ class Module(threading.Thread):
         self._messenger.downlink = self.retrieve    # Call on new messages.
         self._worker.uplink = self.publish          # Call to publish message.
 
-        # Subscribe to the worker's name.
+        # Subscribe to topic of worker's name.
         self._messenger.subscribe(self._topic + '/' + worker.name)
 
     def publish(self, target: str, message: str) -> None:

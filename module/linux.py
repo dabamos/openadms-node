@@ -30,12 +30,15 @@ import logging
 import time
 import threading
 
+from typing import *
+
 try:
     import RPi.GPIO as GPIO
 except ImportError:
     logging.getLogger().error('Module "RPi.GPIO" not found')
 
 from core.observation import Observation
+from core.manager import Manager
 from module.prototype import Prototype
 
 
@@ -52,7 +55,7 @@ class InterruptCounter(Prototype):
         sensorName (str): Name of the connected sensor.
     """
 
-    def __init__(self, name, type, manager):
+    def __init__(self, name: str, type: str, manager: Type[Manager]):
         Prototype.__init__(self, name, type, manager)
         config = self.get_config(self._name)
 
@@ -142,7 +145,7 @@ class InterruptCounter(Prototype):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'.format(self._name))
+        # self.logger.debug('Starting worker "{}"'.format(self._name))
         self._is_running = True
 
         # Run the method `run()` within a thread.
