@@ -41,7 +41,6 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import coloredlogs
 import logging.handlers
 import optparse
 import signal
@@ -50,6 +49,7 @@ import threading
 import time
 import traceback
 
+from rainbow_logging_handler import RainbowLoggingHandler
 from typing import *
 
 from core.intercom import MQTTMessageBroker
@@ -164,12 +164,6 @@ if __name__ == '__main__':
                       help='print debug messages',
                       default=False)
 
-    parser.add_option('-G', '--colorized',
-                      dest='is_colorized',
-                      action='store_true',
-                      help='force colorized output',
-                      default=False)
-
     parser.add_option('-l', '--log-file',
                       dest='log_file',
                       action='store',
@@ -221,19 +215,12 @@ if __name__ == '__main__':
                                               encoding='utf8')
     fh.setLevel(file_level)
     fh.setFormatter(formatter)
-
-    # Add handler to logger.
     logger.addHandler(fh)
 
-    if not System.is_windows() or options.is_colorized:
-        # Colorized output of log messages on Linux/Unix.
-        date_fmt = '%Y-%m-%dT%H:%M:%S'
-        coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
-    else:
-        # Standard output on Microsoft Windows.
-        sh = logging.StreamHandler()
-        sh.setFormatter(formatter)
-        logger.addHandler(sh)
+    # Console handler.
+    handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'yellow', True))
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
 
     # Use internal MQTT message broker (HBMQTT).
     if options.is_mqtt_broker:
