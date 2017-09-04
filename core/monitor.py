@@ -45,3 +45,9 @@ class Monitor(object):
                                                manager.schema_manager)
         manager.sensor_manager = SensorManager(manager.config_manager)
         manager.module_manager = ModuleManager(manager)
+
+        self._manager = manager
+
+    def start(self) -> None:
+        """Starts all modules."""
+        self._manager.module_manager.start_all()

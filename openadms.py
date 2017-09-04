@@ -44,14 +44,13 @@ __license__ = 'EUPL'
 import argparse
 import coloredlogs
 import logging.handlers
-import optparse
 import signal
 import sys
-import threading
 import time
 import traceback
 
 from pathlib import Path
+from threading import Thread
 
 from core.intercom import MQTTMessageBroker
 from core.logging import RootFilter
@@ -66,7 +65,12 @@ LOG_FILE_BACKUP_COUNT = 1
 MAX_LOG_FILE_SIZE = 10485760  # 10 MB.
 
 
-def main(config_file: str) -> None:
+def main(config_file_path: str) -> None:
+    """Main procedure.
+
+    Args:
+        config_file_path: The path to the configuration file.
+    """
     v = 'v.{}'.format(System.get_openadms_version())
 
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
@@ -81,7 +85,9 @@ def main(config_file: str) -> None:
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
     # Start the monitoring.
-    Monitor(config_file)
+    monitor = Monitor(config_file_path)
+    monitor.start()
+
     # Run to infinity and beyond (probably not).
     stay_alive()
 
@@ -91,7 +97,7 @@ def setup_thread_exception_hook() -> None:
     https://bugs.python.org/issue1230540
 
     Call once from the main thread before creating any threads."""
-    init_original = threading.Thread.__init__
+    init_original = Thread.__init__
 
     def init(self, *args, **kwargs):
         init_original(self, *args, **kwargs)
@@ -105,10 +111,11 @@ def setup_thread_exception_hook() -> None:
 
         self.run = run_with_exception_hook
 
-    threading.Thread.__init__ = init
+    Thread.__init__ = init
 
 
 def exception_hook(type, value, tb) -> None:
+    """Sets a hook for logging unhandled exceptions."""
     fmt_exception = ''.join(traceback.format_exception(type,
                                                        value,
                                                        tb)).replace('\n', '')
@@ -117,16 +124,29 @@ def exception_hook(type, value, tb) -> None:
 
 
 def signal_handler(signal, frame) -> None:
+    """Outputs a message before quitting the application."""
     logger.info('Exiting ...')
     sys.exit(0)
 
 
 def stay_alive() -> None:
+    """Runs a loop infinitely."""
     while True:
         time.sleep(1)
 
 
-def valid_path(string):
+def valid_path(string: str) -> str:
+    """Checks whether a given string is a valid file path.
+
+    Args:
+        string: The string.
+
+    Returns:
+        The string with the valid path.
+
+    Raises:
+        argparse.ArgumentTypeError: If string is not a valid file path.
+    """
     path = Path(string)
 
     if not path.exists() or not path.is_file():
@@ -134,6 +154,47 @@ def valid_path(string):
         raise argparse.ArgumentTypeError(msg)
 
     return string
+
+
+def setup_logging(is_debug: bool = False,
+                  verbosity: int = 3,
+                  log_file: str = 'openadms.log') -> None:
+    # Basic logging configuration.
+    console_level = logging.DEBUG if is_debug else logging.INFO
+    logger.setLevel(console_level)
+
+    fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
+    formatter = logging.Formatter(fmt)
+
+    # File handler.
+    file_level = {
+        1: logging.CRITICAL,
+        2: logging.ERROR,
+        3: logging.WARNING,
+        4: logging.INFO,
+        5: logging.DEBUG
+    }.get(verbosity, 3)
+
+    fh = logging.handlers.RotatingFileHandler(log_file,
+                                              maxBytes=MAX_LOG_FILE_SIZE,
+                                              backupCount=LOG_FILE_BACKUP_COUNT,
+                                              encoding='utf8')
+    fh.setLevel(file_level)
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+    # Colorized output of log messages.
+    date_fmt = '%Y-%m-%dT%H:%M:%S'
+    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+
+
+def start_mqtt_message_broker(host: str, port: int) -> None:
+    # Add filter to log handlers.
+    for handler in logging.root.handlers:
+        handler.addFilter(RootFilter())
+
+    broker = MQTTMessageBroker(host, port)
+    broker.start()
 
 
 if __name__ == '__main__':
@@ -146,6 +207,7 @@ if __name__ == '__main__':
 
     # Parse command line options.
     parser = argparse.ArgumentParser(
+        usage='%(prog)s [options]',
         description='OpenADMS {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()),
         epilog='OpenADMS has been developed at the Neubrandenburg University '
@@ -165,7 +227,7 @@ if __name__ == '__main__':
                         help='print debug messages',
                         dest='is_debug',
                         action='store_true',
-                        default=False)
+                        default=True)
     parser.add_argument('-l', '--log-file',
                         help='path to log file',
                         dest='log_file',
@@ -175,7 +237,7 @@ if __name__ == '__main__':
                         help='use internal MQTT message broker',
                         dest='is_mqtt_broker',
                         action='store_true',
-                        default=False)
+                        default=True)
     parser.add_argument('-b', '--bind',
                         help='host of MQTT message broker (IP address or FQDN)',
                         dest='host',
@@ -191,12 +253,12 @@ if __name__ == '__main__':
     # Required arguments.
     required_args = parser.add_argument_group('required arguments')
     required_args.add_argument('-c', '--config',
-                                help='path to configuration file',
-                                dest='config_file_path',
-                                action='store',
-                                type=valid_path,
-                                default='config/config.json',
-                                required=True)
+                               help='path to configuration file',
+                               dest='config_file_path',
+                               action='store',
+                               type=valid_path,
+                               default='config/config.json',
+                               required=True)
 
     try:
         args = parser.parse_args()
@@ -204,42 +266,11 @@ if __name__ == '__main__':
         logger.error(e)
         sys.exit(0)
 
-    # Basic logging configuration.
-    console_level = logging.DEBUG if args.is_debug else logging.INFO
-    logger.setLevel(console_level)
+    setup_logging(args.is_debug, args.verbosity, args.log_file)
 
-    fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
-    formatter = logging.Formatter(fmt)
-
-    # File handler.
-    file_level = {
-        1: logging.CRITICAL,
-        2: logging.ERROR,
-        3: logging.WARNING,
-        4: logging.INFO,
-        5: logging.DEBUG
-    }.get(args.verbosity, 3)
-
-    fh = logging.handlers.RotatingFileHandler(args.log_file,
-                                              maxBytes=MAX_LOG_FILE_SIZE,
-                                              backupCount=LOG_FILE_BACKUP_COUNT,
-                                              encoding='utf8')
-    fh.setLevel(file_level)
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
-
-    # Colorized output of log messages.
-    date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
-
-    # Use internal MQTT message broker (HBMQTT).
     if args.is_mqtt_broker:
-        # Add filter to log handlers.
-        for handler in logging.root.handlers:
-            handler.addFilter(RootFilter())
-
-        broker = MQTTMessageBroker(args.host, args.port)
-        broker.start()
+        # Use internal MQTT message broker (HBMQTT).
+        start_mqtt_message_broker(args.host, args.port)
 
     # Start the monitoring.
     main(args.config_file_path)

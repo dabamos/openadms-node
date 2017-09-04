@@ -221,8 +221,6 @@ class ModuleManager(object):
                 self.logger.error('Module "{}" not loaded {}'.format(module_name, e))
                 continue
 
-            self.start(module_name)
-
     def add(self, module_name: str, class_path: str):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary.
@@ -335,6 +333,11 @@ class ModuleManager(object):
         """
         self._modules.get(module_name).start()
         self._modules.get(module_name).start_worker()
+
+    def start_all(self) -> None:
+        """Starts all modules."""
+        for module_name in self._modules.keys():
+            self.start(module_name)
 
     def stop(self, module_name: str) -> None:
         """Stops a module.
