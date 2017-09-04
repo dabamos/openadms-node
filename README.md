@@ -33,11 +33,11 @@ To run OpenADMS, clone the master branch, install the dependencies and execute
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
-$ python3 openadms.py --config ./config/myconfig.json --debug --with-mqtt-broker
+$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
 
 ### Dependencies
-The following dependencies are used by OpenADMS:
+OpenADMS depends on the following Python libraries:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
@@ -66,7 +66,7 @@ so on there. OpenADMS takes the file name of your custom configuration as an
 argument. For instance, run:
 
 ```
-$ python3 openadms.py --config ./config/myconfig.json --debug
+$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
 
 ## Virtual Environment
@@ -79,8 +79,12 @@ $ source ./virtual-environment/bin/activate.csh
 $ git clone https://github.com/dabamos/openadms
 $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
-$ python3 openadms.py
+$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
+
+## Manual
+The [https://www.dabamos.de/manual/index.html](on-line manual) is available on
+the project website.
 
 ## Licence
 OpenADMS is licenced under the [European Union Public
