@@ -33,7 +33,7 @@ logger = logging.getLogger()
 
 @Gooey(advanced=True,
        language='english',
-       program_name=('OpenADMS {}'
+       program_name=('OpenADMS {} '
                     '- Open Automatic Deformation Monitoring System'
                     .format(System.get_openadms_version())),
        default_size=(610, 580),
@@ -63,13 +63,13 @@ def mainw() -> None:
                         help='Print debug messages',
                         dest='is_debug',
                         action='store_true',
-                        default=False)
+                        default=True)
     parser.add_argument('-m', '--with-mqtt-broker',
                         metavar='MQTT',
                         help='Run internal MQTT message broker',
                         dest='is_mqtt_broker',
                         action='store_true',
-                        default=False)
+                        default=True)
     parser.add_argument('-l', '--log-file',
                         metavar='Log File',
                         help='Path to log file',
