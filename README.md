@@ -83,7 +83,7 @@ $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
 
 ## Manual
-The [https://www.dabamos.de/manual/index.html](on-line manual) is available on
+The [on-line manual](https://www.dabamos.de/manual/index.html) is available on
 the project website.
 
 ## Licence
