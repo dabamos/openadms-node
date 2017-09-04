@@ -39,6 +39,7 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from typing import *
 
+from core.logging import RootFilter
 from core.manager import Manager
 from core.version import *
 from module.prototype import Prototype
@@ -59,6 +60,7 @@ class Alert(Prototype):
 
         # Add logging handler to the root logger.
         qh = logging.handlers.QueueHandler(self._queue)
+        qh.addFilter(RootFilter())
         qh.setLevel(logging.WARNING)    # Only get WARNING, ERROR, and CRITICAL.
         root = logging.getLogger()
         root.addHandler(qh)
@@ -96,6 +98,7 @@ class Alert(Prototype):
         while self.is_running:
             log = self._queue.get()         # Blocking I/O.
             self.logger.info('Processing alert message')
+            print(log.message)
             self.fire(log)
 
     def start(self):

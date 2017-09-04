@@ -29,7 +29,7 @@ Example:
     You can either use the internal MQTT message broker or an external one,
     like Eclipse Mosquitto. The external broker has to be started before
     OpenADMS.
-    
+
     Run OpenADMS with the internal broker:
 
         $ python3 openadms.py -c ./config/my_config.json -m -d
@@ -53,6 +53,7 @@ import traceback
 from typing import *
 
 from core.intercom import MQTTMessageBroker
+from core.logging import RootFilter
 from core.monitor import Monitor
 from core.system import System
 
@@ -122,14 +123,6 @@ def signal_handler(signal, frame) -> None:
 def stay_alive() -> None:
     while True:
         time.sleep(1)
-
-
-def should_log(record: Type[logging.LogRecord]) -> bool:
-    """Returns whether a logging.LogRecord should be logged."""
-    if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
-        return False
-
-    return True
 
 
 if __name__ == '__main__':
@@ -244,12 +237,9 @@ if __name__ == '__main__':
 
     # Use internal MQTT message broker (HBMQTT).
     if options.is_mqtt_broker:
-        logging_filter = logging.Filter()
-        logging_filter.filter = should_log
-
         # Add filter to log handlers.
         for handler in logging.root.handlers:
-            handler.addFilter(logging_filter)
+            handler.addFilter(RootFilter())
 
         broker = MQTTMessageBroker(options.host, options.port)
         broker.start()

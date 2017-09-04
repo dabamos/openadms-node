@@ -31,6 +31,16 @@ from threading import Thread
 from typing import *
 
 
+class RootFilter(logging.Filter):
+
+    def filter(self, record: Type[logging.LogRecord]) -> bool:
+        """Returns whether a logging.LogRecord should be logged."""
+        if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
+            return False
+        else:
+            return True
+
+
 class RingBuffer(object):
     """
     RingBuffer stores elements in a deque. It is used to cache a number of
@@ -89,6 +99,9 @@ class RingBufferLogHandler(object):
         self._queue = Queue(self._size)
 
         self._handler = logging.handlers.QueueHandler(self._queue)
+
+        # Add logging filter.
+        self._handler.addFilter(RootFilter())
 
         level = {
             1: logging.CRITICAL,
