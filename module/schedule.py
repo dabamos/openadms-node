@@ -251,7 +251,7 @@ class Scheduler(Prototype):
 
         # FIXME: Wait for uplink connection.
         sleep_time = 5.0
-        self.logger.info('Starting jobs in {:3.1f} seconds'.format(sleep_time))
+        self.logger.info('Starting jobs in {:3.1f} s'.format(sleep_time))
         time.sleep(sleep_time)
 
         while self.is_running:

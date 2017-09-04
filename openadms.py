@@ -41,6 +41,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import argparse
 import coloredlogs
 import logging.handlers
 import optparse
@@ -50,7 +51,7 @@ import threading
 import time
 import traceback
 
-from typing import *
+from pathlib import Path
 
 from core.intercom import MQTTMessageBroker
 from core.logging import RootFilter
@@ -125,6 +126,16 @@ def stay_alive() -> None:
         time.sleep(1)
 
 
+def valid_path(string):
+    path = Path(string)
+
+    if not path.exists() or not path.is_file():
+        msg = "{} is not a valid configuration file".format(string)
+        raise argparse.ArgumentTypeError(msg)
+
+    return string
+
+
 if __name__ == '__main__':
     # Set the hook for unhandled exceptions.
     setup_thread_exception_hook()
@@ -134,8 +145,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, signal_handler)
 
     # Parse command line options.
-    optparse.OptionParser.format_epilog = lambda self, formatter: self.epilog
-    parser = optparse.OptionParser(
+    parser = argparse.ArgumentParser(
         usage='%prog [options]',
         description='OpenADMS {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()),
@@ -144,57 +154,51 @@ if __name__ == '__main__':
                'Licenced under the European Union Public Licence (EUPL) v.1.1.'
                '\nFor further information, visit https://www.dabamos.de/.\n')
 
-    parser.add_option('-c', '--config',
-                      dest='config_file_path',
-                      action='store',
-                      type='string',
-                      help='path to configuration file',
-                      default='config/config.json')
+    parser.add_argument('-c', '--config',
+                        help='path to configuration file',
+                        dest='config_file_path',
+                        action='store',
+                        type=valid_path,
+                        default='config/config.json',
+                        required=True)
+    parser.add_argument('-v', '--verbosity',
+                        help='log more diagnostic messages',
+                        dest='verbosity',
+                        action='store',
+                        type=int,
+                        default=3,
+                        choices=[1, 2, 3, 4, 5])
+    parser.add_argument('-d', '--debug',
+                        help='print debug messages',
+                        dest='is_debug',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-l', '--log-file',
+                        help='path to log file',
+                        dest='log_file',
+                        action='store',
+                        default='openadms.log')
+    parser.add_argument('-m', '--with-mqtt-broker',
+                        help='use internal MQTT message broker',
+                        dest='is_mqtt_broker',
+                        action='store_true',
+                        default=False)
+    parser.add_argument('-b', '--bind',
+                        help='host of MQTT message broker (IP address or FQDN)',
+                        dest='host',
+                        action='store',
+                        default='127.0.0.1')
+    parser.add_argument('-p', '--port',
+                        help='port of MQTT message broker',
+                        dest='port',
+                        action='store',
+                        type=int,
+                        default=1883)
 
-    parser.add_option('-v', '--verbosity',
-                      dest='verbosity',
-                      action='store',
-                      type='int',
-                      help='log more diagnostic messages',
-                      default=3)
-
-    parser.add_option('-d', '--debug',
-                      dest='is_debug',
-                      action='store_true',
-                      help='print debug messages',
-                      default=False)
-
-    parser.add_option('-l', '--log-file',
-                      dest='log_file',
-                      action='store',
-                      type='string',
-                      help='path to log file',
-                      default='openadms.log')
-
-    parser.add_option('-m', '--with-mqtt-broker',
-                      dest='is_mqtt_broker',
-                      action='store_true',
-                      help='use internal MQTT message broker',
-                      default=False)
-
-    parser.add_option('-b', '--bind',
-                      dest='host',
-                      action='store',
-                      type='string',
-                      help='host of MQTT message broker (IP address or FQDN)',
-                      default='127.0.0.1')
-
-    parser.add_option('-p', '--port',
-                      dest='port',
-                      action='store',
-                      type='int',
-                      help='port of MQTT message broker',
-                      default='1883')
-
-    (options, args) = parser.parse_args()
+    args = parser.parse_args()
 
     # Basic logging configuration.
-    console_level = logging.DEBUG if options.is_debug else logging.INFO
+    console_level = logging.DEBUG if args.is_debug else logging.INFO
     logger.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
@@ -207,9 +211,9 @@ if __name__ == '__main__':
         3: logging.WARNING,
         4: logging.INFO,
         5: logging.DEBUG
-    }.get(options.verbosity, 3)
+    }.get(args.verbosity, 3)
 
-    fh = logging.handlers.RotatingFileHandler(options.log_file,
+    fh = logging.handlers.RotatingFileHandler(args.log_file,
                                               maxBytes=MAX_LOG_FILE_SIZE,
                                               backupCount=LOG_FILE_BACKUP_COUNT,
                                               encoding='utf8')
@@ -217,18 +221,18 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    # Colorized output of log messages on Linux/Unix.
+    # Colorized output of log messages.
     date_fmt = '%Y-%m-%dT%H:%M:%S'
     coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
     # Use internal MQTT message broker (HBMQTT).
-    if options.is_mqtt_broker:
+    if args.is_mqtt_broker:
         # Add filter to log handlers.
         for handler in logging.root.handlers:
             handler.addFilter(RootFilter())
 
-        broker = MQTTMessageBroker(options.host, options.port)
+        broker = MQTTMessageBroker(args.host, args.port)
         broker.start()
 
     # Start the monitoring.
-    main(options.config_file_path)
+    main(args.config_file_path)

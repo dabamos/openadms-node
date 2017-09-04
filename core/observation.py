@@ -50,13 +50,15 @@ class Observation(object):
             self._data = {
                 'enabled': True,
                 'id': str(uuid.uuid4()),
-                'name': None,
+                'name': 'default',
                 'nextReceiver': 0,
+                'onetime': False,
                 'portName': None,
                 'receivers': [],
                 'response': None,
                 'responseSets': {},
-                'target': None,
+                'sleepTime': 0,
+                'target': 'default',
                 'timeStamp': None
             }
         else:
