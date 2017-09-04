@@ -56,10 +56,11 @@ class FileExporter(Prototype):
         dateTimeFormat: Format of date and time (see Python strftime).
         fileExtension: The extension of the file (`.txt` or `.csv`).
         fileName: Placeholders are `{{date}}`, `{{target}}`, `{{name}}`,
-                        `{{port}}`.
+            `{{port}}`.
         fileRotation: Either `none`, `daily`, `monthly`, or `yearly`.
         paths: Paths to save files to (multiple paths possible).
         separator: Separator between values within the CSV file.
+
     """
 
     def __init__(self, name: str, type: str, manager: Manager):

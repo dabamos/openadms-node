@@ -206,6 +206,78 @@ class BluetoothPort(Prototype):
         self._sock.send(bytes(data, 'UTF-8'))
 
 
+class SerialPortConfiguration(object):
+    """
+    SerialPortConfiguration saves a serial port configration.
+    """
+
+    def __init__(self,
+                 port: str,
+                 baudrate: int,
+                 bytesize: int,
+                 stopbits: float,
+                 parity: str,
+                 timeout: float,
+                 xonxoff: bool,
+                 rtscts: bool):
+        """Converts data from JSON style to serial.Serial style."""
+        self._port = port
+        self._baudrate = baudrate
+        self._bytesize = {
+            5: serial.FIVEBITS,
+            6: serial.SIXBITS,
+            7: serial.SEVENBITS,
+            8: serial.EIGHTBITS
+        }[bytesize]
+        self._stopbits = {
+            1: serial.STOPBITS_ONE,
+            1.5: serial.STOPBITS_ONE_POINT_FIVE,
+            2: serial.STOPBITS_TWO
+        }[stopbits]
+        self._parity = {
+            'none': serial.PARITY_NONE,
+            'even': serial.PARITY_EVEN,
+            'odd': serial.PARITY_ODD,
+            'mark': serial.PARITY_MARK,
+            'space': serial.PARITY_SPACE
+        }[parity]
+        self._timeout = timeout
+        self._xonxoff = xonxoff
+        self._rtscts = rtscts
+
+    @property
+    def port(self):
+        return self._port
+
+    @property
+    def baudrate(self):
+        return self._baudrate
+
+    @property
+    def bytesize(self):
+        return self._bytesize
+
+    @property
+    def stopbits(self):
+        return self._stopbits
+
+    @property
+    def parity(self):
+        return self._parity
+
+    @property
+    def timeout(self):
+        return self._timeout
+
+    @property
+    def xonxoff(self):
+        return self._xonxoff
+
+    @property
+    def rtscts(self):
+        return self._rtscts
+
+
 class SerialPort(Prototype):
     """
     SerialPort does I/O on a given serial port. The port can be used in either
@@ -516,74 +588,3 @@ class SerialPort(Prototype):
         """Returns whether or not the port is in passive mode."""
         return self._is_passive
 
-
-class SerialPortConfiguration(object):
-    """
-    SerialPortConfiguration saves a serial port configration.
-    """
-
-    def __init__(self,
-                 port: str,
-                 baudrate: int,
-                 bytesize: int,
-                 stopbits: float,
-                 parity: str,
-                 timeout: float,
-                 xonxoff: bool,
-                 rtscts: bool):
-        """Converts data from JSON style to serial.Serial style."""
-        self._port = port
-        self._baudrate = baudrate
-        self._bytesize = {
-            5: serial.FIVEBITS,
-            6: serial.SIXBITS,
-            7: serial.SEVENBITS,
-            8: serial.EIGHTBITS
-        }[bytesize]
-        self._stopbits = {
-            1: serial.STOPBITS_ONE,
-            1.5: serial.STOPBITS_ONE_POINT_FIVE,
-            2: serial.STOPBITS_TWO
-        }[stopbits]
-        self._parity = {
-            'none': serial.PARITY_NONE,
-            'even': serial.PARITY_EVEN,
-            'odd': serial.PARITY_ODD,
-            'mark': serial.PARITY_MARK,
-            'space': serial.PARITY_SPACE
-        }[parity]
-        self._timeout = timeout
-        self._xonxoff = xonxoff
-        self._rtscts = rtscts
-
-    @property
-    def port(self):
-        return self._port
-
-    @property
-    def baudrate(self):
-        return self._baudrate
-
-    @property
-    def bytesize(self):
-        return self._bytesize
-
-    @property
-    def stopbits(self):
-        return self._stopbits
-
-    @property
-    def parity(self):
-        return self._parity
-
-    @property
-    def timeout(self):
-        return self._timeout
-
-    @property
-    def xonxoff(self):
-        return self._xonxoff
-
-    @property
-    def rtscts(self):
-        return self._rtscts
