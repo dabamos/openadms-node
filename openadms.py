@@ -130,7 +130,7 @@ def valid_path(string):
     path = Path(string)
 
     if not path.exists() or not path.is_file():
-        msg = "{} is not a valid configuration file".format(string)
+        msg = '"{}" is not a valid configuration file'.format(string)
         raise argparse.ArgumentTypeError(msg)
 
     return string
@@ -146,21 +146,14 @@ if __name__ == '__main__':
 
     # Parse command line options.
     parser = argparse.ArgumentParser(
-        usage='%prog [options]',
         description='OpenADMS {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()),
-        epilog='\nOpenADMS has been developed at the Neubrandenburg '
-               'University of Applied Sciences (Germany).\n'
-               'Licenced under the European Union Public Licence (EUPL) v.1.1.'
-               '\nFor further information, visit https://www.dabamos.de/.\n')
+        epilog='OpenADMS has been developed at the Neubrandenburg University '
+               'of Applied Sciences (Germany). Licenced under the European '
+               'Union Public Licence (EUPL) v.1.1. For further information, '
+               'visit https://www.dabamos.de/.')
 
-    parser.add_argument('-c', '--config',
-                        help='path to configuration file',
-                        dest='config_file_path',
-                        action='store',
-                        type=valid_path,
-                        default='config/config.json',
-                        required=True)
+    # Optional arguments.
     parser.add_argument('-v', '--verbosity',
                         help='log more diagnostic messages',
                         dest='verbosity',
@@ -195,7 +188,21 @@ if __name__ == '__main__':
                         type=int,
                         default=1883)
 
-    args = parser.parse_args()
+    # Required arguments.
+    required_args = parser.add_argument_group('required arguments')
+    required_args.add_argument('-c', '--config',
+                                help='path to configuration file',
+                                dest='config_file_path',
+                                action='store',
+                                type=valid_path,
+                                default='config/config.json',
+                                required=True)
+
+    try:
+        args = parser.parse_args()
+    except argparse.ArgumentTypeError as e:
+        logger.error(e)
+        sys.exit(0)
 
     # Basic logging configuration.
     console_level = logging.DEBUG if args.is_debug else logging.INFO
