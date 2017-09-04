@@ -41,6 +41,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import coloredlogs
 import logging.handlers
 import optparse
 import signal
@@ -49,7 +50,6 @@ import threading
 import time
 import traceback
 
-from rainbow_logging_handler import RainbowLoggingHandler
 from typing import *
 
 from core.intercom import MQTTMessageBroker
@@ -217,10 +217,9 @@ if __name__ == '__main__':
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    # Console handler.
-    handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'yellow', True))
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    # Colorized output of log messages on Linux/Unix.
+    date_fmt = '%Y-%m-%dT%H:%M:%S'
+    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
     # Use internal MQTT message broker (HBMQTT).
     if options.is_mqtt_broker:

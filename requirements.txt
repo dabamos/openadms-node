@@ -1,7 +1,7 @@
 arrow>=0.10.0
+coloredlogs>=7.3
 hbmqtt>=0.9
 jsonschema>=2.6.0
 paho-mqtt>=1.2
 pyserial>=3.2.1
-rainbow_logging_handler>=2.2.2
 uptime>=3.0.1
