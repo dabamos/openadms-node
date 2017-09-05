@@ -31,7 +31,7 @@ if sys.platform == 'win32':
 
 executables = [
     Executable('openadms.py', base=base),
-    Executable('openadmsw.pyw', base=base)
+    Executable('openadms-gui.pyw', base=base)
 ]
 
 setup(name='OpenADMS',
