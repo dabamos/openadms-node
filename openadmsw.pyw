@@ -19,6 +19,16 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
+"""OpenADMS with Graphical Launcher
+
+This Python script starts OpenADMS by using a graphical launcher. You have to
+install the Python modules `wxPython` and `Gooey` with pip at first:
+
+    $ python -m pip install gooey
+
+For more information, please see https://www.dabamos.de/.
+"""
+
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
@@ -27,15 +37,14 @@ from gooey import Gooey, GooeyParser
 
 from openadms import *
 
-# Get root logger.
 logger = logging.getLogger()
 
 
 @Gooey(advanced=True,
        language='english',
        program_name=('OpenADMS {} '
-                    '- Open Automatic Deformation Monitoring System'
-                    .format(System.get_openadms_version())),
+                     '- Open Automatic Deformation Monitoring System'
+                     .format(System.get_openadms_version())),
        default_size=(610, 580),
        monospace_display=True,
        image_dir='./res')

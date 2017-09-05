@@ -66,7 +66,7 @@ class Sensor(object):
         Args:
             data: The observation data.
         """
-        data['id'] = str(uuid.uuid4())
+        data['id'] = Observation.get_id()
         data['sensorName'] = self._name
         data['sensorType'] = self._type
 

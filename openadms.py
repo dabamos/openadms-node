@@ -30,7 +30,7 @@ Example:
     like Eclipse Mosquitto. The external broker has to be started before
     OpenADMS.
 
-    Run OpenADMS with the internal broker:
+    To start OpenADMS with the internal broker, run:
 
         $ python3 openadms.py -c ./config/my_config.json -m -d
 
@@ -48,15 +48,16 @@ import signal
 import sys
 import time
 import traceback
+import types
 
 from pathlib import Path
 from threading import Thread
+from typing import *
 
 from core.intercom import MQTTMessageBroker
 from core.logging import RootFilter
 from core.monitor import Monitor
 from core.system import System
-
 
 # Get root logger.
 logger = logging.getLogger()
@@ -114,7 +115,9 @@ def setup_thread_exception_hook() -> None:
     Thread.__init__ = init
 
 
-def exception_hook(type, value, tb) -> None:
+def exception_hook(type: BaseException,
+                   value: Exception,
+                   tb: types.TracebackType) -> None:
     """Sets a hook for logging unhandled exceptions."""
     fmt_exception = ''.join(traceback.format_exception(type,
                                                        value,
@@ -123,7 +126,7 @@ def exception_hook(type, value, tb) -> None:
                     .format(' '.join(fmt_exception.split())))
 
 
-def signal_handler(signal, frame) -> None:
+def signal_handler(signalnum: int, frame: Any) -> None:
     """Outputs a message before quitting the application."""
     logger.info('Exiting ...')
     sys.exit(0)
@@ -159,6 +162,13 @@ def valid_path(string: str) -> str:
 def setup_logging(is_debug: bool = False,
                   verbosity: int = 3,
                   log_file: str = 'openadms.log') -> None:
+    """Setups the logger and logging handlers.
+
+    Args:
+        is_debug: Print debug messages.
+        verbosity: Verbosity level (1 - 5).
+        log_file: Path of the log file.
+    """
     # Basic logging configuration.
     console_level = logging.DEBUG if is_debug else logging.INFO
     logger.setLevel(console_level)
@@ -188,7 +198,14 @@ def setup_logging(is_debug: bool = False,
     coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
 
-def start_mqtt_message_broker(host: str, port: int) -> None:
+def start_mqtt_message_broker(host: str = '127.0.0.1',
+                              port: int = 1883) -> None:
+    """Starts the internal MQTT message broker.
+
+    Args:
+        host: IP address or FQDN.
+        port: Port number.
+    """
     # Add filter to log handlers.
     for handler in logging.root.handlers:
         handler.addFilter(RootFilter())
