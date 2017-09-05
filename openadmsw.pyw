@@ -47,7 +47,7 @@ logger = logging.getLogger()
                      .format(System.get_openadms_version())),
        default_size=(610, 580),
        monospace_display=True,
-       image_dir='./res')
+       image_dir='./res/img')
 def mainw() -> None:
     parser = GooeyParser(
         description='OpenADMS {} - Open Automatic Deformation Monitoring '
@@ -88,13 +88,13 @@ def mainw() -> None:
                         widget='FileChooser')
     parser.add_argument('-b', '--bind',
                         metavar='Host',
-                        help='IP address or FQDN of internal broker',
+                        help='IP address or FQDN of internal MQTT message broker',
                         dest='host',
                         action='store',
                         default='127.0.0.1')
     parser.add_argument('-p', '--port',
                         metavar='Port',
-                        help='Port of internal broker',
+                        help='Port of internal MQTT message broker',
                         dest='port',
                         action='store',
                         type=int,
