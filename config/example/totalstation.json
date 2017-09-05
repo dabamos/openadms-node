@@ -6,7 +6,7 @@
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
         "helmertTransformer": "module.totalstation.HelmertTransformer",
-        "localControlServer": "module.server.LocalControlServer"
+        "localControlServer": "module.server.LocalControlServer",
         "mailAgent": "module.notification.MailAgent",
         "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
@@ -18,7 +18,7 @@
         "scheduler2": "module.schedule.Scheduler",
         "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor",
         "shortMessageAgent": "module.notification.ShortMessageAgent",
-        "shortMessageFormatter": "module.notification.AlertMessageFormatter",
+        "shortMessageFormatter": "module.notification.AlertMessageFormatter"
     },
     "project": {
         "name": "projectX",
