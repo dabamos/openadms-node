@@ -55,6 +55,9 @@ OpenADMS depends on the following Python libraries:
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
 
+The graphical launcher uses [Gooey](https://pypi.python.org/pypi/Gooey) (MIT
+Licence).
+
 ## Message Broker
 The MQTT protocol is used for the message exchange in OpenADMS. You can either
 use an external MQTT message broker, like
