@@ -63,7 +63,7 @@ def mainw() -> None:
                         help='Print debug messages',
                         dest='is_debug',
                         action='store_true',
-                        default=True)
+                        default=False)
     parser.add_argument('-m', '--with-mqtt-broker',
                         metavar='MQTT',
                         help='Run internal MQTT message broker',
