@@ -33,7 +33,7 @@ from core.observation import Observation
 
 
 data = {
-    'id': str(uuid.uuid4()),
+    'id': Observation.get_id(),
     'target': 'test',
     'requestSets': {
         'getValue': {

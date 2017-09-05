@@ -143,7 +143,7 @@ class Job(object):
         obs_copy = copy.deepcopy(self._obs)
 
         # Generate a new UUID4.
-        obs_copy.set('id', str(uuid.uuid4()))
+        obs_copy.set('id', Observation.get_id())
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.

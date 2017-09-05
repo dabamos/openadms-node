@@ -25,9 +25,9 @@ __license__ = 'EUPL'
 
 import json
 import logging
-import uuid
 
 from typing import *
+from uuid import uuid4
 
 # Type definition for the value inside a response set of an observation.
 # `ResponseType` can either be of type float, int, or str.
@@ -49,7 +49,7 @@ class Observation(object):
         if not data:
             self._data = {
                 'enabled': True,
-                'id': str(uuid.uuid4()),
+                'id': Observation.get_id(),
                 'name': 'default',
                 'nextReceiver': 0,
                 'onetime': False,
@@ -106,6 +106,15 @@ class Observation(object):
         return {
             'type': 'observation'
         }
+
+    @staticmethod
+    def get_id() -> str:
+        """Returns an UUID4 in hexadecimal format.
+
+        Returns:
+            UUID4 in hex.
+        """
+        return uuid4().hex
 
     def get_response_type(self, name: str) -> str:
         """Returns the type of a given response set.
