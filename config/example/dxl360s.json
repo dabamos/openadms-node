@@ -1,0 +1,129 @@
+{
+    "modules": {
+        "com1": "module.port.SerialPort",
+        "scheduler": "module.schedule.Scheduler",
+        "preProcessor": "module.processing.PreProcessor",
+        "unitConverter": "module.processing.UnitConverter",
+        "fileExporter": "module.export.FileExporter",
+        "localControlServer": "module.server.LocalControlServer"
+    },
+    "project": {
+        "name": "DXL360S",
+        "id": "dxl360s",
+        "description": ""
+    },
+    "intercom": {
+        "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "openADMS"
+        }
+    },
+    "ports": {
+        "serial": {
+            "com1": {
+                "port": "COM1",
+                "passive": true,
+                "baudRate": 9600,
+                "byteSize": 8,
+                "stopBits": 1,
+                "parity": "none",
+                "timeout": 2.0,
+                "softwareFlowControl": false,
+                "hardwareFlowControl": false
+            }
+        }
+    },
+    "sensors": {
+        "dxl360s": {
+            "description": "DXL360S",
+            "type": "inclinometer",
+            "observations": [
+                {
+                    "name": "getXY",
+                    "description": "gets inclination",
+                    "receivers": [
+                        "preProcessor",
+                        "unitConverter",
+                        "fileExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "target": "dxl360s",
+                    "requestsOrder": [
+                        "draft"
+                    ],
+                    "requestSets": {
+                        "draft": {
+                            "enabled": true,
+                            "responseDelimiter": "",
+                            "responseLength": 12,
+                            "responsePattern": "X(?P<x>[+-]?\\d{4})Y(?P<y>[+-]?\\d{4})",
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "x": {
+                            "type": "float",
+                            "unit": "mdeg"
+                        },
+                        "y": {
+                            "type": "float",
+                            "unit": "mdeg"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    "schedulers": {
+        "scheduler": {
+            "port": "com1",
+            "sensor": "dxl360s",
+            "schedules": [
+                {
+                    "enabled": true,
+                    "startDate": "2017-01-01",
+                    "endDate": "2030-12-31",
+                    "weekdays": {},
+                    "observations": [
+                        "getXY"
+                    ]
+                }
+            ]
+        }
+    },
+    "fileExporter": {
+        "fileExtension": ".csv",
+        "fileName": "{{port}}_{{target}}_{{date}}",
+        "fileRotation": "monthly",
+        "paths": [
+            "./data"
+        ],
+        "separator": ",",
+        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+        "saveObservationId": true
+    },
+    "unitConverter": {
+        "conversionTable": {
+            "x": {
+                "sourceUnit": "mdeg",
+                "designatedUnit": "deg",
+                "conversionType": "scale",
+                "scalingValue": 0.01
+            },
+            "y": {
+                "sourceUnit": "mdeg",
+                "designatedUnit": "deg",
+                "conversionType": "scale",
+                "scalingValue": 0.01
+            }
+        }
+    },
+    "localControlServer": {
+        "host": "127.0.0.1",
+        "port": 8080
+    }
+}

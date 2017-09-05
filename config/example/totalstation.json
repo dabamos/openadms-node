@@ -6,6 +6,7 @@
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
         "helmertTransformer": "module.totalstation.HelmertTransformer",
+        "localControlServer": "module.server.LocalControlServer"
         "mailAgent": "module.notification.MailAgent",
         "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
@@ -13,11 +14,11 @@
         "realTimePublisher": "module.export.RealTimePublisher",
         "refractionCorrector": "module.totalstation.RefractionCorrector",
         "returnCodeInspector": "module.processing.ReturnCodeInspector",
+        "scheduler1": "module.schedule.Scheduler",
         "scheduler2": "module.schedule.Scheduler",
         "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor",
         "shortMessageAgent": "module.notification.ShortMessageAgent",
         "shortMessageFormatter": "module.notification.AlertMessageFormatter",
-        "localControlServer": "module.server.LocalControlServer"
     },
     "project": {
         "name": "projectX",
@@ -1513,8 +1514,8 @@
             "schedules": [
                 {
                     "enabled": true,
-                    "startDate": "2016-02-01",
-                    "endDate": "2020-07-30",
+                    "startDate": "2017-01-01",
+                    "endDate": "2030-12-31",
                     "weekdays": {},
                     "observations": [
                         "initialize",
@@ -1529,8 +1530,8 @@
             "schedules": [
                 {
                     "enabled": true,
-                    "startDate": "2016-02-01",
-                    "endDate": "2020-07-30",
+                    "startDate": "2017-01-01",
+                    "endDate": "2030-12-31",
                     "weekdays": {
                         "monday": [
                             {
@@ -1553,32 +1554,6 @@
                         "getP3",
                         "getP4",
                         "wait10"
-                    ]
-                }
-            ]
-        },
-        "scheduler3": {
-            "port": "virtualLeicaTM30",
-            "sensor": "leicaTM30",
-            "schedules": [
-                {
-                    "enabled": false,
-                    "startDate": "2016-02-01",
-                    "endDate": "2017-07-30",
-                    "weekdays": {
-                        "monday": [],
-                        "tuesday": [],
-                        "wednesday": [],
-                        "thursday": [],
-                        "friday": [],
-                        "saturday": [],
-                        "sunday": []
-                    },
-                    "observations": [
-                        "initialize",
-                        "getP1",
-                        "getP2",
-                        "getP3"
                     ]
                 }
             ]
