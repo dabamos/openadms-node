@@ -1,0 +1,115 @@
+{
+    "modules": {
+        "com1": "modules.port.SerialPort",
+        "fileExporter": "modules.export.FileExporter",
+        "preProcessor": "modules.processing.PreProcessor",
+        "scheduler1": "modules.schedule.Scheduler"
+    },
+    "project": {
+        "name": "Nivel210 Project",
+        "id": "nivel210",
+        "description": "Nivel210 test project"
+    },
+    "intercom": {
+        "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/openADMS"
+        }
+    },
+    "ports": {
+        "serial": {
+            "com1": {
+                "port": "COM1",
+                "mode": "active",
+                "baudRate": 9600,
+                "byteSize": 8,
+                "stopBits": 1,
+                "parity": "none",
+                "timeout": 2.0,
+                "softwareFlowControl": false,
+                "hardwareFlowControl": false,
+                "maxAttempts": 1
+
+            }
+        }
+    },
+    "sensors": {
+        "nivel210": {
+            "description": "Leica Nivel210",
+            "type": "inclinometer",
+            "observations": [
+                {
+                    "name": "getValues",
+                    "description": "gets inclination and temperature",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "target": "nivel210",
+                    "requestsOrder": [
+                        "getXYTemperature"
+                    ],
+                    "requestSets": {
+                        "getXYTemperature": {
+                            "enabled": true,
+                            "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
+                            "response": "",
+                            "responseDelimiter": "\\x03",
+                            "responsePattern": "X:(?P<x>[-+]?[0-9]*\\.?[0-9]+) Y:(?P<y>[-+]?[0-9]*\\.?[0-9]+) T:(?P<temperature>[-+]?[0-9]*\\.?[0-9]+)",
+                            "sleepTime": 0.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "temperature": {
+                            "type": "float",
+                            "unit": "C"
+                        },
+                        "x": {
+                            "type": "float",
+                            "unit": "mrad"
+                        },
+                        "y": {
+                            "type": "float",
+                            "unit": "mrad"
+                        }
+                    },
+                    "sleepTime": 10.0
+                }
+            ]
+        }
+    },
+    "schedulers": {
+        "scheduler1": {
+            "port": "com1",
+            "sensor": "nivel210",
+            "schedules": [
+                {
+                    "enabled": true,
+                    "startDate": "2017-01-01",
+                    "endDate": "2030-12-31",
+                    "weekdays": {},
+                    "observations": [
+                        "getValues"
+                    ]
+                }
+            ]
+        }
+    },
+    "fileExporter": {
+        "fileExtension": ".csv",
+        "fileName": "{{port}}_{{target}}_{{date}}",
+        "fileRotation": "monthly",
+        "paths": [
+            "./data"
+        ],
+        "separator": ",",
+        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+        "saveObservationId": true
+    }
+}
