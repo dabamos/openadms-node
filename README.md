@@ -26,15 +26,23 @@ The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
 more information, please see https://www.dabamos.de/.
 
 ## Installation
-To run OpenADMS, clone the master branch, install the dependencies and execute
-`openadms.py`:
-
+Before you can start OpenADMS, you have to clone the master branch and install
+all dependencies:
 ```
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
 $ python3 -m pip install -U -r requirements.txt
-$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
+Run OpenADMS from the command line:
+```
+$ python3 openadms.py --config ./config/my_config.json --with-mqtt-broker --debug
+```
+OpenADMS also features a graphical launcher. At first, run `win_install.bat` on
+Microsoft Windows or install the dependencies manually:
+```
+$ python3 -m pip install Gooey
+```
+Execute `openadms-gui.pyw` to start the graphical launcher.
 
 ### Dependencies
 OpenADMS depends on the following Python libraries:
@@ -64,7 +72,6 @@ The configuration of OpenADMS is done by using a JSON-based text file, located
 in the directory `./config`. Please define modules, serial ports, sensors, and
 so on there. OpenADMS takes the file name of your custom configuration as an
 argument. For instance, run:
-
 ```
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
@@ -72,7 +79,6 @@ $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ## Virtual Environment
 The Python tool `venv` can create a virtual Python environment for development
 (with `csh`/`tcsh` on Unix):
-
 ```
 $ python3 -m venv virtual-environment
 $ source ./virtual-environment/bin/activate.csh
@@ -89,4 +95,3 @@ the project website.
 ## Licence
 OpenADMS is licenced under the [European Union Public
 Licence](https://joinup.ec.europa.eu/community/eupl/og_page/eupl) (EUPL) v1.1.
-
