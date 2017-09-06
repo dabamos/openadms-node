@@ -143,7 +143,7 @@ class Job(object):
         obs_copy = copy.deepcopy(self._obs)
 
         # Generate a new UUID4.
-        obs_copy.set('id', Observation.get_id())
+        obs_copy.set('id', Observation.get_new_id())
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
@@ -195,8 +195,8 @@ class Scheduler(Prototype):
         schedules: List of schedules.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         self._config = self.get_config('schedulers', self._name)
 
         self._port_name = self._config.get('port')

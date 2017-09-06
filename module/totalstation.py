@@ -44,8 +44,8 @@ class DistanceCorrector(Prototype):
     data.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         # Maximum age of atmospheric data, before a warning will be generated.
@@ -256,8 +256,8 @@ class HelmertTransformer(Prototype):
     using the Helmert transformation.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
         self._is_residual = config.get('residualMismatchTransformationEnabled')
@@ -314,7 +314,7 @@ class HelmertTransformer(Prototype):
                                     view_point_y: float,
                                     view_point_z: float,
                                     a: float,
-                                    o: float) -> List[float]:
+                                    o: float) -> Tuple[float, float, float]:
         """Calculates Cartesian coordinates out of polar coordinates.
 
         Args:
@@ -343,7 +343,7 @@ class HelmertTransformer(Prototype):
 
     def _calculate_residual_mismatches(self,
                                        global_x: float,
-                                       global_y: float) -> List[float]:
+                                       global_y: float) -> Tuple[float, float]:
         sum_p = 0
         sum_p_vx = 0
         sum_p_vy = 0
@@ -615,7 +615,7 @@ class HelmertTransformer(Prototype):
         return view_point
 
     def get_cartesian_coordinates(self, hz: float, v: float, slope_dist: float)\
-            -> List[float]:
+            -> Tuple[float, float, float]:
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
@@ -649,7 +649,7 @@ class HelmertTransformer(Prototype):
         dist = obs.get_response_value('slopeDist')
 
         if None in [hz, v, dist]:
-            return obs
+            return
 
         # Calculate the coordinates of the fixed point if the Helmert
         # transformation has been done already. Otherwise, use the datum from
@@ -705,8 +705,8 @@ class PolarTransformer(Prototype):
     accuracy of the horizontal directions ('Abriss' in German).
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._view_point = config.get('viewPoint')
@@ -932,8 +932,8 @@ class RefractionCorrector(Prototype):
     distance and corrects the Z value of an observed target.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
 
     def process_observation(self, obs: Observation) -> Observation:
         z = obs.get_response_value('z')
@@ -980,8 +980,8 @@ class SerialMeasurementProcessor(Prototype):
     averaged and stored in a new response set.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
 
     def process_observation(self, obs: Observation) -> Observation:
         # Calculate the serial measurement of an observation in two faces.

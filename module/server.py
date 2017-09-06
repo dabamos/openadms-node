@@ -53,8 +53,8 @@ class LocalControlServer(Prototype):
         port: Port number.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
@@ -109,7 +109,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def __init__(self,
                  manager: Manager,
-                 log_handler: Type[logging.Handler],
+                 log_handler: Type[RingBufferLogHandler],
                  *args):
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager

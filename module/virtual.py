@@ -31,8 +31,6 @@ import random
 import re
 import time
 
-from typing import *
-
 from core.manager import Manager
 from core.observation import Observation
 from module.prototype import Prototype
@@ -43,8 +41,8 @@ class VirtualSensor(Prototype):
     VirtualSensor is a prototype class for virtual sensors.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         self.patterns = {}
 
     def process_observation(self, obs: Observation) -> Observation:
@@ -106,7 +104,7 @@ class VirtualTotalStationTM30(VirtualSensor):
     GeoCOM commands.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -172,7 +170,7 @@ class VirtualDTM(VirtualSensor):
     VirtualDTM simulates an STS DTM meteorological sensor.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self.patterns = {
@@ -216,7 +214,7 @@ class VirtualIndicatorOne(VirtualSensor):
     indicator/extensometer.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
         VirtualSensor.__init__(self, name, type, manager)
 
         self._current_value = 0.0

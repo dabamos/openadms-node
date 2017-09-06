@@ -41,8 +41,8 @@ class PreProcessor(Prototype):
     converts them to the defined types.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
 
     def process_observation(self, obs: Observation) -> Observation:
         """Extracts the values from the raw responses of the observation
@@ -227,8 +227,8 @@ class ReturnCodeInspector(Prototype):
     sensors of Leica Geosystems and creates an appropriate log message.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._response_sets = config.get('responseSets')
@@ -294,8 +294,8 @@ class UnitConverter(Prototype):
     meters by setting a scale factor.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
         self._conversions = config.get('conversions')
 

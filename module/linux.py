@@ -56,8 +56,8 @@ class InterruptCounter(Prototype):
         sensorName: Name of the connected sensor.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._gpio = config.get('gpio')
@@ -153,4 +153,3 @@ class InterruptCounter(Prototype):
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
-

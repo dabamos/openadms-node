@@ -50,8 +50,8 @@ class Alert(Prototype):
     Alert is used to send warning and error messages to other modules.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._is_enabled = config.get('enabled')
@@ -117,8 +117,8 @@ class Alert(Prototype):
 
 class AlertMessageFormatter(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         self._config = self._config_manager.get(self._name)
         self._thread = None
 
@@ -156,11 +156,11 @@ class AlertMessageFormatter(Prototype):
 
     def process_alert_messages(self,
                                receiver: str,
-                               messages: List[str]) -> None:
+                               alerts: List[Dict[str, str]]) -> None:
         """
         Args:
             receiver: The receiver of the alert.
-            messages: The list of alert messages.
+            alerts: The list of alert messages.
         """
         if not receiver or receiver == '':
             self.logger.warning('No receiver defined for alert message')
@@ -186,19 +186,15 @@ class AlertMessageFormatter(Prototype):
         # Append the alert messages line by line to the body of the template.
         msg_body = ''
 
-        for msg in messages:
-            line = self._templates.get('body')
-
-            for key, value in msg.items():
-                line = line.replace('{{' + key + '}}', value)
-
+        for key, value in alerts.items():
             # Add the line to the message body.
-            msg_body += line
+            line = self._templates.get('body')
+            msg_body += line.replace('{{' + key + '}}', value)
 
-            # Concatenate the message parts.
-            complete_msg = ''.join([msg_header,
-                                    msg_body,
-                                    msg_footer])
+        # Concatenate the message parts.
+        complete_msg = ''.join([msg_header,
+                                msg_body,
+                                msg_footer])
 
         # Create the payload of the message.
         payload = properties
@@ -263,8 +259,8 @@ class AlertMessageFormatter(Prototype):
 
 class MailAgent(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
         self._charset = config.get('charset')
@@ -365,8 +361,8 @@ class ShortMessageAgent(Prototype):
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
         self._host = config.get('host')
@@ -431,8 +427,8 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
         self._receivers = config.get('receivers')
@@ -461,10 +457,6 @@ class Heartbeat(Prototype):
             time.sleep(sleep_time)
 
         while True:
-            if self._is_paused:
-                time.sleep(sleep_time)
-                continue
-
             payload = {
                 'dt': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
                 'projectId': project_id
@@ -489,8 +481,8 @@ class Heartbeat(Prototype):
 
 class HeartbeatMonitor(Prototype):
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
 
         # Capture messages of type 'heartbeat'.
         self.add_handler('heartbeat', self.handle_heartbeat)

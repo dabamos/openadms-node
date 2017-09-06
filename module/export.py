@@ -63,8 +63,8 @@ class FileExporter(Prototype):
 
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._file_extension = config.get('fileExtension')
@@ -182,8 +182,8 @@ class RealTimePublisher(Prototype):
         enabled: If or if not enabled.
     """
 
-    def __init__(self, name: str, type: str, manager: Manager):
-        super().__init__(name, type, manager)
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._receivers = config.get('receivers')

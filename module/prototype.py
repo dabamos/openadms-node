@@ -39,17 +39,17 @@ class Prototype(object):
     Prototype is used as a blueprint for OpenADMS workers.
     """
 
-    def __init__(self, name: str, type: str, manager: Any):
+    def __init__(self, module_name: str, module_type: str, manager: Any):
         """
         Args:
-            name: The name of the module.
-            type: The type of the module.
+            module_name: The name of the module.
+            module_type: The type of the module.
             manager: The manager objects.
         """
-        self.logger = logging.getLogger(name)
+        self.logger = logging.getLogger(module_name)
 
-        self._name = name       # Module name, e.g., 'com5'.
-        self._type = type       # Module type, e.g., 'module.port.SerialPort'.
+        self._name = module_name  # Module name, e.g., 'com5'.
+        self._type = module_type  # Module type, e.g., 'module.port.SerialPort'.
         self._config_schema_name = None
 
         self._config_manager = manager.config_manager

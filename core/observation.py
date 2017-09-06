@@ -49,7 +49,7 @@ class Observation(object):
         if not data:
             self._data = {
                 'enabled': True,
-                'id': Observation.get_id(),
+                'id': Observation.get_new_id(),
                 'name': 'default',
                 'nextReceiver': 0,
                 'onetime': False,
@@ -108,11 +108,11 @@ class Observation(object):
         }
 
     @staticmethod
-    def get_id() -> str:
-        """Returns an UUID4 in hexadecimal format.
+    def get_new_id() -> str:
+        """Returns a new observation id.
 
         Returns:
-            UUID4 in hex.
+            New UUID4.
         """
         return uuid4().hex
 
