@@ -22,7 +22,7 @@ The software is written in Python 3 and has been tested on:
 
 OpenADMS can either be used with CPython 3.6 or PyPy3.5.
 
-The current development version of OpenADMS is 0.5 (code name “Eindhoven”). For
+The current development version of OpenADMS is 0.6 (code name “Fukuyama”). For
 more information, please see https://www.dabamos.de/.
 
 ## Installation
