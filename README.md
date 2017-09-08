@@ -42,7 +42,7 @@ Microsoft Windows or install the dependencies manually:
 ```
 $ python3 -m pip install Gooey
 ```
-Execute `openadms-gui.pyw` to start the graphical launcher.
+Execute `openadms-launcher.pyw` to start the graphical launcher.
 
 ### Dependencies
 OpenADMS depends on the following Python libraries:
