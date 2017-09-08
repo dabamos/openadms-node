@@ -105,7 +105,7 @@ class VirtualTotalStationTM30(VirtualSensor):
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
-        VirtualSensor.__init__(self, module_name, module_type, manager)
+        super().__init__(module_name, module_type, manager)
 
         self.patterns = {
             '%R1Q,5003:\\r\\n': self.get_sensor_id,
@@ -171,7 +171,7 @@ class VirtualDTM(VirtualSensor):
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
-        VirtualSensor.__init__(self, module_name, module_type, manager)
+        super().__init__(module_name, module_type, manager)
 
         self.patterns = {
             'A\\r': self.power_on,
@@ -215,7 +215,7 @@ class VirtualIndicatorOne(VirtualSensor):
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
-        VirtualSensor.__init__(self, module_name, module_type, manager)
+        super().__init__(module_name, module_type, manager)
 
         self._current_value = 0.0
         self.patterns = {
