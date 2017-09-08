@@ -30,10 +30,9 @@ import copy
 import re
 import serial
 import socket
-import threading
 import time
 
-from typing import *
+from threading import Thread
 
 from core.observation import Observation
 from core.manager import Manager
@@ -160,7 +159,7 @@ class BluetoothPort(Prototype):
     def _open(self) -> None:
         if not self._server_mac_address:
             self.logger.error('MAC address of server not set')
-            return False
+            return
 
         try:
             self._sock = socket.socket(socket.AF_BLUETOOTH,
@@ -296,7 +295,6 @@ class SerialPort(Prototype):
         timeout: Timeout in seconds.
         softwareFlowControl: XON/XOFF flow control.
         hardwareFlowControl: RTS/CTS flow control.
-
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -306,16 +304,12 @@ class SerialPort(Prototype):
                                                   .get(self.name)
 
         self._max_attempts = self._config.get('maxAttempts')
-
-        if self._config.get('mode') == 'passive':
-            self._is_passive = True
-            self._obs_draft = None
-            self._thread = None     # Thread for passive mode.
-        else:
-            self._is_passive = False
-
         self._serial = None         # Pyserial object.
         self._serial_port_config = None
+
+        # Passive mode.
+        self._is_passive = False
+        self._passive_listener = None
 
     def __del__(self):
         self._is_running = False
@@ -330,11 +324,28 @@ class SerialPort(Prototype):
             self._serial.close()
 
     def process_observation(self, obs: Observation) -> Observation:
-        if self._is_passive:
-            # Set observation template for passive mode.
-            self._obs_draft = obs
+        # Turn on passive mode.
+        if obs.get('passiveMode'):
+            if self._is_passive:
+                self._is_passive = False
+                self._passive_listener.join()
+
+            self._is_passive = True
+            self._passive_listener = Thread(target=self.listen, args=(obs,))
+            self._passive_listener.daemon = True
+            self._passive_listener.start()
+            self.logger.debug('Started passive listener of port "{}"'
+                              .format(self.name))
             return
 
+        # Turn off passive mode.
+        if self._is_passive and not obs.get('passiveMode'):
+            self._is_passive = False
+            self._passive_listener.join()
+            self.logger.debug('Stopped passive listener of port "{}"'
+                              .format(self.name))
+
+        # Create new serial connection.
         if not self._serial:
             self._create()
 
@@ -350,7 +361,7 @@ class SerialPort(Prototype):
             self._serial.reset_output_buffer()
             self._serial.reset_input_buffer()
 
-        # Add the name of this serial port to the observation.
+        # Add the name of this serial port module to the observation.
         obs.set('portName', self.name)
 
         requests_order = obs.get('requestsOrder', [])
@@ -408,7 +419,7 @@ class SerialPort(Prototype):
                 if response != '':
                     self.logger.debug('Received response "{}" for request "{}" '
                                       'of observation "{}" from sensor "{}"'
-                                      .format(self._sanitize(response),
+                                      .format(self.sanitize(response),
                                               request_name,
                                               obs.get('name'),
                                               obs.get('sensorName')))
@@ -432,19 +443,15 @@ class SerialPort(Prototype):
 
         return obs
 
-    def run(self) -> None:
+    def listen(self, obs_draft: Observation) -> None:
         """Threaded method for passive mode. Reads incoming data from serial
         port. Used for sensors which start streaming data without prior
         request."""
-        if not self.is_passive:
-            self.logger.warning('Serial port not in passive mode')
-            return
-
-        while self._is_running:
-            if self._obs_draft is None:
-                self.logger.debug('No observation draft set')
-                time.sleep(1.0)
-                continue
+        while self._is_running and self._is_passive:
+            if not obs_draft:
+                self.logger.warning('No observation set for passive listener of'
+                                    'port "{}"'.format(self.name))
+                break
 
             if not self._serial:
                 self._create()
@@ -460,13 +467,18 @@ class SerialPort(Prototype):
                 self._serial.open()
                 self._serial.reset_input_buffer()
 
-            obs = copy.deepcopy(self._obs_draft)
+            obs = copy.deepcopy(obs_draft)
             obs.set('portName', self.name)
 
             draft = obs.get('requestSets').get('draft')
+
             timeout = draft.get('timeout')
             response_delimiter = draft.get('responseDelimiter')
             length = draft.get('responseLength')
+            request = draft.get('request')
+
+            if request and request != "":
+                self._write(request)
 
             response = self._read(eol=response_delimiter,
                                   length=length,
@@ -474,24 +486,12 @@ class SerialPort(Prototype):
 
             if response != '':
                 self.logger.debug('Received "{}" from sensor "{}" on port "{}"'
-                                  .format(self._sanitize(response),
+                                  .format(self.sanitize(response),
                                           obs.get('sensorName'),
                                           self._name))
                 draft['response'] = response
                 obs.set('timeStamp', str(arrow.utcnow()))
                 self.publish_observation(obs)
-
-    def start(self) -> None:
-        if self._is_running:
-            return
-
-        # self.logger.debug('Starting worker "{}"'.format(self._name))
-        self._is_running = True
-
-        if self.is_passive:
-            self._thread = threading.Thread(target=self.run)
-            self._thread.daemon = True
-            self._thread.start()
 
     def _get_port_config(self) -> SerialPortConfiguration:
         if not self._config:
@@ -572,7 +572,7 @@ class SerialPort(Prototype):
 
         return response
 
-    def _sanitize(self, s: str) -> str:
+    def sanitize(self, s: str) -> str:
         """Converts some non-printable characters of a given string."""
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
@@ -587,4 +587,3 @@ class SerialPort(Prototype):
     def is_passive(self) -> bool:
         """Returns whether or not the port is in passive mode."""
         return self._is_passive
-

@@ -204,7 +204,6 @@ class ModuleManager(object):
             manager: The manager object.
         """
         self.logger = logging.getLogger('moduleManager')
-
         self._manager = manager
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
@@ -462,7 +461,7 @@ class SchemaManager(object):
         configuration schema file.
 
         For instance, the given class path `module.schedule.Scheduler` will be
-        converted to the schema path `module/schedule/scheduler.json`.
+        converted to the file path `module/schedule/scheduler.json`.
 
         Args:
             class_path: The class path of a module.

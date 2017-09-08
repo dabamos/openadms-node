@@ -31,8 +31,6 @@ import logging
 import time
 import threading
 
-from typing import *
-
 try:
     import RPi.GPIO as GPIO
 except ImportError:
@@ -75,7 +73,7 @@ class InterruptCounter(Prototype):
     def __del__(self):
         GPIO.cleanup()
 
-    def init_gpio(self):
+    def init_gpio(self) -> None:
         # Set SoC as reference.
         GPIO.setmode(GPIO.BCM)
         # Set pin as input and activate pull-down resistor.
@@ -88,7 +86,7 @@ class InterruptCounter(Prototype):
                               callback=self._interrupt,
                               bouncetime=self._bounce_time)
 
-    def _interrupt(self, channel):
+    def _interrupt(self) -> None:
         self._lock.acquire()
 
         try:
@@ -98,7 +96,7 @@ class InterruptCounter(Prototype):
         finally:
             self._lock.release()
 
-    def run(self):
+    def run(self) -> None:
         t1 = time.time()
         t2 = t1
 
@@ -142,7 +140,7 @@ class InterruptCounter(Prototype):
 
         self.publish_observation(obs)
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 

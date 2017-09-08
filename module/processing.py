@@ -306,11 +306,10 @@ class UnitConverter(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
-        self._conversions = config.get('conversions')
+        self._config = self._config_manager.get(self._name)
 
     def process_observation(self, obs: Observation) -> Observation:
-        for name, conversion in self._conversions.items():
+        for name, properties in self._config.items():
             response_set = obs.get('responseSets').get(name)
 
             if not response_set:
@@ -322,20 +321,20 @@ class UnitConverter(Prototype):
             if not src_value or not src_unit:
                 continue
 
-            if src_unit != conversion.get('sourceUnit'):
+            if src_unit != properties.get('sourceUnit'):
                 self.logger.warning('Unit "{}" of response "{}" of observation '
                                     '"{}" of target "{}" does not match "{}"'
                                     .format(src_unit,
                                             name,
                                             obs.get('name'),
                                             obs.get('target'),
-                                            conversion.get('sourceUnit')))
+                                            properties.get('sourceUnit')))
                 continue
 
-            if conversion.get('conversionType') == 'scale':
+            if properties.get('conversionType') == 'scale':
                 dgn_value = self.scale(float(src_value),
-                                        conversion.get('scalingValue'))
-                dgn_unit = conversion.get('designatedUnit')
+                                        properties.get('scalingValue'))
+                dgn_unit = properties.get('designatedUnit')
 
                 self.logger.info('Converted response "{}" of observation "{}" '
                                  'of target "{}" from {:.4f} {} to {:.4f} {}'
