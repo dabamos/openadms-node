@@ -2,7 +2,6 @@
     "name": "DXL360S",
     "type": "inclinometer",
     "description": "Dual-axis level box with RS-232/Bluetooth interface.",
-    "mode": "passive",
     "observations": {
         "getXY": {
             "description": "Observation template for passive communication with sensor.",

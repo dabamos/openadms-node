@@ -2,7 +2,6 @@
     "name": "GeoCOM",
     "type": "totalstation",
     "description": "GeoCOM commands for Leica Geosystems robotic total stations.",
-    "mode": "active",
     "observations": {
         "beepOn": {
             "requestSets": {

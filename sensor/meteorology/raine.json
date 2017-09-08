@@ -1,8 +1,7 @@
 {
     "name": "Lambrecht rain-e",
     "type": "meteo",
-    "description": "Weighing precipitation sensor.",
-    "mode": "active",
+    "description": "Weighting precipitation sensor.",
     "observations": {
         "getValues": {
             "description": "Returns intensity (mm/min), intensity (mm/h), relative intensity (mm/min), relative intensity (mm/h), relative amount (mm), total amount (mm), heating status (0/1), temperature (C).",

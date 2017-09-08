@@ -2,7 +2,6 @@
     "name": "Soehnle Terminal 3010",
     "type": "scale",
     "description": "Terminal for industrial scales with RS-232 interface.",
-    "mode": "active",
     "observations": {
         "getValue": {
             "description": "Returns the current weight.",

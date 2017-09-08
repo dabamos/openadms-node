@@ -2,7 +2,6 @@
     "name": "Leica Disto pro4a",
     "type": "ldm",
     "description": "Laser distance meter with RS-232 interface.",
-    "mode": "active",
     "observations": {
         "backlightOff": {
             "description": "Turns backlight off.",
@@ -178,7 +177,7 @@
             "responseSets": {
                 "distance": {
                     "type": "integer",
-                    "unit": "mm"
+                    "unit": "um"
                 },
                 "returnCode": {
                     "type": "string",
@@ -306,18 +305,20 @@
         },
         "startTracking": {
             "description": "Starts tracking (serial port mode must be set to passive). Use 'stop' to stop measurement.",
+            "passiveMode": true,
             "requestSets": {
                 "startTracking": {
                     "request": "h\r",
-                    "responseDelimiter": "\n",
-                    "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
-                    "timeout": 1
+                    "responseDelimiter": "\r\n",
+                    "responseLength": 0,
+                    "responsePattern": "^31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 10.0
                 }
             },
             "responseSets": {
                 "distance": {
                     "type": "integer",
-                    "unit": "mm"
+                    "unit": "um"
                 },
                 "returnCode": {
                     "type": "string",
