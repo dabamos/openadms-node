@@ -6,9 +6,9 @@
         "scheduler1": "module.schedule.Scheduler"
     },
     "project": {
-        "name": "Disto",
-        "id": "distopro4a",
-        "description": "Leica Disto pro4a test project"
+        "name": "My Project",
+        "id": "myproject",
+        "description": "project for testing only"
     },
     "intercom": {
         "mqtt": {
