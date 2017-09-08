@@ -21,9 +21,9 @@ limitations under the Licence.
 
 """OpenADMS - Open Automatic Deformation Monitoring System
 
-OpenADMS is an open source automatic deformation monitoring system for permanent
-observations. It can be used to monitor buildings, terrain, and other objects
-with the help of geodetical or geotechnical sensors.
+OpenADMS is an open source automatic deformation monitoring software for
+permanent observations. It can be used to monitor buildings, terrain, and other
+objects with the help of geodetical or geotechnical sensors.
 
 Example:
     You can either use the internal MQTT message broker or an external one,
@@ -62,8 +62,8 @@ from core.system import System
 # Get root logger.
 logger = logging.getLogger()
 
-LOG_FILE_BACKUP_COUNT = 1
-MAX_LOG_FILE_SIZE = 10485760  # 10 MB.
+LOG_FILE_BACKUP_COUNT = 1     # 1 log file only.
+MAX_LOG_FILE_SIZE = 10485760  # 10 MiB.
 
 
 def main(config_file_path: str) -> None:
