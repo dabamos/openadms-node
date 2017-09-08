@@ -52,12 +52,22 @@ class PreProcessor(Prototype):
             response_pattern = request_set.get('responsePattern')
 
             if response is None or response == '':
-                self.logger.error('No response in observation "{}" of target "{}"'
-                                  .format(obs.get('name'), obs.get('target')))
+                self.logger.warning('No response "{}" in observation "{}" of '
+                                    'target "{}"'.format(set_name,
+                                                         obs.get('name'),
+                                                         obs.get('target')))
                 continue
 
-            pattern = re.compile(response_pattern)
-            match = pattern.search(response)
+            try:
+                pattern = re.compile(response_pattern)
+                match = pattern.search(response)
+            except Exception:
+                self.logger.error('Invalid regular expression for response '
+                                  '"{}" in observation "{}" of target "{}"'
+                                  .format(set_name,
+                                          obs.get('name'),
+                                          obs.get('target')))
+                return obs
 
             if not match:
                 self.logger.error('Response "{}" of request "{}" of '
@@ -87,8 +97,8 @@ class PreProcessor(Prototype):
             # actual data type (float, int).
             response_sets = obs.get('responseSets')
 
-            for group_name, raw_value in match.groupdict().items():
-                if not raw_value:
+            for group_name, raw_value in match.groupdict("").items():
+                if raw_value is None:
                     self.logger.error('No raw value found for response set '
                                       '"{}" of observation "{}" of target "{}"'
                                       .format(group_name,
