@@ -41,6 +41,42 @@
             "type": "ldm",
             "observations": [
                 {
+                    "name": "getDistance",
+                    "description": "gets inclination and temperature",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "target": "disto",
+                    "requestsOrder": [
+                        "getDistance"
+                    ],
+                    "requestSets": {
+                        "getDistance": {
+                            "enabled": true,
+                            "request": "G\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "distance": {
+                            "type": "integer",
+                            "unit": "mm"
+                        },
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 1.0
+                },
+                {
                     "name": "getStatus",
                     "description": "gets status information",
                     "receivers": [
@@ -218,7 +254,7 @@
                             "enabled": true,
                             "request": "a\r",
                             "responseDelimiter": "\n",
-                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3}|)",
                             "sleepTime": 3.0,
                             "timeout": 1.0
                         }
@@ -279,42 +315,6 @@
                         }
                     },
                     "sleepTime": 3.0
-                },
-                {
-                    "name": "getDistance",
-                    "description": "gets inclination and temperature",
-                    "receivers": [
-                        "preProcessor",
-                        "fileExporter"
-                    ],
-                    "nextReceiver": 0,
-                    "enabled": true,
-                    "onetime": true,
-                    "target": "disto",
-                    "requestsOrder": [
-                        "getDistance"
-                    ],
-                    "requestSets": {
-                        "getDistance": {
-                            "enabled": true,
-                            "request": "G\r",
-                            "responseDelimiter": "\n",
-                            "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
-                            "sleepTime": 1.0,
-                            "timeout": 1.0
-                        }
-                    },
-                    "responseSets": {
-                        "distance": {
-                            "type": "integer",
-                            "unit": "mm"
-                        },
-                        "returnCode": {
-                            "type": "string",
-                            "unit": "none"
-                        }
-                    },
-                    "sleepTime": 5.0
                 }
             ]
         }
@@ -332,8 +332,7 @@
                     "observations": [
                         "init",
                         "getStatus",
-                        "getDistance",
-                        "shutdown"
+                        "getDistance"
                     ]
                 }
             ]
