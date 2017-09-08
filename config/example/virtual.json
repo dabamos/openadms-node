@@ -18,7 +18,7 @@
     },
     "project": {
         "name": "Virtual Project",
-        "id": "virtualProject",
+        "id": "virtual",
         "description": "project for testing virtual sensors"
     },
     "intercom": {
@@ -26,7 +26,7 @@
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/openADMS"
+            "topic": "openadms"
         }
     },
     "sensors": {

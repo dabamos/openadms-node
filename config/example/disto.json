@@ -1,0 +1,353 @@
+{
+    "modules": {
+        "com1": "module.port.SerialPort",
+        "fileExporter": "module.export.FileExporter",
+        "preProcessor": "module.processing.PreProcessor",
+        "scheduler1": "module.schedule.Scheduler"
+    },
+    "project": {
+        "name": "Disto",
+        "id": "distopro4a",
+        "description": "Leica Disto pro4a test project"
+    },
+    "intercom": {
+        "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "openadms"
+        }
+    },
+    "ports": {
+        "serial": {
+            "com1": {
+                "port": "/dev/ttyU0",
+                "mode": "active",
+                "baudRate": 9600,
+                "byteSize": 8,
+                "stopBits": 1,
+                "parity": "none",
+                "timeout": 2.0,
+                "softwareFlowControl": false,
+                "hardwareFlowControl": false,
+                "maxAttempts": 1
+
+            }
+        }
+    },
+    "sensors": {
+        "disto": {
+            "description": "Leica Disto pro4a",
+            "type": "ldm",
+            "observations": [
+                {
+                    "name": "getStatus",
+                    "description": "gets status information",
+                    "receivers": [
+                        "preProcessor"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "target": "status",
+                    "requestsOrder": [
+                        "getSoftwareVersion",
+                        "getHardwareVersion",
+                        "getSerialNumber",
+                        "getDateOfProduction",
+                        "getBatteryCharge"
+                    ],
+                    "requestSets": {
+                        "getSoftwareVersion": {
+                            "enabled": true,
+                            "request": "N00N\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "13\\.{4}(?P<softwareVersion>[+-]\\d{8}|@E\\d{3})",
+                            "sleepTime": 0.5,
+                            "timeout": 1.0
+                        },
+                        "getHardwareVersion": {
+                            "enabled": true,
+                            "request": "N01N\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "14\\.{4}(?P<hardwareVersion>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 0.5,
+                            "timeout": 1.0
+                        },
+                        "getSerialNumber": {
+                            "enabled": true,
+                            "request": "N02N\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "12\\.{4}(?P<serialNumber>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 0.5,
+                            "timeout": 1.0
+                        },
+                        "getDateOfProduction": {
+                            "enabled": true,
+                            "request": "N03N\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "15\\.{4}(?P<productionDate>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 0.5,
+                            "timeout": 1.0
+                        },
+                        "getBatteryCharge": {
+                            "enabled": true,
+                            "request": "v\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "996\\.{3}(?P<battery>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 0.5,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "softwareVersion": {
+                            "type": "integer",
+                            "unit": "none"
+                        },
+                        "hardwareVersion": {
+                            "type": "integer",
+                            "unit": "none"
+                        },
+                        "serialNumber": {
+                            "type": "integer",
+                            "unit": "none"
+                        },
+                        "productionDate": {
+                            "type": "integer",
+                            "unit": "none"
+                        },
+                        "battery": {
+                            "type": "integer",
+                            "unit": "none"
+                        },
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 3.0
+                },
+                {
+                    "name": "init",
+                    "description": "starts and initializes the sensor",
+                    "receivers": [
+                        "preProcessor"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "target": "init",
+                    "requestsOrder": [
+                        "turnOn",
+                        "enableOnlineMode",
+                        "beep",
+                        "backlightOn",
+                        "laserOn",
+                        "clearScreen",
+                        "displayString",
+                        "laserOff",
+                        "backlightOff",
+                        "beep"
+                    ],
+                    "requestSets": {
+                        "backlightOn": {
+                            "enabled": true,
+                            "request": "LIGHT 1\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "backlightOff": {
+                            "enabled": true,
+                            "request": "LIGHT 0\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "beep": {
+                            "enabled": true,
+                            "request": "BEEP 500\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "clearScreen": {
+                            "enabled": true,
+                            "request": "CDISP\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "displayString": {
+                            "enabled": true,
+                            "request": "DISPL 10 10 OpenADMS\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "enableOnlineMode": {
+                            "enabled": true,
+                            "request": "EXT\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "laserOn": {
+                            "enabled": true,
+                            "request": "o\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "laserOff": {
+                            "enabled": true,
+                            "request": "p\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "turnOn": {
+                            "enabled": true,
+                            "request": "a\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 3.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 10.0
+                },
+                {
+                    "name": "shutdown",
+                    "description": "stop and power off",
+                    "receivers": [
+                        "preProcessor"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "target": "shutdown",
+                    "requestsOrder": [
+                        "disableOnlineMode",
+                        "stop",
+                        "turnOff"
+                    ],
+                    "requestSets": {
+                        "disableOnlineMode": {
+                            "enabled": true,
+                            "request": "STD\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "stop": {
+                            "enabled": true,
+                            "request": "c\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "turnOff": {
+                            "enabled": true,
+                            "request": "b\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 0.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 3.0
+                },
+                {
+                    "name": "getDistance",
+                    "description": "gets inclination and temperature",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "target": "disto",
+                    "requestsOrder": [
+                        "getDistance"
+                    ],
+                    "requestSets": {
+                        "getDistance": {
+                            "enabled": true,
+                            "request": "G\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "distance": {
+                            "type": "integer",
+                            "unit": "mm"
+                        },
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 5.0
+                }
+            ]
+        }
+    },
+    "schedulers": {
+        "scheduler1": {
+            "port": "com1",
+            "sensor": "disto",
+            "schedules": [
+                {
+                    "enabled": true,
+                    "startDate": "2017-01-01",
+                    "endDate": "2030-12-31",
+                    "weekdays": {},
+                    "observations": [
+                        "init",
+                        "getStatus",
+                        "getDistance",
+                        "shutdown"
+                    ]
+                }
+            ]
+        }
+    },
+    "fileExporter": {
+        "fileExtension": ".csv",
+        "fileName": "{{port}}_{{target}}_{{date}}",
+        "fileRotation": "monthly",
+        "paths": [
+            "./data"
+        ],
+        "separator": ",",
+        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+        "saveObservationId": true
+    }
+}

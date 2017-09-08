@@ -8,16 +8,16 @@
         "localControlServer": "module.server.LocalControlServer"
     },
     "project": {
-        "name": "DXL360S",
-        "id": "dxl360s",
-        "description": ""
+        "name": "My Project",
+        "id": "myproject",
+        "description": "project for testing only"
     },
     "intercom": {
         "mqtt": {
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "openADMS"
+            "topic": "openadms"
         }
     },
     "ports": {

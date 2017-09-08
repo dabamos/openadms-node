@@ -1,21 +1,21 @@
 {
     "modules": {
-        "com1": "modules.port.SerialPort",
-        "fileExporter": "modules.export.FileExporter",
-        "preProcessor": "modules.processing.PreProcessor",
-        "scheduler1": "modules.schedule.Scheduler"
+        "com1": "module.port.SerialPort",
+        "fileExporter": "module.export.FileExporter",
+        "preProcessor": "module.processing.PreProcessor",
+        "scheduler1": "module.schedule.Scheduler"
     },
     "project": {
-        "name": "Nivel210 Project",
-        "id": "nivel210",
-        "description": "Nivel210 test project"
+        "name": "My Project",
+        "id": "myproject",
+        "description": "project for testing only"
     },
     "intercom": {
         "mqtt": {
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/openADMS"
+            "topic": "openadms"
         }
     },
     "ports": {

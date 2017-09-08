@@ -21,8 +21,8 @@
         "shortMessageFormatter": "module.notification.AlertMessageFormatter"
     },
     "project": {
-        "name": "projectX",
-        "id": "projectX",
+        "name": "My Project",
+        "id": "myproject",
         "description": "project for testing only"
     },
     "intercom": {
@@ -30,7 +30,7 @@
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "98ca9b13-f1b0-4868-8a4e-615461a6093f/openADMS"
+            "topic": "openadms"
         }
     },
     "ports": {
