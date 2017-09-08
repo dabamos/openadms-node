@@ -1,0 +1,380 @@
+{
+    "name": "Leica Disto pro4a",
+    "type": "ldm",
+    "description": "Laser distance meter with RS-232 interface.",
+    "mode": "active",
+    "observations": {
+        "backlightOff": {
+            "description": "Turns backlight off.",
+            "requestSets": {
+                "backlightOff": {
+                    "request": "LIGHT 0\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "backlightOn": {
+            "description": "Turns the backlight on .",
+            "requestSets": {
+                "backlightOn": {
+                    "request": "LIGHT 1\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "beep": {
+            "description": "Beeps 500 ms.",
+            "requestSets": {
+                "beep": {
+                    "request": "BEEP 500\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "clearScreen": {
+            "description": "Clears screen.",
+            "requestSets": {
+                "clearScreen": {
+                    "request": "CDISP\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "disableOnlineMode": {
+            "description": "Disables online mode and returns to standard mode.",
+            "requestSets": {
+                "disableOnlineMode": {
+                    "request": "STD\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "displayString": {
+            "description": "Displays 'OpenADMS' on screen.",
+            "requestSets": {
+                "displayString": {
+                    "request": "DISPL 10 10 OpenADMS\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "enableOnlineMode": {
+            "description": "Enables online mode. Most commands need this mode activated!",
+            "requestSets": {
+                "enableOnlineMode": {
+                    "request": "EXT\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getBatteryCharge": {
+            "description": "Returns the battery charge [V].",
+            "requestSets": {
+                "getBatteryCharge": {
+                    "request": "v\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "996\\.{3}(?P<battery>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "battery": {
+                    "type": "integer",
+                    "unit": "none"
+                },
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getDateOfProduction": {
+            "description": "Returns the date of production (YYYYMMDD).",
+            "requestSets": {
+                "getDateOfProduction": {
+                    "request": "N03N\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "15\\.{4}(?P<productionDate>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "productionDate": {
+                    "type": "integer",
+                    "unit": "none"
+                },
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getDistance": {
+            "description": "Returns the distance (single measurement).",
+            "requestSets": {
+                "getDistance": {
+                    "request": "G\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "distance": {
+                    "type": "integer",
+                    "unit": "mm"
+                },
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getHardwareVersion": {
+            "description": "Returns the hardware version.",
+            "requestSets": {
+                "getHardwareVersion": {
+                    "request": "N01N\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "14\\.{4}(?P<hardwareVersion>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "hardwareVersion": {
+                    "type": "integer",
+                    "unit": "none"
+                },
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getSerialNumber": {
+            "description": "Returns the serial number.",
+            "requestSets": {
+                "getSerialNumber": {
+                    "request": "N02N\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "12\\.{4}(?P<serialNumber>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                },
+                "serialNumber": {
+                    "type": "integer",
+                    "unit": "none"
+                }
+            }
+        },
+        "getSoftwareVersion": {
+            "description": "Returns the software version.",
+            "requestSets": {
+                "getSoftwareVersion": {
+                    "request": "N00N\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "13\\.{4}(?P<softwareVersion>[+-]\\d{8}|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                },
+                "softwareVersion": {
+                    "type": "integer",
+                    "unit": "none"
+                }
+            }
+        },
+        "laserOff": {
+            "description": "Turns laser off.",
+            "requestSets": {
+                "laserOff": {
+                    "request": "p\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "laserOn": {
+            "description": "Turns laser on.",
+            "requestSets": {
+                "laserOn": {
+                    "request": "o\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "startSignalMeasurement": {
+            "description": "Starts signal [V] measurement (serial port mode must be set to passive). Use 'stop' to stop measurement.",
+            "requestSets": {
+                "startSignalMeasurement": {
+                    "request": "h\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "53\\.{4}(?P<signal>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                },
+                "signal": {
+                    "type": "integer",
+                    "unit": "V"
+                }
+            }
+        },
+        "startTracking": {
+            "description": "Starts tracking (serial port mode must be set to passive). Use 'stop' to stop measurement.",
+            "requestSets": {
+                "startTracking": {
+                    "request": "h\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "distance": {
+                    "type": "integer",
+                    "unit": "mm"
+                },
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "stop": {
+            "description": "Stops current measurement.",
+            "requestSets": {
+                "stop": {
+                    "request": "c\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "turnOff": {
+            "description": "Turns sensor off.",
+            "requestSets": {
+                "turnOff": {
+                    "request": "b\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "turnOn": {
+            "description": "Turns sensor on.",
+            "requestSets": {
+                "turnOn": {
+                    "request": "a\r",
+                    "responseDelimiter": "\n",
+                    "responsePattern": "(?P<returnCode>\\?|@E\\d{3}|)",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "returnCode": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        }
+    }
+}
