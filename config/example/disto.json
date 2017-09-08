@@ -3,7 +3,8 @@
         "com1": "module.port.SerialPort",
         "fileExporter": "module.export.FileExporter",
         "preProcessor": "module.processing.PreProcessor",
-        "scheduler1": "module.schedule.Scheduler"
+        "scheduler1": "module.schedule.Scheduler",
+        "unitConverter": "module.processing.UnitConverter"
     },
     "project": {
         "name": "My Project",
@@ -22,7 +23,6 @@
         "serial": {
             "com1": {
                 "port": "/dev/ttyU0",
-                "mode": "active",
                 "baudRate": 9600,
                 "byteSize": 8,
                 "stopBits": 1,
@@ -67,7 +67,7 @@
                     "responseSets": {
                         "distance": {
                             "type": "integer",
-                            "unit": "mm"
+                            "unit": "um"
                         },
                         "returnCode": {
                             "type": "string",
@@ -75,6 +75,44 @@
                         }
                     },
                     "sleepTime": 1.0
+                },
+                {
+                    "name": "startTracking",
+                    "description": "tracks distance",
+                    "receivers": [
+                        "preProcessor",
+                        "unitConverter",
+                        "fileExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": true,
+                    "passiveMode": true,
+                    "target": "disto",
+                    "requestsOrder": [
+                        "draft"
+                    ],
+                    "requestSets": {
+                        "draft": {
+                            "enabled": true,
+                            "request": "h\r",
+                            "responseDelimiter": "\r\n",
+                            "responsePattern": "^31\\.{2}\\d{2}(?P<distance>[+-]\\d{8})|(?P<returnCode>@E\\d{3})",
+                            "responseLength": 0,
+                            "timeout": 10.0
+                        }
+                    },
+                    "responseSets": {
+                        "distance": {
+                            "type": "integer",
+                            "unit": "um"
+                        },
+                        "returnCode": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 30.0
                 },
                 {
                     "name": "getStatus",
@@ -175,6 +213,7 @@
                     "target": "init",
                     "requestsOrder": [
                         "turnOn",
+                        "stop",
                         "enableOnlineMode",
                         "beep",
                         "backlightOn",
@@ -257,6 +296,14 @@
                             "responsePattern": "(?P<returnCode>\\?|@E\\d{3}|)",
                             "sleepTime": 3.0,
                             "timeout": 1.0
+                        },
+                        "stop": {
+                            "enabled": true,
+                            "request": "c\r",
+                            "responseDelimiter": "\n",
+                            "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
                         }
                     },
                     "responseSets": {
@@ -265,7 +312,7 @@
                             "unit": "none"
                         }
                     },
-                    "sleepTime": 10.0
+                    "sleepTime": 12.0
                 },
                 {
                     "name": "shutdown",
@@ -278,8 +325,8 @@
                     "onetime": true,
                     "target": "shutdown",
                     "requestsOrder": [
-                        "disableOnlineMode",
                         "stop",
+                        "disableOnlineMode",
                         "turnOff"
                     ],
                     "requestSets": {
@@ -296,7 +343,7 @@
                             "request": "c\r",
                             "responseDelimiter": "\n",
                             "responsePattern": "(?P<returnCode>\\?|@E\\d{3})",
-                            "sleepTime": 1.0,
+                            "sleepTime": 3.0,
                             "timeout": 1.0
                         },
                         "turnOff": {
@@ -331,11 +378,19 @@
                     "weekdays": {},
                     "observations": [
                         "init",
-                        "getStatus",
-                        "getDistance"
+                        "startTracking",
+                        "shutdown"
                     ]
                 }
             ]
+        }
+    },
+    "unitConverter": {
+        "distance": {
+            "conversionType": "scale",
+            "sourceUnit": "um",
+            "scalingValue": 0.0001,
+            "designatedUnit": "m"
         }
     },
     "fileExporter": {

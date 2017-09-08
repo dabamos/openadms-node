@@ -24,7 +24,6 @@
         "serial": {
             "com1": {
                 "port": "COM1",
-                "passive": true,
                 "baudRate": 9600,
                 "byteSize": 8,
                 "stopBits": 1,
