@@ -283,7 +283,8 @@
             }
         },
         "startSignalMeasurement": {
-            "description": "Starts signal [V] measurement (serial port mode must be set to passive). Use 'stop' to stop measurement.",
+            "description": "Starts signal [V] measurement (passive mode must be enabled). Use 'stop' to stop measurement.",
+            "passiveMode": true,
             "requestSets": {
                 "startSignalMeasurement": {
                     "request": "h\r",
@@ -304,7 +305,7 @@
             }
         },
         "startTracking": {
-            "description": "Starts tracking (serial port mode must be set to passive). Use 'stop' to stop measurement.",
+            "description": "Starts tracking (passive mode must be enabled). Use 'stop' to stop measurement.",
             "passiveMode": true,
             "requestSets": {
                 "startTracking": {

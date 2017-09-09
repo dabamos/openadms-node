@@ -286,8 +286,7 @@ class SerialPort(Prototype):
 
     Configuration:
         port: Name of the port (COMX or /dev/ttyX).
-        mode: Run serial port in 'active' or 'passive' mode.
-        maxAttemps: Maximum number of attempts.
+        maxAttempts: Maximum number of attempts.
         baudRate: Baud rate (e.g., 4800, 9600, or 115200).
         byteSize:: Start bits, either 5, 6, 7, or 8.
         stopBits: Stop bits, either 1 or 2.
@@ -323,7 +322,38 @@ class SerialPort(Prototype):
                              .format(self._serial_port_config.port))
             self._serial.close()
 
+    def _create(self) -> None:
+        """Opens a serial port."""
+        if not self._serial_port_config:
+            self._serial_port_config = self._get_port_config()
+
+        self.logger.info('Opening port "{}"'
+                         .format(self._serial_port_config.port))
+
+        try:
+            self._serial = serial.Serial(
+                port=self._serial_port_config.port,
+                baudrate=self._serial_port_config.baudrate,
+                timeout=self._serial_port_config.timeout,
+                bytesize=self._serial_port_config.bytesize,
+                parity=self._serial_port_config.parity,
+                stopbits=self._serial_port_config.stopbits,
+                xonxoff=self._serial_port_config.xonxoff,
+                rtscts=self._serial_port_config.rtscts)
+        except serial.serialutil.SerialException:
+            self.logger.error('Permission denied for port "{}"'
+                              .format(self._serial_port_config.port))
+
     def process_observation(self, obs: Observation) -> Observation:
+        """Processes an observation object. Sends request to sensor and stores
+        response.
+
+        Args:
+            obs: The observation object.
+
+        Returns:
+            The processed observation.
+        """
         # Turn on passive mode.
         if obs.get('passiveMode'):
             if self._is_passive:
@@ -443,10 +473,30 @@ class SerialPort(Prototype):
 
         return obs
 
+    def _get_port_config(self) -> SerialPortConfiguration:
+        if not self._config:
+            self.logger.debug('No port "{}" defined in configuration'
+                              .format(self.name))
+
+        return SerialPortConfiguration(
+            port=self._config.get('port'),
+            baudrate=self._config.get('baudRate'),
+            bytesize=self._config.get('byteSize'),
+            stopbits=self._config.get('stopBits'),
+            parity=self._config.get('parity'),
+            timeout=self._config.get('timeout'),
+            xonxoff=self._config.get('softwareFlowControl'),
+            rtscts=self._config.get('hardwareFlowControl')
+        )
+
     def listen(self, obs_draft: Observation) -> None:
         """Threaded method for passive mode. Reads incoming data from serial
         port. Used for sensors which start streaming data without prior
-        request."""
+        request.
+
+        Args:
+            obs_draft: The observation draft with the response pattern.
+        """
         while self._is_running and self._is_passive:
             if not obs_draft:
                 self.logger.warning('No observation set for passive listener of'
@@ -472,9 +522,9 @@ class SerialPort(Prototype):
 
             draft = obs.get('requestSets').get('draft')
 
-            timeout = draft.get('timeout')
-            response_delimiter = draft.get('responseDelimiter')
-            length = draft.get('responseLength')
+            timeout = draft.get('timeout', 1.0)
+            response_delimiter = draft.get('responseDelimiter', "")
+            length = draft.get('responseLength', 0)
             request = draft.get('request')
 
             if request and request != "":
@@ -493,48 +543,10 @@ class SerialPort(Prototype):
                 obs.set('timeStamp', str(arrow.utcnow()))
                 self.publish_observation(obs)
 
-    def _get_port_config(self) -> SerialPortConfiguration:
-        if not self._config:
-            self.logger.debug('No port "{}" defined in configuration'
-                              .format(self.name))
-
-        return SerialPortConfiguration(
-            port=self._config.get('port'),
-            baudrate=self._config.get('baudRate'),
-            bytesize=self._config.get('byteSize'),
-            stopbits=self._config.get('stopBits'),
-            parity=self._config.get('parity'),
-            timeout=self._config.get('timeout'),
-            xonxoff=self._config.get('softwareFlowControl'),
-            rtscts=self._config.get('hardwareFlowControl')
-        )
-
-    def _create(self) -> None:
-        """Opens a serial port."""
-        if not self._serial_port_config:
-            self._serial_port_config = self._get_port_config()
-
-        self.logger.info('Opening port "{}"'
-                         .format(self._serial_port_config.port))
-
-        try:
-            self._serial = serial.Serial(
-                port=self._serial_port_config.port,
-                baudrate=self._serial_port_config.baudrate,
-                timeout=self._serial_port_config.timeout,
-                bytesize=self._serial_port_config.bytesize,
-                parity=self._serial_port_config.parity,
-                stopbits=self._serial_port_config.stopbits,
-                xonxoff=self._serial_port_config.xonxoff,
-                rtscts=self._serial_port_config.rtscts)
-        except serial.serialutil.SerialException:
-            self.logger.error('Permission denied for port "{}"'
-                              .format(self._serial_port_config.port))
-
     def _read(self,
               eol: str = None,
               length: int = 0,
-              timeout: float = 30.0) -> str:
+              timeout: float = 10.0) -> str:
         """Reads from serial port."""
         response = ''
         start_time = time.time()
@@ -582,8 +594,3 @@ class SerialPort(Prototype):
     def _write(self, data: str) -> str:
         """Sends command to sensor."""
         self._serial.write(data.encode())
-
-    @property
-    def is_passive(self) -> bool:
-        """Returns whether or not the port is in passive mode."""
-        return self._is_passive

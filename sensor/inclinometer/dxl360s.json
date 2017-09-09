@@ -5,6 +5,7 @@
     "observations": {
         "getXY": {
             "description": "Observation template for passive communication with sensor.",
+            "passiveMode": true,
             "requestSets": {
                 "draft": {
                     "responsePattern": "X(?P<x>[+-]?\\d{4})Y(?P<y>[+-]?\\d{4})",
