@@ -10,7 +10,7 @@
     "project": {
         "name": "My Project",
         "id": "myproject",
-        "description": "project for testing only"
+        "description": "Project for testing a Leica Disto pro4a."
     },
     "intercom": {
         "mqtt": {
@@ -86,7 +86,8 @@
                     "receivers": [
                         "preProcessor",
                         "unitConverter",
-                        "fileExporter"
+                        "fileExporter",
+                        "couchDriver"
                     ],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -382,7 +383,8 @@
                     "weekdays": {},
                     "observations": [
                         "init",
-                        "getDistance",
+                        "getStatus",
+                        "startTracking",
                         "shutdown"
                     ]
                 }

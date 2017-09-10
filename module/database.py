@@ -28,7 +28,7 @@ import logging
 try:
     import couchdb
 except ImportError:
-    logging.getLogger().error('Importing Python module "couchdb" failed')
+    logging.getLogger().critical('Importing Python module "couchdb" failed')
 
 from core.manager import Manager
 from core.observation import Observation
@@ -36,6 +36,11 @@ from module.prototype import Prototype
 
 
 class CouchDriver(Prototype):
+    """
+    CouchDriver provides connectivity for Apache CouchDB. Observations send to
+    a CouchDriver instance will be saved in the database set in the
+    configuration. This module is for dumping observations only.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)

@@ -31,7 +31,7 @@ import paho.mqtt.client as mqtt
 try:
     from hbmqtt.broker import Broker
 except ImportError:
-    logging.getLogger().error('Importing Python module "HBMQTT" failed')
+    logging.getLogger().critical('Importing Python module "HBMQTT" failed')
 
 
 class MQTTMessageBroker(Thread):

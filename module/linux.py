@@ -34,7 +34,7 @@ import threading
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    logging.getLogger().error('Importing Python module "RPi.GPIO" failed')
+    logging.getLogger().critical('Importing Python module "RPi.GPIO" failed')
 
 from core.observation import Observation
 from core.manager import Manager
