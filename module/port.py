@@ -81,8 +81,8 @@ class BluetoothPort(Prototype):
         if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
             return s
         elif re.match(r'^[a-fA-F0-9]{12}$', s):
-            l = re.findall('..', s)
-            return '{}:{}:{}:{}:{}:{}'.format(*l)
+            f = re.findall('..', s)
+            return '{}:{}:{}:{}:{}:{}'.format(*f)
         else:
             return
 
@@ -106,7 +106,7 @@ class BluetoothPort(Prototype):
         if len(requests_order) == 0:
             self.logger.info('No requests order defined in observation "{}" '
                              'of target "{}"'.format(obs.get('name'),
-                                                   obs.get('target')))
+                                                     obs.get('target')))
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
@@ -114,9 +114,10 @@ class BluetoothPort(Prototype):
 
             if not request_set:
                 self.logger.error('Request set "{}" not found in observation '
-                                  '"{}" of target "{}"'.format(request_name,
-                                                             obs.get('name'),
-                                                             obs.get('target')))
+                                  '"{}" of target "{}"'
+                                  .format(request_name,
+                                          obs.get('name'),
+                                          obs.get('target')))
                 return
 
             # The response of the sensor.
@@ -141,7 +142,7 @@ class BluetoothPort(Prototype):
 
             self.logger.debug('Received response "{}" for request "{}" '
                               'of observation "{}" from sensor "{}"'
-                              .format(self._sanitize(response),
+                              .format(self.sanitize(response),
                                       request_name,
                                       obs.get('name'),
                                       obs.get('sensorName')))
@@ -167,8 +168,6 @@ class BluetoothPort(Prototype):
                                        socket.BTPROTO_RFCOMM)
             self._sock.connect((self._server_mac_address, self._port))
         except OSError as e:
-            self.logger.error(e)
-        except TimeoutError as e:
             self.logger.error(e)
 
     def _receive(self, eol: str, timeout: float = 30.0) -> str:
@@ -199,6 +198,13 @@ class BluetoothPort(Prototype):
                 break
 
         return response
+
+    def sanitize(self, s: str) -> str:
+        """Converts some non-printable characters of a given string."""
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')\
+                .strip()
 
     def _send(self, data: str) -> None:
         """Sends command to sensor."""
@@ -591,6 +597,6 @@ class SerialPort(Prototype):
                 .replace('\t', '\\t')\
                 .strip()
 
-    def _write(self, data: str) -> str:
+    def _write(self, data: str):
         """Sends command to sensor."""
         self._serial.write(data.encode())

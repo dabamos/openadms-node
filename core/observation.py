@@ -63,6 +63,7 @@ class Observation(object):
             }
         else:
             self._data = data
+            self._data.pop('description', None)     # Remove description text.
 
     @staticmethod
     def create_response_set(type: str,

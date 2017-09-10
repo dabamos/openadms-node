@@ -367,3 +367,4 @@ class UnitConverter(Prototype):
             Scaled value.
         """
         return value * factor
+

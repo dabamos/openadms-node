@@ -4,7 +4,8 @@
         "fileExporter": "module.export.FileExporter",
         "preProcessor": "module.processing.PreProcessor",
         "scheduler1": "module.schedule.Scheduler",
-        "unitConverter": "module.processing.UnitConverter"
+        "unitConverter": "module.processing.UnitConverter",
+        "couchDriver": "module.database.CouchDriver"
     },
     "project": {
         "name": "My Project",
@@ -45,12 +46,15 @@
                     "description": "gets inclination and temperature",
                     "receivers": [
                         "preProcessor",
-                        "fileExporter"
+                        "unitConverter",
+                        "fileExporter",
+                        "couchDriver"
                     ],
                     "nextReceiver": 0,
                     "enabled": true,
-                    "onetime": false,
+                    "onetime": true,
                     "target": "disto",
+                    "passiveMode": false,
                     "requestsOrder": [
                         "getDistance"
                     ],
@@ -74,7 +78,7 @@
                             "unit": "none"
                         }
                     },
-                    "sleepTime": 1.0
+                    "sleepTime": 3.0
                 },
                 {
                     "name": "startTracking",
@@ -378,7 +382,7 @@
                     "weekdays": {},
                     "observations": [
                         "init",
-                        "startTracking",
+                        "getDistance",
                         "shutdown"
                     ]
                 }
@@ -403,5 +407,13 @@
         "separator": ",",
         "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
         "saveObservationId": true
+    },
+    "couchDriver": {
+        "server": "10.0.0.1",
+        "port": 5984,
+        "tls": false,
+        "user": "client",
+        "password": "openadms",
+        "db": "openadms"
     }
 }
