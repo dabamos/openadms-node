@@ -217,7 +217,8 @@ class ModuleManager(object):
             try:
                 self.add(module_name, class_path)
             except Exception as e:
-                self.logger.error('Module "{}" not loaded {}'.format(module_name, e))
+                self.logger.error('Module "{}" not loaded{}'
+                                  .format(module_name, ': ' + e))
                 continue
 
     def add(self, module_name: str, class_path: str):
