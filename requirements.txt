@@ -1,5 +1,6 @@
 arrow>=0.10.0
 coloredlogs>=7.3
+couchdb>=1.1
 hbmqtt>=0.9
 jsonschema>=2.6.0
 paho-mqtt>=1.2
