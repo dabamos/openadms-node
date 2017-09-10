@@ -25,13 +25,12 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import copy
 import logging
 import threading
 import time
-import uuid
 
-from datetime import datetime
 from typing import *
 
 from core.manager import Manager
@@ -64,20 +63,15 @@ class Job(object):
         self.logger = logging.getLogger('job')
 
         # Used date and time formats.
-        self._date_fmt = '%Y-%m-%d'
-        self._time_fmt = '%H:%M:%S'
+        self._date_fmt = 'YYYY-MM-DD'
+        self._time_fmt = 'HH:mm:ss'
 
-        # Convert date to date and time (00: 00: 00).
-        self._start_date = self.get_datetime(start_date, self._date_fmt)
-        self._end_date = self.get_datetime(end_date, self._date_fmt)
-
-    def get_datetime(self, dt_str: str, dt_fmt: str) -> str:
-        """Converts a date string to a time stamp."""
-        return datetime.strptime(dt_str, dt_fmt)
+        self._start_date = arrow.get(start_date, self._date_fmt)
+        self._end_date = arrow.get(end_date, self._date_fmt)
 
     def has_expired(self) -> bool:
         """Checks if the job has expired."""
-        now = datetime.now()
+        now = arrow.now()
 
         if now > self._end_date:
             self.logger.debug('Job "{}" has expired'.format(self._name))
@@ -91,7 +85,7 @@ class Job(object):
         if not self._is_enabled:
             return False
 
-        now = datetime.now()
+        now = arrow.now()
 
         # Are we within the date range of the job?
         if self._start_date <= now < self._end_date:
@@ -100,7 +94,7 @@ class Job(object):
                 return True
 
             # Name of the current day (e.g., "monday").
-            current_day = now.strftime('%A').lower()
+            current_day = arrow.now().format('dddd').lower()
 
             # Ignore current day if it is not listed in the schedule.
             if current_day in self._weekdays:
@@ -116,10 +110,10 @@ class Job(object):
                 if len(periods) > 0:
                     for period in periods:
                         # Start and end time of the current day.
-                        start_time = self.get_datetime(period.get('startTime'),
-                                                       self._time_fmt).time()
-                        end_time = self.get_datetime(period.get('endTime'),
-                                                     self._time_fmt).time()
+                        start_time = arrow.get(period.get('startTime'),
+                                               self._time_fmt).time()
+                        end_time = arrow.get(period.get('endTime'),
+                                             self._time_fmt).time()
 
                         # Are we within the time range of the current day?
                         if start_time <= now.time() < end_time:
