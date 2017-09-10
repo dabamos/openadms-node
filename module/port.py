@@ -524,6 +524,7 @@ class SerialPort(Prototype):
                 self._serial.reset_input_buffer()
 
             obs = copy.deepcopy(obs_draft)
+            obs.set('id', Observation.get_new_id())
             obs.set('portName', self.name)
 
             draft = obs.get('requestSets').get('draft')
