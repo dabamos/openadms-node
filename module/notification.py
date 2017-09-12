@@ -65,6 +65,8 @@ class Alert(Prototype):
         root = logging.getLogger()
         root.addHandler(qh)
 
+        manager.schema_manager.add_schema('alert', 'alert.json')
+
         self._modules = config.get('modules')
 
     def fire(self, record: logging.LogRecord) -> None:
@@ -76,6 +78,8 @@ class Alert(Prototype):
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
+                self.logger.debug('Skipped module "{}" (not enabled)'
+                                  .format(module_name))
                 continue
 
             receivers = module.get('receivers').get(record.levelname.lower())
@@ -98,9 +102,9 @@ class Alert(Prototype):
 
     def run(self) -> None:
         while self.is_running:
-            log = self._queue.get()         # Blocking I/O.
+            record = self._queue.get()      # Blocking I/O.
             self.logger.info('Processing alert message')
-            self.fire(log)
+            self.fire(record)
 
     def start(self) -> None:
         if self._is_running:
@@ -188,10 +192,13 @@ class AlertMessageFormatter(Prototype):
         # Append the alert messages line by line to the body of the template.
         msg_body = ''
 
-        for key, value in alerts.items():
-            # Add the line to the message body.
+        for alert in alerts:
             line = self._templates.get('body')
-            msg_body += line.replace('{{' + key + '}}', value)
+
+            for key, value in alert.items():
+                line = line.replace('{{' + key + '}}', value)
+
+            msg_body += line
 
         # Concatenate the message parts.
         complete_msg = ''.join([msg_header,
@@ -279,6 +286,7 @@ class MailAgent(Prototype):
         self._x_mailer = 'OpenADMS {} Mail Agent'.format(OPENADMS_VERSION)
 
         self.add_handler('email', self.handle_mail)
+        manager.schema_manager.add_schema('email', 'email.json')
 
     def handle_mail(self,
                     header: Dict[str, Any],
@@ -305,7 +313,7 @@ class MailAgent(Prototype):
                      mail_to: str,
                      mail_subject: str,
                      mail_message: str) -> None:
-        """Sends emails by SMTP.
+        """Sends e-mails by SMTP.
 
         Args:
             mail_from: The sender of the email.
@@ -421,7 +429,7 @@ class ShortMessageAgent(Prototype):
             sock.send(message.encode())
 
             self.logger.debug('Closed connection to "{}:{}"'
-                     .format(self._host, self._port))
+                              .format(self._host, self._port))
 
 
 class Heartbeat(Prototype):
