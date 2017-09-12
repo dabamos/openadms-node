@@ -28,8 +28,6 @@ __license__ = 'EUPL'
 
 import re
 
-from typing import *
-
 from core.observation import Observation
 from core.manager import Manager
 from module.prototype import Prototype

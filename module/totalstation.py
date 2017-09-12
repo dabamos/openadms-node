@@ -52,10 +52,9 @@ class DistanceCorrector(Prototype):
         self._max_age = 3600
         # TODO ... maybe should be better part of the configuration?
 
-        self._is_atmospheric_correction =\
-            config.get('atmosphericCorrectionEnabled')
-        self._is_sea_level_correction =\
-            config.get('seaLevelCorrectionEnabled')
+        self._is_atmospheric_correction = config.get('atmospheric'
+                                                     'CorrectionEnabled')
+        self._is_sea_level_correction = config.get('seaLevelCorrectionEnabled')
 
         self._distance_name = config.get('distanceName')
         self._temperature = config.get('temperature')
@@ -169,21 +168,21 @@ class DistanceCorrector(Prototype):
     def _update_meteorological_data(self, obs: Observation) -> None:
         """Updates the temperature, air pressure, and humidity attributes by
         using the measured data of a weather station."""
-        # Temperature.
+        # Update temperature.
         t = obs.get_response_value('temperature')
 
         if t is not None:
             self.temperature = t
 
-        # Pressure.
+        # Update pressure.
         p = obs.get_response_value('pressure')
 
         if p is not None:
             self.pressure = p
 
-        # Humidity.
+        # Update humidity.
         if obs.has_response_value('humidity') and\
-            obs.has_response_type('humidity'):
+           obs.has_response_type('humidity'):
             h = obs.get_response_value('humidity')
             u = obs.get_response_unit('humidity')
 
@@ -386,7 +385,7 @@ class HelmertTransformer(Prototype):
         if None in [hz, v, dist]:
             self.logger.warning('Hz, V, or distance is missing in observation '
                                 '"{}" of target "{}"'.format(obs.get('name'),
-                                                           obs.get('target')))
+                                                             obs.get('target')))
             return obs
 
         # Calculate the coordinates in the global system (X, Y, Z).
@@ -582,16 +581,19 @@ class HelmertTransformer(Prototype):
 
         # Scale factor.
         m = math.sqrt((self._a * self._a) + (self._o * self._o))
-        self.logger.debug('Calculated scale factor (m = {})'
-                          .format(round(m, 5)))
+        self.logger.debug('Calculated scale factor (m = {:1.5f})'
+                          .format(m))
 
         # Create response sets for the view point.
         response_sets = {
-            'x': Observation.create_response_set('float', 'm',
+            'x': Observation.create_response_set('float',
+                                                 'm',
                                                  self._view_point['x']),
-            'y': Observation.create_response_set('float', 'm',
+            'y': Observation.create_response_set('float',
+                                                 'm',
                                                  self._view_point['y']),
-            'z': Observation.create_response_set('float', 'm',
+            'z': Observation.create_response_set('float',
+                                                 'm',
                                                  self._view_point['z']),
             'stdDevX': Observation.create_response_set('float', 'm', sx),
             'stdDevY': Observation.create_response_set('float', 'm', sy),
@@ -751,7 +753,7 @@ class PolarTransformer(Prototype):
     def _is_valid_sensor_type(self, obs):
         sensor_type = obs.get('sensorType')
 
-        if not SensorType.is_total_station(sensor_type.lower()):
+        if not SensorType.is_total_station(sensor_type):
             self.logger.error('Sensor type "{}" is not supported'
                               .format(sensor_type))
             return False
@@ -1017,7 +1019,7 @@ class SerialMeasurementProcessor(Prototype):
                                                               hz)
         response_sets['v'] = Observation.create_response_set('float',
                                                              'rad',
-                                                              v)
+                                                             v)
         response_sets['slopeDist'] = Observation.create_response_set('float',
                                                                      'm',
                                                                      dist)
@@ -1027,4 +1029,3 @@ class SerialMeasurementProcessor(Prototype):
                           .format(obs.get('name'), obs.get('target')))
 
         return obs
-

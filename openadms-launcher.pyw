@@ -42,8 +42,8 @@ logger = logging.getLogger()
 
 @Gooey(advanced=True,
        language='english',
-       program_name=('OpenADMS {} '
-                     '- Open Automatic Deformation Monitoring System'
+       program_name=('OpenADMS {} - '
+                     'Open Automatic Deformation Monitoring System'
                      .format(System.get_openadms_version())),
        default_size=(610, 580),
        monospace_display=True,

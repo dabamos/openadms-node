@@ -230,7 +230,7 @@ class ModuleManager(object):
             class_path: Path to the Python class.
 
         Returns:
-            True of module has been added, False if not.
+            True if module has been added, False if not.
 
         Raises:
             ValueError: If module file not exists.
@@ -266,14 +266,6 @@ class ModuleManager(object):
             List of module names.
         """
         return self._modules.keys()
-
-    def get_root_dir(self) -> Path:
-        """Returns the root directory of OpenADMS.
-
-        Returns:
-            Path object.
-        """
-        return Path(__file__).parent.parent
 
     def get_worker(self, module_name: str, class_path: str) -> Prototype:
         """Loads a Python class from a given path and returns the instance.
@@ -426,7 +418,7 @@ class SchemaManager(object):
         Args:
             data_type: The name of the data type (e.g., 'observation').
             path: The path to the JSON schema file.
-            root: The root directory (default: 'schema').
+            root: The root directory (default: './schema').
 
         Returns:
             True if schema has been added, False if not.

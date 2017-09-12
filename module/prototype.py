@@ -200,7 +200,7 @@ class Prototype(object):
         Returns:
             The processed observation object.
         """
-        pass
+        return obs
 
     def publish(self, target: str, header: Dict, payload: Dict) -> None:
         """Appends header and payload to a list, converts the list to a JSON
@@ -252,9 +252,9 @@ class Prototype(object):
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            self.logger.debug('Observation "{}" of target "{}" has been finished'
-                              .format(obs.get('name'),
-                                      obs.get('target')))
+            self.logger.debug('Observation "{}" of target "{}" has been '
+                              'finished'.format(obs.get('name'),
+                                                obs.get('target')))
             return
 
         # Name of the sending module.

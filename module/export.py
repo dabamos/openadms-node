@@ -30,7 +30,6 @@ import copy
 
 from enum import Enum
 from pathlib import Path
-from typing import *
 
 from core.manager import Manager
 from core.observation import Observation

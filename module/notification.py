@@ -67,40 +67,42 @@ class Alert(Prototype):
 
         self._modules = config.get('modules')
 
-    def fire(self, log):
+    def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
-        header = {'type': 'alert'}
+        header = {
+            'type': 'alert'
+        }
 
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
                 continue
 
-            receivers = module.get('receivers').get(log.levelname.lower())
+            receivers = module.get('receivers').get(record.levelname.lower())
 
             if not receivers or len(receivers) == 0:
                 self.logger.debug('No receivers defined for log level "{}"'
-                                  .format(log.levelname.lower()))
+                                  .format(record.levelname.lower()))
                 continue
 
             # Publish a single message for each receiver.
             for receiver in receivers:
                 payload = {
-                    'dt': log.asctime,
-                    'level': log.levelname.lower(),
-                    'message': log.message,
+                    'dt': record.asctime,
+                    'level': record.levelname.lower(),
+                    'message': record.message,
                     'receiver': receiver
                 }
 
                 self.publish(module_name, header, payload)
 
-    def run(self):
+    def run(self) -> None:
         while self.is_running:
             log = self._queue.get()         # Blocking I/O.
             self.logger.info('Processing alert message')
             self.fire(log)
 
-    def start(self):
+    def start(self) -> None:
         if self._is_running:
             return
 

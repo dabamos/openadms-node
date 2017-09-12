@@ -30,6 +30,8 @@ import arrow
 import uptime
 #import psutil
 
+from pathlib import Path
+
 from core.version import *
 
 
@@ -48,6 +50,15 @@ class System(object):
 #            Float with the CPU load (between 0.0 and 100.0).
 #        """
 #        return psutil.cpu_percent(interval=0.1)
+
+    @staticmethod
+    def get_current_year() -> int:
+        """Returns the current year.
+
+        Returns:
+            Current year.
+        """
+        return arrow.now().year
 
     @staticmethod
     def get_date_time() -> str:
@@ -133,6 +144,15 @@ class System(object):
                               platform.python_version())
 
     @staticmethod
+    def get_root_dir() -> Path:
+        """Returns the root directory of OpenADMS.
+
+        Returns:
+            Path object.
+        """
+        return Path(__file__).parent.parent
+
+    @staticmethod
     def get_system_string() -> str:
         """Returns a string containing operating system and hardware
         architecture (e.g., 'Windows 7 (AMD64)').
@@ -174,15 +194,6 @@ class System(object):
         d, h = divmod(h, 24)
 
         return u.format(d, h, m, s)
-
-    @staticmethod
-    def get_current_year() -> int:
-        """Returns the current year.
-
-        Returns:
-            Current year.
-        """
-        return arrow.now().year
 
 #    @staticmethod
 #    def get_used_memory():

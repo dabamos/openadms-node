@@ -1421,6 +1421,7 @@
         }
     },
     "alert": {
+        "enabled": false,
         "modules": {
             "shortMessageFormatter": {
                 "enabled": false,

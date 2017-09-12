@@ -25,13 +25,10 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import logging
-
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from string import Template
 from threading import Thread
-from typing import *
 from urllib import parse
 
 from core.logging import *
@@ -240,7 +237,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
             'python_version': System.get_python_version(),
-            'root_dir': self._module_manager.get_root_dir(),
+            'root_dir': System.get_root_dir(),
             'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
             'uptime': System.get_uptime_string(),

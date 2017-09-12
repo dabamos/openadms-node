@@ -23,7 +23,6 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-
 import logging
 
 from collections import deque
@@ -143,4 +142,3 @@ class RingBufferLogHandler(logging.Handler):
     @property
     def size(self) -> int:
         return self._size
-
