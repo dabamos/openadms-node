@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/email.json",
+    "properties": {
+        "subject": {
+            "id": "/properties/subject",
+            "type": "string"
+        },
+        "from": {
+            "id": "/properties/from",
+            "type": "string"
+        },
+        "to": {
+            "id": "/properties/to",
+            "type": "string"
+        },
+        "message": {
+            "id": "/properties/message",
+            "type": "string"
+        }
+    },
+    "required": [
+        "subject",
+        "from",
+        "to",
+        "message"
+    ],
+    "type": "object"
+}

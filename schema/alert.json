@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/alert.json",
+    "properties": {
+        "dt": {
+            "id": "/properties/dt",
+            "type": "string"
+        },
+        "level": {
+            "id": "/properties/level",
+            "type": "string"
+        },
+        "message": {
+            "id": "/properties/message",
+            "type": "string"
+        },
+        "receiver": {
+            "id": "/properties/receiver",
+            "type": "string"
+        }
+    },
+    "required": [
+        "dt",
+        "level",
+        "message",
+        "receiver"
+    ],
+    "type": "object"
+}
