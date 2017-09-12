@@ -23,17 +23,16 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+
 import logging
 
 from collections import deque
-from queue import Queue
-from threading import Thread
 from typing import *
 
 
 class RootFilter(logging.Filter):
 
-    def filter(self, record: Type[logging.LogRecord]) -> bool:
+    def filter(self, record: logging.LogRecord) -> bool:
         """Returns whether a logging.LogRecord should be logged."""
         if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
             return False
@@ -43,8 +42,9 @@ class RootFilter(logging.Filter):
 
 class RingBuffer(object):
     """
-    RingBuffer stores elements in a deque. It is used to cache a number of
-    elements, while older ones get overwritten automatically.
+    RingBuffer stores elements in a deque. It is a FIFO list with fixed size to
+    cache a number of elements, like log messages. The oldest elements get
+    removed when the number of elements is greater than the maximum length.
     """
 
     def __init__(self, max_length: int):
@@ -87,63 +87,60 @@ class RingBuffer(object):
         return '\n'.join(self.get())
 
 
-class RingBufferLogHandler(object):
+class StringFormatter(logging.Formatter):
     """
-    RingBufferLogHandler stores log messages in a `RingBuffer` with a fixed
-    length.
+    StringFormatter simply returns a formatted string of a log record.
     """
 
-    def __init__(self, size: int, log_level: int):
+    def __init__(self):
+        super().__init__()
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Return formatted string of log record.
+
+        Args:
+            record: The log record.
+
+        Returns:
+            Formatted string of log record.
+        """
+        s = '{} - {:>8} - {:>26} - {}'.format(record.asctime,
+                                              record.levelname,
+                                              record.name,
+                                              record.message)
+
+        return s
+
+
+class RingBufferLogHandler(logging.Handler):
+    """
+    RingBufferLogHandler stores a number of log messages in a `RingBuffer`.
+    """
+
+    def __init__(self,  level: int, size: int):
+        """
+        Args:
+            level: The log level.
+            size: The size of the `RingBuffer`.
+        """
+        super().__init__(level)
+
         self._size = size
         self._buffer = RingBuffer(self._size)
-        self._queue = Queue(self._size)
 
-        self._handler = logging.handlers.QueueHandler(self._queue)
+    def emit(self, record: logging.LogRecord) -> None:
+        """Adds a log record to the internal ring buffer.
 
-        # Add logging filter.
-        self._handler.addFilter(RootFilter())
-
-        level = {
-            1: logging.CRITICAL,
-            2: logging.ERROR,
-            3: logging.WARNING,
-            4: logging.INFO,
-            5: logging.DEBUG
-        }.get(log_level, 4)
-
-        self._handler.setLevel(level)
-
-        fmt = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
-        formatter = logging.Formatter(fmt)
-        self._handler.setFormatter(formatter)
-
-        root = logging.getLogger()
-        root.addHandler(self._handler)
-
-        self._is_running = True
-        self._thread = Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
-    def __del__(self):
-        self._is_running = False
-
-    def run(self) -> None:
-        while self._is_running:
-            log_record = self._queue.get()  # Blocking I/O.
-            s = '{} - {:>8} - {:>26} - {}'.format(log_record.asctime,
-                                                  log_record.levelname,
-                                                  log_record.name,
-                                                  log_record.message)
-            self._buffer.append(s)
+        Args:
+            record: The log record.
+        """
+        log_entry = self.format(record)
+        self._buffer.append(log_entry)
 
     def get_logs(self) -> str:
         return self._buffer.to_string()
 
     @property
-    def is_running(self) -> bool:
-        return self._is_running
-
-    @property
     def size(self) -> int:
         return self._size
+

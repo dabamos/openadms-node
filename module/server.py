@@ -25,7 +25,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import logging.handlers
+import logging
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
@@ -34,7 +34,7 @@ from threading import Thread
 from typing import *
 from urllib import parse
 
-from core.logging import RingBufferLogHandler
+from core.logging import *
 from core.manager import Manager
 from core.system import System
 from module.prototype import Prototype
@@ -64,8 +64,16 @@ class LocalControlServer(Prototype):
         self._thread = Thread(target=self.run)
         self._thread.daemon = True
 
-        # Store the last 50 log messages of level 4 ("INFO").
-        log_handler = RingBufferLogHandler(size=50, log_level=4)
+        # Store the last 50 log messages of level INFO.
+        log_handler = RingBufferLogHandler(logging.INFO, 50)
+        log_formatter = StringFormatter()
+
+        log_handler.addFilter(RootFilter())
+        log_handler.setFormatter(log_formatter)
+
+        # Add log handler to root handler.
+        root = logging.getLogger()
+        root.addHandler(log_handler)
 
         # Custom request handler of the HTTP server.
         def handler(*args):
@@ -109,7 +117,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     def __init__(self,
                  manager: Manager,
-                 log_handler: Type[RingBufferLogHandler],
+                 log_handler: RingBufferLogHandler,
                  *args):
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
@@ -331,7 +339,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
     def parse(self, template: str, vars: Dict[str, str]) -> str:
-        """Substitudes placeholders in the template with variables from the
+        """Substitutes placeholders in the template with variables from the
         given dictionary.
 
         Args:
