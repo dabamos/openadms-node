@@ -21,12 +21,13 @@ limitations under the Licence.
 
 """Setup for cx_Freeze
 
-This script creates executables for OpenADMS by using cx_Freeze. Just run:
+This script creates executables for Microsoft Windows by using cx_Freeze.
+Just run
 
-    $ python setup.py
+    $ python setup.py build
 
-All files are stored in the sub-folder `dist`. For more information, please see
-https://www.dabamos.de/.
+or start the batch file `win_make.bat`. All files are stored in the sub-folder
+`dist`. For more information, please see https://www.dabamos.de/.
 """
 
 __author__ = 'Philipp Engel'
