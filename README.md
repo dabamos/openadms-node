@@ -26,8 +26,8 @@ The current development version of OpenADMS is 0.6 (code name “Fukuyama”). For
 more information, please see https://www.dabamos.de/.
 
 ## Installation
-Before you can start OpenADMS, you have to clone the master branch and install
-all dependencies:
+The latest source version of OpenADMS can be obtained by cloning the master
+branch and installing the required dependencies with `pip`:
 ```
 $ git clone https://github.com/dabamos/openadms.git
 $ cd openadms
@@ -49,6 +49,7 @@ OpenADMS depends on the following Python libraries:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
+* [couchdb](https://pypi.python.org/pypi/couchdb) (BSD Licence)
 * [hbmqtt](https://pypi.python.org/pypi/hbmqtt) (MIT Licence)
 * [jsonschema](https://pypi.python.org/pypi/jsonschema) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
