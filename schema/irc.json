@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/irc.json",
+    "properties": {
+        "message": {
+            "id": "/properties/message",
+            "type": "string"
+        },
+        "target": {
+            "id": "/properties/target",
+            "type": "string"
+        }
+    },
+    "required": [
+        "message",
+        "target"
+    ],
+    "type": "object"
+}

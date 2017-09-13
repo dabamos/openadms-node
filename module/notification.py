@@ -29,6 +29,7 @@ import logging
 import queue
 import smtplib
 import socket
+import ssl
 import threading
 import time
 
@@ -45,9 +46,9 @@ from core.version import *
 from module.prototype import Prototype
 
 
-class Alert(Prototype):
+class Alerter(Prototype):
     """
-    Alert is used to send warning and error messages to other modules.
+    Alerter is used to send warning and error messages to other modules.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -163,7 +164,10 @@ class AlertMessageFormatter(Prototype):
     def process_alert_messages(self,
                                receiver: str,
                                alerts: List[Dict[str, str]]) -> None:
-        """
+        """Parses a template and fills values of an alert message into header,
+        body, and footer. The parsed template is forwarded to an agent (e-mail,
+        SMS, ...).
+
         Args:
             receiver: The receiver of the alert.
             alerts: The list of alert messages.
@@ -182,8 +186,8 @@ class AlertMessageFormatter(Prototype):
             properties[prop_name] = prop.replace('{{receiver}}', receiver)
 
         # Load the templates
-        msg_header = self._templates.get('header')
-        msg_footer = self._templates.get('footer')
+        msg_header = self._templates.get('header', '')
+        msg_footer = self._templates.get('footer', '')
 
         # Parse the header and the footer.
         msg_header = msg_header.replace('{{receiver}}', receiver)
@@ -214,7 +218,7 @@ class AlertMessageFormatter(Prototype):
 
     def run(self) -> None:
         # Dictionary for caching alert messages. Stores a list of dictionaries:
-        # '<receiver_name>': [<msg_1>, <msg_2>, ..., <msg_n>]
+        # '<receiver_name>': [<dict_1>, <dict_2>, ..., <dict_n>]
         cache = {}
 
         while self._is_running:
@@ -239,6 +243,7 @@ class AlertMessageFormatter(Prototype):
                 if len(cache) > 0:
                     for receiver, messages in cache.items():
                         if not messages or len(messages) == 0:
+                            # No messages for receiver.
                             continue
 
                         self.process_alert_messages(receiver, messages)
@@ -266,6 +271,205 @@ class AlertMessageFormatter(Prototype):
             self._thread.start()
 
 
+class Heartbeat(Prototype):
+    """
+    Heartbeat sends heartbeat messages ("pings") to the message broker.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self._config_manager.get(self._name)
+
+        self._receivers = config.get('receivers')
+        self._interval = config.get('interval')
+
+        self._thread = None
+        self._header = {'type': 'heartbeat'}
+
+        self.add_handler('heartbeat', self.process_heartbeat)
+
+    def process_heartbeat(self,
+                          header: Dict[str, Any],
+                          payload: Dict[str, Any]) -> None:
+        self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
+                         .format(payload.get('dt'),
+                                 payload.get('projectId')))
+
+    def run(self, sleep_time: float = 0.5) -> None:
+        project_id = self._config_manager.config.get('project').get('id')
+
+        if not project_id:
+            self.logger.warning('No project ID set in configuration')
+            project_id = ''
+
+        while not self._uplink:
+            time.sleep(sleep_time)
+
+        while True:
+            payload = {
+                'dt': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
+                'projectId': project_id
+            }
+
+            for target in self._receivers:
+                self.publish(target, self._header, payload)
+
+            time.sleep(self._interval)
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        # self.logger.debug('Starting worker "{}"'
+        #                   .format(self._name))
+        self._is_running = True
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+
+class HeartbeatMonitor(Prototype):
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+
+        # Capture messages of type 'heartbeat'.
+        self.add_handler('heartbeat', self.handle_heartbeat)
+
+    def handle_heartbeat(self,
+                         header: Dict[str, Any],
+                         payload: Dict[str, Any]) -> None:
+        pass
+
+
+class IrcClient(Prototype):
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self._config_manager.get(self._name)
+
+        self._hostname = config.get('server')
+        self._port = config.get('port', 6667)
+        self._is_tls = config.get('tls', False)
+        self._nickname = config.get('nickname', 'openadms')
+        self._password = config.get('password')
+        self._target = config.get('target')
+        self._channel = config.get('channel')
+
+        if not self._channel.startswith('#'):
+            self._channel = '#' + self._channel
+
+        self._conn = None
+        self._thread = None
+        self._queue = queue.Queue(-1)
+
+        self.add_handler('irc', self.handle_irc)
+        manager.schema_manager.add_schema('irc', 'irc.json')
+
+    def __del__(self):
+        self._disconnect()
+
+    def _connect(self) -> None:
+        self._disconnect()
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        if self._is_tls:
+            context = ssl.create_default_context()
+            self._conn = context.wrap_socket(sock,
+                                             server_hostname=self._hostname)
+        else:
+            self._conn = sock
+
+        self.logger.info('Connecting to "{}:{}"'.format(self._hostname,
+                                                        self._port))
+        self._conn.connect((self._hostname, self._port))
+
+    def _disconnect(self) -> None:
+        if self._conn:
+            self._send('QUIT\r\n')
+            self._conn.shutdown()
+            self._conn.close()
+
+    def handle_irc(self,
+                   header: Dict[str, Any],
+                   payload: Dict[str, Any]) -> None:
+        """Handles messages of type `irc` and forwards them to the
+        `process_irc()` method.
+
+        Args:
+            header: The message header.
+            payload: The message payload.
+        """
+        self.process_irc(payload)
+
+    def _init(self) -> None:
+        self._receive()
+
+        if self._password:
+            self._send('PASS {}\r\n'.format(self._password))
+
+        self._send('NICK {}\r\n'.format(self._nickname))
+        self._send('USER {} {} {} :{}\r\n'.format(self._nickname,
+                                                  self._nickname,
+                                                  self._nickname,
+                                                  'OpenADMS IRC Client'))
+
+        if self._channel and self._channel != '':
+            self.logger.info('Joining channel "{}" on "{}"'
+                             .format(self._channel,
+                                     self._hostname))
+            self._send('JOIN {}\r\n'.format(self._channel))
+
+    def _priv_msg(self, target: str, message: str) -> None:
+        self._send('PRIVMSG {} :{}\r\n'.format(target, message))
+
+    def process_irc(self, payload: Dict[str, Any]) -> None:
+        self._queue.put(payload)
+        self.logger.info('Added "{}" to queue'.format(payload.get('message')))
+
+    def _receive(self, buffer_size: int = 4096) -> str:
+        return self._conn.recv(buffer_size).decode('utf-8')
+
+    def run(self) -> None:
+        while self._is_running:
+            if not self._conn:
+                self._connect()
+                self._init()
+
+            if not self._queue.empty():
+                item = self._queue.get_nowait()
+                target = item.get('target', self._target)
+                message = item.get('message', '')
+
+                self._priv_msg(target, message)
+                self.logger.debug('Sent alert message "{}" to target "{}" on '
+                                  'network "{}"'.format(message,
+                                                        target,
+                                                        self._hostname))
+
+            data = self._receive()
+
+            if data.startswith('PING'):
+                self._send('PONG ' + data.split()[1] + '\r\n')
+
+            time.sleep(0.1)
+
+        self._disconnect()
+
+    def _send(self, message: str) -> None:
+        self._conn.send(message.encode('utf-8'))
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        self._is_running = True
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+
 class MailAgent(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -291,7 +495,7 @@ class MailAgent(Prototype):
     def handle_mail(self,
                     header: Dict[str, Any],
                     payload: Dict[str, Any]) -> None:
-        """Handles messages of type`email` and forwards them to the
+        """Handles messages of type `email` and forwards them to the
         `process_mail()` method.
 
         Args:
@@ -430,74 +634,3 @@ class ShortMessageAgent(Prototype):
 
             self.logger.debug('Closed connection to "{}:{}"'
                               .format(self._host, self._port))
-
-
-class Heartbeat(Prototype):
-    """
-    Heartbeat sends heartbeat messages ("pings") to the message broker.
-    """
-
-    def __init__(self, module_name: str, module_type: str, manager: Manager):
-        super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
-
-        self._receivers = config.get('receivers')
-        self._interval = config.get('interval')
-
-        self._thread = None
-        self._header = {'type': 'heartbeat'}
-
-        self.add_handler('heartbeat', self.process_heartbeat)
-
-    def process_heartbeat(self,
-                          header: Dict[str, Any],
-                          payload: Dict[str, Any]) -> None:
-        self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
-                         .format(payload.get('dt'),
-                                 payload.get('projectId')))
-
-    def run(self, sleep_time: float = 0.5) -> None:
-        project_id = self._config_manager.config.get('project').get('id')
-
-        if not project_id:
-            self.logger.warning('No project ID set in configuration')
-            project_id = ''
-
-        while not self._uplink:
-            time.sleep(sleep_time)
-
-        while True:
-            payload = {
-                'dt': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
-                'projectId': project_id
-            }
-
-            for target in self._receivers:
-                self.publish(target, self._header, payload)
-
-            time.sleep(self._interval)
-
-    def start(self) -> None:
-        if self._is_running:
-            return
-
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
-        self._is_running = True
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
-
-class HeartbeatMonitor(Prototype):
-
-    def __init__(self, module_name: str, module_type: str, manager: Manager):
-        super().__init__(module_name, module_type, manager)
-
-        # Capture messages of type 'heartbeat'.
-        self.add_handler('heartbeat', self.handle_heartbeat)
-
-    def handle_heartbeat(self,
-                         header: Dict[str, Any],
-                         payload: Dict[str, Any]) -> None:
-        pass

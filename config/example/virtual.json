@@ -1,8 +1,10 @@
 {
     "modules": {
-        "alert": "module.notification.Alert",
+        "alerter": "module.notification.Alerter",
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
+        "ircClient": "module.notification.IrcClient",
+        "ircFormatter": "module.notification.AlertMessageFormatter",
         "mailAgent": "module.notification.MailAgent",
         "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
@@ -1420,20 +1422,27 @@
             ]
         }
     },
-    "alert": {
-        "enabled": false,
+    "alerter": {
+        "enabled": true,
         "modules": {
+            "mailFormatter": {
+                "enabled": false,
+                "receivers": {
+                    "error": ["monitoring@example.com"]
+                }
+            },
+            "ircFormatter": {
+                "enabled": true,
+                "receivers": {
+                    "error": ["#dabamos"],
+                    "critical": ["#dabamos"]
+                }
+            },
             "shortMessageFormatter": {
                 "enabled": false,
                 "receivers": {
                     "error": ["+49152 0987654"],
                     "critical": ["+49152 0987654"]
-                }
-            },
-            "mailFormatter": {
-                "enabled": false,
-                "receivers": {
-                    "error": ["monitoring@example.com"]
                 }
             }
         }
@@ -1442,6 +1451,7 @@
         "messageCollectionEnabled": false,
         "messageCollectionTime": 0,
         "type": "email",
+        "receiver": "mailAgent",
         "templates": {
             "header": "The following incident(s) occurred:\n\n",
             "body": "{{dt}} - {{level}} - {{message}}\n",
@@ -1453,10 +1463,23 @@
             "to": "{{receiver}}"
         }
     },
+    "ircFormatter": {
+        "messageCollectionEnabled": false,
+        "messageCollectionTime": 0,
+        "type": "irc",
+        "receiver": "ircClient",
+        "templates": {
+            "body": "{{dt}} - {{level}} - {{message}}"
+        },
+        "properties": {
+            "target": "{{receiver}}"
+        }
+    },
     "shortMessageFormatter": {
         "messageCollectionEnabled": false,
         "messageCollectionTime": 0,
         "type": "sms",
+        "receiver": "smsAgent",
         "templates": {
             "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
             "body": "{{dt}} - {{level}} - {{message}}",
@@ -1484,6 +1507,20 @@
         "port": 465,
         "tls": true,
         "startTls": false
+    },
+    "ircClient": {
+        "server": "irc.freenode.net",
+        "port": 6697,
+        "tls": true,
+        "nickname": "openadms",
+        "password": null,
+        "target": "#test",
+        "channel": "#test"
+    },
+    "gpioController": {
+        "pin": 17,
+        "defaultState": 0,
+        "duration": 10
     },
     "distanceCorrector": {
         "distanceName": "slopeDist",
