@@ -343,6 +343,9 @@ class HeartbeatMonitor(Prototype):
 
 
 class IrcClient(Prototype):
+    """
+    IrcClient sends alert messages to an IRC channel or user.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
@@ -369,12 +372,17 @@ class IrcClient(Prototype):
     def __del__(self):
         self._disconnect()
 
-    def _connect(self) -> None:
+    def _connect(self, is_tls: bool = False) -> None:
+        """Creates socket connection to IRC server.
+
+        Args:
+            is_tls: If True, use TLS encrypted connection.
+        """
         self._disconnect()
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        if self._is_tls:
+        if is_tls:
             context = ssl.create_default_context()
             self._conn = context.wrap_socket(sock,
                                              server_hostname=self._hostname)
@@ -386,6 +394,7 @@ class IrcClient(Prototype):
         self._conn.connect((self._hostname, self._port))
 
     def _disconnect(self) -> None:
+        """Disconnects from IRC server and closes socket connection."""
         if self._conn:
             self._send('QUIT\r\n')
             self._conn.shutdown()
@@ -404,6 +413,7 @@ class IrcClient(Prototype):
         self.process_irc(payload)
 
     def _init(self) -> None:
+        """Enters IRC server and joins channel."""
         self._receive()
 
         if self._password:
@@ -422,19 +432,39 @@ class IrcClient(Prototype):
             self._send('JOIN {}\r\n'.format(self._channel))
 
     def _priv_msg(self, target: str, message: str) -> None:
+        """Sends message to channel or user.
+
+        Args:
+            target: The channel or user name.
+            message: The message to send.
+        """
         self._send('PRIVMSG {} :{}\r\n'.format(target, message))
 
     def process_irc(self, payload: Dict[str, Any]) -> None:
+        """Puts alert message on queue.
+
+        Args:
+            payload: Dictionary with target and message.
+        """
         self._queue.put(payload)
-        self.logger.info('Added "{}" to queue'.format(payload.get('message')))
 
     def _receive(self, buffer_size: int = 4096) -> str:
+        """Receives message from server.
+
+        Args:
+            buffer_size: The buffer size.
+
+        Returns:
+            String with the message.
+        """
         return self._conn.recv(buffer_size).decode('utf-8')
 
     def run(self) -> None:
+        """Connects to IRC server, enters channel, and sends messages. Reacts
+        to PING messages by the server."""
         while self._is_running:
             if not self._conn:
-                self._connect()
+                self._connect(self._is_tls)
                 self._init()
 
             if not self._queue.empty():
@@ -458,6 +488,11 @@ class IrcClient(Prototype):
         self._disconnect()
 
     def _send(self, message: str) -> None:
+        """Sends message to server.
+
+        Args:
+            message: The message string.
+        """
         self._conn.send(message.encode('utf-8'))
 
     def start(self) -> None:
