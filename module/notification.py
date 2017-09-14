@@ -383,7 +383,8 @@ class IrcClient(Prototype):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         if is_tls:
-            context = ssl.create_default_context()
+            context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+            context.load_default_certs()
             self._conn = context.wrap_socket(sock,
                                              server_hostname=self._hostname)
         else:
@@ -391,7 +392,10 @@ class IrcClient(Prototype):
 
         self.logger.info('Connecting to "{}:{}"'.format(self._hostname,
                                                         self._port))
-        self._conn.connect((self._hostname, self._port))
+        try:
+            self._conn.connect((self._hostname, self._port))
+        except ssl.SSLError:
+            self.logger.error('SSL certificate verification failed')
 
     def _disconnect(self) -> None:
         """Disconnects from IRC server and closes socket connection."""
@@ -399,6 +403,7 @@ class IrcClient(Prototype):
             self._send('QUIT\r\n')
             self._conn.shutdown()
             self._conn.close()
+            self._conn = None
 
     def handle_irc(self,
                    header: Dict[str, Any],
