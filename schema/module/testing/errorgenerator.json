@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/testing/errorgenerator.json",
+    "properties": {
+        "critical": {
+            "id": "/properties/critical",
+            "type": "boolean"
+        },
+        "error": {
+            "id": "/properties/error",
+            "type": "boolean"
+        },
+        "interval": {
+            "id": "/properties/interval",
+            "type": "integer"
+        },
+        "warning": {
+            "id": "/properties/warning",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "critical",
+        "error",
+        "interval",
+        "warning"
+    ],
+    "type": "object"
+}
