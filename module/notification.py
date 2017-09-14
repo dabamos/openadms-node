@@ -352,8 +352,12 @@ class IrcClient(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self.get_config(self._name)
 
+        self._conn = None
+        self._thread = None
+        self._queue = queue.Queue(-1)
+
+        config = self.get_config(self._name)
         self._host = config.get('server')
         self._port = config.get('port', 6667)
         self._is_tls = config.get('tls', False)
@@ -364,10 +368,6 @@ class IrcClient(Prototype):
 
         if not self._channel.startswith('#'):
             self._channel = '#' + self._channel
-
-        self._conn = None
-        self._thread = None
-        self._queue = queue.Queue(-1)
 
         self.add_handler('irc', self.handle_irc)
         manager.schema_manager.add_schema('irc', 'irc.json')

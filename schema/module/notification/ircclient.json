@@ -35,7 +35,6 @@
         "channel",
         "port",
         "nickname",
-        "password",
         "server",
         "target",
         "tls"
