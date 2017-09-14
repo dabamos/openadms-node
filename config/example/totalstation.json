@@ -1,6 +1,6 @@
 {
     "modules": {
-        "alert": "module.notification.Alert",
+        "alerter": "module.notification.Alerter",
         "com1": "module.port.SerialPort",
         "com2": "module.port.SerialPort",
         "distanceCorrector": "module.totalstation.DistanceCorrector",
@@ -1557,7 +1557,7 @@
             ]
         }
     },
-    "alert": {
+    "alerter": {
         "modules": {
             "shortMessageFormatter": {
                 "enabled": false,
@@ -1578,6 +1578,7 @@
         "messageCollectionEnabled": true,
         "messageCollectionTime": 600,
         "type": "email",
+        "receiver": "mailAgent",
         "templates": {
             "header": "The following incident(s) occurred:\n\n",
             "body": "{{dt}} - {{level}} - {{message}}\n",
@@ -1593,6 +1594,7 @@
         "messageCollectionEnabled": false,
         "messageCollectionTime": 0,
         "type": "sms",
+        "receiver": "shortMessageAgent",
         "templates": {
             "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
             "body": "{{dt}} - {{level}} - {{message}}",
