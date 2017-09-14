@@ -16,7 +16,8 @@
         "scheduler2": "module.schedule.Scheduler",
         "virtualDTM": "module.virtual.VirtualDTM",
         "virtualTotalStationTM30": "module.virtual.VirtualTotalStationTM30",
-        "localControlServer": "module.server.LocalControlServer"
+        "localControlServer": "module.server.LocalControlServer",
+        "errorGenerator": "module.testing.ErrorGenerator"
     },
     "project": {
         "name": "Virtual Project",
@@ -1434,6 +1435,7 @@
             "ircFormatter": {
                 "enabled": true,
                 "receivers": {
+                    "warning": ["#dabamos"],
                     "error": ["#dabamos"],
                     "critical": ["#dabamos"]
                 }
@@ -1512,7 +1514,7 @@
         "server": "irc.freenode.net",
         "port": 6697,
         "tls": true,
-        "nickname": "openadms",
+        "nickname": "openadms__",
         "password": null,
         "target": "#test",
         "channel": "#test"
@@ -1592,5 +1594,11 @@
     "localControlServer": {
         "host": "127.0.0.1",
         "port": 8080
+    },
+    "errorGenerator": {
+        "warning": true,
+        "error": true,
+        "critical": false,
+        "interval": 20
     }
 }

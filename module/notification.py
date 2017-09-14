@@ -55,6 +55,7 @@ class Alerter(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
+        self._modules = config.get('modules')
         self._is_enabled = config.get('enabled')
         self._thread = None
         self._queue = queue.Queue(1000)
@@ -67,8 +68,6 @@ class Alerter(Prototype):
         root.addHandler(qh)
 
         manager.schema_manager.add_schema('alert', 'alert.json')
-
-        self._modules = config.get('modules')
 
     def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
@@ -177,7 +176,9 @@ class AlertMessageFormatter(Prototype):
             return
 
         # Create the header of the message.
-        header = {'type': self._config.get('type')}
+        header = {
+            'type': self._config.get('type')
+        }
 
         # Parse the properties.
         properties = {}
@@ -214,6 +215,8 @@ class AlertMessageFormatter(Prototype):
         payload['message'] = complete_msg
 
         # Fire and forget.
+        self.logger.debug('Sending formatted alert message to "{}"'
+                          .format(self._receiver))
         self.publish(self._receiver, header, payload)
 
     def run(self) -> None:
@@ -351,7 +354,7 @@ class IrcClient(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
-        self._hostname = config.get('server')
+        self._host = config.get('server')
         self._port = config.get('port', 6667)
         self._is_tls = config.get('tls', False)
         self._nickname = config.get('nickname', 'openadms')
@@ -379,23 +382,36 @@ class IrcClient(Prototype):
             is_tls: If True, use TLS encrypted connection.
         """
         self._disconnect()
-
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         if is_tls:
+            # Create SSL context for secured socket connection to IRC server.
             context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
             context.load_default_certs()
             self._conn = context.wrap_socket(sock,
-                                             server_hostname=self._hostname)
+                                             server_hostname=self._host)
         else:
             self._conn = sock
 
-        self.logger.info('Connecting to "{}:{}"'.format(self._hostname,
+        self.logger.info('Connecting to "{}:{}"'.format(self._host,
                                                         self._port))
         try:
-            self._conn.connect((self._hostname, self._port))
+            # Connect to IRC server.
+            self._conn.connect((self._host, self._port))
+            self._conn.setblocking(0)
+            self._conn.settimeout(1)
+        except ConnectionRefusedError:
+            self.logger.error('Could not connect to "{}:{}" '
+                              '(connection refused)'
+                              .format(self._host, self._port))
+        except TimeoutError:
+            self.logger.error('Could not connect to "{}:{}" '
+                              '(timeout)'
+                              .format(self._host, self._port))
         except ssl.SSLError:
-            self.logger.error('SSL certificate verification failed')
+            self.logger.error('Could not connect to "{}:{}" '
+                              '(SSL certificate verification failed)'
+                              .format(self._host, self._port))
 
     def _disconnect(self) -> None:
         """Disconnects from IRC server and closes socket connection."""
@@ -408,14 +424,13 @@ class IrcClient(Prototype):
     def handle_irc(self,
                    header: Dict[str, Any],
                    payload: Dict[str, Any]) -> None:
-        """Handles messages of type `irc` and forwards them to the
-        `process_irc()` method.
+        """Handles messages of type `irc` and puts alert message on a queue.
 
         Args:
             header: The message header.
             payload: The message payload.
         """
-        self.process_irc(payload)
+        self._queue.put(payload)
 
     def _init(self) -> None:
         """Enters IRC server and joins channel."""
@@ -433,7 +448,7 @@ class IrcClient(Prototype):
         if self._channel and self._channel != '':
             self.logger.info('Joining channel "{}" on "{}"'
                              .format(self._channel,
-                                     self._hostname))
+                                     self._host))
             self._send('JOIN {}\r\n'.format(self._channel))
 
     def _priv_msg(self, target: str, message: str) -> None:
@@ -445,14 +460,6 @@ class IrcClient(Prototype):
         """
         self._send('PRIVMSG {} :{}\r\n'.format(target, message))
 
-    def process_irc(self, payload: Dict[str, Any]) -> None:
-        """Puts alert message on queue.
-
-        Args:
-            payload: Dictionary with target and message.
-        """
-        self._queue.put(payload)
-
     def _receive(self, buffer_size: int = 4096) -> str:
         """Receives message from server.
 
@@ -462,7 +469,14 @@ class IrcClient(Prototype):
         Returns:
             String with the message.
         """
-        return self._conn.recv(buffer_size).decode('utf-8')
+        s = ''
+
+        try:
+            s = self._conn.recv(buffer_size).decode('utf-8')
+        except:
+            pass
+
+        return s
 
     def run(self) -> None:
         """Connects to IRC server, enters channel, and sends messages. Reacts
@@ -472,8 +486,13 @@ class IrcClient(Prototype):
                 self._connect(self._is_tls)
                 self._init()
 
+            data = self._receive()
+
+            if data.startswith('PING'):
+                self._send('PONG ' + data.split()[1] + '\r\n')
+
             if not self._queue.empty():
-                item = self._queue.get_nowait()
+                item = self._queue.get()
                 target = item.get('target', self._target)
                 message = item.get('message', '')
 
@@ -481,14 +500,7 @@ class IrcClient(Prototype):
                 self.logger.debug('Sent alert message "{}" to target "{}" on '
                                   'network "{}"'.format(message,
                                                         target,
-                                                        self._hostname))
-
-            data = self._receive()
-
-            if data.startswith('PING'):
-                self._send('PONG ' + data.split()[1] + '\r\n')
-
-            time.sleep(0.1)
+                                                        self._host))
 
         self._disconnect()
 
@@ -566,8 +578,8 @@ class MailAgent(Prototype):
             mail_message: The body test of the email.
         """
         if self._is_tls and self._is_start_tls:
-            self.logger.critical('Invalid SSL configuration '
-                                 '(select TLS or StartTLS)')
+            self.logger.erro('Invalid SSL configuration '
+                             '(select either TLS or StartTLS)')
             return
 
         msg = MIMEMultipart('alternative')
@@ -584,7 +596,7 @@ class MailAgent(Prototype):
         msg.attach(plain_text)
 
         try:
-            if self._is_tls:
+            if self._is_tls and not self._is_start_tls:
                 # Use TLS encryption.
                 smtp = smtplib.SMTP_SSL(self._host, self._port)
             else:
