@@ -352,7 +352,7 @@ class IrcClient(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_config(self._name)
 
         self._host = config.get('server')
         self._port = config.get('port', 6667)
@@ -436,7 +436,7 @@ class IrcClient(Prototype):
         """Enters IRC server and joins channel."""
         self._receive()
 
-        if self._password:
+        if self._password and self._password != '':
             self._send('PASS {}\r\n'.format(self._password))
 
         self._send('NICK {}\r\n'.format(self._nickname))
@@ -446,9 +446,10 @@ class IrcClient(Prototype):
                                                   'OpenADMS IRC Client'))
 
         if self._channel and self._channel != '':
-            self.logger.info('Joining channel "{}" on "{}"'
+            self.logger.info('Joining channel "{}" on "{}:{}"'
                              .format(self._channel,
-                                     self._host))
+                                     self._host,
+                                     self._port))
             self._send('JOIN {}\r\n'.format(self._channel))
 
     def _priv_msg(self, target: str, message: str) -> None:
@@ -469,14 +470,14 @@ class IrcClient(Prototype):
         Returns:
             String with the message.
         """
-        s = ''
+        message = ''
 
         try:
-            s = self._conn.recv(buffer_size).decode('utf-8')
+            message = self._conn.recv(buffer_size).decode('utf-8')
         except:
             pass
 
-        return s
+        return message
 
     def run(self) -> None:
         """Connects to IRC server, enters channel, and sends messages. Reacts
@@ -497,10 +498,10 @@ class IrcClient(Prototype):
                 message = item.get('message', '')
 
                 self._priv_msg(target, message)
-                self.logger.debug('Sent alert message "{}" to target "{}" on '
-                                  'network "{}"'.format(message,
-                                                        target,
-                                                        self._host))
+                self.logger.debug('Sent alert message to target "{}" on '
+                                  'network "{}:{}"'.format(target,
+                                                           self._host,
+                                                           self._port))
 
         self._disconnect()
 

@@ -3,8 +3,6 @@
         "alerter": "module.notification.Alerter",
         "distanceCorrector": "module.totalstation.DistanceCorrector",
         "fileExporter": "module.export.FileExporter",
-        "ircClient": "module.notification.IrcClient",
-        "ircFormatter": "module.notification.AlertMessageFormatter",
         "mailAgent": "module.notification.MailAgent",
         "mailFormatter": "module.notification.AlertMessageFormatter",
         "polarTransformer": "module.totalstation.PolarTransformer",
@@ -17,7 +15,6 @@
         "virtualDTM": "module.virtual.VirtualDTM",
         "virtualTotalStationTM30": "module.virtual.VirtualTotalStationTM30",
         "localControlServer": "module.server.LocalControlServer",
-        "errorGenerator": "module.testing.ErrorGenerator"
     },
     "project": {
         "name": "Virtual Project",
@@ -1424,20 +1421,12 @@
         }
     },
     "alerter": {
-        "enabled": true,
+        "enabled": false,
         "modules": {
             "mailFormatter": {
                 "enabled": false,
                 "receivers": {
                     "error": ["monitoring@example.com"]
-                }
-            },
-            "ircFormatter": {
-                "enabled": true,
-                "receivers": {
-                    "warning": ["#dabamos"],
-                    "error": ["#dabamos"],
-                    "critical": ["#dabamos"]
                 }
             },
             "shortMessageFormatter": {
@@ -1510,20 +1499,6 @@
         "tls": true,
         "startTls": false
     },
-    "ircClient": {
-        "server": "irc.freenode.net",
-        "port": 6697,
-        "tls": true,
-        "nickname": "openadms__",
-        "password": null,
-        "target": "#test",
-        "channel": "#test"
-    },
-    "gpioController": {
-        "pin": 17,
-        "defaultState": 0,
-        "duration": 10
-    },
     "distanceCorrector": {
         "distanceName": "slopeDist",
         "temperature": 20.0,
@@ -1594,11 +1569,5 @@
     "localControlServer": {
         "host": "127.0.0.1",
         "port": 8080
-    },
-    "errorGenerator": {
-        "warning": true,
-        "error": true,
-        "critical": false,
-        "interval": 20
     }
 }

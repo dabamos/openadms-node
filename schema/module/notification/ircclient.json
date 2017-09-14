@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/notification/ircclient.json",
+    "properties": {
+        "channel": {
+            "id": "/properties/channel",
+            "type": "string"
+        },
+        "nickname": {
+            "id": "/properties/nickname",
+            "type": "string"
+        },
+        "password": {
+            "id": "/properties/password",
+            "type": "string"
+        },
+        "port": {
+            "id": "/properties/port",
+            "type": "integer"
+        },
+        "server": {
+            "id": "/properties/server",
+            "type": "string"
+        },
+        "target": {
+            "id": "/properties/target",
+            "type": "string"
+        },
+        "tls": {
+            "id": "/properties/tls",
+            "type": "boolean"
+        }
+    },
+    "required": [
+        "channel",
+        "port",
+        "nickname",
+        "password",
+        "server",
+        "target",
+        "tls"
+    ],
+    "type": "object"
+}
