@@ -10,6 +10,13 @@
 
         <title>OpenADMS | Local Control Server</title>
 
+        <style>
+            .gr { color: #52c652; }
+            .ye { color: #efa20b; }
+            .bl { color: #3daed1; }
+            .bk { color: #525252; }
+            .re { color: #e62825; }
+        </style>
     </head>
 
     <body>
@@ -125,7 +132,7 @@ $sensors_table
 
             <h4 id="log">Log Messages</h4>
             <p>Last $log_size log messages:</p>
-            <code style="background-color: #5f5f5f; color: #ffffff; font-family: monospace; height: 25em; overflow: scroll; white-space: pre; width: 100%;">$log</code>
+            <code id="console" style="background-color: #fcfcfc; color: #525252; font-family: monospace; height: 25em; overflow: scroll; white-space: pre; width: 100%;">$log</code>
 
             <hr>
 
@@ -141,14 +148,31 @@ $sensors_table
 
     <script type="text/javascript">
     <!--
-        var elems = document.getElementsByClassName('confirm');
+        var elements = document.getElementsByClassName('confirm');
+
         var confirmIt = function (e) {
             if (!confirm('Are you sure to start or stop this module?'))
                 e.preventDefault();
         };
-        for (var i = 0, l = elems.length; i < l; i++) {
-            elems[i].addEventListener('click', confirmIt, false);
+
+        for (var i = 0, l = elements.length; i < l; i++) {
+            elements[i].addEventListener('click', confirmIt, false);
         }
+
+        document.addEventListener("DOMContentLoaded", function(event) {
+            var console = document.getElementById('console');
+            console.innerHTML = console.innerHTML.replace(
+                /(.*) - (.*) - (.*) - (.*)/g,
+                function(a, b, c, d, e) {
+                    var color = 'bk';
+
+                    if (c.trim() == 'WARNING' || c.trim() == 'ERROR' || c.trim() == 'CRITICAL')
+                        color = 're';
+
+                    return '<span class="gr">' + b + '</span> - <span class="ye">' + c + '</span> - <span class="bl">' + d + '</span> - <span class="' + color + '">' + e + '</span>';
+                }
+            );
+        });
     //-->
     </script>
 
