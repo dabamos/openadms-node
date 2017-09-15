@@ -346,9 +346,9 @@ class HeartbeatMonitor(Prototype):
         pass
 
 
-class IrcClient(Prototype):
+class IrcAgent(Prototype):
     """
-    IrcClient sends alert messages to an IRC channel or user.
+    IrcAgent sends alert messages to an IRC channel or user.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
