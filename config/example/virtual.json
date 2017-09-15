@@ -14,7 +14,7 @@
         "scheduler2": "module.schedule.Scheduler",
         "virtualDTM": "module.virtual.VirtualDTM",
         "virtualTotalStationTM30": "module.virtual.VirtualTotalStationTM30",
-        "localControlServer": "module.server.LocalControlServer",
+        "localControlServer": "module.server.LocalControlServer"
     },
     "project": {
         "name": "Virtual Project",
