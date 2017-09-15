@@ -25,6 +25,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
+import arrow
 import json
 import jsonschema
 import logging
@@ -42,15 +43,15 @@ from module.prototype import Prototype
 class Manager(object):
     """
     Manager is a container class for the configuration manager, the sensor
-    manager, the module manager, and the schema manager.
+    manager, the module manager, the schema manager, and the project manager.
     """
 
     def __init__(self):
         self._config_manager = None
-        self._sensor_manager = None
         self._module_manager = None
         self._project_manager = None
         self._schema_manager = None
+        self._sensor_manager = None
 
     @property
     def config_manager(self) -> Any:
@@ -95,7 +96,7 @@ class Manager(object):
 
 class ConfigManager(object):
     """
-    ConfigurationManager loads and stores the OpenADMS configuration.
+    ConfigManager loads and stores the OpenADMS configuration.
     """
 
     def __init__(self, path: str, schema_manager):
@@ -262,7 +263,7 @@ class ModuleManager(object):
         """
         return self._modules.get(name)
 
-    def get_modules_list(self) -> List[str]:
+    def get_modules_list(self) -> KeysView:
         """Returns a list with all names of all modules.
 
         Returns:
@@ -362,24 +363,45 @@ class ProjectManager(object):
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
 
+        # Configuration of the project manager.
         self._schema_manager.add_schema('project', 'core/project.json')
         config = self._config_manager.get_valid_config('project', 'project')
 
-        self._project_name = config.get('name')
-        self._project_id = config.get('id')
-        self._project_description = config.get('description')
+        # Project information.
+        self._name = config.get('name')
+        self._id = config.get('id')
+        self._description = config.get('description')
+
+        # Start-time of the monitoring software.
+        self._start_time = arrow.now()
 
     @property
     def description(self) -> str:
-        return self._project_description
+        return self._description
 
     @property
     def id(self) -> str:
-        return self._project_id
+        return self._id
 
     @property
     def name(self) -> str:
-        return self._project_name
+        return self._name
+
+    def get_uptime_string(self) -> str:
+        """Returns the software uptime as a formatted string (days, hours,
+        minutes, seconds).
+
+        Returns:
+            String with the software uptime.
+        """
+        u = '{:d}d {:d}h {:d}m {:d}s'
+
+        t = int((arrow.now() - self._start_time).total_seconds())
+        m, s = divmod(t, 60)
+        h, m = divmod(m, 60)
+        d, h = divmod(h, 24)
+
+        return u.format(d, h, m, s)
 
 
 class SchemaManager(object):
@@ -534,7 +556,7 @@ class SensorManager(object):
         """Returns the sensor object with the given name."""
         return self._sensors.get(name)
 
-    def get_sensors_names(self) -> List[str]:
+    def get_sensors_names(self) -> KeysView:
         """Returns a list with all sensor names."""
         return self._sensors.keys()
 

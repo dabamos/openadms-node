@@ -182,7 +182,7 @@ class System(object):
         Returns:
             String with the uptime.
         """
-        u = '{}d {}h {}m {}s'
+        u = '{:d}d {:d}h {:d}m {:d}s'
 
         if not System.get_uptime():
             # Doesn't work with PyPy3.5 v5.7.1 and below.
