@@ -94,6 +94,7 @@ class Alerter(Prototype):
                 payload = {
                     'dt': record.asctime,
                     'level': record.levelname.lower(),
+                    'name': record.name,
                     'message': record.message,
                     'receiver': receiver
                 }
@@ -379,7 +380,7 @@ class IrcClient(Prototype):
         """Creates socket connection to IRC server.
 
         Args:
-            is_tls: If True, use TLS encrypted connection.
+            is_tls: If True, use TLS-encrypted connection.
         """
         self._disconnect()
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -410,7 +411,7 @@ class IrcClient(Prototype):
                               .format(self._host, self._port))
         except ssl.SSLError:
             self.logger.error('Could not connect to "{}:{}" '
-                              '(SSL certificate verification failed)'
+                              '(SSL error)'
                               .format(self._host, self._port))
 
     def _disconnect(self) -> None:
@@ -687,3 +688,4 @@ class ShortMessageAgent(Prototype):
 
             self.logger.debug('Closed connection to "{}:{}"'
                               .format(self._host, self._port))
+
