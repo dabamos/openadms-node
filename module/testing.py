@@ -39,6 +39,12 @@ class ErrorGenerator(Prototype):
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
+        """
+        Args:
+            module_name: The name of the module.
+            module_type: The type of the module.
+            manager: The manager objects.
+        """
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
@@ -54,6 +60,7 @@ class ErrorGenerator(Prototype):
         self._thread = None
 
     def run(self) -> None:
+        """Generates log messages in the set interval."""
         while self.is_running:
             time.sleep(self._interval)
 

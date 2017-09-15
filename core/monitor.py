@@ -46,9 +46,9 @@ class Monitor(object):
             manager.schema_manager = SchemaManager()
             manager.config_manager = ConfigManager(config_file_path,
                                                    manager.schema_manager)
+            manager.project_manager = ProjectManager(manager)
             manager.sensor_manager = SensorManager(manager.config_manager)
             manager.module_manager = ModuleManager(manager)
-            manager.project_manager = ProjectManager(manager)
         except ValueError as e:
             self.logger.error(e)
 

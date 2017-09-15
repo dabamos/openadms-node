@@ -50,10 +50,10 @@ class Prototype(object):
 
         self._name = module_name  # Module name, e.g., 'com5'.
         self._type = module_type  # Module type, e.g., 'module.port.SerialPort'.
-        self._config_schema_name = None
 
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
+        self._project_manager = manager.project_manager
         self._sensor_manager = manager.sensor_manager
         self._schema_manager = manager.schema_manager
 

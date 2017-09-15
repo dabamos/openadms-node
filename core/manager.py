@@ -375,18 +375,6 @@ class ProjectManager(object):
         # Start-time of the monitoring software.
         self._start_time = arrow.now()
 
-    @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
-
     def get_uptime_string(self) -> str:
         """Returns the software uptime as a formatted string (days, hours,
         minutes, seconds).
@@ -402,6 +390,18 @@ class ProjectManager(object):
         d, h = divmod(h, 24)
 
         return u.format(d, h, m, s)
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @property
+    def name(self) -> str:
+        return self._name
 
 
 class SchemaManager(object):
