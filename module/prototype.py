@@ -160,13 +160,12 @@ class Prototype(object):
         Returns:
             A dictionary with the module's configuration.
         """
-        # Get the name of the JSON schema.
+        # Add the JSON schema to the Schema Manager.
         schema_path = self._schema_manager.get_schema_path(self._type)
+        self._schema_manager.add_schema(self._type, schema_path)
 
         # Return a valid configuration for the module or raise an exception.
-        return self._config_manager.get_valid_config(self._type,
-                                                     schema_path,
-                                                     *args)
+        return self._config_manager.get_valid_config(self._type, *args)
 
     def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not.

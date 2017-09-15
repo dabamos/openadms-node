@@ -89,13 +89,14 @@ class MQTTMessenger(object):
         """
         self.logger = logging.getLogger('mqtt')
 
+        self._type = 'core.intercom.MQTTMessenger'
+        self._client = None
+
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
 
-        self._type = 'core.intercom.MQTTMessenger'
-        config = self.get_config('intercom', 'mqtt')
+        config = self._get_config('intercom', 'mqtt')
 
-        self._client = None
         self._client_id = client_id
         self._host = config.get('host')
         self._port = config.get('port')
@@ -114,6 +115,23 @@ class MQTTMessenger(object):
     def __del__(self):
         if self._client:
             self.disconnect()
+
+    def _get_config(self, *args):
+        """Returns the validated configuration of the module. If no JSON schema
+        is available, the function just returns an unchecked configuration.
+
+        Args:
+            *args: Key names to the configuration in the dictionary.
+
+        Returns:
+            A dictionary with the module's configuration.
+        """
+        # Add the JSON schema to the Schema Manager.
+        schema_path = self._schema_manager.get_schema_path(self._type)
+        self._schema_manager.add_schema(self._type, schema_path)
+
+        # Return a valid configuration for the module or raise an exception.
+        return self._config_manager.get_valid_config(self._type, *args)
 
     def _on_connect(self,
                     client: Type[mqtt.Client],
@@ -165,21 +183,6 @@ class MQTTMessenger(object):
         if self._client:
             self._client.loop_stop()
             self._client.disconnect()
-
-    def get_config(self, *args: List[str]) -> Dict[str, Any]:
-        """Returns the validated configuration of the module.
-
-        Args:
-            *args: Key names to the configuration in the dictionary.
-
-        Returns:
-            A dictionary with the module's configuration.
-        """
-        schema_path = self._schema_manager.get_schema_path(self._type)
-
-        return self._config_manager.get_valid_config(self._type,
-                                                     schema_path,
-                                                     *args)
 
     def publish(self, topic: str, message: str) -> None:
         """Send message to the message broker."""

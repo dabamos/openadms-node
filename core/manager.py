@@ -49,6 +49,7 @@ class Manager(object):
         self._config_manager = None
         self._sensor_manager = None
         self._module_manager = None
+        self._project_manager = None
         self._schema_manager = None
 
     @property
@@ -58,6 +59,10 @@ class Manager(object):
     @property
     def module_manager(self) -> Any:
         return self._module_manager
+
+    @property
+    def project_manager(self) -> Any:
+        return self._project_manager
 
     @property
     def schema_manager(self) -> Any:
@@ -74,6 +79,10 @@ class Manager(object):
     @module_manager.setter
     def module_manager(self, module_manager):
         self._module_manager = module_manager
+
+    @project_manager.setter
+    def project_manager(self, project_manager):
+        self._project_manager = project_manager
 
     @schema_manager.setter
     def schema_manager(self, schema_manager):
@@ -142,15 +151,13 @@ class ConfigManager(object):
 
     def get_valid_config(self,
                          schema_name: str,
-                         schema_path: str,
-                         *args: List[str]) -> Dict[str, Any]:
+                         *args) -> Dict[str, Any]:
         """
         Returns the validated configuration of a module. Raises a ValueError
         exception if the configuration is invalid.
 
         Args:
             schema_name: Name of the JSON schema.
-            schema_path: Path to the JSON schema file.
             *args: Key names to the module's configuration.
 
         Returns:
@@ -167,10 +174,6 @@ class ConfigManager(object):
                 config = config[key]
             except AttributeError:
                 break
-
-        # Add JSON schema if missing.
-        if not self._schema_manager.has_schema(schema_name):
-            self._schema_manager.add_schema(schema_name, schema_path)
 
         # Check whether module's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
@@ -208,12 +211,12 @@ class ModuleManager(object):
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
 
-        self._config = self._config_manager.get('modules')
         self._schema_manager.add_schema('modules', 'core/modules.json')
+        config = self._config_manager.get_valid_config('modules', 'modules')
 
         self._modules = {}
 
-        for module_name, class_path in self._config.items():
+        for module_name, class_path in config.items():
             try:
                 self.add(module_name, class_path)
             except Exception:
@@ -344,57 +347,39 @@ class ModuleManager(object):
         return self._modules
 
 
-class SensorManager(object):
+class ProjectManager(object):
     """
-    SensorManager stores and manages object of type `Sensor`.
+    ProjectManager loads and stores the project configuration.
     """
 
-    def __init__(self, config_manager: ConfigManager):
+    def __init__(self, manager: Manager):
         """
         Args:
-            config_manager: The configuration manager.
+            manager: The manager object.
         """
-        self.logger = logging.getLogger('sensorManager')
-        self._sensor_config = config_manager.get('sensors')
-        self._sensors = {}
+        self.logger = logging.getLogger('projectManager')
+        self._manager = manager
+        self._config_manager = manager.config_manager
+        self._schema_manager = manager.schema_manager
 
-        self.load_sensors()
+        self._schema_manager.add_schema('project', 'core/project.json')
+        config = self._config_manager.get_valid_config('project', 'project')
 
-    def load_sensors(self) -> None:
-        """Creates the sensors defined in the configuration."""
-        if not self._sensor_config:
-            self.logger.info('No sensors defined')
-            return
-
-        for sensor_name, sensor_config in self._sensor_config.items():
-            sensor_obj = Sensor(sensor_name, sensor_config)
-            self.add_sensor(sensor_name, sensor_obj)
-            self.logger.info('Created sensor "{}"'.format(sensor_name))
-
-    def add_sensor(self, name: str, sensor: Sensor) -> None:
-        """Adds a sensor to the sensors dictionary.
-
-        Args:
-            name: The name of the sensor.
-            sensor: The sensor object.
-        """
-        self._sensors[name] = sensor
-
-    def delete(self, name: str) -> None:
-        """Removes a sensor from the sensors dictionary."""
-        self._sensors[name] = None
-
-    def get(self, name: str) -> Sensor:
-        """Returns the sensor object with the given name."""
-        return self._sensors.get(name)
-
-    def get_sensors_names(self) -> List[str]:
-        """Returns a list with all sensor names."""
-        return self._sensors.keys()
+        self._project_name = config.get('name')
+        self._project_id = config.get('id')
+        self._project_description = config.get('description')
 
     @property
-    def sensors(self) -> Dict[str, Sensor]:
-        return self._sensors
+    def description(self) -> str:
+        return self._project_description
+
+    @property
+    def id(self) -> str:
+        return self._project_id
+
+    @property
+    def name(self) -> str:
+        return self._project_name
 
 
 class SchemaManager(object):
@@ -423,6 +408,9 @@ class SchemaManager(object):
         Returns:
             True if schema has been added, False if not.
         """
+        if self._schema.get(data_type):
+            return
+
         schema_path = Path(root, path)
 
         if not schema_path.exists():
@@ -500,3 +488,56 @@ class SchemaManager(object):
             return False
 
         return True
+
+
+class SensorManager(object):
+    """
+    SensorManager stores and manages object of type `Sensor`.
+    """
+
+    def __init__(self, config_manager: ConfigManager):
+        """
+        Args:
+            config_manager: The configuration manager.
+        """
+        self.logger = logging.getLogger('sensorManager')
+        self._sensor_config = config_manager.get('sensors')
+        self._sensors = {}
+
+        self.load_sensors()
+
+    def load_sensors(self) -> None:
+        """Creates the sensors defined in the configuration."""
+        if not self._sensor_config:
+            self.logger.info('No sensors defined')
+            return
+
+        for sensor_name, sensor_config in self._sensor_config.items():
+            sensor_obj = Sensor(sensor_name, sensor_config)
+            self.add_sensor(sensor_name, sensor_obj)
+            self.logger.info('Created sensor "{}"'.format(sensor_name))
+
+    def add_sensor(self, name: str, sensor: Sensor) -> None:
+        """Adds a sensor to the sensors dictionary.
+
+        Args:
+            name: The name of the sensor.
+            sensor: The sensor object.
+        """
+        self._sensors[name] = sensor
+
+    def delete(self, name: str) -> None:
+        """Removes a sensor from the sensors dictionary."""
+        self._sensors[name] = None
+
+    def get(self, name: str) -> Sensor:
+        """Returns the sensor object with the given name."""
+        return self._sensors.get(name)
+
+    def get_sensors_names(self) -> List[str]:
+        """Returns a list with all sensor names."""
+        return self._sensors.keys()
+
+    @property
+    def sensors(self) -> Dict[str, Sensor]:
+        return self._sensors

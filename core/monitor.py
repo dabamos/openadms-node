@@ -39,15 +39,22 @@ class Monitor(object):
         Args:
             config_file_path: The path to the configuration file.
         """
+        self.logger = logging.getLogger('monitor')
         manager = Manager()
-        manager.schema_manager = SchemaManager()
-        manager.config_manager = ConfigManager(config_file_path,
-                                               manager.schema_manager)
-        manager.sensor_manager = SensorManager(manager.config_manager)
-        manager.module_manager = ModuleManager(manager)
+
+        try:
+            manager.schema_manager = SchemaManager()
+            manager.config_manager = ConfigManager(config_file_path,
+                                                   manager.schema_manager)
+            manager.sensor_manager = SensorManager(manager.config_manager)
+            manager.module_manager = ModuleManager(manager)
+            manager.project_manager = ProjectManager(manager)
+        except ValueError as e:
+            self.logger.error(e)
 
         self._manager = manager
 
     def start(self) -> None:
         """Starts all modules."""
-        self._manager.module_manager.start_all()
+        if self._manager.module_manager:
+            self._manager.module_manager.start_all()
