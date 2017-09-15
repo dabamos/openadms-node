@@ -218,7 +218,7 @@ class ReturnCodes(object):
         1283: [3, False, 'Measurement without full correction'],
         1284: [3, False, 'Accuracy can not be guaranteed'],
         1285: [4, True,  'Only angle measurement valid'],
-        1288: [3, False, 'Only angle measurement valid, but without full '\
+        1288: [3, False, 'Only angle measurement valid, but without full '
                          'correction'],
         1292: [4, True,  'Distance measurement not done (no aim, etc.)'],
         8704: [4, True,  'Position not reached'],
@@ -246,7 +246,7 @@ class ReturnCodeInspector(Prototype):
         for response_set in self._response_sets:
             return_code = obs.get_value('responseSets', response_set, 'value')
 
-            # Key is zero or not in response set.
+            # Return code is zero or not in response set.
             if return_code is None or return_code == 0:
                 continue
 
@@ -275,13 +275,14 @@ class ReturnCodeInspector(Prototype):
 
                 if error_values:
                     # Return code related log message.
-                    self.logger.log(lvl * 10, 'Observation "{}" of target "{}": '
-                                              '{} (code {} in response "{}")'
-                                              .format(obs.get('name'),
-                                                      obs.get('target'),
-                                                      msg,
-                                                      return_code,
-                                                      response_set))
+                    self.logger.log(lvl * 10,
+                                    'Observation "{}" of target "{}": {} '
+                                    '(code {} in response "{}")'
+                                    .format(obs.get('name'),
+                                            obs.get('target'),
+                                            msg,
+                                            return_code,
+                                            response_set))
 
                 else:
                     # Generic log message.
@@ -365,4 +366,3 @@ class UnitConverter(Prototype):
             Scaled value.
         """
         return value * factor
-

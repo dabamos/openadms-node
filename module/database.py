@@ -54,7 +54,7 @@ class CouchDriver(Prototype):
         self._server = config.get('server')
         self._port = config.get('port')
 
-        # CouchDB user.
+        # CouchDB user and password.
         user = config.get('user')
         password = config.get('password')
 
@@ -76,7 +76,6 @@ class CouchDriver(Prototype):
                              .format(self._scheme, self._server, self._port))
             self._couch = couchdb.Server(self._server_url)
 
-        if not self._db:
             self.logger.info('Opening CouchDB database "{}"'
                              .format(self._db_name))
             self._db = self._couch[self._db_name]
@@ -84,14 +83,21 @@ class CouchDriver(Prototype):
     def process_observation(self, obs: Observation) -> Observation:
         self._connect()
 
-        # Save document to CouchDB database.
-        self._db[obs.get('id')] = obs.data
-
-        self.logger.info('Saved observation "{}" of target "{}" from port "{}" '
-                         'to CouchDB database "{}"'
-                         .format(obs.get('name'),
-                                 obs.get('target'),
-                                 obs.get('portName'),
-                                 self._db_name))
+        # Save document in CouchDB database.
+        try:
+            self._db[obs.get('id')] = obs.data
+            self.logger.info('Saved observation "{}" of target "{}" from '
+                             'port "{}" to CouchDB database "{}"'
+                             .format(obs.get('name'),
+                                     obs.get('target'),
+                                     obs.get('portName'),
+                                     self._db_name))
+        except:
+            self.logger.error('Observation "{}" of target "{}" from port "{}" '
+                              'could not be saved in CouchDB database "{}"'
+                              .format(obs.get('name'),
+                                      obs.get('target'),
+                                      obs.get('portName'),
+                                      self._db_name))
 
         return obs

@@ -29,6 +29,7 @@ import arrow
 import json
 import jsonschema
 import logging
+import re
 
 from importlib import *
 from pathlib import Path
@@ -369,8 +370,11 @@ class ProjectManager(object):
 
         # Project information.
         self._name = config.get('name')
-        self._id = config.get('id')
         self._description = config.get('description')
+
+        # Remove non-word characters from project id.
+        id = config.get('id')
+        self._id = re.sub('[^a-zA-Z0-9]', '', id)
 
         # Start-time of the monitoring software.
         self._start_time = arrow.now()

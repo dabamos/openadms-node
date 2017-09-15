@@ -74,6 +74,7 @@ def main(config_file_path: str) -> None:
     """
     v = 'v.{}'.format(System.get_openadms_version())
 
+    logger = logging.getLogger('openadms')
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
     logger.info(' _____             _____ ____  _____ _____')
     logger.info('|     |___ ___ ___|  _  |    \|     |   __|')
@@ -174,7 +175,7 @@ def setup_logging(is_debug: bool = False,
     logger.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
-    formatter = logging.Formatter(fmt)
+    formatter = logging.Formatter(fmt, '%Y-%m-%dT%H:%M:%S')
 
     # File handler.
     file_level = {
@@ -244,7 +245,7 @@ if __name__ == '__main__':
                         help='print debug messages',
                         dest='is_debug',
                         action='store_true',
-                        default=True)
+                        default=False)
     parser.add_argument('-l', '--log-file',
                         help='path to log file',
                         dest='log_file',

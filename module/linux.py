@@ -151,4 +151,3 @@ class InterruptCounter(Prototype):
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
-
