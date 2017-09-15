@@ -52,10 +52,19 @@ build_exe_options = {
                  'module.prototype',
                  'module.schedule',
                  'module.server',
+                 'module.testing',
                  'module.totalstation',
                  'module.virtual'],
     'excludes': ['tkinter'],
-    'include_files': ['config', 'data', 'module', 'schema', 'sensor', 'res'],
+    'include_files': [
+        'config',
+        'data',
+        'extra',
+        'module',
+        'schema',
+        'sensor',
+        'res'
+    ],
     'silent': True
 }
 
@@ -76,4 +85,3 @@ setup(name='OpenADMS',
           'build_exe': build_exe_options
       },
       executables=executables)
-
