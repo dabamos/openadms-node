@@ -18,8 +18,13 @@
     },
     "project": {
         "name": "Virtual Project",
-        "id": "virtual",
-        "description": "project for testing virtual sensors"
+        "id": "4a2e8b9d87d849e38bb6911b9f2364ea",
+        "description": "Project for testing virtual sensors."
+    },
+    "node": {
+        "name": "Sensor Node 1",
+        "id": "6426bf58c20840768912f116740c4974",
+        "description": "The only sensor node in this project."
     },
     "intercom": {
         "mqtt": {

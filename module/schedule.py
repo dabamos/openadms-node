@@ -225,7 +225,7 @@ class Scheduler(Prototype):
 
                 # Add sensor name to the observation.
                 obs.set('sensorName', self._sensor_name)
-                obs.set('project', self._project_manager.id)
+                obs.set('project', self._project_manager.project.id)
 
                 # Create a new job.
                 job = Job(obs_name,

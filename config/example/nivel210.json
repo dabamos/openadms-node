@@ -6,9 +6,14 @@
         "scheduler1": "module.schedule.Scheduler"
     },
     "project": {
-        "name": "My Project",
-        "id": "myproject",
-        "description": "project for testing only"
+        "name": "Nivel210 Project",
+        "id": "19481e0791604b489a8a9c4a25e9dd80",
+        "description": "Project for testing a Leica Nivel210."
+    },
+    "node": {
+        "name": "Sensor Node 1",
+        "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+        "description": "The only sensor node in this project."
     },
     "intercom": {
         "mqtt": {

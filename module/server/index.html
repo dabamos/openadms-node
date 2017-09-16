@@ -28,6 +28,7 @@
             <div class="breadcrumbs">
                 <ol>
                     <li><a href="#project">Project</a></li>
+                    <li><a href="#node">Sensor Node</a></li>
                     <li><a href="#system">System</a></li>
                     <li><a href="#statistics">Statistics</a></li>
                     <li><a href="#modules">Modules</a></li>
@@ -36,59 +37,88 @@
                 </ol>
             </div>
 
-            <h4 id="project">Project</h4>
             <div class="row">
-                <div class="full col-2"><strong>Name:</strong></div>
-                <div class="full col-3">$project_name</div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>ID:</strong></div>
-                <div class="full col-3"><code>$project_id</code></div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Description:</strong></div>
-                <div class="full col-3">$project_description</div>
-            </div>
-
-            <h4 id="system">System</h4>
-            <div class="row">
-                <div class="full col-2"><strong>Host Name:</strong></div>
-                <div class="full col-3">$hostname</div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Operating System:</strong></div>
-                <div class="full col-3">$system</div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Software Version:</strong></div>
-                <div class="full col-3">$openadms_string</div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Python Interpreter:</strong></div>
-                <div class="full col-3">$python_version</div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Root Directory:</strong></div>
-                <div class="full col-3"><code>$root_dir</code></div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Configuration File:</strong></div>
-                <div class="full col-3"><code>$config_file</code></div>
-            </div>
-            <div class="row">
-                <div class="full col-2"><strong>Local Date &amp; Time:</strong></div>
-                <div class="full col-3">$datetime</div>
+                <div class="full col-6">
+                    <h4 id="project">Project</h4>
+                    <div class="row">
+                        <div class="full col-3"><strong>Name:</strong></div>
+                        <div class="full col-9">$project_name</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>ID:</strong></div>
+                        <div class="full col-9"><code>$project_id</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Description:</strong></div>
+                        <div class="full col-9">$project_description</div>
+                    </div>
+                </div>
+                <div class="full col-6">
+                    <h4 id="node">Sensor Node</h4>
+                    <div class="row">
+                        <div class="full col-3"><strong>Name:</strong></div>
+                        <div class="full col-9">$node_name</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>ID:</strong></div>
+                        <div class="full col-9"><code>$node_id</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Description:</strong></div>
+                        <div class="full col-9">$node_description</div>
+                    </div>
+                </div>
             </div>
 
-            <h4 id="statistics">Statistics</h4>
             <div class="row">
-                <div class="full col-2"><strong>System Uptime:</strong></div>
-                <div class="full col-3">$system_uptime</div>
+                <div class="full col-6">
+                    <h4 id="system">System</h4>
+                    <div class="row">
+                        <div class="full col-3"><strong>Host Name:</strong></div>
+                        <div class="full col-9">$hostname</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Operating System:</strong></div>
+                        <div class="full col-9">$system</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Software Version:</strong></div>
+                        <div class="full col-9">$openadms_string</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Python Interpreter:</strong></div>
+                        <div class="full col-9">$python_version</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Root Directory:</strong></div>
+                        <div class="full col-9"><code>$root_dir</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Configuration File:</strong></div>
+                        <div class="full col-9"><code>$config_file</code></div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Local Date &amp; Time:</strong></div>
+                        <div class="full col-9">$datetime</div>
+                    </div>
+                </div>
+                <div class="full col-6">
+                    <h4 id="statistics">Statistics</h4>
+                    <div class="row">
+                        <div class="full col-3"><strong>System Uptime:</strong></div>
+                        <div class="full col-9">$system_uptime</div>
+                    </div>
+                    <div class="row">
+                        <div class="full col-3"><strong>Software Uptime:</strong></div>
+                        <div class="full col-9">$software_uptime</div>
+                    </div>
+                </div>
             </div>
-            <div class="row">
-                <div class="full col-2"><strong>Software Uptime:</strong></div>
-                <div class="full col-3">$software_uptime</div>
-            </div>
+
+
+
+
+
 <!--
             <div class="row">
                 <div class="full col-2"><strong>CPU Load:</strong></div>

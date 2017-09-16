@@ -8,9 +8,14 @@
         "couchDriver": "module.database.CouchDriver"
     },
     "project": {
-        "name": "My Project",
-        "id": "myproject",
+        "name": "Leica Disto pro4a Project",
+        "id": "167a790b51934ac5935340c981652d44",
         "description": "Project for testing a Leica Disto pro4a."
+    },
+    "node": {
+        "name": "Sensor Node 1",
+        "id": "27cb8ba8b5a44b24897edbd3fe4fb736",
+        "description": "The only sensor node in this project."
     },
     "intercom": {
         "mqtt": {

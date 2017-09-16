@@ -21,9 +21,14 @@
         "shortMessageFormatter": "module.notification.AlertMessageFormatter"
     },
     "project": {
-        "name": "My Project",
-        "id": "myproject",
-        "description": "project for testing only"
+        "name": "Total Station Project",
+        "id": "f27b9bcc31164390a2f8bd07aa1babd9",
+        "description": "Project for testing a total station."
+    },
+    "node": {
+        "name": "Sensor Node 1",
+        "id": "82438c8fdaf049e2aea790bddda5a90b",
+        "description": "The only sensor node in this project."
     },
     "intercom": {
         "mqtt": {

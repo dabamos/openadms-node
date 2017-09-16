@@ -43,13 +43,13 @@ from module.prototype import Prototype
 
 class Manager(object):
     """
-    Manager is a container class for the configuration manager, the sensor
-    manager, the module manager, the schema manager, and the project manager.
+    Manager is a container class for all the managers.
     """
 
     def __init__(self):
         self._config_manager = None
         self._module_manager = None
+        self._node_manager = None
         self._project_manager = None
         self._schema_manager = None
         self._sensor_manager = None
@@ -61,6 +61,10 @@ class Manager(object):
     @property
     def module_manager(self) -> Any:
         return self._module_manager
+
+    @property
+    def node_manager(self) -> Any:
+        return self._node_manager
 
     @property
     def project_manager(self) -> Any:
@@ -81,6 +85,10 @@ class Manager(object):
     @module_manager.setter
     def module_manager(self, module_manager):
         self._module_manager = module_manager
+
+    @node_manager.setter
+    def node_manager(self, node_manager):
+        self._node_manager = node_manager
 
     @project_manager.setter
     def project_manager(self, project_manager):
@@ -216,6 +224,8 @@ class ModuleManager(object):
         self._schema_manager.add_schema('modules', 'core/modules.json')
         config = self._config_manager.get_valid_config('modules', 'modules')
 
+        # Start-time of the monitoring software.
+        self._start_time = arrow.now()
         self._modules = {}
 
         for module_name, class_path in config.items():
@@ -271,6 +281,22 @@ class ModuleManager(object):
             List of module names.
         """
         return self._modules.keys()
+
+    def get_uptime_string(self) -> str:
+        """Returns the software uptime as a formatted string (days, hours,
+        minutes, seconds).
+
+        Returns:
+            String with the software uptime.
+        """
+        u = '{:d}d {:d}h {:d}m {:d}s'
+
+        t = int((arrow.now() - self._start_time).total_seconds())
+        m, s = divmod(t, 60)
+        h, m = divmod(m, 60)
+        d, h = divmod(h, 24)
+
+        return u.format(d, h, m, s)
 
     def get_worker(self, module_name: str, class_path: str) -> Prototype:
         """Loads a Python class from a given path and returns the instance.
@@ -349,6 +375,101 @@ class ModuleManager(object):
         return self._modules
 
 
+class Node(object):
+
+    def __init__(self, name: str, id: str, description: str):
+        self._name = name
+        self._description = description
+        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @description.setter
+    def description(self, description: str) -> None:
+        self._description = description
+
+    @id.setter
+    def id(self, id: str) -> None:
+        # Remove non-word characters from node id.
+        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
+
+
+class NodeManager(object):
+    """
+    NodeManager loads and stores the node configuration.
+    """
+
+    def __init__(self, manager: Manager):
+        """
+        Args:
+            manager: The manager object.
+        """
+        self.logger = logging.getLogger('nodeManager')
+        self._manager = manager
+        self._config_manager = manager.config_manager
+        self._schema_manager = manager.schema_manager
+
+        # Configuration of the node.
+        self._schema_manager.add_schema('node', 'core/node.json')
+        config = self._config_manager.get_valid_config('node', 'node')
+
+        # Node information.
+        self._node = Node(config.get('name'),
+                          config.get('id'),
+                          config.get('description'))
+
+    @property
+    def node(self) -> Node:
+        return self._node
+
+
+class Project(object):
+
+    def __init__(self, name: str, id: str, description: str):
+        self._name = name
+        self._description = description
+        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+
+    @property
+    def description(self) -> str:
+        return self._description
+
+    @property
+    def id(self) -> str:
+        return self._id
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @description.setter
+    def description(self, description: str) -> None:
+        self._description = description
+
+    @id.setter
+    def id(self, id: str) -> None:
+        # Remove non-word characters from project id.
+        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+
+    @name.setter
+    def name(self, name: str) -> None:
+        self._name = name
+
+
 class ProjectManager(object):
     """
     ProjectManager loads and stores the project configuration.
@@ -364,48 +485,18 @@ class ProjectManager(object):
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
 
-        # Configuration of the project manager.
+        # Configuration of the project.
         self._schema_manager.add_schema('project', 'core/project.json')
         config = self._config_manager.get_valid_config('project', 'project')
 
         # Project information.
-        self._name = config.get('name')
-        self._description = config.get('description')
-
-        # Remove non-word characters from project id.
-        id = config.get('id')
-        self._id = re.sub('[^a-zA-Z0-9]', '', id)
-
-        # Start-time of the monitoring software.
-        self._start_time = arrow.now()
-
-    def get_uptime_string(self) -> str:
-        """Returns the software uptime as a formatted string (days, hours,
-        minutes, seconds).
-
-        Returns:
-            String with the software uptime.
-        """
-        u = '{:d}d {:d}h {:d}m {:d}s'
-
-        t = int((arrow.now() - self._start_time).total_seconds())
-        m, s = divmod(t, 60)
-        h, m = divmod(m, 60)
-        d, h = divmod(h, 24)
-
-        return u.format(d, h, m, s)
+        self._project = Project(config.get('name'),
+                                config.get('id'),
+                                config.get('description'))
 
     @property
-    def description(self) -> str:
-        return self._description
-
-    @property
-    def id(self) -> str:
-        return self._id
-
-    @property
-    def name(self) -> str:
-        return self._name
+    def project(self) -> Project:
+        return self._project
 
 
 class SchemaManager(object):
@@ -435,7 +526,7 @@ class SchemaManager(object):
             True if schema has been added, False if not.
         """
         if self._schema.get(data_type):
-            return
+            return False
 
         schema_path = Path(root, path)
 

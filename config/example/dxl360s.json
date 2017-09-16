@@ -8,9 +8,14 @@
         "localControlServer": "module.server.LocalControlServer"
     },
     "project": {
-        "name": "My Project",
-        "id": "myproject",
-        "description": "project for testing only"
+        "name": "DXL360S Project",
+        "id": "adb3e737ae174c1e9652b278b6182f11",
+        "description": "Project for testing a DLX360S."
+    },
+    "node": {
+        "name": "Sensor Node 1",
+        "id": "82ac5e091c734fcfb6294831d2c9e192",
+        "description": "The only sensor node in this project."
     },
     "intercom": {
         "mqtt": {

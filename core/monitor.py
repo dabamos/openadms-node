@@ -47,6 +47,7 @@ class Monitor(object):
             manager.config_manager = ConfigManager(config_file_path,
                                                    manager.schema_manager)
             manager.project_manager = ProjectManager(manager)
+            manager.node_manager = NodeManager(manager)
             manager.sensor_manager = SensorManager(manager.config_manager)
             manager.module_manager = ModuleManager(manager)
         except ValueError as e:

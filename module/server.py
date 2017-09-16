@@ -120,6 +120,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._module_manager = manager.module_manager
         self._sensor_manager = manager.sensor_manager
         self._project_manager = manager.project_manager
+        self._node_manager = manager.node_manager
 
         self._log_handler = log_handler
         self._root_dir = 'module/server'
@@ -235,17 +236,20 @@ class RequestHandler(BaseHTTPRequestHandler):
             'log': self._log_handler.get_logs(),
             'log_size': self._log_handler.size,
             'modules_table': self.get_modules_table(),
+            'node_description': self._node_manager.node.description,
+            'node_id': self._node_manager.node.id,
+            'node_name': self._node_manager.node.name,
             'openadms_string': System.get_openadms_string(),
             'os_name': System.get_os_name(),
             'python_version': System.get_python_version(),
-            'project_description': self._project_manager.description,
-            'project_id': self._project_manager.id,
-            'project_name': self._project_manager.name,
+            'project_description': self._project_manager.project.description,
+            'project_id': self._project_manager.project.id,
+            'project_name': self._project_manager.project.name,
             'root_dir': System.get_root_dir(),
             'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
             'system_uptime': System.get_uptime_string(),
-            'software_uptime': self._project_manager.get_uptime_string(),
+            'software_uptime': self._module_manager.get_uptime_string(),
             'year': System.get_current_year()
         }
 
