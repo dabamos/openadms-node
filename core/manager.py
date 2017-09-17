@@ -632,7 +632,7 @@ class SensorManager(object):
         for sensor_name, sensor_config in self._sensor_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
             self.add_sensor(sensor_name, sensor_obj)
-            self.logger.info('Created sensor "{}"'.format(sensor_name))
+            self.logger.info('Loaded sensor "{}"'.format(sensor_name))
 
     def add_sensor(self, name: str, sensor: Sensor) -> None:
         """Adds a sensor to the sensors dictionary.

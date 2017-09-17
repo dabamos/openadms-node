@@ -46,6 +46,8 @@ class Job(object):
 
     def __init__(self,
                  name: str,
+                 project_id: str,
+                 node_id: str,
                  port_name: str,
                  obs: Observation,
                  is_enabled: bool,
@@ -54,6 +56,8 @@ class Job(object):
                  weekdays: Dict[str, List],
                  uplink: Callable[[str, Dict[str, Any], Dict[str, Any]], None]):
         self._name = name               # Name of the job.
+        self._project_id = project_id   # Project ID.
+        self._node_id = node_id         # Node ID.
         self._port_name = port_name     # Name of the port.
         self._obs = obs                 # Observation object.
         self._is_enabled = is_enabled   # Is enabled or not.
@@ -136,8 +140,10 @@ class Job(object):
         # observation in our observation set.
         obs_copy = copy.deepcopy(self._obs)
 
-        # Generate a new UUID4.
+        # Set IDs.
         obs_copy.set('id', Observation.get_new_id())
+        obs_copy.set('project', self._project_id)
+        obs_copy.set('node', self._node_id)
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
@@ -225,10 +231,15 @@ class Scheduler(Prototype):
 
                 # Add sensor name to the observation.
                 obs.set('sensorName', self._sensor_name)
+
+                # Add project and node id.
                 obs.set('project', self._project_manager.project.id)
+                obs.set('node', self._node_manager.node.id)
 
                 # Create a new job.
                 job = Job(obs_name,
+                          self._project_manager.project.id,
+                          self._node_manager.node.id,
                           self._port_name,
                           obs,
                           schedule.get('enabled'),

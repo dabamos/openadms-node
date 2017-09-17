@@ -341,7 +341,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return False
 
-    def log_message(self, format, *args) -> None:
+    def log_message(self, format: str, *args) -> None:
         return
 
     def parse(self, template: str, vars: Dict[str, str]) -> str:

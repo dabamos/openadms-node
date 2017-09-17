@@ -53,6 +53,7 @@ class Prototype(object):
 
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager
+        self._node_manager = manager.node_manager
         self._project_manager = manager.project_manager
         self._sensor_manager = manager.sensor_manager
         self._schema_manager = manager.schema_manager

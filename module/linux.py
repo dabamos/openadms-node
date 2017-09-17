@@ -125,17 +125,19 @@ class InterruptCounter(Prototype):
             gpio: Observation.create_response_set('int', 'none', c)
         }
 
-        obs.set('target', gpio)
-        obs.set('name', 'interruptCount')
         obs.set('enabled', False)
-        obs.set('onetime', False)
+        obs.set('name', 'interruptCount')
         obs.set('nextReceiver', 0)
+        obs.set('node', self._node_manager.node.id)
+        obs.set('onetime', False)
         obs.set('portName', 'GPIO{}'.format(self._gpio))
+        obs.set('project', self._project_manager.project.id)
         obs.set('receivers', [self._receiver])
         obs.set('responseSets', response_sets)
         obs.set('sensorName', self._sensor_name)
         obs.set('sensorType', 'gpio')
         obs.set('sleepTime', 0.0)
+        obs.set('target', gpio)
         obs.set('timeStamp', str(arrow.utcnow()))
 
         self.publish_observation(obs)

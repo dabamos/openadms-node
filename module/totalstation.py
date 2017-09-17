@@ -603,14 +603,16 @@ class HelmertTransformer(Prototype):
 
         # Create Observation instance for the view point.
         view_point = Observation()
-        view_point.set('target', self._view_point.get('target'))
         view_point.set('name', 'getViewPoint')
         view_point.set('nextReceiver', 0)
+        view_point.set('node', self._node_manager.node.id)
         view_point.set('portName', obs.get('portName'))
+        view_point.set('project', self._project_manager.project.id)
         view_point.set('receivers', self._view_point.get('receivers'))
         view_point.set('responseSets', response_sets)
         view_point.set('sensorName', obs.get('sensorName'))
         view_point.set('sensorType', obs.get('sensorType'))
+        view_point.set('target', self._view_point.get('target'))
         view_point.set('timeStamp', str(arrow.utcnow()))
 
         # Return the Observation object of the view point.
