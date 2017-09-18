@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/rss.json",
+    "properties": {
+        "author": {
+            "id": "/properties/author",
+            "type": "string"
+        },
+        "dt": {
+            "id": "/properties/dt",
+            "type": "string"
+        },
+        "guid": {
+            "id": "/properties/guid",
+            "type": "string"
+        },
+        "message": {
+            "id": "/properties/message",
+            "type": "string"
+        },
+        "title": {
+            "id": "/properties/message",
+            "type": "string"
+        }
+    },
+    "required": [
+        "message",
+        "title"
+    ],
+    "type": "object"
+}

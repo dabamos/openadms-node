@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/notification/rssagent.json",
+    "properties": {
+        "author": {
+            "id": "/properties/author",
+            "type": "string"
+        },
+        "description": {
+            "id": "/properties/description",
+            "type": "string"
+        },
+        "filePath": {
+            "id": "/properties/filePath",
+            "type": "string"
+        },
+        "language": {
+            "id": "/properties/language",
+            "type": "string"
+        },
+        "link": {
+            "id": "/properties/link",
+            "type": "string"
+        },
+        "title": {
+            "id": "/properties/title",
+            "type": "string"
+        }
+    },
+    "required": [
+        "author",
+        "description",
+        "filePath",
+        "link",
+        "title"
+    ],
+    "type": "object"
+}

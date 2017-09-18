@@ -40,6 +40,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from pathlib import Path
 from string import Template
 from typing import *
 
@@ -187,16 +188,27 @@ class AlertMessageFormatter(Prototype):
         # Parse the properties.
         properties = {}
 
+        vars = {
+            'node_id': self._node_manager.node.id,
+            'node_name': self._node_manager.node.name,
+            'project_id': self._project_manager.project.id,
+            'project_name': self._project_manager.project.name,
+            'receiver': receiver
+        }
+
         for prop_name, prop in self._config.get('properties').items():
-            properties[prop_name] = prop.replace('{{receiver}}', receiver)
+            for var_name, var in vars.items():
+                properties[prop_name] = prop.replace('{{' + var_name + '}}',
+                                                     var)
 
         # Load the templates
         msg_header = self._templates.get('header', '')
         msg_footer = self._templates.get('footer', '')
 
         # Parse the header and the footer.
-        msg_header = msg_header.replace('{{receiver}}', receiver)
-        msg_footer = msg_footer.replace('{{receiver}}', receiver)
+        for var_name, var in vars.items():
+            msg_header = msg_header.replace('{{' + var_name + '}}', var)
+            msg_footer = msg_footer.replace('{{' + var_name + '}}', var)
 
         # Append the alert messages line by line to the body of the template.
         msg_body = ''
@@ -630,26 +642,42 @@ class MailAgent(Prototype):
 
 class RssAgent(Prototype):
 
+    """
+    RSSAgent creates an RSS 2.0 feed out of given data.
+    """
+
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
         self._ring_buffer = RingBuffer(25)
+        self._default_title = '[OpenADMS] Alert Message'
+        self._file_path = Path(config.get('filePath'))
 
         self._vars = {
-            'author': System.get_openadms_string(),
-            'description': 'OpenADMS Alert Messages RSS Feed',
-            'language': 'en-gb',
-            'title': 'OpenADMS RSS Feed',
+            'author': config.get('author', System.get_openadms_string()),
+            'description': config.get('description',
+                                      'OpenADMS Alert Messages RSS Feed'),
+            'language': config.get('language', 'en-gb'),
+            'link': config.get('link', ''),
+            'title': config.get('title', 'OpenADMS RSS Feed'),
             'version': System.get_openadms_version()
         }
 
         self.add_handler('rss', self.handle_rss)
         manager.schema_manager.add_schema('rss', 'rss.json')
 
+    def escape(self, html: str) -> str:
+        """Returns the given HTML with ampersands, quotes and carets encoded."""
+        return html.replace('&', '&amp;')\
+                   .replace('<', '&lt;')\
+                   .replace('>', '&gt;')\
+                   .replace('"', '&quot;')\
+                   .replace("'", '&#39;')
+
     def handle_rss(self,
-                    header: Dict[str, Any],
-                    payload: Dict[str, Any]) -> None:
+                   header: Dict[str, Any],
+                   payload: Dict[str, Any]) -> None:
         """Handles messages of type `rss` and forwards them to the
         `process_rss()` method.
 
@@ -657,35 +685,101 @@ class RssAgent(Prototype):
             header: The message header.
             payload: The message payload.
         """
+        # Add default values.
         if not payload.get('author'):
             payload['author'] = self._vars.get('author')
+
+        if not payload.get('dt'):
+            payload['dt'] = str(arrow.utcnow())
+
+        if not payload.get('description'):
+            payload['description'] = ''
 
         if not payload.get('guid'):
             payload['guid'] = 'urn:uuid:{}'.format(uuid.uuid4())
 
-        if not payload.get('date'):
-            payload['date'] = str(arrow.utcnow())
+        if not payload.get('title'):
+            payload['title'] = self._default_title
 
-        # Convert UTC to RFC 822 date format.
-        date = payload.get('date', str(arrow.utcnow()))
-        payload['date'] = self.get_rfc_822(date)
+        # Convert UTC date to RFC 822 format.
+        dt = payload.get('dt', str(arrow.utcnow()))
+        payload['dt'] = self.get_rfc_822(dt)
 
         self._ring_buffer.append(payload)
+        rss = self.get_rss_feed(self._vars, self._ring_buffer.get())
+        self.write(self._file_path, rss)
 
-        rss = self.get_rss(self._vars, self._ring_buffer.get())
+    def get_rfc_822(self, date: str = None) -> str:
+        """Returns a date string formatted as RFC 822. If no date is given, the
+        current one is used.
 
-    def get_rfc_822(self, date: str) -> str:
+        Args:
+            date: A string with date and time in UTC.
+
+        Returns:
+            A string with the date and time as RFC 822.
+        """
         if not date or date == '':
             date = str(arrow.utcnow())
 
-        return str(arrow.get(date).format('ddd, DD MMM YYYY HH:mm:ss ZZZ'))
+        return str(arrow.get(date).format('ddd, DD MMM YYYY HH:mm:ss Z'))
+
+    def get_rss_feed(self,
+                     vars: Dict[str, str],
+                     items: List[Dict[str, str]]) -> str:
+        """Returns a string with the RSS 2.0 feed.
+
+        Args:
+            vars: The variables to replace in the RSS template.
+            items: The items of the RSS feeds.
+
+        Returns:
+            The RSS 2.0 feed as a string.
+        """
+        # Create the RSS items.
+        item_tpl = ('        <item>\n'
+                    '            <title>$title</title>\n'
+                    '            <description>$message</description>\n'
+                    '            <author>$author</author>\n'
+                    '            <guid isPermaLink="false">$guid</guid>\n'
+                    '            <pubDate>$dt</pubDate>\n'
+                    '            <link>$link</link>\n'
+                    '        </item>\n\n')
+        rss_items = ''
+
+        # Parse item template.
+        for item in items:
+            rss_items += self.parse(item_tpl, **item)
+
+        # Create the RSS feed.
+        vars['date'] = self.get_rfc_822()
+        vars['items'] = rss_items
+
+        rss_tpl = ('<?xml version="1.0" encoding="utf-8" ?>\n'
+                   '<rss version="2.0" '
+                   'xmlns:atom="http://www.w3.org/2005/Atom">\n'
+                   '    <channel>\n'
+                   '        <title>$title</title>\n'
+                   '        <description>$description</description>\n'
+                   '        <language>$language</language>\n'
+                   '        <link>$link</link>\n'
+                   '        <copyright>$author</copyright>\n'
+                   '        <pubDate>$date</pubDate>\n'
+                   '        <atom:link rel="self" href="$link" '
+                   'type="application/rss+xml"/>\n\n'
+                   '$items'
+                   '    </channel>\n'
+                   '</rss>')
+        rss = self.parse(rss_tpl, **vars)
+
+        return rss
 
     def parse(self, template: str, **kwargs) -> str:
         """Substitutes placeholders in the template with variables from the
         given arguments.
 
         Args:
-            template: The (HTML) template.
+            template: The template.
             kwargs: The key-value pairs.
 
         Returns:
@@ -693,35 +787,19 @@ class RssAgent(Prototype):
         """
         return str(Template(template).safe_substitute(**kwargs))
 
-    def get_rss(self, vars: Dict[str, str], items: Dict[str, str]) -> None:
-        item_tpl = ('       <item>\n'
-                    '           <title>$title</title>\n'
-                    '           <description>$description</description>\n'
-                    '           <author>$author</author>\n'
-                    '           <guid>$guid</guid>\n'
-                    '           <pubDate>$date</pubDate>\n'
-                    '       </item>\n\n')
-        items_rss = ''
+    def write(self, file_path: Path, contents: str) -> None:
+        """Writes string to file."""
+        if not file_path:
+            self.logger.error('No file path set')
+            return
 
-        for item in items:
-            items_rss += self.parse(item_tpl, **item)
+        if not contents:
+            self.logger.error('No contents to write')
+            return
 
-        vars['date'] = self.get_rfc_822()
-        vars['items'] = items_rss
-
-        rss_tpl = ('<!-- RSS generated by OpenADMS $version on $date -->\n'
-                   '<?xml version="1.0" encoding="utf-8"?>\n'
-                   '<rss version="2.0">\n'
-                   '    <channel>\n'
-                   '        <title>$title</title>\n'
-                   '        <description>$description</description>\n'
-                   '        <language>$language</language>\n'
-                   '        <copyright>$author</copyright>\n'
-                   '        <pubDate>$date</pubDate>\n\n'
-                   '$items'
-                   '    </channel>\n'
-                   '</rss>')
-        rss = self.parse(rss_tpl, **vars)
+        with open(str(file_path), 'w') as fh:
+            fh.write(contents)
+            self.logger.info('Saved RSS feed to file "{}"'.format(str(file_path)))
 
 
 class ShortMessageAgent(Prototype):

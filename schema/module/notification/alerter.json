@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "schema/module/notification/alert.json",
+    "id": "schema/module/notification/alerter.json",
     "properties": {
         "modules": {
             "id": "/properties/modules",
