@@ -253,7 +253,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             'year': System.get_current_year()
         }
 
-        return self.parse(template, vars)
+        return self.parse(template, **vars)
 
     def get_modules_table(self) -> str:
         """Returns table rows with all modules of the current configuration in
@@ -293,7 +293,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 vars['button_class'] = 'success'
                 vars['button_action'] = 'start'
 
-            content += self.parse(template, vars)
+            content += self.parse(template, **vars)
 
         return content
 
@@ -322,7 +322,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 'sensor_description': sensor.description
             }
 
-            content += self.parse(template, vars)
+            content += self.parse(template, **vars)
 
         return content
 
@@ -344,18 +344,18 @@ class RequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args) -> None:
         return
 
-    def parse(self, template: str, vars: Dict[str, str]) -> str:
+    def parse(self, template: str, **kwargs) -> str:
         """Substitutes placeholders in the template with variables from the
-        given dictionary.
+        given arguments.
 
         Args:
             template: The (HTML) template.
-            vars: The variables.
+            kwargs: The key-value pairs.
 
         Returns:
             String with parsed template.
         """
-        return str(Template(template).safe_substitute(**vars))
+        return str(Template(template).safe_substitute(**kwargs))
 
     def respond(self, opts: Dict[str, str]) -> None:
         """Responds to an HTTP request.
