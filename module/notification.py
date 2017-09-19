@@ -650,7 +650,8 @@ class RssAgent(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
-        self._ring_buffer = RingBuffer(25)
+        self._size = config.get('size', 25)
+        self._ring_buffer = RingBuffer(self._size)
         self._default_title = '[OpenADMS] Alert Message'
         self._file_path = Path(config.get('filePath'))
 
@@ -706,7 +707,7 @@ class RssAgent(Prototype):
         payload['dt'] = self.get_rfc_822(dt)
 
         self._ring_buffer.append(payload)
-        rss = self.get_rss_feed(self._vars, self._ring_buffer.get())
+        rss = self.get_rss_feed(self._vars, self._ring_buffer.get().reverse())
         self.write(self._file_path, rss)
 
     def get_rfc_822(self, date: str = None) -> str:
