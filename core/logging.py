@@ -33,7 +33,7 @@ class RootFilter(logging.Filter):
 
     def filter(self, record: logging.LogRecord) -> bool:
         """Returns whether a logging.LogRecord should be logged."""
-        if record.name.startswith(('asyncio', 'hbmqtt', 'passlib')):
+        if record.name.startswith(('asyncio', 'hbmqtt', 'passlib', 'urllib3')):
             return False
         else:
             return True

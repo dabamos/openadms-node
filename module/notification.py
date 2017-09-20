@@ -40,6 +40,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
+from mastodon import Mastodon
 from pathlib import Path
 from string import Template
 from typing import *
@@ -216,6 +217,9 @@ class AlertMessageFormatter(Prototype):
 
             for key, value in alert.items():
                 line = line.replace('{{' + key + '}}', value)
+
+            for var_name, var in vars.items():
+                line = line.replace('{{' + var_name + '}}', var)
 
             msg_body += line
 
@@ -447,7 +451,7 @@ class IrcAgent(Prototype):
         """Enters IRC server and joins channel."""
         self._receive()
 
-        if self._password and self._password != '':
+        if self._password and len(self._password) > 0:
             self._send('PASS {}\r\n'.format(self._password))
 
         self._send('NICK {}\r\n'.format(self._nickname))
@@ -456,7 +460,7 @@ class IrcAgent(Prototype):
                                                   self._nickname,
                                                   'OpenADMS IRC Client'))
 
-        if self._channel and self._channel != '':
+        if self._channel and len(self._channel) > 0:
             self.logger.info('Joining channel "{}" on "{}:{}"'
                              .format(self._channel,
                                      self._host,
@@ -536,6 +540,9 @@ class IrcAgent(Prototype):
 
 
 class MailAgent(Prototype):
+    """
+    MailAgents sends e-mail via SMTP.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
@@ -634,6 +641,69 @@ class MailAgent(Prototype):
             self.logger.warning('E-mail could not be sent (SMTP error)')
         except TimeoutError:
             self.logger.warning('E-mail could not be sent (timeout)')
+
+
+class MastodonAgent(Prototype):
+    """
+    Mastodon sends toots to the Mastodon social network.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self.get_config(self._name)
+
+        self.add_handler('mastodon', self.handle_mastodon)
+        manager.schema_manager.add_schema('mastodon', 'mastodon.json')
+
+        self._email = config.get('email')
+        self._password = config.get('password')
+        self._api_base_url = config.get('url', 'https://mastodon.social')
+
+        self._client_cred_file = 'openadms_clientcred.secret'
+        self._user_cred_file = 'openadms_usercred.secret'
+
+        self._mastodon = None
+        self._is_login = False
+
+    def _create_app(self) -> None:
+        Mastodon.create_app('openadms',
+                            api_base_url=self._api_base_url,
+                            to_file='openadms_clientcred.secret')
+        self.logger.debug('Created client application')
+
+    def _login(self) -> None:
+        try:
+            self._mastodon.log_in(self._email,
+                                  self._password,
+                                  to_file=self._user_cred_file)
+            self._is_login = True
+            self.logger.debug('Login on {} successful'
+                              .format(self._api_base_url))
+        except:
+            self.logger.error('Cannot login on {}'.format(self._api_base_url))
+
+    def handle_mastodon(self,
+                        header: Dict[str, Any],
+                        payload: Dict[str, Any]) -> None:
+        """Uses the Mastodon API to send toots to the network."""
+        if not Path(self._client_cred_file).exists():
+            self._create_app()
+
+        if not self._mastodon:
+            self._mastodon = Mastodon(client_id=self._client_cred_file,
+                                      api_base_url=self._api_base_url)
+
+        if not self._is_login:
+            self._login()
+
+        message = payload.get('message')
+
+        if message and len(message) > 0:
+            try:
+                self._mastodon.toot(message)
+                self.logger.info('Tooted to {}'.format(self._api_base_url))
+            except:
+                self.logger.error('Cannot access Mastodon API')
 
 
 class RssAgent(Prototype):

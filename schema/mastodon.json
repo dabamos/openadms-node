@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/mastodon.json",
+    "properties": {
+        "message": {
+            "id": "/properties/message",
+            "type": "string"
+        }
+    },
+    "required": [
+        "message"
+    ],
+    "type": "object"
+}
