@@ -115,9 +115,7 @@ class Alerter(Prototype):
         if self._is_running:
             return
 
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
-        self._is_running = True
+        super().start()
 
         # Check the logging queue continuously for messages and proceed
         # them to the alert agents.
@@ -279,9 +277,7 @@ class AlertMessageFormatter(Prototype):
         if self._is_running:
             return
 
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
-        self._is_running = True
+        super().start()
 
         if self._msg_collection_enabled:
             # Threading for alert message collection.
@@ -339,9 +335,8 @@ class Heartbeat(Prototype):
         if self._is_running:
             return
 
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
-        self._is_running = True
+        super().start()
+
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
@@ -533,7 +528,8 @@ class IrcAgent(Prototype):
         if self._is_running:
             return
 
-        self._is_running = True
+        super().start()
+
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()

@@ -83,8 +83,8 @@ class ErrorGenerator(Prototype):
         if self._is_running:
             return
 
-        self._is_running = True
+        super().start()
+
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
-

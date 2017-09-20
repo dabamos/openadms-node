@@ -277,14 +277,18 @@ class Prototype(object):
 
     def start(self) -> None:
         """Starts the worker."""
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
+        if self._is_running:
+            return
+
+        self.logger.debug('Starting worker "{}"'.format(self._name))
         self._is_running = True
 
     def stop(self) -> None:
         """Stops the worker."""
-        # self.logger.debug('Stopping worker "{}"'
-        #                   .format(self._name))
+        if not self._is_running:
+            return
+
+        self.logger.debug('Stopping worker "{}"'.format(self._name))
         self._is_running = False
 
     @property

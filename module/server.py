@@ -90,17 +90,13 @@ class LocalControlServer(Prototype):
         if self._is_running:
             return
 
-        # self.logger.debug('Starting worker "{}"'
-        #                   .format(self._name))
-        self._is_running = True
+        super().start()
 
         # Run HTTP server in thread to avoid blocking.
         self._thread.start()
 
     def stop(self) -> None:
-        self.logger.debug('Stopping worker "{}"'
-                          .format(self._name))
-        self._is_running = False
+        super().stop()
 
         if self._httpd:
             # Close the HTTP server.

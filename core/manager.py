@@ -231,9 +231,9 @@ class ModuleManager(object):
         for module_name, class_path in config.items():
             try:
                 self.add(module_name, class_path)
-            except Exception:
-                self.logger.error('Module "{}" not loaded'
-                                  .format(module_name))
+            except Exception as e:
+                self.logger.error('Module "{}" not loaded{}'
+                                  .format(module_name, ': ' + str(e)))
                 continue
 
     def add(self, module_name: str, class_path: str):
