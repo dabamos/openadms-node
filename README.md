@@ -49,9 +49,10 @@ OpenADMS depends on the following Python libraries:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
-* [couchdb](https://pypi.python.org/pypi/couchdb) (BSD Licence)
+* [CouchDB](https://pypi.python.org/pypi/CouchDB) (BSD Licence)
 * [hbmqtt](https://pypi.python.org/pypi/hbmqtt) (MIT Licence)
 * [jsonschema](https://pypi.python.org/pypi/jsonschema) (MIT Licence)
+* [Mastodon.py](https://pypi.python.org/pypi/Mastodon.py) (MIT Licence)
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
