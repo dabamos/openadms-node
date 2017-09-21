@@ -188,10 +188,10 @@ class AlertMessageFormatter(Prototype):
         properties = {}
 
         vars = {
-            'node_id': self._node_manager.node.id,
-            'node_name': self._node_manager.node.name,
-            'project_id': self._project_manager.project.id,
-            'project_name': self._project_manager.project.name,
+            'nid': self._node_manager.node.id,
+            'node': self._node_manager.node.name,
+            'pid': self._project_manager.project.id,
+            'project': self._project_manager.project.name,
             'receiver': receiver
         }
 
@@ -213,7 +213,7 @@ class AlertMessageFormatter(Prototype):
         msg_body = ''
 
         for alert in alerts:
-            line = self._templates.get('body')
+            line = self._templates.get('body', '')
 
             for key, value in alert.items():
                 line = line.replace('{{' + key + '}}', value)

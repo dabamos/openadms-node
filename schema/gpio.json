@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/gpio.json",
+    "properties": {
+        "value": {
+            "id": "/properties/value",
+            "type": "string"
+        }
+    },
+    "required": [
+        "value"
+    ],
+    "type": "object"
+}

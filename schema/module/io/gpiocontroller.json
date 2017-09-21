@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "schema/module/io/gpiocontroller.json",
+    "properties": {
+        "defaultState": {
+            "id": "/properties/defaultState",
+            "type": "integer"
+        },
+        "duration": {
+            "id": "/properties/duration",
+            "type": "number"
+        },
+        "os": {
+            "id": "/properties/os",
+            "type": "string"
+        },
+        "pin": {
+            "id": "/properties/pin",
+            "type": "string"
+        }
+    },
+    "required": [
+        "defaultState",
+        "duration",
+        "os",
+        "pin"
+    ],
+    "type": "object"
+}
