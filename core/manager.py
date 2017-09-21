@@ -38,6 +38,7 @@ from typing import *
 from core.intercom import MQTTMessenger
 from core.module import Module
 from core.sensor import Sensor
+from core.system import System
 from module.prototype import Prototype
 
 
@@ -528,7 +529,7 @@ class SchemaManager(object):
         if self._schema.get(data_type):
             return False
 
-        schema_path = Path(root, path)
+        schema_path = Path(System.get_root_dir(), root, path)
 
         if not schema_path.exists():
             self.logger.error('Schema file "{}" not found.'
