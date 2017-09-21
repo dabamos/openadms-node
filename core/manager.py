@@ -30,6 +30,7 @@ import json
 import jsonschema
 import logging
 import re
+import sys
 
 from importlib import *
 from pathlib import Path
@@ -252,8 +253,7 @@ class ModuleManager(object):
             ValueError: If module file not exists.
         """
         if not self.module_exists(class_path):
-            self.logger.error('Module "{}" not found'.format(class_path))
-            raise ValueError
+            raise ValueError('Module "{}" not found'.format(class_path))
 
         messenger = MQTTMessenger(self._manager, module_name)
         worker = self.get_worker(module_name, class_path)
@@ -529,7 +529,7 @@ class SchemaManager(object):
         if self._schema.get(data_type):
             return False
 
-        schema_path = Path(System.get_root_dir(), root, path)
+        schema_path = Path(root, path)
 
         if not schema_path.exists():
             self.logger.error('Schema file "{}" not found.'
