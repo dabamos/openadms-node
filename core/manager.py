@@ -30,7 +30,6 @@ import json
 import jsonschema
 import logging
 import re
-import sys
 
 from importlib import *
 from pathlib import Path
@@ -39,7 +38,6 @@ from typing import *
 from core.intercom import MQTTMessenger
 from core.module import Module
 from core.sensor import Sensor
-from core.system import System
 from module.prototype import Prototype
 
 
