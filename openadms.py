@@ -216,6 +216,9 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
 
 
 if __name__ == '__main__':
+    # Add OpenADMS directory to system path.
+    sys.path.append(System.get_root_dir())
+
     # Set the hook for unhandled exceptions.
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
