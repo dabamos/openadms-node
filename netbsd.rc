@@ -29,7 +29,7 @@ openadms_start() {
 
     echo "Starting OpenADMS."
     cd ${openadms_path}
-    su ${openadms_user} -c "${command} ${command_args}" & echo $! > ${pidfile}
+    su ${openadms_user} -c "${command} ${command_args} & echo \$! > ${pidfile}"
 }
 
 openadms_stop() {
