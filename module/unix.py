@@ -19,15 +19,13 @@ See the Licence for the specific language governing permissions and
 limitations under the Licence.
 """
 
-"""Module for Linux-specific features, which are not available on other
-operating systems."""
+"""Module for BSD-specific features, which are not available on other operating
+systems."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import arrow
-import logging
 import queue
 import shlex
 import subprocess
@@ -45,9 +43,15 @@ class Unix(Enum):
 
     FREEBSD = 0
     NETBSD = 1
+    OPENBSD = 2
 
 
 class GpioController(Prototype):
+
+    """GpioController sets single pins of the General Purpose Input Output
+    (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD or
+    NetBSD. This module does not work on Linux. Support for OpenBSD may be added
+    in future."""
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
@@ -76,7 +80,15 @@ class GpioController(Prototype):
         self.add_handler('gpio', self.handle_gpio)
         manager.schema_manager.add_schema('gpio', 'gpio.json')
 
-    def _communicate(self, cmd: str) -> str:
+    def _communicate(self, cmd: str) -> Tuple[str, str]:
+        """Communicates with the operating system using `subprocess`.
+
+        Args:
+            cmd: The command to execute.
+
+        Returns:
+            The stdout and stderr of the process.
+        """
         args = shlex.split(cmd)
         process = subprocess.Popen(args,
                                    stdout=subprocess.PIPE,
@@ -85,7 +97,13 @@ class GpioController(Prototype):
 
         return stdout.decode('utf-8'), stderr.decode('utf-8')
 
-    def _set_pin(self, pin: str, value: int):
+    def _set_pin(self, pin: str, value: int) -> None:
+        """Sets given pin to value.
+
+        Args:
+            pin: The pin name or number.
+            value: The value to set the pin to (e.g., 0 or 1).
+        """
         if self._os == Unix.FREEBSD:
             cmd = self._cmd_freebsd.format(pin, value)
         elif self._os == Unix.NETBSD:
@@ -102,9 +120,16 @@ class GpioController(Prototype):
     def handle_gpio(self,
                     header: Dict[str, Any],
                     payload: Dict[str, Any]) -> None:
+        """Puts message payload in the queue.
+
+        Args:
+            header: The message header.
+            payload: The message payload.
+        """
         self._queue.put(payload)
 
     def run(self) -> None:
+        """Waits for new messages and sets GPIO pin to high or low."""
         while self.is_running:
             message = self._queue.get()      # Blocking I/O.
             value = message.get('value', self._default_state)
