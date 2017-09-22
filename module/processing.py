@@ -35,8 +35,8 @@ from module.prototype import Prototype
 
 class PreProcessor(Prototype):
     """
-    Extracts values from the raw response of a given observation set and
-    converts them to the defined types.
+    PreProcessor extracts values from the raw response of a given observation
+    set and converts them to the defined types.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -179,6 +179,48 @@ class PreProcessor(Prototype):
             self.logger.warning('Value "{}" could not be converted '
                                 '(not integer)'.format(raw_value))
             return None
+
+
+class ResponseInspector(Prototype):
+    """
+    ResponseInspector checks if response values of observations are within
+    defined thresholds.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self.get_config(self._name)
+        self._limits = config.get('limits', {})
+
+    def process_observation(self, obs: Observation) -> Observation:
+        for response_name, limit in self._limits.items():
+            value = obs.get_response_value(response_name)
+
+            if not value:
+                continue
+
+            min = limit.get('min')
+            max = limit.get('max')
+
+            if min and value < min:
+                self.logger.warning('Response value "{}" of observation "{}" '
+                                    'with target "{}" is less than minimum '
+                                    '({} < {})'.format(response_name,
+                                                       obs.get('name'),
+                                                       obs.get('target'),
+                                                       value,
+                                                       min))
+
+            if max and value > max:
+                self.logger.warning('Response value "{}" of observation "{}" '
+                                    'with target "{}" is greater than minimum '
+                                    '({} > {})'.format(response_name,
+                                                       obs.get('name'),
+                                                       obs.get('target'),
+                                                       value,
+                                                       max))
+
+        return obs
 
 
 class ReturnCodes(object):
