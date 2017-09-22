@@ -103,6 +103,12 @@ class StringFormatter(logging.Formatter):
         Returns:
             Formatted string of log record.
         """
+        if 'asctime' not in record.args:
+            record.asctime = self.formatTime(record, self.datefmt)
+
+        if 'message' not in record.args:
+            record.message = record.msg
+
         s = '{} - {:>8} - {:>26} - {}'.format(record.asctime,
                                               record.levelname,
                                               record.name,

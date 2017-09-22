@@ -167,6 +167,7 @@ def setup_logging(is_quiet: bool = False,
     """Setups the logger and logging handlers.
 
     Args:
+        is_quiet: Disable output.
         is_debug: Print debug messages.
         verbosity: Verbosity level (1 - 5).
         log_file: Path of the log file.
@@ -195,10 +196,15 @@ def setup_logging(is_quiet: bool = False,
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    if not is_quiet:
-        # Colorized output of log messages.
-        date_fmt = '%Y-%m-%dT%H:%M:%S'
-        coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+    if is_quiet:
+        console_level = 100
+
+    # Colorized output of log messages.
+    date_fmt = '%Y-%m-%dT%H:%M:%S'
+    coloredlogs.install(level=console_level,
+                        fmt=fmt,
+                        datefmt=date_fmt,
+                        logger=logger)
 
 
 def start_mqtt_message_broker(host: str = '127.0.0.1',
