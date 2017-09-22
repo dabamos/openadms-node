@@ -160,7 +160,8 @@ def valid_path(string: str) -> str:
     return string
 
 
-def setup_logging(is_debug: bool = False,
+def setup_logging(is_quiet: bool = False,
+                  is_debug: bool = False,
                   verbosity: int = 3,
                   log_file: str = 'openadms.log') -> None:
     """Setups the logger and logging handlers.
@@ -194,9 +195,10 @@ def setup_logging(is_debug: bool = False,
     fh.setFormatter(formatter)
     logger.addHandler(fh)
 
-    # Colorized output of log messages.
-    date_fmt = '%Y-%m-%dT%H:%M:%S'
-    coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
+    if not is_quiet:
+        # Colorized output of log messages.
+        date_fmt = '%Y-%m-%dT%H:%M:%S'
+        coloredlogs.install(level=console_level, fmt=fmt, datefmt=date_fmt)
 
 
 def start_mqtt_message_broker(host: str = '127.0.0.1',
@@ -249,6 +251,11 @@ if __name__ == '__main__':
                         dest='is_debug',
                         action='store_true',
                         default=False)
+    parser.add_argument('-q', '--quiet',
+                        help='do not output log messages',
+                        dest='is_quiet',
+                        action='store_true',
+                        default=False)
     parser.add_argument('-l', '--log-file',
                         help='path to log file',
                         dest='log_file',
@@ -287,7 +294,7 @@ if __name__ == '__main__':
         logger.error(e)
         sys.exit(0)
 
-    setup_logging(args.is_debug, args.verbosity, args.log_file)
+    setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)
 
     if args.is_mqtt_broker:
         # Use internal MQTT message broker (HBMQTT).
