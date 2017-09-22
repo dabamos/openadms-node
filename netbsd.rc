@@ -1,0 +1,42 @@
+#!/bin/sh
+
+# PROVIDE: openadms
+# REQUIRE: network mountall
+# BEFORE:  LOGIN
+
+$_rc_subr_loaded . /etc/rc.subr
+
+name="openadms"
+rcvar="${name}"
+
+load_rc_config ${name}
+: ${openadms_user="openadms"}
+: ${openadms_path="/usr/sbin/openadms/"}
+: ${openadms_config="/usr/etc/openadms/openadms.json"}
+: ${openadms_log="/var/log/openadms.log"}
+
+pidfile="/var/run/${name}.pid"
+command="python3.6 ${openadms_path}"
+command_args="-c ${openadms_config} -l ${openadms_log} -m"
+
+start_cmd="${name}_start"
+stop_cmd="${name}_stop"
+
+openadms_start() {
+    touch ${pidfile}
+    chown ${openadms_user} ${pidfile}
+
+    echo "Starting OpenADMS."
+    cd ${openadms_path}
+    su ${openadms_user} -c "./openadms.py ${command_args}" & echo $! > ${pidfile}
+}
+
+openadms_stop() {
+    echo "Stopping OpenADMS."
+    pid=`cat ${pidfile}`
+    echo "Waiting for PID: ${pid}."
+    kill -9 ${pid}
+    rm ${pidfile}
+}
+
+run_rc_command "$1"
