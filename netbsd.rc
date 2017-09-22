@@ -18,7 +18,7 @@ load_rc_config ${name}
 
 pidfile="/var/run/${name}.pid"
 command="./openadms.py"
-command_args="-c ${openadms_config} -l ${openadms_log} -m -q"
+command_args="-c ${openadms_config} -l ${openadms_log} -m"
 
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
