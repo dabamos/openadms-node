@@ -35,7 +35,7 @@ openadms_stop() {
     echo "Stopping OpenADMS."
     pid=`cat ${pidfile}`
     echo "Waiting for PID: ${pid}."
-    kill -9 ${pid}
+    kill ${pid}
     rm ${pidfile}
 }
 
