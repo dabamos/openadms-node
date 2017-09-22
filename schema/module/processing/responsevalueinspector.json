@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "id": "schema/module/processing/responseinspector.json",
+    "id": "schema/module/processing/responsevalueinspector.json",
     "properties": {
         "limits": {
             "id": "/properties/limits",

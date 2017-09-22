@@ -28,6 +28,8 @@ __license__ = 'EUPL'
 
 import re
 
+from typing import *
+
 from core.observation import Observation
 from core.manager import Manager
 from module.prototype import Prototype
@@ -181,9 +183,9 @@ class PreProcessor(Prototype):
             return None
 
 
-class ResponseInspector(Prototype):
+class ResponseValueInspector(Prototype):
     """
-    ResponseInspector checks if response values of observations are within
+    ResponseValueInspector checks if response values of observations are within
     defined thresholds.
     """
 
@@ -193,34 +195,47 @@ class ResponseInspector(Prototype):
         self._limits = config.get('limits', {})
 
     def process_observation(self, obs: Observation) -> Observation:
-        for response_name, limit in self._limits.items():
-            value = obs.get_response_value(response_name)
+        for response_name, limits in self._limits.items():
+            response_value = obs.get_response_value(response_name)
 
-            if not value:
+            if not response_value or not self.is_number(response_value):
                 continue
 
-            min = limit.get('min')
-            max = limit.get('max')
+            min_value = limits.get('min')
+            max_value = limits.get('max')
 
-            if min and value < min:
+            self.logger.debug('Checking response "{}" of observation "{}" with '
+                              'target "{}"'.format(response_name,
+                                                   obs.get('name'),
+                                                   obs.get('target')))
+
+            if min_value and response_value < min_value:
                 self.logger.warning('Response value "{}" of observation "{}" '
                                     'with target "{}" is less than minimum '
                                     '({} < {})'.format(response_name,
                                                        obs.get('name'),
                                                        obs.get('target'),
-                                                       value,
-                                                       min))
+                                                       response_value,
+                                                       min_value))
 
-            if max and value > max:
+            if max_value and response_value > max_value:
                 self.logger.warning('Response value "{}" of observation "{}" '
                                     'with target "{}" is greater than minimum '
                                     '({} > {})'.format(response_name,
                                                        obs.get('name'),
                                                        obs.get('target'),
-                                                       value,
-                                                       max))
+                                                       response_value,
+                                                       max_value))
 
         return obs
+
+    def is_number(self, value: Any) -> bool:
+        """Returns whether a value is a number or not."""
+        try:
+            float(value)
+            return True
+        except ValueError:
+            return False
 
 
 class ReturnCodes(object):
