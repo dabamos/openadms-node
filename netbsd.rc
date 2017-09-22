@@ -10,6 +10,7 @@ name="openadms"
 rcvar="${name}"
 
 load_rc_config ${name}
+: ${openadms:=no}
 : ${openadms_user="openadms"}
 : ${openadms_path="/usr/sbin/openadms/"}
 : ${openadms_config="/usr/etc/openadms/openadms.json"}
