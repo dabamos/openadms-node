@@ -16,7 +16,7 @@ load_rc_config ${name}
 : ${openadms_log="/var/log/openadms.log"}
 
 pidfile="/var/run/${name}.pid"
-command="python3.6 ${openadms_path}"
+command="./openadms.py"
 command_args="-c ${openadms_config} -l ${openadms_log} -m"
 
 start_cmd="${name}_start"
@@ -28,7 +28,7 @@ openadms_start() {
 
     echo "Starting OpenADMS."
     cd ${openadms_path}
-    su ${openadms_user} -c "./openadms.py ${command_args}" & echo $! > ${pidfile}
+    su ${openadms_user} -c "${command} ${command_args}" & echo $! > ${pidfile}
 }
 
 openadms_stop() {
