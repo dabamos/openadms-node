@@ -48,6 +48,11 @@ class PreProcessor(Prototype):
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('requestSets').items():
+            if not request_set.get('enabled') or\
+                    set_name not in obs.get('requestsOrder'):
+                # Request is disabled.
+                continue
+
             response = request_set.get('response')
             response_pattern = request_set.get('responsePattern')
 
