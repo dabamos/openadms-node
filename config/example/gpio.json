@@ -1,6 +1,6 @@
 {
     "modules": {
-        "com1": "module.port.SerialPort",
+        "ttyU0": "module.port.SerialPort",
         "fileExporter": "module.export.FileExporter",
         "preProcessor": "module.processing.PreProcessor",
         "scheduler1": "module.schedule.Scheduler",
@@ -13,12 +13,12 @@
     },
     "project": {
         "name": "Leica Disto pro4a Project",
-        "id": "167a790b51934ac5935340c981652d44",
-        "description": "Project for testing a Leica Disto pro4a."
+        "id": "5a3cd5b098944d5fb7b21ad7db7fc367",
+        "description": "Project for testing the GPIO interface of the Raspberry Pi 2 on NetBSD 7."
     },
     "node": {
         "name": "Sensor Node 1",
-        "id": "27cb8ba8b5a44b24897edbd3fe4fb736",
+        "id": "83bd1c2fecbc478cb40e2e44fa358d71",
         "description": "The only sensor node in this project."
     },
     "intercom": {
@@ -31,7 +31,7 @@
     },
     "ports": {
         "serial": {
-            "com1": {
+            "ttyU0": {
                 "port": "/dev/ttyU0",
                 "baudRate": 9600,
                 "byteSize": 8,
@@ -375,7 +375,7 @@
     },
     "schedulers": {
         "scheduler1": {
-            "port": "com1",
+            "port": "ttyU0",
             "sensor": "disto",
             "schedules": [
                 {
@@ -412,6 +412,11 @@
             "value": "1"
         }
     },
+    "gpioController": {
+        "defaultState": 0,
+        "duration": 5.0,
+        "pin": "pin_17"
+    },
     "unitConverter": {
         "distance": {
             "conversionType": "scale",
@@ -431,29 +436,18 @@
         "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
         "saveObservationId": true
     },
-    "couchDriver": {
-        "server": "10.0.0.1",
-        "port": 5984,
-        "tls": false,
-        "user": "client",
-        "password": "openadms",
-        "db": "openadms"
-    },
     "localControlServer": {
         "host": "192.168.0.101",
         "port": 8080
     },
     "responseValueInspector": {
-        "limits": {
-            "distance": {
-                "min": 1.0,
-                "max": 20.0
+        "observations": {
+            "getDistance": {
+                "distance": {
+                    "min": 1.0,
+                    "max": 20.0
+                }
             }
         }
-    },
-    "gpioController": {
-        "defaultState": 0,
-        "duration": 5.0,
-        "pin": "pin_17"
     }
 }
