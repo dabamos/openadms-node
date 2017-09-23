@@ -39,10 +39,10 @@ logger = logging.getLogger('observation')
 
 class Observation(object):
     """
-    Stores all information regarding a request to and a response by a sensor in
-    a dictionary. Filled with initial information from the configuration file
-    and later supplemented by data of the processing modules. Can easily be
-    transformed to JSON format.
+    Observation stores all information regarding a request to and a response by
+    a sensor in a dictionary. Filled with initial information from the
+    configuration file and later supplemented by data of the processing modules.
+    Can easily be transformed to JSON format.
     """
 
     def __init__(self, data=None):
@@ -117,7 +117,7 @@ class Observation(object):
         """
         return uuid4().hex
 
-    def get_response_type(self, name: str) -> str:
+    def get_response_type(self, name: str) -> Union[str, None]:
         """Returns the type of a given response set.
 
         Args:
@@ -126,6 +126,8 @@ class Observation(object):
         Returns:
             Type of the response set.
         """
+        t = None
+
         try:
             t = self._data.get('responseSets').get(name).get('type')
         except AttributeError:
@@ -137,7 +139,7 @@ class Observation(object):
 
         return t
 
-    def get_response_unit(self, name: str) -> str:
+    def get_response_unit(self, name: str) -> Union[str, None]:
         """Returns the unit of a given response set.
 
         Args:
@@ -146,7 +148,7 @@ class Observation(object):
         Returns:
             Unit of the response set.
         """
-        u = ''
+        u = None
 
         try:
             u = self._data.get('responseSets').get(name).get('value')
@@ -159,7 +161,7 @@ class Observation(object):
 
         return u
 
-    def get_response_value(self, name: str) -> ResponseType:
+    def get_response_value(self, name: str) -> Union[ResponseType, None]:
         """Returns the value of a given response set.
 
         Args:
@@ -181,7 +183,7 @@ class Observation(object):
 
         return v
 
-    def get_value(self, *args: str) -> ResponseType:
+    def get_value(self, *args: str) -> Union[ResponseType, None]:
         """Returns the value of a set of keys.
 
         Args:
