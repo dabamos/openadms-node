@@ -142,8 +142,9 @@ class RingBufferLogHandler(logging.Handler):
         Args:
             record: The log record.
         """
-        log_entry = self.format(record)
-        self._buffer.append(log_entry)
+        if record:
+            log_entry = self.format(record)
+            self._buffer.append(log_entry)
 
     def get_logs(self) -> str:
         return self._buffer.to_string()
