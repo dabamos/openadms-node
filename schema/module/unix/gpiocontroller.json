@@ -10,10 +10,6 @@
             "id": "/properties/duration",
             "type": "number"
         },
-        "os": {
-            "id": "/properties/os",
-            "type": "string"
-        },
         "pin": {
             "id": "/properties/pin",
             "type": "string"
@@ -22,7 +18,6 @@
     "required": [
         "defaultState",
         "duration",
-        "os",
         "pin"
     ],
     "type": "object"

@@ -36,14 +36,16 @@ from enum import Enum
 from typing import *
 
 from core.manager import Manager
+from core.system import System
 from module.prototype import Prototype
 
 
 class Unix(Enum):
 
-    FREEBSD = 0
-    NETBSD = 1
-    OPENBSD = 2
+    NONE = 0
+    FREEBSD = 1
+    NETBSD = 2
+    OPENBSD = 3
 
 
 class GpioController(Prototype):
@@ -61,15 +63,14 @@ class GpioController(Prototype):
         self._duration = config.get('duration')
         self._pin = config.get('pin')
 
-        os = str(config.get('os'))
+        self._os = {
+            'FreeBSD': Unix.FREEBSD,
+            'NetBSD': Unix.NETBSD,
+            'OpenBSD': Unix.OPENBSD
+            }.get(System.get_os_name(), Unix.NONE)
 
-        if os.lower() == 'freebsd':
-            self._os = Unix.FREEBSD
-        elif os.lower() == 'netbsd':
-            self._os = Unix.NETBSD
-        else:
-            raise ValueError('Operating system must be either '
-                             '"FreeBSD" or "NetBSD"')
+        if self._os == Unix.NONE:
+            raise ValueError('Operating system is not supported')
 
         self._cmd_freebsd = 'gpioctl -f /dev/gpioc0 {} {}'
         self._cmd_netbsd = 'gpioctl gpio0 {} {}'

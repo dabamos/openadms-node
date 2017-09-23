@@ -28,8 +28,6 @@ __license__ = 'EUPL'
 
 import re
 
-from typing import *
-
 from core.observation import Observation
 from core.manager import Manager
 from module.prototype import Prototype
@@ -183,9 +181,9 @@ class PreProcessor(Prototype):
             return None
 
 
-class ResponseValueInspector(Prototype):
+class ResponseInspector(Prototype):
     """
-    ResponseValueInspector checks if response values of observations are within
+    ResponseInspector checks if response values of observations are within
     defined thresholds.
     """
 
@@ -196,41 +194,37 @@ class ResponseValueInspector(Prototype):
 
     def process_observation(self, obs: Observation) -> Observation:
         for response_name, limits in self._limits.items():
+            self.logger.info('checking "{}"'.format(response_name))
             response_value = obs.get_response_value(response_name)
 
             if not response_value or not self.is_number(response_value):
                 continue
 
-            min_value = limits.get('min')
-            max_value = limits.get('max')
+            min_value = float(limits.get('min'))
+            max_value = float(limits.get('max'))
 
-            self.logger.debug('Checking response "{}" of observation "{}" with '
-                              'target "{}"'.format(response_name,
-                                                   obs.get('name'),
-                                                   obs.get('target')))
+            if min_value and float(response_value) < min_value:
+                self.logger.warning('Response value "{}" of observation "{}" '
+                                    'with target "{}" is less than minimum '
+                                    '({} < {})'.format(response_name,
+                                                       obs.get('name'),
+                                                       obs.get('target'),
+                                                       response_value,
+                                                       min_value))
 
-            if min_value and response_value < min_value:
-                self.logger.critical('Response value "{}" of observation "{}" '
-                                     'with target "{}" is less than minimum '
-                                     '({} < {})'.format(response_name,
-                                                        obs.get('name'),
-                                                        obs.get('target'),
-                                                        response_value,
-                                                        min_value))
-
-            if max_value and response_value > max_value:
-                self.logger.critical('Response value "{}" of observation "{}" '
-                                     'with target "{}" is greater than maximum '
-                                     '({} > {})'.format(response_name,
-                                                        obs.get('name'),
-                                                        obs.get('target'),
-                                                        response_value,
-                                                        max_value))
+            if max_value and float(response_value) > max_value:
+                self.logger.warning('Response value "{}" of observation "{}" '
+                                    'with target "{}" is greater than minimum '
+                                    '({} > {})'.format(response_name,
+                                                       obs.get('name'),
+                                                       obs.get('target'),
+                                                       response_value,
+                                                       max_value))
 
         return obs
 
-    def is_number(self, value: Any) -> bool:
-        """Returns whether a value is a number or not."""
+    def is_number(self, value: str) -> bool:
+        """Returns whether a value is float or not."""
         try:
             float(value)
             return True
