@@ -20,7 +20,28 @@ limitations under the Licence.
 """
 
 """Module for BSD-specific features, which are not available on other operating
-systems."""
+systems.
+
+                ,        ,         
+               /(        )`        
+               \ \___   / |        
+               /- _  `-/  '        
+              (/\/ \ \   /\        
+              / /   | `    \       
+              O O   ) /    |       
+              `-^--'`<     '       
+             (_.)  _  )   /        
+              `.___/`    /         
+                `-----' /          
+   <----.     __ / __   \          
+   <----|====O)))==) \) /====|      
+   <----'    `--' `.__,' \         
+                |        |         
+                 \       /       /\
+            ______( (_  / \______/ 
+          ,'  ,-----'   |          
+          `--{__________)
+"""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -51,9 +72,8 @@ class Unix(Enum):
 class GpioController(Prototype):
 
     """GpioController sets single pins of the General Purpose Input Output
-    (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD or
-    NetBSD. This module does not work on Linux. Support for OpenBSD may be added
-    in future."""
+    (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD,
+    NetBSD, or OpenBSD. This module does not work on Linux."""
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
@@ -67,13 +87,10 @@ class GpioController(Prototype):
             'FreeBSD': Unix.FREEBSD,
             'NetBSD': Unix.NETBSD,
             'OpenBSD': Unix.OPENBSD
-            }.get(System.get_os_name(), Unix.NONE)
+        }.get(System.get_os_name(), Unix.NONE)
 
         if self._os == Unix.NONE:
             raise ValueError('Operating system is not supported')
-
-        self._cmd_freebsd = 'gpioctl -f /dev/gpioc0 {} {}'
-        self._cmd_netbsd = 'gpioctl gpio0 {} {}'
 
         self._queue = queue.Queue(-1)
         self._thread = None
@@ -98,6 +115,24 @@ class GpioController(Prototype):
 
         return stdout.decode('utf-8'), stderr.decode('utf-8')
 
+    def _get_command(self, os: Unix) -> Union[str, None]:
+        """Returns derivate-specific command to set a single pin of the GPIO
+        interface.
+
+        Args:
+            os: The BSD unix derivate.
+
+        Returns:
+            Command to access the GPIO interface on BSD.
+        """
+        cmd = {
+            Unix.FREEBSD: 'gpioctl -f /dev/gpioc0 {} {}',
+            Unix.NETBSD: 'gpioctl gpio0 {} {}',
+            Unix.OPENBSD: 'gpioctl gpio0 {} {}'
+        }.get(os, None)
+
+        return cmd
+
     def _set_pin(self, pin: str, value: int) -> None:
         """Sets given pin to value.
 
@@ -105,11 +140,7 @@ class GpioController(Prototype):
             pin: The pin name or number.
             value: The value to set the pin to (e.g., 0 or 1).
         """
-        if self._os == Unix.FREEBSD:
-            cmd = self._cmd_freebsd.format(pin, value)
-        elif self._os == Unix.NETBSD:
-            cmd = self._cmd_netbsd.format(pin, value)
-
+        cmd = self._get_command(self._os).format(pin, value)
         out, err = self._communicate(cmd)
 
         if err and len(err) > 0:
@@ -135,11 +166,10 @@ class GpioController(Prototype):
             message = self._queue.get()      # Blocking I/O.
             value = message.get('value', self._default_state)
 
-            if value in ["0", "1"]:
+            if value in [0, 1, "0", "1"]:
                 self._set_pin(self._pin, value)
 
             time.sleep(self._duration)
-
             self._set_pin(self._pin, self._default_state)
 
     def start(self) -> None:

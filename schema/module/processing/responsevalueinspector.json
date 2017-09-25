@@ -2,25 +2,31 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "id": "schema/module/processing/responsevalueinspector.json",
     "properties": {
-        "limits": {
-            "id": "/properties/limits",
+        "observations": {
+            "id": "/properties/observations",
             "patternProperties": {
                 "^[a-zA-Z0-9]+$": {
-                    "id": "/properties/limits/properties/responseName",
-                    "properties": {
-                        "max": {
-                            "id": "/properties/limits/properties/responseName/properties/max",
-                            "type": "number"
-                        },
-                        "min": {
-                            "id": "/properties/limits/properties/responseName/properties/min",
-                            "type": "number"
+                    "id": "/properties/observations/properties/observationName",
+                    "patternProperties": {
+                        "^[a-zA-Z0-9]+$": {
+                            "id": "/properties/observations/properties/observationName/properties/responseName",
+                            "properties": {
+                                "max": {
+                                    "id": "/properties/observations/properties/observationName/properties/responseName/properties/max",
+                                    "type": "number"
+                                },
+                                "min": {
+                                    "id": "/properties/observations/properties/observationName/properties/responseName/properties/min",
+                                    "type": "number"
+                                }
+                            },
+                            "type": "object"
                         }
                     },
                     "type": "object"
-                }
-            },
-            "type": "object"
+                },
+                "type": "object"
+            }
         }
     },
     "type": "object"

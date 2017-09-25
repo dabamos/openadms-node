@@ -60,7 +60,7 @@ from core.monitor import Monitor
 from core.system import System
 
 # Get root logger.
-logger = logging.getLogger()
+root = logging.getLogger()
 
 LOG_FILE_BACKUP_COUNT = 1     # 1 log file only.
 MAX_LOG_FILE_SIZE = 10485760  # 10 MiB.
@@ -123,13 +123,13 @@ def exception_hook(type: BaseException,
     fmt_exception = ''.join(traceback.format_exception(type,
                                                        value,
                                                        tb)).replace('\n', '')
-    logger.critical('Unhandled exception: {}'
-                    .format(' '.join(fmt_exception.split())))
+    root.critical('Unhandled exception: {}'
+                  .format(' '.join(fmt_exception.split())))
 
 
 def signal_handler(signalnum: int, frame: Any) -> None:
     """Outputs a message before quitting the application."""
-    logger.info('Exiting ...')
+    root.info('Exiting ...')
     sys.exit(0)
 
 
@@ -174,7 +174,7 @@ def setup_logging(is_quiet: bool = False,
     """
     # Basic logging configuration.
     console_level = logging.DEBUG if is_debug else logging.INFO
-    logger.setLevel(console_level)
+    root.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
     formatter = logging.Formatter(fmt, '%Y-%m-%dT%H:%M:%S')
@@ -194,9 +194,10 @@ def setup_logging(is_quiet: bool = False,
                                               encoding='utf8')
     fh.setLevel(file_level)
     fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    root.addHandler(fh)
 
     if is_quiet:
+        # Silence logger output.
         console_level = 100
 
     # Colorized output of log messages.
@@ -204,7 +205,7 @@ def setup_logging(is_quiet: bool = False,
     coloredlogs.install(level=console_level,
                         fmt=fmt,
                         datefmt=date_fmt,
-                        logger=logger)
+                        logger=root)
 
 
 def start_mqtt_message_broker(host: str = '127.0.0.1',
@@ -297,7 +298,7 @@ if __name__ == '__main__':
     try:
         args = parser.parse_args()
     except argparse.ArgumentTypeError as e:
-        logger.error(e)
+        root.error(e)
         sys.exit(0)
 
     setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)

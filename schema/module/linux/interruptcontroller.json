@@ -10,8 +10,8 @@
             "id": "/properties/countTime",
             "type": "integer"
         },
-        "gpio": {
-            "id": "/properties/gpio",
+        "pin": {
+            "id": "/properties/pin",
             "type": "integer"
         },
         "receiver": {
@@ -27,7 +27,7 @@
     "required": [
         "bounceTime",
         "countTime",
-        "gpio",
+        "pin",
         "receiver",
         "sensorName"
     ],

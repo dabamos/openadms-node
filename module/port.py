@@ -33,6 +33,7 @@ import socket
 import time
 
 from threading import Thread
+from typing import *
 
 from core.observation import Observation
 from core.manager import Manager
@@ -77,7 +78,7 @@ class BluetoothPort(Prototype):
             self.logger.info('Closing port "{}"'.format(self._port))
             self._sock.close()
 
-    def get_mac_address(self, s: str) -> str:
+    def get_mac_address(self, s: str) -> Union[str, None]:
         if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
             return s
         elif re.match(r'^[a-fA-F0-9]{12}$', s):
@@ -86,7 +87,7 @@ class BluetoothPort(Prototype):
         else:
             return
 
-    def process_observation(self, obs: Observation) -> Observation:
+    def process_observation(self, obs: Observation) -> Union[Observation, None]:
         if System.is_windows():
             self.logger.error('Operating system not supported (no '
                               'socket.AF_BLUETOOTH on Microsoft Windows)')
@@ -309,7 +310,7 @@ class SerialPort(Prototype):
                                                   .get(self.name)
 
         self._max_attempts = self._config.get('maxAttempts')
-        self._serial = None         # Pyserial object.
+        self._serial = None
         self._serial_port_config = None
 
         # Passive mode.
@@ -350,7 +351,7 @@ class SerialPort(Prototype):
             self.logger.error('Permission denied for port "{}"'
                               .format(self._serial_port_config.port))
 
-    def process_observation(self, obs: Observation) -> Observation:
+    def process_observation(self, obs: Observation) -> Union[Observation, None]:
         """Processes an observation object. Sends request to sensor and stores
         response.
 
@@ -363,6 +364,7 @@ class SerialPort(Prototype):
         # Turn on passive mode.
         if obs.get('passiveMode'):
             if self._is_passive:
+                # Restart passive listener.
                 self._is_passive = False
                 self._passive_listener.join()
 
@@ -398,7 +400,7 @@ class SerialPort(Prototype):
             self._serial.reset_input_buffer()
 
         # Add the name of this serial port module to the observation.
-        obs.set('portName', self.name)
+        obs.set('portName', self._name)
 
         requests_order = obs.get('requestsOrder', [])
         request_sets = obs.get('requestSets')
@@ -408,7 +410,7 @@ class SerialPort(Prototype):
                              'of target "{}"'.format(obs.get('name'),
                                                      obs.get('target')))
 
-        # Send requests one by one to the sensor.
+        # Send requests sequentially to the sensor.
         for request_name in requests_order:
             request_set = request_sets.get(request_name)
 
@@ -452,7 +454,7 @@ class SerialPort(Prototype):
                 self._serial.reset_output_buffer()
                 self._serial.reset_input_buffer()
 
-                if response != '':
+                if len(response) > 0:
                     self.logger.debug('Received response "{}" for request "{}" '
                                       'of observation "{}" from sensor "{}"'
                                       .format(self.sanitize(response),
@@ -470,10 +472,8 @@ class SerialPort(Prototype):
 
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
-
             # Add the timestamp to the observation.
             obs.set('timeStamp', str(arrow.utcnow()))
-
             # Sleep until the next request.
             time.sleep(sleep_time)
 
@@ -530,18 +530,18 @@ class SerialPort(Prototype):
             draft = obs.get('requestSets').get('draft')
 
             timeout = draft.get('timeout', 1.0)
-            response_delimiter = draft.get('responseDelimiter', "")
+            response_delimiter = draft.get('responseDelimiter', '')
             length = draft.get('responseLength', 0)
             request = draft.get('request')
 
-            if request and request != "":
+            if request and len(request) > 0:
                 self._write(request)
 
             response = self._read(eol=response_delimiter,
                                   length=length,
                                   timeout=timeout)
 
-            if response != '':
+            if len(response) > 0:
                 self.logger.debug('Received "{}" from sensor "{}" on port "{}"'
                                   .format(self.sanitize(response),
                                           obs.get('sensorName'),

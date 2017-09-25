@@ -60,7 +60,7 @@ class Job(object):
         self._node_id = node_id         # Node ID.
         self._port_name = port_name     # Name of the port.
         self._obs = obs                 # Observation object.
-        self._is_enabled = is_enabled   # Is enabled or not.
+        self._is_enabled = is_enabled   # Job is enabled or not.
         self._weekdays = weekdays       # The time sheet.
         self._uplink = uplink           # Callback function.
 
@@ -74,7 +74,7 @@ class Job(object):
         self._end_date = arrow.get(end_date, self._date_fmt)
 
     def has_expired(self) -> bool:
-        """Checks if the job has expired."""
+        """Checks whether or not the job has expired."""
         now = arrow.now()
 
         if now > self._end_date:

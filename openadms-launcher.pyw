@@ -88,13 +88,13 @@ def mainw() -> None:
                         widget='FileChooser')
     parser.add_argument('-b', '--bind',
                         metavar='Host',
-                        help='IP address or FQDN of internal MQTT message broker',
+                        help='IP address or FQDN of MQTT message broker',
                         dest='host',
                         action='store',
                         default='127.0.0.1')
     parser.add_argument('-p', '--port',
                         metavar='Port',
-                        help='Port of internal MQTT message broker',
+                        help='Port of MQTT message broker',
                         dest='port',
                         action='store',
                         type=int,

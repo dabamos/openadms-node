@@ -30,6 +30,10 @@ from typing import *
 
 
 class RootFilter(logging.Filter):
+    """
+    RootFilter is a helper class to filter unwanted log messages from external
+    Python modules.
+    """
 
     def filter(self, record: logging.LogRecord) -> bool:
         """Returns whether a logging.LogRecord should be logged."""
@@ -144,6 +148,11 @@ class RingBufferLogHandler(logging.Handler):
             self._buffer.append(log_entry)
 
     def get_logs(self) -> str:
+        """Returns all log messages as a concatenated string.
+
+        Returns:
+            All log messages.
+        """
         return self._buffer.to_string()
 
     @property

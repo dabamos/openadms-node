@@ -319,7 +319,7 @@ class HelmertTransformer(Prototype):
         Args:
             hz: Horizontal direction.
             v: Vertical angle.
-            dist: Horizontal direction.
+            dist: Horizontal distance.
             view_point_x: X coordinate of the view point.
             view_point_y: Y coordinate of the view point.
             view_point_z: Z coordinate of the view point.
@@ -333,7 +333,6 @@ class HelmertTransformer(Prototype):
         local_x, local_y, local_z = self.get_cartesian_coordinates(hz,
                                                                    v,
                                                                    dist)
-
         x = view_point_x + (a * local_x) - (o * local_y)
         y = view_point_y + (a * local_y) + (o * local_x)
         z = view_point_z + local_z
@@ -426,7 +425,8 @@ class HelmertTransformer(Prototype):
 
         return obs
 
-    def _calculate_view_point(self, obs: Observation) -> Observation:
+    def _calculate_view_point(self, obs: Observation) -> Union[Observation,
+                                                               None]:
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
         num_fixed_points = len(self._fixed_points)      # n.
@@ -618,8 +618,12 @@ class HelmertTransformer(Prototype):
         # Return the Observation object of the view point.
         return view_point
 
-    def get_cartesian_coordinates(self, hz: float, v: float, slope_dist: float)\
-            -> Tuple[float, float, float]:
+    def get_cartesian_coordinates(self,
+                                  hz: float,
+                                  v: float,
+                                  slope_dist: float) -> Tuple[float,
+                                                              float,
+                                                              float]:
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
@@ -640,7 +644,7 @@ class HelmertTransformer(Prototype):
         """Checks whether all fixed points have been measured at least once."""
         for fixed_point_id, fixed_point in self._fixed_points.items():
             if fixed_point.get('lastUpdate') is None:
-                # Tie point has not been measured yet.
+                # Fixed point has not been measured yet.
                 return False
 
         return True

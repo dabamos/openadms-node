@@ -49,7 +49,7 @@ class InterruptCounter(Prototype):
     Configuration:
         bounceTime: Bounce time in ms.
         countTime: Observation time in s.
-        gpio: GPIO pin number of the Raspberry Pi.
+        pin: GPIO pin number of the Raspberry Pi.
         receiver: Name of the receiving module.
         sensorName: Name of the connected sensor.
     """
@@ -58,7 +58,7 @@ class InterruptCounter(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 
-        self._gpio = config.get('gpio')
+        self._pin = config.get('pin')
         self._bounce_time = config.get('bounceTime')
         self._count_time = config.get('countTime')
         self._receiver = config.get('receiver')
@@ -74,29 +74,33 @@ class InterruptCounter(Prototype):
         GPIO.cleanup()
 
     def init_gpio(self) -> None:
+        """Initializes the GPIO interface."""
         # Set SoC as reference.
         GPIO.setmode(GPIO.BCM)
         # Set pin as input and activate pull-down resistor.
-        GPIO.setup(self._gpio,
+        GPIO.setup(self._pin,
                    GPIO.IN,
                    pull_up_down=GPIO.PUD_DOWN)
         # Add interrupt event.
-        GPIO.add_event_detect(self._gpio,
+        GPIO.add_event_detect(self._pin,
                               GPIO.RISING,
                               callback=self._interrupt,
                               bouncetime=self._bounce_time)
 
     def _interrupt(self) -> None:
+        """Catches an interrupt and increases the counter."""
         self._lock.acquire()
 
         try:
             self._counter += 1
             self.logger.debug('Counted interrupt {} on GPIO pin {}'
-                              .format(self._counter, self._gpio))
+                              .format(self._counter, self._pin))
         finally:
             self._lock.release()
 
     def run(self) -> None:
+        """The counter loop. Creates a new observation at the defined
+        interval."""
         t1 = time.time()
         t2 = t1
 
@@ -118,8 +122,9 @@ class InterruptCounter(Prototype):
             t2 = time.time()
 
     def _fire(self, c: int) -> None:
+        """Creates a new observation with the given counter value."""
         obs = Observation()
-        gpio = 'GPIO{}'.format(self._gpio)
+        gpio = 'gpio{}'.format(self._pin)
 
         response_sets = {
             gpio: Observation.create_response_set('int', 'none', c)
@@ -130,7 +135,7 @@ class InterruptCounter(Prototype):
         obs.set('nextReceiver', 0)
         obs.set('node', self._node_manager.node.id)
         obs.set('onetime', False)
-        obs.set('portName', 'GPIO{}'.format(self._gpio))
+        obs.set('portName', 'GPIO{}'.format(self._pin))
         obs.set('project', self._project_manager.project.id)
         obs.set('receivers', [self._receiver])
         obs.set('responseSets', response_sets)

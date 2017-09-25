@@ -48,9 +48,12 @@ class PreProcessor(Prototype):
         """Extracts the values from the raw responses of the observation
         using regular expressions."""
         for set_name, request_set in obs.get('requestSets').items():
-            if not request_set.get('enabled') or\
-                    set_name not in obs.get('requestsOrder'):
+            if not request_set.get('enabled'):
                 # Request is disabled.
+                continue
+
+            if set_name not in obs.get('requestsOrder'):
+                # Request should be ignored.
                 continue
 
             response = request_set.get('response')
@@ -86,11 +89,10 @@ class PreProcessor(Prototype):
                                                    obs.get('portName')))
                 return obs
 
-            # The regular expression pattern needs a least one defined group
-            # by using the braces "(" and ")". Otherwise, the extraction of the
-            # values fails.
+            # The regular expression pattern needs a least one named group
+            # defined. Otherwise, the extraction of the values fails.
             #
-            # Right: "(.*)"
+            # Right: "(?P<id>.*)"
             # Wrong: ".*"
             if pattern.groups == 0:
                 self.logger.error('No group(s) defined in regular expression '
@@ -124,14 +126,12 @@ class PreProcessor(Prototype):
                 response_type = response_set.get('type').lower()
 
                 if response_type == 'float':
-                    # Convert raw value to float.
-                    # Replace comma by dot.
+                    # Convert raw value to float. Replace comma by dot.
                     response_value = self.to_float(raw_value)
                 elif response_type == 'integer':
                     # Convert raw value to int.
                     response_value = self.to_int(raw_value)
                 else:
-                    # "Convert" raw value to string.
                     response_value = raw_value
 
                 if response_value is not None:
@@ -167,7 +167,7 @@ class PreProcessor(Prototype):
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')
 
-    def to_float(self, raw_value: str) -> float:
+    def to_float(self, raw_value: str) -> Union[float, None]:
         dot_value = raw_value.replace(',', '.')
 
         if self.is_float(dot_value):
@@ -178,7 +178,7 @@ class PreProcessor(Prototype):
                                 '(not float)'.format(raw_value))
             return None
 
-    def to_int(self, raw_value: str) -> int:
+    def to_int(self, raw_value: str) -> Union[int, None]:
         if self.is_int(raw_value):
             response_value = int(raw_value)
             return response_value
@@ -197,10 +197,16 @@ class ResponseValueInspector(Prototype):
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
-        self._limits = config.get('limits', {})
+        self._observations = config.get('observations', {})
 
     def process_observation(self, obs: Observation) -> Observation:
-        for response_name, limits in self._limits.items():
+        if not obs.get('name') in self._observations:
+            # Nothing defined for this observation.
+            return obs
+
+        response_sets = self._observations.get(obs.get('name'))
+
+        for response_name, limits in response_sets.items():
             response_value = obs.get_response_value(response_name)
 
             if not response_value or not self.is_number(response_value):
@@ -394,7 +400,7 @@ class UnitConverter(Prototype):
 
             if properties.get('conversionType') == 'scale':
                 dgn_value = self.scale(float(src_value),
-                                        properties.get('scalingValue'))
+                                       properties.get('scalingValue'))
                 dgn_unit = properties.get('designatedUnit')
 
                 self.logger.info('Converted response "{}" of observation "{}" '

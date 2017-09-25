@@ -126,6 +126,10 @@ class Alerter(Prototype):
 
 
 class AlertMessageFormatter(Prototype):
+    """
+    AlertMessageFormatter caches and formats alerts. They are then forwarded to
+    other modules for further processing and transmission.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
@@ -142,7 +146,7 @@ class AlertMessageFormatter(Prototype):
         # Message handler.
         self.add_handler('alert', self.handle_alert_message)
 
-        # Queue for alert message collection.
+        # Queue for alert message caching.
         self._queue = queue.Queue(-1)
 
     def handle_alert_message(self,
@@ -156,11 +160,11 @@ class AlertMessageFormatter(Prototype):
             payload: The alert payload.
         """
         if self._msg_collection_enabled:
-            # Add the alert message to the collection queue. It will be
-            # processed by the threaded `run()` method later.
+            # Cache the alert message. It will be processed by the threaded
+            # `run()` method later.
             self._queue.put(payload)
         else:
-            # Process a single alert message.
+            # Process a single alert message immediately.
             receiver = payload.get('receiver')
             self.process_alert_messages(receiver, [payload])
 
@@ -184,7 +188,7 @@ class AlertMessageFormatter(Prototype):
             'type': self._config.get('type')
         }
 
-        # Parse the properties.
+        # Parse the properties and replace placeholders.
         properties = {}
 
         vars = {
@@ -246,13 +250,11 @@ class AlertMessageFormatter(Prototype):
             try:
                 # Get a message from the queue.
                 msg = self._queue.get_nowait()
-
                 # Check the receiver.
                 receiver = msg.get('receiver')
 
                 if not receiver:
-                    self.logger.warning('No receiver defined in alert message')
-                    continue
+                    raise ValueError('No receiver defined in alert message')
 
                 # Create an empty list for the alert messages.
                 if not cache.get(receiver):
@@ -303,7 +305,9 @@ class Heartbeat(Prototype):
         self._interval = config.get('interval')
 
         self._thread = None
-        self._header = {'type': 'heartbeat'}
+        self._header = {
+            'type': 'heartbeat'
+        }
 
         self.add_handler('heartbeat', self.process_heartbeat)
 
@@ -312,22 +316,15 @@ class Heartbeat(Prototype):
                           payload: Dict[str, Any]) -> None:
         self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
                          .format(payload.get('dt'),
-                                 payload.get('projectId')))
+                                 payload.get('project')))
 
     def run(self, sleep_time: float = 0.5) -> None:
-        project_id = self._config_manager.config.get('project').get('id')
-
-        if not project_id:
-            self.logger.warning('No project ID set in configuration')
-            project_id = ''
-
-        while not self._uplink:
-            time.sleep(sleep_time)
+        project_id = self._project_manager.project.id
 
         while True:
             payload = {
-                'dt': datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f'),
-                'projectId': project_id
+                'dt': arrow.utcnow(),
+                'project': project_id
             }
 
             for target in self._receivers:
@@ -382,6 +379,7 @@ class IrcAgent(Prototype):
         self._channel = config.get('channel')
 
         if not self._channel.startswith('#'):
+            self.logger.warning('Channel name is missing "#"')
             self._channel = '#' + self._channel
 
         self.add_handler('irc', self.handle_irc)
@@ -489,7 +487,7 @@ class IrcAgent(Prototype):
 
         try:
             message = self._conn.recv(buffer_size).decode('utf-8')
-        except:
+        except Exception:
             pass
 
         return message
@@ -562,6 +560,10 @@ class MailAgent(Prototype):
         self._x_mailer = 'OpenADMS {} Mail Agent'\
                          .format(System.get_openadms_version())
 
+        if self._is_tls and self._is_start_tls:
+            raise ValueError('Invalid SSL configuration '
+                             '(select either TLS or StartTLS)')
+
         self.add_handler('email', self.handle_mail)
         manager.schema_manager.add_schema('email', 'email.json')
 
@@ -598,11 +600,6 @@ class MailAgent(Prototype):
             mail_subject: The subject of the email.
             mail_message: The body test of the email.
         """
-        if self._is_tls and self._is_start_tls:
-            self.logger.erro('Invalid SSL configuration '
-                             '(select either TLS or StartTLS)')
-            return
-
         msg = MIMEMultipart('alternative')
         msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
         msg['To'] = mail_to
@@ -613,7 +610,6 @@ class MailAgent(Prototype):
         plain_text = MIMEText(mail_message.encode(self._charset),
                               'plain',
                               self._charset)
-
         msg.attach(plain_text)
 
         try:
@@ -663,7 +659,6 @@ class MastodonAgent(Prototype):
         self._user_cred_file = 'openadms_usercred.secret'
 
         self._mastodon = None
-        self._is_login = False
 
     def _create_app(self) -> None:
         Mastodon.create_app('openadms',
@@ -676,10 +671,9 @@ class MastodonAgent(Prototype):
             self._mastodon.log_in(self._email,
                                   self._password,
                                   to_file=self._user_cred_file)
-            self._is_login = True
             self.logger.debug('Login on {} successful'
                               .format(self._api_base_url))
-        except:
+        except Exception:
             self.logger.error('Cannot login on {}'.format(self._api_base_url))
 
     def handle_mastodon(self,
@@ -693,21 +687,18 @@ class MastodonAgent(Prototype):
             self._mastodon = Mastodon(client_id=self._client_cred_file,
                                       api_base_url=self._api_base_url)
 
-        if not self._is_login:
-            self._login()
-
         message = payload.get('message')
 
         if message and len(message) > 0:
             try:
+                self._login()
                 self._mastodon.toot(message)
                 self.logger.info('Tooted to {}'.format(self._api_base_url))
-            except:
-                self.logger.error('Cannot access Mastodon API')
+            except Exception:
+                self.logger.error('Accessing Mastodon instance failed')
 
 
 class RssAgent(Prototype):
-
     """
     RSSAgent creates an RSS 2.0 feed out of given data.
     """

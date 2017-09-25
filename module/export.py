@@ -133,7 +133,7 @@ class FileExporter(Prototype):
                 if header:
                     fh.write(header)
 
-                # Format the time stamp. For more information, see
+                # Format the time stamp. For more information, see:
                 # http://arrow.readthedocs.io/en/latest/#tokens
                 date_time = ts.format(self._date_time_format)
 
@@ -205,7 +205,7 @@ class RealTimePublisher(Prototype):
                                                obs_copy.get('target'),
                                                target))
 
-            header = {'type': 'observation'}
+            header = Observation.get_header()
             payload = obs_copy.data
 
             self.publish(target, header, payload)
