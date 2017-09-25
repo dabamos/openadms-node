@@ -21,13 +21,12 @@
                                 }
                             },
                             "type": "object"
-                        },
-                        "type": "object"
+                        }
                     },
                     "type": "object"
-                },
-                "type": "object"
-            }
+                }
+            },
+            "type": "object"
         }
     },
     "type": "object"
