@@ -1,23 +1,6 @@
 #!/usr/bin/env python3.6
-"""
-Copyright (c) 2017 Hochschule Neubrandenburg.
 
-Licenced under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
-
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
+"""Connectivity modules for various NoSQL databases."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -47,7 +30,7 @@ class CouchDriver(Prototype):
         config = self.get_config(self._name)
 
         # HTTPS or HTTP.
-        tls = config.get('tls')
+        tls = config.get('tls', False)
         self._scheme = 'https' if tls else 'http'
 
         # CouchDB server.
@@ -92,7 +75,7 @@ class CouchDriver(Prototype):
                                      obs.get('target'),
                                      obs.get('portName'),
                                      self._db_name))
-        except:
+        except Exception:
             self.logger.error('Observation "{}" of target "{}" from port "{}" '
                               'could not be saved in CouchDB database "{}"'
                               .format(obs.get('name'),

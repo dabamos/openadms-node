@@ -1,23 +1,4 @@
 #!/usr/bin/env python3.6
-"""
-Copyright (c) 2017 Hochschule Neubrandenburg.
-
-Licenced under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
-
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
 
 """Module for the scheduling of observations."""
 
@@ -58,7 +39,7 @@ class Job(object):
         self._name = name               # Name of the job.
         self._project_id = project_id   # Project ID.
         self._node_id = node_id         # Node ID.
-        self._port_name = port_name     # Name of the port.
+        self._port_name = port_name     # Name of the port module.
         self._obs = obs                 # Observation object.
         self._is_enabled = is_enabled   # Job is enabled or not.
         self._weekdays = weekdays       # The time sheet.
@@ -262,9 +243,6 @@ class Scheduler(Prototype):
 
         while self.is_running:
             t1 = time.time()
-
-            if not self._is_running:
-                break
 
             for job in self._jobs:
                 if job.has_expired():

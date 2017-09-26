@@ -1,23 +1,4 @@
 #!/usr/bin/env python3.6
-"""
-Copyright (c) 2017 Hochschule Neubrandenburg.
-
-Licenced under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
-
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
 
 """Module for alerting."""
 
@@ -192,11 +173,11 @@ class AlertMessageFormatter(Prototype):
         properties = {}
 
         vars = {
-            'nid': self._node_manager.node.id,
-            'node': self._node_manager.node.name,
-            'pid': self._project_manager.project.id,
-            'project': self._project_manager.project.name,
-            'receiver': receiver
+            'nid': self._node_manager.node.id,              # Sensor node ID.
+            'node': self._node_manager.node.name,           # Sensor node name.
+            'pid': self._project_manager.project.id,        # Project ID.
+            'project': self._project_manager.project.name,  # Project name.
+            'receiver': receiver                            # Name of receiver.
         }
 
         for prop_name, prop in self._config.get('properties').items():
@@ -242,6 +223,7 @@ class AlertMessageFormatter(Prototype):
         self.publish(self._receiver, header, payload)
 
     def run(self) -> None:
+        """Processes the cached alert messages."""
         # Dictionary for caching alert messages. Stores a list of dictionaries:
         # '<receiver_name>': [<dict_1>, <dict_2>, ..., <dict_n>]
         cache = {}
@@ -286,7 +268,7 @@ class AlertMessageFormatter(Prototype):
         super().start()
 
         if self._msg_collection_enabled:
-            # Threading for alert message collection.
+            # Threading for alert message caching.
             self._thread = threading.Thread(target=self.run)
             self._thread.daemon = True
             self._thread.start()
@@ -294,7 +276,8 @@ class AlertMessageFormatter(Prototype):
 
 class Heartbeat(Prototype):
     """
-    Heartbeat sends heartbeat messages ("pings") to the message broker.
+    Heartbeat sends heartbeat messages ("pings") to the message broker by using
+    the message type `heartbeat`.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -318,7 +301,7 @@ class Heartbeat(Prototype):
                          .format(payload.get('dt'),
                                  payload.get('project')))
 
-    def run(self, sleep_time: float = 0.5) -> None:
+    def run(self) -> None:
         project_id = self._project_manager.project.id
 
         while True:
@@ -359,7 +342,9 @@ class HeartbeatMonitor(Prototype):
 
 class IrcAgent(Prototype):
     """
-    IrcAgent sends alert messages to an IRC channel or user.
+    IrcAgent sends alert messages to the Internet Relay Chat. This module acts
+    as a simple IRC bot which connects to an IRC server and sends text to a
+    channel or user. IrcAgents implements only a few commands of RFC 1459.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -641,7 +626,8 @@ class MailAgent(Prototype):
 
 class MastodonAgent(Prototype):
     """
-    Mastodon sends toots to the Mastodon social network.
+    Mastodon sends toots to the Mastodon social network. Requires the Python
+    module "Mastodon.py".
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -785,7 +771,8 @@ class RssAgent(Prototype):
     def get_rss_feed(self,
                      vars: Dict[str, str],
                      items: List[Dict[str, str]]) -> str:
-        """Returns a string with the RSS 2.0 feed.
+        """Returns a string with the RSS 2.0 feed. Feed template is hard-coded
+        into this method. Rather quick and dirty, but does the job.
 
         Args:
             vars: The variables to replace in the RSS template.
@@ -857,7 +844,8 @@ class RssAgent(Prototype):
 
         with open(str(file_path), 'w') as fh:
             fh.write(contents)
-            self.logger.info('Saved RSS feed to file "{}"'.format(str(file_path)))
+            self.logger.info('Saved RSS feed to file "{}"'
+                             .format(str(file_path)))
 
 
 class ShortMessageAgent(Prototype):

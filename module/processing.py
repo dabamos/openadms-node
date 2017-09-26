@@ -1,23 +1,4 @@
 #!/usr/bin/env python3.6
-"""
-Copyright (c) 2017 Hochschule Neubrandenburg.
-
-Licenced under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
-
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
 
 """Module for data processing (pre-processing, atmospheric corrections,
 transformations, and so on)."""
@@ -37,16 +18,24 @@ from module.prototype import Prototype
 
 class PreProcessor(Prototype):
     """
-    PreProcessor extracts values from the raw response of a given observation
-    set and converts them to the defined types.
+    PreProcessor extracts values from the raw responses of a given observation
+    and converts them to the defined data types.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
+        # This module has nothing to configure.
 
     def process_observation(self, obs: Observation) -> Observation:
         """Extracts the values from the raw responses of the observation
-        using regular expressions."""
+        using regular expressions.
+
+        Args:
+            obs: The observation object.
+
+        Returns:
+            The observation object with extracted and converted responses.
+        """
         for set_name, request_set in obs.get('requestSets').items():
             if not request_set.get('enabled'):
                 # Request is disabled.
@@ -59,7 +48,7 @@ class PreProcessor(Prototype):
             response = request_set.get('response')
             response_pattern = request_set.get('responsePattern')
 
-            if response is None or response == '':
+            if response is None or len(response) == 0:
                 self.logger.warning('No response "{}" in observation "{}" of '
                                     'target "{}"'.format(set_name,
                                                          obs.get('name'),
@@ -105,9 +94,9 @@ class PreProcessor(Prototype):
             response_sets = obs.get('responseSets')
 
             for group_name, raw_value in match.groupdict("").items():
-                if raw_value is None:
-                    self.logger.error('No raw value found for response set '
-                                      '"{}" of observation "{}" of target "{}"'
+                if raw_value is None or len(raw_value) == 0:
+                    self.logger.error('No raw value found in response set "{}" '
+                                      'of observation "{}" of target "{}"'
                                       .format(group_name,
                                               obs.get('name'),
                                               obs.get('target')))
@@ -146,7 +135,14 @@ class PreProcessor(Prototype):
         return obs
 
     def is_int(self, value: str) -> bool:
-        """Returns whether a value is int or not."""
+        """Returns whether a value is int or not.
+
+        Args:
+            value: The value string.
+
+        Returns:
+            True if value is integer, false if not.
+        """
         try:
             int(value)
             return True
@@ -154,7 +150,14 @@ class PreProcessor(Prototype):
             return False
 
     def is_float(self, value: str) -> bool:
-        """Returns whether a value is float or not."""
+        """Returns whether a value is float or not.
+
+        Args:
+            value: The value string.
+
+        Returns:
+            True if value is float, false if not.
+        """
         try:
             float(value)
             return True
@@ -162,12 +165,27 @@ class PreProcessor(Prototype):
             return False
 
     def sanitize(self, s: str) -> str:
-        """Removes some non-printable characters from a string."""
+        """Removes some non-printable characters from a string.
+
+        Args:
+            s: String to sanitize.
+
+        Returns:
+            Sanitized string.
+        """
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')
 
     def to_float(self, raw_value: str) -> Union[float, None]:
+        """Converts string to float.
+
+        Args:
+            raw_value: The raw string.
+
+        Returns:
+            Float number if string can be converted, otherwise None.
+        """
         dot_value = raw_value.replace(',', '.')
 
         if self.is_float(dot_value):
@@ -179,6 +197,14 @@ class PreProcessor(Prototype):
             return None
 
     def to_int(self, raw_value: str) -> Union[int, None]:
+        """Converts string to int.
+
+        Args:
+            raw_value: The raw string.
+
+        Returns:
+            Integer number if string can be converted, otherwise None.
+        """
         if self.is_int(raw_value):
             response_value = int(raw_value)
             return response_value
@@ -200,6 +226,14 @@ class ResponseValueInspector(Prototype):
         self._observations = config.get('observations', {})
 
     def process_observation(self, obs: Observation) -> Observation:
+        """Checks, if responses are inside defined bounds.
+
+        Args:
+            obs: The observation object.
+
+        Returns:
+            The untouched observation object.
+        """
         if not obs.get('name') in self._observations:
             # Nothing defined for this observation.
             return obs
@@ -241,7 +275,14 @@ class ResponseValueInspector(Prototype):
         return obs
 
     def is_number(self, value: Any) -> bool:
-        """Returns whether a value is a number or not."""
+        """Returns whether a value is a number or not.
+
+        Args:
+            value: The value variable.
+
+        Returns:
+            True of value is a number, false if not.
+        """
         try:
             float(value)
             return True

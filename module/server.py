@@ -1,23 +1,4 @@
 #!/usr/bin/env python3.6
-"""
-Copyright (c) 2017 Hochschule Neubrandenburg.
-
-Licenced under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
-
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
 
 """Module for network services."""
 
@@ -56,6 +37,8 @@ class LocalControlServer(Prototype):
 
         self._host = config.get('host')
         self._port = config.get('port')
+
+        self._httpd = None
 
         # Thread for the HTTP server.
         self._thread = Thread(target=self.run)
@@ -185,7 +168,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             module.start_worker()
 
     def get_404(self) -> str:
-        """Returns a file not found page (error 404).
+        """Returns a "file not found" page (error 404).
 
         Returns:
             String with HTML page.
@@ -338,6 +321,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         return False
 
     def log_message(self, format: str, *args) -> None:
+        """Prevents HTTP request handler from adding log messages to the root
+        logger."""
         return
 
     def parse(self, template: str, **kwargs) -> str:
