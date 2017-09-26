@@ -9,11 +9,12 @@ __license__ = 'EUPL'
 import platform
 import socket
 
+from pathlib import Path
+
 import arrow
 import uptime
 #import psutil
 
-from pathlib import Path
 
 from core.version import *
 

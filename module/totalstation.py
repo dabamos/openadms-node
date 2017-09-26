@@ -7,11 +7,12 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import arrow
 import math
 import time
 
 from typing import *
+
+import arrow
 
 from core.observation import Observation
 from core.manager import Manager

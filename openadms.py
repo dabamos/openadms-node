@@ -23,7 +23,6 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
 import argparse
-import coloredlogs
 import logging.handlers
 import signal
 import sys
@@ -34,6 +33,8 @@ import types
 from pathlib import Path
 from threading import Thread
 from typing import *
+
+import coloredlogs
 
 from core.intercom import MQTTMessageBroker
 from core.logging import RootFilter
@@ -177,6 +178,10 @@ def setup_logging(is_quiet: bool = False,
     fh.setFormatter(formatter)
     root.addHandler(fh)
 
+    # Add filter to log handlers.
+    for handler in logging.root.handlers:
+        handler.addFilter(RootFilter())
+
     if is_quiet:
         # Silence logger output.
         console_level = 100
@@ -197,16 +202,12 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
         host: IP address or FQDN.
         port: Port number.
     """
-    # Add filter to log handlers.
-    for handler in logging.root.handlers:
-        handler.addFilter(RootFilter())
-
     broker = MQTTMessageBroker(host, port)
     broker.start()
 
 
 if __name__ == '__main__':
-    # Add OpenADMS directory to system path.
+    # Add OpenADMS directory to the Python system path.
     sys.path.append(System.get_root_dir())
 
     # Set the hook for unhandled exceptions.

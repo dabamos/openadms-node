@@ -6,16 +6,20 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import arrow
+# Build-in modules.
 import copy
 import re
-import serial
 import socket
 import time
 
 from threading import Thread
 from typing import *
 
+# Third-party modules.
+import arrow
+import serial
+
+# OpenADMS modules.
 from core.observation import Observation
 from core.manager import Manager
 from core.system import System

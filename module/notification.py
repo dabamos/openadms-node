@@ -6,7 +6,7 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'EUPL'
 
-import arrow
+# Build-in modules.
 import logging
 import queue
 import smtplib
@@ -16,16 +16,20 @@ import threading
 import time
 import uuid
 
-from datetime import datetime
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from mastodon import Mastodon
 from pathlib import Path
 from string import Template
 from typing import *
 
+# Third-party modules.
+import arrow
+
+from mastodon import Mastodon
+
+# OpenADMS modules.
 from core.logging import RingBuffer, RootFilter
 from core.manager import Manager
 from core.system import System

@@ -8,7 +8,6 @@ __license__ = 'EUPL'
 
 import codecs
 import logging
-import uuid
 
 from typing import *
 
