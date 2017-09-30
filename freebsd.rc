@@ -15,10 +15,11 @@ load_rc_config $name
 : ${openadms_path="/usr/local/sbin/openadms/openadms.py"}
 : ${openadms_config="/usr/local/etc/openadms/openadms.json"}
 : ${openadms_log="/var/log/openadms.log"}
+: ${openadms_args=""}
 
 pidfile="/var/run/${name}.pid"
 command="python3.6 ${openadms_path}"
-command_args="--config ${openadms_config} --log ${openadms_log}"
+command_args="--config ${openadms_config} --log ${openadms_log} ${openadms_args}"
 
 start_cmd="${name}_start"
 stop_cmd="${name}_stop"
