@@ -27,6 +27,9 @@ openadms_start() {
     touch ${pidfile}
     chown ${openadms_user} ${pidfile}
 
+    touch ${openadms_log}
+    chown ${openadms_user} ${openadms_log}
+
     echo "Starting OpenADMS."
     cd ${openadms_path}
     su ${openadms_user} -c "${command} ${command_args} & echo \$! > ${pidfile}"
