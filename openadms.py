@@ -178,10 +178,6 @@ def setup_logging(is_quiet: bool = False,
     fh.setFormatter(formatter)
     root.addHandler(fh)
 
-    # Add filter to log handlers.
-    for handler in logging.root.handlers:
-        handler.addFilter(RootFilter())
-
     if is_quiet:
         # Silence logger output.
         console_level = 100
@@ -205,6 +201,9 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
     broker = MQTTMessageBroker(host, port)
     broker.start()
 
+    # Add filter to log handlers.
+    for handler in logging.root.handlers:
+        handler.addFilter(RootFilter())
 
 if __name__ == '__main__':
     # Add OpenADMS directory to the Python system path.
