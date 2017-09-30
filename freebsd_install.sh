@@ -47,27 +47,21 @@ install() {
   echo
   echo -n "Creating user ...                  "
   create_user
-  sleep 0.25 ; echo "[OK]"
 
   echo -n "Creating directories ...           "
   create_dirs
-  sleep 0.25 ; echo "[OK]"
 
   echo -n "Copying files ...                  "
   copy_files
-  sleep 0.25 ; echo "[OK]"
 
   echo -n "Installing pip for Python 3.6 ...  "
   install_pip
-  sleep 0.25 ; echo "[OK]"
 
   echo -n "Installing Python dependencies ... "
   install_modules
-  sleep 0.25 ; echo "[OK]"
 
   echo -n "Installing rc.d script ...         "
   copy_rc
-  sleep 0.25 ; echo "[OK]"
 
   echo ; echo "Add the following line to /etc/rc.conf:" ; echo
   echo "    openadms_enable=\"YES\"" ; echo
