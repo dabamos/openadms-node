@@ -87,7 +87,7 @@ class Manager(object):
 
 class ConfigManager(object):
     """
-    ConfigManager loads and stores the OpenADMS configuration.
+    ConfigManager loads and stores the OpenADMS Node configuration.
     """
 
     def __init__(self, path: str, schema_manager):
@@ -190,7 +190,7 @@ class ConfigManager(object):
 
 class ModuleManager(object):
     """
-    ModuleManager loads and manages OpenADMS modules.
+    ModuleManager loads and manages OpenADMS Node modules.
     """
 
     def __init__(self, manager: Manager):
@@ -312,8 +312,8 @@ class ModuleManager(object):
             return False
 
     def module_exists(self, class_path: str) -> bool:
-        """Returns whether or not a OpenADMS module exists in the given file
-        path.
+        """Returns whether or not a OpenADMS Node module exists in the given
+        file path.
 
         Args:
             class_path: The path to the class.

@@ -43,6 +43,9 @@ from module.prototype import Prototype
 
 
 class Unix(Enum):
+    """
+    Type of BSD Unix derivate.
+    """
 
     NONE = 0
     FREEBSD = 1
@@ -51,10 +54,11 @@ class Unix(Enum):
 
 
 class GpioController(Prototype):
-
-    """GpioController sets single pins of the General Purpose Input Output
+    """
+    GpioController sets single pins of the General Purpose Input Output
     (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD,
-    NetBSD, or OpenBSD. This module does not work on Linux."""
+    NetBSD, or OpenBSD. This module does not work on Linux.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)

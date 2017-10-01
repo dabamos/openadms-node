@@ -2,18 +2,24 @@
 
 """OpenADMS - Open Automatic Deformation Monitoring System
 
-OpenADMS is an open source automatic deformation monitoring software for
-permanent observations. It can be used to monitor buildings, terrain, and other
-objects with the help of geodetical or geotechnical sensors.
+The Open Automatic Deformation Monitoring System (OpenADMS) is a free and
+open-source software for permanent observations. It can be used to monitor
+buildings, terrain, and other objects with the help of geodetical or
+geotechnical sensors.
+
+The OpenADMS Node software runs on single sensor node instances in a sensor
+network to obtain the measured data of total stations, digital levels,
+inclinometers, weather stations, GNSS receivers, and other sensors. The raw
+data is then processed, analysed, stored, and transmitted.
 
 Example:
     You can either use the internal MQTT message broker or an external one,
     like Eclipse Mosquitto. The external broker has to be started before
-    OpenADMS.
+    OpenADMS Node.
 
-    To start OpenADMS with the internal broker, run:
+    To start OpenADMS Node with the internal broker, run:
 
-        $ python3 openadms.py -c ./config/my_config.json -m -d
+        $ python3 openadms.py -c ./config/my_config.json -m
 
     The monitoring will begin automatically.
 """
@@ -201,9 +207,10 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
     broker = MQTTMessageBroker(host, port)
     broker.start()
 
-    # Add filter to log handlers.
+    # Add filter to log handlers, to exclude log messages from HBMQTT.
     for handler in logging.root.handlers:
         handler.addFilter(RootFilter())
+
 
 if __name__ == '__main__':
     # Add OpenADMS directory to the Python system path.
@@ -219,12 +226,12 @@ if __name__ == '__main__':
     # Parse command line options.
     parser = argparse.ArgumentParser(
         usage='%(prog)s [options]',
-        description='OpenADMS {} - Open Automatic Deformation Monitoring '
+        description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()),
-        epilog='OpenADMS has been developed at the Neubrandenburg University '
-               'of Applied Sciences (Germany). Licenced under the European '
-               'Union Public Licence (EUPL) v.1.1. For further information, '
-               'visit https://www.dabamos.de/.')
+        epilog='OpenADMS Node has been developed at the Neubrandenburg '
+               'University of Applied Sciences (Germany). Licenced under the '
+               'European Union Public Licence (EUPL) v.1.1. For further '
+               'information, visit https://www.dabamos.de/.')
 
     # Optional arguments.
     parser.add_argument('-v', '--verbosity',

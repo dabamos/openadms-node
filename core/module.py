@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 
-"""The module class to bundle an OpenADMS worker with a messenger."""
+"""The module class to bundle an OpenADMS Node worker with a messenger."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'

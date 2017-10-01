@@ -1,9 +1,9 @@
 #!/usr/bin/env python3.6
 
-"""OpenADMS with Graphical Launcher
+"""OpenADMS Node with Graphical Launcher
 
-This Python script starts OpenADMS by using a graphical launcher. You have to
-install the Python modules `wxPython` and `Gooey` with pip at first:
+This Python script starts OpenADMS Node by using a graphical launcher. You have
+to install the Python modules `wxPython` and `Gooey` with pip at first:
 
     $ python -m pip install gooey
 
@@ -23,7 +23,7 @@ logger = logging.getLogger()
 
 @Gooey(advanced=True,
        language='english',
-       program_name=('OpenADMS {} - '
+       program_name=('OpenADMS Node {} - '
                      'Open Automatic Deformation Monitoring System'
                      .format(System.get_openadms_version())),
        default_size=(610, 580),
@@ -31,7 +31,7 @@ logger = logging.getLogger()
        image_dir='./res/img')
 def mainw() -> None:
     parser = GooeyParser(
-        description='OpenADMS {} - Open Automatic Deformation Monitoring '
+        description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()))
 
     parser.add_argument('-c', '--config',

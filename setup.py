@@ -61,9 +61,9 @@ executables = [
     Executable('openadms-launcher.pyw', base=base)
 ]
 
-setup(name='OpenADMS',
+setup(name='OpenADMS Node',
       version=OPENADMS_VERSION,
-      description='OpenADMS',
+      description='OpenADMS Node',
       options={
           'build_exe': build_exe_options
       },

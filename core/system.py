@@ -73,13 +73,13 @@ class System(object):
 
     @staticmethod
     def get_openadms_string() -> str:
-        """Returns a string with OpenADMS version and version name:
+        """Returns a string with OpenADMS Node version and version name:
 
         Returns:
-            Complete OpenADMS version string.
+            Complete OpenADMS Node version string.
         """
-        return 'OpenADMS {} ({})'.format(OPENADMS_VERSION,
-                                         OPENADMS_VERSION_NAME)
+        return 'OpenADMS Node {} ({})'.format(OPENADMS_VERSION,
+                                              OPENADMS_VERSION_NAME)
 
     @staticmethod
     def get_openadms_version() -> float:
@@ -92,7 +92,7 @@ class System(object):
 
     @staticmethod
     def get_openadms_version_name() -> str:
-        """Returns the code name of the current OpenADMS version.
+        """Returns the code name of the current OpenADMS Node version.
 
         Returns:
             String with the version name.

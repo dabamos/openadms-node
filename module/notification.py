@@ -29,7 +29,7 @@ import arrow
 
 from mastodon import Mastodon
 
-# OpenADMS modules.
+# OpenADMS Node modules.
 from core.logging import RingBuffer, RootFilter
 from core.manager import Manager
 from core.system import System
@@ -445,7 +445,7 @@ class IrcAgent(Prototype):
         self._send('USER {} {} {} :{}\r\n'.format(self._nickname,
                                                   self._nickname,
                                                   self._nickname,
-                                                  'OpenADMS IRC Client'))
+                                                  'OpenADMS Node IRC Client'))
 
         if self._channel and len(self._channel) > 0:
             self.logger.info('Joining channel "{}" on "{}:{}"'
@@ -546,7 +546,7 @@ class MailAgent(Prototype):
         self._user_mail = config.get('userMail')
         self._user_name = config.get('userName')
         self._user_password = config.get('userPassword')
-        self._x_mailer = 'OpenADMS {} Mail Agent'\
+        self._x_mailer = 'OpenADMS Node {} Mail Agent'\
                          .format(System.get_openadms_version())
 
         if self._is_tls and self._is_start_tls:

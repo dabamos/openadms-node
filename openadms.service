@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenADMS daemon
+Description=OpenADMS Node daemon
 ConditionPathExists=/etc/openadms/openadms.json
 After=network.target
 Requires=network.target

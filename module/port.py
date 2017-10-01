@@ -19,7 +19,7 @@ from typing import *
 import arrow
 import serial
 
-# OpenADMS modules.
+# OpenADMS Node modules.
 from core.observation import Observation
 from core.manager import Manager
 from core.system import System
