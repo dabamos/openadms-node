@@ -1,11 +1,12 @@
-![OpenADMS](https://www.dabamos.de/github/openadms.png)
+![OpenADMS Node](https://www.dabamos.de/github/openadms.png)
 
 OpenADMS is an open source automatic deformation monitoring system for
-geodetical and geotechnical observations in the Internet of Things.  The
-software obtaines the measured data of arbitrary sensors, like total stations,
-digital levels, inclinometers, weather stations, or GNSS receivers. The raw
-sensor data is then processed, analysed, stored, and transmitted. OpenADMS
-can be used to observe objects like:
+geodetical and geotechnical observations in the Internet of Things.
+
+OpenADMS Node obtaines the measured data of arbitrary sensors, like total
+stations, digital levels, inclinometers, weather stations, or GNSS receivers.
+The raw sensor data is then processed, analysed, stored, and transmitted.
+It can be used to observe objects like:
 
 * bridges, tunnels, dams;
 * landslides, cliffs, glaciers;
@@ -20,32 +21,32 @@ The software is written in Python 3 and has been tested on:
 * FreeBSD 11 (x86-64, ARMv7)
 * NetBSD 7 (ARMv7)
 
-OpenADMS can either be used with CPython 3.6 or PyPy3.5.
+OpenADMS Node can either be used with CPython 3.6 or PyPy3.5.
 
-The current development version of OpenADMS is 0.6 (code name “Fukuyama”). For
-more information, please see https://www.dabamos.de/.
+The current development version of OpenADMS Node is 0.6 (code name
+“Fukuyama”). For more information, please see https://www.dabamos.de/.
 
 ## Installation
-The latest source version of OpenADMS can be obtained by cloning the master
+The latest source version of OpenADMS Node can be obtained by cloning the master
 branch and installing the required dependencies with `pip`:
 ```
-$ git clone https://github.com/dabamos/openadms.git
-$ cd openadms
+$ git clone https://github.com/dabamos/openadms-node.git
+$ cd openadms-node
 $ python3 -m pip install -U -r requirements.txt
 ```
-Run OpenADMS from the command line:
+Run OpenADMS Node from the command line:
 ```
 $ python3 openadms.py --config ./config/my_config.json --with-mqtt-broker --debug
 ```
-OpenADMS also features a graphical launcher. At first, run `win_install.bat` on
-Microsoft Windows or install the dependencies manually:
+OpenADMS Node also features a graphical launcher. At first, run
+`win_install.bat` on Microsoft Windows or install the dependencies manually:
 ```
 $ python3 -m pip install Gooey
 ```
 Execute `openadms-launcher.pyw` to start the graphical launcher.
 
 ### Dependencies
-OpenADMS depends on the following Python libraries:
+OpenADMS Node depends on the following Python libraries:
 
 * [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
 * [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
@@ -61,8 +62,8 @@ The graphical launcher uses [Gooey](https://pypi.python.org/pypi/Gooey) (MIT
 Licence).
 
 ## Message Broker
-The MQTT protocol is used for the message exchange in OpenADMS. You can either
-use an external MQTT message broker, like
+The MQTT protocol is used for the message exchange in OpenADMS Node. You can
+either use an external MQTT message broker, like
 [Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by using
 the parameter `--with-mqtt-broker`.
 
@@ -73,10 +74,10 @@ using the hostname `iot.eclipse.org` and port `1883`. For encryption, use port
 `8883`. MQTT over WebSockets runs on the ports `80` and `443`.
 
 ## Configuration
-The configuration of OpenADMS is done by using a JSON-based text file, located
-in the directory `./config`. Please define modules, serial ports, sensors, and
-so on there. OpenADMS takes the file name of your custom configuration as an
-argument. For instance, run:
+The configuration of OpenADMS Node is done by using a JSON-based text file,
+located in the directory `./config`. Please define modules, serial ports,
+sensors, and so on there. OpenADMS Node takes the file name of your custom
+configuration as an argument. For instance, run:
 ```
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
@@ -87,8 +88,8 @@ The Python tool `venv` can create a virtual Python environment for development
 ```
 $ python3 -m venv virtual-environment
 $ source ./virtual-environment/bin/activate.csh
-$ git clone https://github.com/dabamos/openadms
-$ cd openadms
+$ git clone https://github.com/dabamos/openadms-node
+$ cd openadms-node
 $ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
