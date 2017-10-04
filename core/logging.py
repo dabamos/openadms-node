@@ -56,21 +56,13 @@ class RingBuffer(object):
         """
         return self._deque.popleft()
 
-    def get(self) -> List[Any]:
-        """Returns a list with all elements.
-
-        Returns:
-            List with all elements in the deque.
-        """
-        return list(self._deque)
-
     def to_string(self) -> str:
         """Returns the whole deque as a string.
 
         Returns:
             String containing all string elements in the deque.
         """
-        return '\n'.join(self.get())
+        return '\n'.join(list(self._deque))
 
 
 class StringFormatter(logging.Formatter):
@@ -90,10 +82,10 @@ class StringFormatter(logging.Formatter):
         Returns:
             Formatted string of log record.
         """
-        if 'asctime' not in record.args:
+        if not record.asctime:
             record.asctime = self.formatTime(record, self.datefmt)
 
-        if 'message' not in record.args:
+        if not record.message:
             record.message = record.msg
 
         s = '{} - {:>8} - {:>26} - {}'.format(record.asctime,
