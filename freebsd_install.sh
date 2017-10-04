@@ -45,22 +45,22 @@ copy_rc() {
 
 install() {
   echo
-  echo -n "Creating user ...                  "
+  echo "Creating user ..."
   create_user
 
-  echo -n "Creating directories ...           "
+  echo "Creating directories ..."
   create_dirs
 
-  echo -n "Copying files ...                  "
+  echo "Copying files ..."
   copy_files
 
-  echo -n "Installing pip for Python 3.6 ...  "
+  echo "Installing pip for Python 3.6 ..."
   install_pip
 
-  echo -n "Installing Python dependencies ... "
+  echo "Installing Python dependencies ..."
   install_modules
 
-  echo -n "Installing rc.d script ...         "
+  echo "Installing rc.d script ..."
   copy_rc
 
   echo ; echo "Add the following line to /etc/rc.conf:" ; echo
