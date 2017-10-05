@@ -129,10 +129,10 @@ class GpioController(Prototype):
         out, err = self._communicate(cmd)
 
         if err and len(err) > 0:
-            self.logger.error('Setting pin "{}" to "{}" failed: {}'
+            self.logger.error('Setting GPIO pin "{}" to "{}" failed: {}'
                               .format(pin, value, err))
         else:
-            self.logger.info('Set pin "{}" to "{}"'.format(pin, value))
+            self.logger.verbose('Set GPIO pin "{}" to "{}"'.format(pin, value))
 
     def handle_gpio(self,
                     header: Dict[str, Any],

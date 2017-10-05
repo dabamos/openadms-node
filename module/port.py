@@ -126,12 +126,12 @@ class BluetoothPort(Prototype):
             # Get the response of the sensor.
             response = self._receive(response_delimiter, timeout)
 
-            self.logger.debug('Received response "{}" for request "{}" '
-                              'of observation "{}" from sensor "{}"'
-                              .format(self.sanitize(response),
-                                      request_name,
-                                      obs.get('name'),
-                                      obs.get('sensorName')))
+            self.logger.verbose('Received response "{}" for request "{}" '
+                                'of observation "{}" from sensor "{}"'
+                                .format(self.sanitize(response),
+                                        request_name,
+                                        obs.get('name'),
+                                        obs.get('sensorName')))
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
 
@@ -527,10 +527,10 @@ class SerialPort(Prototype):
                                   timeout=timeout)
 
             if len(response) > 0:
-                self.logger.debug('Received "{}" from sensor "{}" on port "{}"'
-                                  .format(self.sanitize(response),
-                                          obs.get('sensorName'),
-                                          self._name))
+                self.logger.verbose('Received "{}" from sensor "{}" on port '
+                                    '"{}"'.format(self.sanitize(response),
+                                                  obs.get('sensorName'),
+                                                  self._name))
                 draft['response'] = response
                 obs.set('timeStamp', str(arrow.utcnow()))
                 self.publish_observation(obs)

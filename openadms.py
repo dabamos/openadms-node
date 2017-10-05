@@ -169,7 +169,8 @@ def setup_logging(is_quiet: bool = False,
     root.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
-    formatter = logging.Formatter(fmt, '%Y-%m-%dT%H:%M:%S')
+    date_fmt = '%Y-%m-%dT%H:%M:%S,%f'
+    formatter = logging.Formatter(fmt, date_fmt)
 
     # File handler.
     file_level = {
@@ -197,7 +198,6 @@ def setup_logging(is_quiet: bool = False,
         console_level = 100
 
     # Colorized output of log messages.
-    date_fmt = '%Y-%m-%dT%H:%M:%S'
     coloredlogs.install(level=console_level,
                         fmt=fmt,
                         datefmt=date_fmt,

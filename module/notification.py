@@ -46,7 +46,7 @@ class Alerter(Prototype):
         config = self.get_config(self._name)
 
         self._modules = config.get('modules')
-        self._is_enabled = config.get('enabled')
+        self._is_enabled = config.get('enabled', True)
         self._thread = None
         self._queue = queue.Queue(1000)
 
@@ -96,6 +96,10 @@ class Alerter(Prototype):
 
     def run(self) -> None:
         while self.is_running:
+            if not self._is_enabled:
+                time.sleep(1)
+                continue
+
             record = self._queue.get()      # Blocking I/O.
             self.logger.info('Processing alert message')
             self.fire(record)
