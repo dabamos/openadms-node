@@ -72,6 +72,7 @@ class StringFormatter(logging.Formatter):
 
     def __init__(self):
         super().__init__()
+        self.datefmt = '%Y-%m-%dT%H:%M:%S'
 
     def format(self, record: logging.LogRecord) -> str:
         """Return formatted string of log record.

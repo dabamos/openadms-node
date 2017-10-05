@@ -169,7 +169,7 @@ def setup_logging(is_quiet: bool = False,
     root.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
-    date_fmt = '%Y-%m-%dT%H:%M:%S,%f'
+    date_fmt = '%Y-%m-%dT%H:%M:%S'
     formatter = logging.Formatter(fmt, date_fmt)
 
     # File handler.
