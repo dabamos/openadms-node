@@ -90,9 +90,9 @@ class BluetoothPort(Prototype):
         request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
-            self.logger.info('No requests order defined in observation "{}" '
-                             'of target "{}"'.format(obs.get('name'),
-                                                     obs.get('target')))
+            self.logger.notice('No requests order defined in observation "{}" '
+                               'of target "{}"'.format(obs.get('name'),
+                                                       obs.get('target')))
 
         # Send requests one by one to the sensor.
         for request_name in requests_order:
@@ -116,10 +116,10 @@ class BluetoothPort(Prototype):
             timeout = request_set.get('timeout')
 
             # Send the request of the observation to the attached sensor.
-            self.logger.info('Sending request "{}" of observation "{}" to '
-                             'sensor "{}"'.format(request_name,
-                                                  obs.get('name'),
-                                                  obs.get('sensorName')))
+            self.logger.verbose('Sending request "{}" of observation "{}" to '
+                                'sensor "{}"'.format(request_name,
+                                                     obs.get('name'),
+                                                     obs.get('sensorName')))
             # Write to the Bluetooth port.
             self._send(request)
 
@@ -310,8 +310,8 @@ class SerialPort(Prototype):
 
     def close(self) -> None:
         if self._serial:
-            self.logger.info('Closing port "{}"'
-                             .format(self._serial_port_config.port))
+            self.logger.verbose('Closing port "{}"'
+                                .format(self._serial_port_config.port))
             self._serial.close()
 
     def _create(self) -> None:
@@ -319,8 +319,8 @@ class SerialPort(Prototype):
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
 
-        self.logger.info('Opening port "{}"'
-                         .format(self._serial_port_config.port))
+        self.logger.verbose('Opening port "{}"'
+                            .format(self._serial_port_config.port))
 
         try:
             self._serial = serial.Serial(
@@ -378,8 +378,8 @@ class SerialPort(Prototype):
             return
 
         if not self._serial.is_open:
-            self.logger.info('Re-opening port "{}"'
-                             .format(self._serial_port_config.port))
+            self.logger.verbose('Re-opening port "{}"'
+                                .format(self._serial_port_config.port))
             self._serial.open()
             self._serial.reset_output_buffer()
             self._serial.reset_input_buffer()
@@ -391,9 +391,9 @@ class SerialPort(Prototype):
         request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
-            self.logger.info('No requests order defined in observation "{}" '
-                             'of target "{}"'.format(obs.get('name'),
-                                                     obs.get('target')))
+            self.logger.notice('No requests order defined in observation "{}" '
+                               'of target "{}"'.format(obs.get('name'),
+                                                       obs.get('target')))
 
         # Send requests sequentially to the sensor.
         for request_name in requests_order:
@@ -417,10 +417,10 @@ class SerialPort(Prototype):
             timeout = request_set.get('timeout')
 
             # Send the request of the observation to the attached sensor.
-            self.logger.info('Sending request "{}" of observation "{}" to '
-                             'sensor "{}"'.format(request_name,
-                                                  obs.get('name'),
-                                                  obs.get('sensorName')))
+            self.logger.verbose('Sending request "{}" of observation "{}" to '
+                                'sensor "{}"'.format(request_name,
+                                                     obs.get('name'),
+                                                     obs.get('sensorName')))
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:

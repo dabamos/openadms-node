@@ -136,9 +136,9 @@ class Job(object):
         # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
-        self.logger.debug('Starting job "{}" for port "{}"'
-                          .format(self._obs.get('name'),
-                                  self._port_name))
+        self.logger.info('Starting job "{}" for port "{}"'
+                         .format(self._obs.get('name'),
+                                 self._port_name))
 
         # Get the sleep time of the whole observation.
         sleep_time = obs_copy.get('sleepTime', 0)
@@ -239,7 +239,7 @@ class Scheduler(Prototype):
 
         # FIXME: Wait for uplink connection.
         sleep_time = 5.0
-        self.logger.info('Starting jobs in {:3.1f} s'.format(sleep_time))
+        self.logger.verbose('Starting jobs in {:3.1f} s'.format(sleep_time))
         time.sleep(sleep_time)
 
         while self.is_running:

@@ -41,6 +41,7 @@ from threading import Thread
 from typing import *
 
 import coloredlogs
+import verboselogs
 
 from core.intercom import MQTTMessageBroker
 from core.logging import RootFilter
@@ -68,7 +69,7 @@ def main(config_file_path: str) -> None:
     logger.info('|     |___ ___ ___|  _  |    \|     |   __|')
     logger.info('|  |  | . | -_|   |     |  |  | | | |__   |')
     logger.info('|_____|  _|___|_|_|__|__|____/|_|_|_|_____|')
-    logger.info('      |_| {:>33}'.format(v))
+    logger.info('      |_|                        Node {}'.format(v))
     logger.info('')
     logger.info('Copyright (c) Hochschule Neubrandenburg')
     logger.info('European Union Public Licence (EUPL) v.1.1')
@@ -160,6 +161,9 @@ def setup_logging(is_quiet: bool = False,
         verbosity: Verbosity level (1 - 5).
         log_file: Path of the log file.
     """
+    # Enable verbose logging.
+    verboselogs.install()
+
     # Basic logging configuration.
     console_level = logging.DEBUG if is_debug else logging.INFO
     root.setLevel(console_level)
@@ -171,10 +175,14 @@ def setup_logging(is_quiet: bool = False,
     file_level = {
         1: logging.CRITICAL,
         2: logging.ERROR,
-        3: logging.WARNING,
-        4: logging.INFO,
-        5: logging.DEBUG
-    }.get(verbosity, 3)
+        3: logging.SUCCESS,
+        4: logging.WARNING,
+        5: logging.NOTICE,
+        6: logging.INFO,
+        7: logging.VERBOSE,
+        8: logging.DEBUG,
+        9: logging.SPAM
+    }.get(verbosity, 5)
 
     fh = logging.handlers.RotatingFileHandler(log_file,
                                               maxBytes=MAX_LOG_FILE_SIZE,

@@ -59,6 +59,9 @@ class Alerter(Prototype):
 
         manager.schema_manager.add_schema('alert', 'alert.json')
 
+        if not self._is_enabled:
+            self.logger.notice('Alerting is disabled')
+
     def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
         header = {
@@ -68,8 +71,8 @@ class Alerter(Prototype):
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
-                self.logger.debug('Skipped module "{}" (not enabled)'
-                                  .format(module_name))
+                self.logger.notice('Skipped module "{}" (not enabled)'
+                                   .format(module_name))
                 continue
 
             receivers = module.get('receivers').get(record.levelname.lower())

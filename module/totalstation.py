@@ -197,8 +197,8 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if temperature is not None:
-            self.logger.info('Updated temperature to {} C'
-                             .format(round(temperature, 2)))
+            self.logger.verbose('Updated temperature to {} C'
+                                .format(round(temperature, 2)))
 
     @pressure.setter
     def pressure(self, pressure: float) -> None:
@@ -207,8 +207,8 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if pressure is not None:
-            self.logger.info('Updated pressure to {} hPa'
-                             .format(round(pressure, 2)))
+            self.logger.verbose('Updated pressure to {} hPa'
+                                .format(round(pressure, 2)))
 
     @humidity.setter
     def humidity(self, humidity: float) -> None:
@@ -217,8 +217,8 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if humidity is not None:
-            self.logger.info('Updated humidity to {} %'
-                             .format(round(humidity, 2)))
+            self.logger.verbose('Updated humidity to {} %'
+                                .format(round(humidity, 2)))
 
     @last_update.setter
     def last_update(self, last_update: int) -> None:
@@ -407,8 +407,8 @@ class HelmertTransformer(Prototype):
 
         return obs
 
-    def _calculate_view_point(self, obs: Observation) -> Union[Observation,
-                                                               None]:
+    def _calculate_view_point(self,
+                              obs: Observation) -> Union[Observation, None]:
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
         num_fixed_points = len(self._fixed_points)      # n.

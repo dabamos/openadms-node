@@ -36,10 +36,11 @@ class VirtualSensor(Prototype):
             sleep_time = request_set.get('sleepTime')
             response = ''
 
-            self.logger.info('Sending request "{}" to sensor "{}" on virtual '
-                             'port "{}"'.format(set_name,
-                                                obs.get('sensorName'),
-                                                self.name))
+            self.logger.verbose('Sending request "{}" to sensor "{}" on '
+                                'virtual port "{}"'
+                                .format(set_name,
+                                        obs.get('sensorName'),
+                                        self.name))
 
             for pattern in self.patterns:
                 reg_exp = re.compile(pattern)
@@ -50,11 +51,11 @@ class VirtualSensor(Prototype):
 
                 response = self.patterns[pattern](request)
 
-                self.logger.info('Received response "{}" from sensor "{}" on '
-                                 'virtual port "{}"'
-                                 .format(self.sanitize(response),
-                                         obs.get('sensorName'),
-                                         self.name))
+                self.logger.verbose('Received response "{}" from sensor "{}" '
+                                    'on virtual port "{}"'
+                                    .format(self.sanitize(response),
+                                            obs.get('sensorName'),
+                                            self.name))
                 break
 
             request_set['response'] = response

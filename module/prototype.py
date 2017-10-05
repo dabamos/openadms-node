@@ -233,9 +233,9 @@ class Prototype(object):
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            self.logger.debug('Observation "{}" of target "{}" has been '
-                              'finished'.format(obs.get('name'),
-                                                obs.get('target')))
+            self.logger.info('Observation "{}" of target "{}" has been '
+                             'finished'.format(obs.get('name'),
+                                               obs.get('target')))
             return
 
         # Name of the sending module.
