@@ -25,8 +25,8 @@ The software is written in Python 3 and has been tested on:
 
 OpenADMS Node can either be used with CPython 3.6+ or PyPy3.5.
 
-The current development version of OpenADMS Node is 0.6 (code name
-“Fukuyama”). For more information, see https://www.dabamos.de/.
+The current development version of OpenADMS Node is 0.7 (code name
+ï¿½Genevaï¿½). For more information, see https://www.dabamos.de/.
 
 ## Installation
 The latest source version of OpenADMS Node can be downloaded by cloning the
@@ -59,6 +59,7 @@ OpenADMS Node depends on the following Python libraries:
 * [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
 * [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
 * [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
+* [verboselogs](https://pypi.python.org/pypi/verboselogs) (MIT Licence)
 
 The graphical launcher uses [Gooey](https://pypi.python.org/pypi/Gooey) (MIT
 Licence).
