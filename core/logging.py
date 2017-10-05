@@ -82,10 +82,14 @@ class StringFormatter(logging.Formatter):
         Returns:
             Formatted string of log record.
         """
-        if not record.asctime:
+        try:
+            record.asctime
+        except AttributeError:
             record.asctime = self.formatTime(record, self.datefmt)
 
-        if not record.message:
+        try:
+            record.message
+        except AttributeError:
             record.message = record.msg
 
         s = '{} - {:>8} - {:>26} - {}'.format(record.asctime,
