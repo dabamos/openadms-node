@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "http://json-schema.org/draft-06/schema#",
     "id": "schema/observation.json",
     "properties": {
         "description": {
@@ -22,12 +22,20 @@
             "id": "/properties/nextReceiver",
             "type": "integer"
         },
+        "node": {
+            "id": "/properties/node",
+            "type": "string"
+        },
         "onetime": {
             "id": "/properties/onetime",
             "type": "boolean"
         },
         "portName": {
             "id": "/properties/portName",
+            "type": "string"
+        },
+        "project": {
+            "id": "/properties/project",
             "type": "string"
         },
         "receivers": {
