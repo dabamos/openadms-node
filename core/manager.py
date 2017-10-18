@@ -312,8 +312,8 @@ class ModuleManager(object):
             return False
 
     def module_exists(self, class_path: str) -> bool:
-        """Returns whether or not a OpenADMS Node module exists in the given
-        file path.
+        """Returns whether or not a OpenADMS Node module exists at the given
+        class path.
 
         Args:
             class_path: The path to the class.
@@ -357,6 +357,9 @@ class ModuleManager(object):
 
 
 class Node(object):
+    """
+    Node stores name, description, and ID of the sensor node.
+    """
 
     def __init__(self, name: str, id: str, description: str):
         self._name = name
@@ -419,6 +422,9 @@ class NodeManager(object):
 
 
 class Project(object):
+    """
+    Project stores name, description, and ID of the monitoring project.
+    """
 
     def __init__(self, name: str, id: str, description: str):
         self._name = name
