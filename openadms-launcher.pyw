@@ -43,11 +43,11 @@ def mainw() -> None:
                         required=True,
                         widget='FileChooser')
     parser.add_argument('-v', '--verbosity',
-                        metavar='Verbosity Level (1 - 5)',
+                        metavar='Verbosity Level (1 - 9)',
                         help='Log more diagnostic messages',
                         dest='verbosity',
                         action='count',
-                        default=3)
+                        default=6)
     parser.add_argument('-d', '--debug',
                         metavar='Debug',
                         help='Print debug messages',

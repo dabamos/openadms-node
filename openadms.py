@@ -151,7 +151,7 @@ def valid_path(string: str) -> str:
 
 def setup_logging(is_quiet: bool = False,
                   is_debug: bool = False,
-                  verbosity: int = 3,
+                  verbosity: int = 6,
                   log_file: str = 'openadms.log') -> None:
     """Setups the logger and logging handlers.
 
@@ -176,14 +176,14 @@ def setup_logging(is_quiet: bool = False,
     file_level = {
         1: logging.CRITICAL,
         2: logging.ERROR,
-        3: logging.SUCCESS,
+        3: verboselogs.SUCCESS,
         4: logging.WARNING,
-        5: logging.NOTICE,
+        5: verboselogs.NOTICE,
         6: logging.INFO,
-        7: logging.VERBOSE,
+        7: verboselogs.VERBOSE,
         8: logging.DEBUG,
-        9: logging.SPAM
-    }.get(verbosity, 5)
+        9: verboselogs.SPAM
+    }.get(verbosity, 6)
 
     fh = logging.handlers.RotatingFileHandler(log_file,
                                               maxBytes=MAX_LOG_FILE_SIZE,
@@ -247,8 +247,8 @@ if __name__ == '__main__':
                         dest='verbosity',
                         action='store',
                         type=int,
-                        default=3,
-                        choices=[1, 2, 3, 4, 5])
+                        default=6,
+                        choices=[1, 2, 3, 4, 5, 6, 7, 8, 9])
     parser.add_argument('-d', '--debug',
                         help='print debug messages',
                         dest='is_debug',

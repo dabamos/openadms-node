@@ -97,6 +97,7 @@ class Alerter(Prototype):
     def run(self) -> None:
         while self.is_running:
             if not self._is_enabled:
+                self.logger.notice('Alerting is disabled')
                 time.sleep(1)
                 continue
 

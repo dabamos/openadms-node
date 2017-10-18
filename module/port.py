@@ -440,12 +440,12 @@ class SerialPort(Prototype):
                 self._serial.reset_input_buffer()
 
                 if len(response) > 0:
-                    self.logger.debug('Received response "{}" for request "{}" '
-                                      'of observation "{}" from sensor "{}"'
-                                      .format(self.sanitize(response),
-                                              request_name,
-                                              obs.get('name'),
-                                              obs.get('sensorName')))
+                    self.logger.verbose('Received response "{}" for request '
+                                        '"{}" of observation "{}" from sensor '
+                                        '"{}"'.format(self.sanitize(response),
+                                                      request_name,
+                                                      obs.get('name'),
+                                                      obs.get('sensorName')))
                     break
 
                 # Try next attempt if response is empty.
