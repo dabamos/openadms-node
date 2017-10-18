@@ -102,5 +102,4 @@ The [on-line manual](https://www.dabamos.de/manual/index.html) is available on
 the project website.
 
 ## Licence
-OpenADMS is licenced under the [European Union Public
-Licence](https://joinup.ec.europa.eu/community/eupl/og_page/eupl) (EUPL) v1.1.
+OpenADMS is licenced under BSD (2-clause).
