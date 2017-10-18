@@ -4,7 +4,7 @@
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'EUPL'
+__license__ = 'BSD (2-Clause)'
 
 from core.manager import *
 

@@ -4,7 +4,7 @@
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'EUPL'
+__license__ = 'BSD (2-Clause)'
 
 import logging
 
@@ -13,7 +13,7 @@ from typing import *
 
 
 class RootFilter(logging.Filter):
-    """
+    """s
     RootFilter is a helper class to filter unwanted log messages from external
     Python modules.
     """
