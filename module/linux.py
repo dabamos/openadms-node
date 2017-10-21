@@ -25,15 +25,15 @@ from module.prototype import Prototype
 
 class InterruptCounter(Prototype):
     """
-    Counts GPIO interrupts on a single pin of a Raspberry Pi single-board
-    computer. Works on Linux only.
+    InterruptCounter counts GPIO interrupts on a single pin of a Raspberry Pi
+    single-board computer by using `RPi.GPIO`. Works on Linux only.
 
-    Configuration:
-        bounceTime: Bounce time in ms.
-        countTime: Observation time in s.
-        pin: GPIO pin number of the Raspberry Pi.
-        receiver: Name of the receiving module.
-        sensorName: Name of the connected sensor.
+    Configuration::
+        bounceTime (float): Bounce time in ms.
+        countTime (float): Observation time in s.
+        pin (int): GPIO pin number of the Raspberry Pi.
+        receiver (str): Name of the receiving module.
+        sensorName (str): Name of the connected sensor.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

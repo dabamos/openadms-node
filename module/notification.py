@@ -39,6 +39,10 @@ from module.prototype import Prototype
 class Alerter(Prototype):
     """
     Alerter is used to send warning and error messages to other modules.
+
+    Configuration::
+        is_enabled (bool): If true, alerter is enabled.
+        modules (Dict): Modules to send alert messages to.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -121,6 +125,14 @@ class AlertMessageFormatter(Prototype):
     """
     AlertMessageFormatter caches and formats alerts. They are then forwarded to
     other modules for further processing and transmission.
+
+    Configuration::
+        messageCollectionEnabled (bool): If true, cache alert messages.
+        messageCollectionTime (float): Time to cache messages before sending.
+        properties (Dict): Additional properties to add to the message.
+        receiver (str): Name of the receiving module.
+        templates (Dict): Templates for `header`, `body`, and `footer`.
+        type (str): Type of the message to be send (`email`, `sms`, etc.).
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -289,6 +301,10 @@ class Heartbeat(Prototype):
     """
     Heartbeat sends heartbeat messages ("pings") to the message broker by using
     the message type `heartbeat`.
+
+    Configuration::
+        interval (float): Interval for sending heartbeats.
+        receivers (List): List of topics to send heartbeats to.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -356,6 +372,15 @@ class IrcAgent(Prototype):
     IrcAgent sends alert messages to the Internet Relay Chat. This module acts
     as a simple IRC bot which connects to an IRC server and sends text to a
     channel or user. IrcAgents implements only a few commands of RFC 1459.
+
+    Configuration::
+        channel (str): IRC channel to join.
+        host (str): FQDN or IP of the IRC server.
+        port (int): Port number of the IRC server.
+        is_tls (bool): If true, use TLS encryption.
+        nickname (str): Nickname to use.
+        password (str): Password of registered nickname (optional).
+        target (str): IRC channel or user to send messages to.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
