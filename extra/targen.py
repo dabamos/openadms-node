@@ -1,42 +1,23 @@
 #!/usr/bin/env python3
-"""
-Copyright (c) 2016 Hochschule Neubrandenburg.
 
-Licensed under the EUPL, Version 1.1 or - as soon they will be approved
-by the European Commission - subsequent versions of the EUPL (the
-"Licence");
+"""Target generator for OpenADMS. FOR TESTING ONLY. Reads a CSV file with
+targets and a JSON file with observations/commands to merge them into a valid
+sensor configuration. This tool will be deprecated in near future, once the user
+interface has been finished."""
 
-You may not use this work except in compliance with the Licence.
-
-You may obtain a copy of the Licence at:
-
-    https://joinup.ec.europa.eu/community/eupl/og_page/eupl
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the Licence is distributed on an "AS IS" basis,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the Licence for the specific language governing permissions and
-limitations under the Licence.
-"""
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__license__ = 'BSD (2-Clause)'
 
 import coloredlogs
 import copy
 import json
-import logging
 import logging.handlers
 import math
 import optparse
 import os
-import re
 import sys
 
-"""
-Target generator for OpenADMS. FOR TESTING ONLY. Reads a CSV file with targets
-and a JSON file with observations/commands to merge them into a valid sensor
-configuration. This tool will be deprecated in near future, once the user
-interface has been finished.
-
-"""
 
 def grad2rad(angle):
     return angle * (math.pi / 200)
@@ -112,7 +93,7 @@ if __name__ == '__main__':
         usage='%prog [options]',
         description='Target Generator',
         epilog='\nTarget file generator for OpenADMS.\n'
-               'Licenced under the European Union Public Licence (EUPL) v.1.1.'
+               'Licenced under BSD (2-Clause),'
                '\nFor further information visit https://www.dabamos.de/.\n')
 
     parser.add_option('-t', '--targets',

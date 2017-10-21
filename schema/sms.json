@@ -1,14 +1,19 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/mastodon.json",
+    "id": "schema/sms.json",
     "properties": {
         "message": {
             "id": "/properties/message",
             "type": "string"
+        },
+        "number": {
+            "id": "/properties/number",
+            "type": "string"
         }
     },
     "required": [
-        "message"
+        "message",
+        "number"
     ],
     "type": "object"
 }
