@@ -97,6 +97,21 @@ $ python3 -m pip install -U -r requirements.txt
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
 
+## Documentation
+You can generate the software documentation with
+[Sphinx](http://www.sphinx-doc.org/). At first, install Sphinx with `pip`:
+```
+$ cd doc/
+$ python3 -m pip install -U -r requirements.txt
+```
+
+Build the documentation:
+```
+$ sphinx-apidoc -f -o docs/source ..
+$ gmake html
+$ gmake clean
+```
+
 ## Manual
 The [on-line manual](https://www.dabamos.de/manual/index.html) is available on
 the project website.
