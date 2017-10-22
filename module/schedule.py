@@ -24,6 +24,18 @@ class Job(object):
     """
     Job stores an observation object and sends it to a callback function if the
     current date and time are within the set schedule.
+
+    Args:
+        name: Name of the job.
+        project_id: ID of the project.
+        node_id: ID of the sensor node.
+        port_name: Name of the (serial) port.
+        obs: Observation object.
+        is_enabled: If True, job is enabled.
+        start_date: Date to start the job.
+        stop_date: Date to stop the job.
+        weekdays: Dict of days and times to run this job at.
+        uplink: Callback function to send the observation to.
     """
 
     def __init__(self,
@@ -170,6 +182,8 @@ class Scheduler(Prototype):
     to a sensor. Each observation is represented by a single job. Jobs are
     stored in a jobs list and will be executed at the given date and time. A
     separate scheduler is necessary for each serial port.
+
+    The JSON-based configuration for this module:
 
     Parameters:
         port (str): Name of the port module.

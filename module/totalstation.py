@@ -24,6 +24,8 @@ class DistanceCorrector(Prototype):
     """
     Corrects the slope distance of EDM measurements using atmospheric data.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         atmosphericCorrectionEnabled (bool): Enables atmospheric correction.
         seaLevelCorrectionEnabled (bool): Enables correction to sea level.
@@ -243,6 +245,8 @@ class HelmertTransformer(Prototype):
     """
     HelmertTransformer calculates the 3-dimensional coordinates of a view point
     using the Helmert transformation.
+
+    The JSON-based configuration for this module:
 
     Parameters:
         residualMismatchTransformationEnabled (bool): If True, prorate
@@ -711,6 +715,8 @@ class PolarTransformer(Prototype):
     It is possible to use multiple fixed points in order to improve the
     accuracy of the horizontal directions ('Abriss' in German).
 
+    The JSON-based configuration for this module:
+
     Parameters:
         adjustmentEnabled (bool): If True, improve horizontal directions.
         azimuthAngle (float): Between local azimuth and global azimuth (in gon).
@@ -736,7 +742,13 @@ class PolarTransformer(Prototype):
         self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle', 0))
         self._is_adjustment_enabled = config.get('adjustmentEnabled')
 
-    def _get_adjustment_value(self):
+    def _get_adjustment_value(self) -> float:
+        """Returns the adjustment value for the improvement of horizontal
+        directions.
+
+        Returns:
+            The adjustment value.
+        """
         delta_hz_sum = 0
         fixed_point_count = 0
         r = 0

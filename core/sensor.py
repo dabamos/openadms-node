@@ -127,7 +127,7 @@ class SensorType(object):
 
     @staticmethod
     def is_total_station(name: str) -> bool:
-        """Returns whether or not the given name is a total station or not.
+        """Returns whether or not the given name is a total station.
 
         Returns:
             True if name is a total station, False if not.
@@ -139,7 +139,7 @@ class SensorType(object):
 
     @staticmethod
     def is_weather_station(name: str) -> bool:
-        """Returns whether or not the given name is a weather station or not.
+        """Returns whether or not the given name is a weather station.
 
         Returns:
             True if name is a weather station, False if not.

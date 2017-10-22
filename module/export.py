@@ -33,6 +33,8 @@ class FileExporter(Prototype):
     """
     FileExporter writes sensor data to a flat file in CSV format.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         dateTimeFormat (str): Format of date and time (see `arrow` library).
         fileExtension (str): Extension of the file (`.txt` or `.csv`).
@@ -157,6 +159,8 @@ class RealTimePublisher(Prototype):
     """
     RealTimePublisher sends copies of `Observation` objects to a list of
     receivers.
+
+    The JSON-based configuration for this module:
 
     Parameters:
         receivers (List): List of modules to send the observation to.

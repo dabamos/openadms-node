@@ -220,6 +220,8 @@ class ResponseValueInspector(Prototype):
     ResponseValueInspector checks if response values of observations are within
     defined thresholds and creates critical log messages if not.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         observations (Dict): Observations to inspect.
 
@@ -361,6 +363,8 @@ class ReturnCodeInspector(Prototype):
     ReturnCodeInspector inspects the return code in an observation sent by
     sensors of Leica Geosystems and creates an appropriate log message.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         responseSets (List): Names of response sets to inspect.
         retries (int): Number of retries in case of an error.
@@ -433,8 +437,10 @@ class UnitConverter(Prototype):
     observations. For instance, a response in centimeters can be converted to
     meters by setting a scale factor.
 
+    The JSON-based configuration for this module:
+
     Parameters:
-        "<responseSet>" (Dict): Responses to convert.
+        <responseSetName> (Dict): Responses to convert.
 
     Example:
         The configuration may be::

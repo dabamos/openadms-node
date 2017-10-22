@@ -33,6 +33,8 @@ class BluetoothPort(Prototype):
     Python 3.3. At the moment, the class is not very useful and needs further
     testing.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         port (str): Port name.
         serverMacAddress (str): MAC address of the server.
@@ -229,6 +231,16 @@ class BluetoothPort(Prototype):
 class SerialPortConfiguration(object):
     """
     SerialPortConfiguration saves a serial port configuration.
+
+    Args:
+        port: Name of the port (e.g.: `COM1` or `/dev/tty0`).
+        baudrate: Baud rate (e.g.: 4800, 9600, or 115200).
+        bytesize: Start bits, either 5, 6, 7, or 8.
+        stopbits: Stop bits, either 1. 1.5, or 2.
+        parity: Parity, either `none`, `even`, `odd`, `mark`, or `space`.
+        timeout (float): Timeout in seconds.
+        xonxoff: Software flow control.
+        rtscts: Hardware flow control.
     """
 
     def __init__(self,
@@ -305,6 +317,8 @@ class SerialPort(Prototype):
     based on request/response. In passive mode, the port just listens for
     incoming data without sending any requests.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         port (str): Name of the port (e.g.: `COM1` or `/dev/tty0`).
         baudRate (int): Baud rate (e.g.: 4800, 9600, or 115200).
@@ -313,7 +327,7 @@ class SerialPort(Prototype):
         parity (str): Parity, either `odd`, `even`, or `none`.
         softwareFlowControl (bool): XON/XOFF flow control.
         hardwareFlowControl (bool): RTS/CTS flow control.
-        maxAttempts (int): Maximum number of attempts.
+        maxAttempts (int): Maximum number of attempts to access the port.
         timeout (float): Timeout in seconds.
     """
 

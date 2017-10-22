@@ -38,6 +38,8 @@ class GpioController(Prototype):
     (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD,
     NetBSD, or OpenBSD. This module does not work on Linux.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         defaultState (int): Default state of pin (either 0 or 1).
         duration (float): Time span to change the state of the pin (in seconds).

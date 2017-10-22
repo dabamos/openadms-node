@@ -67,7 +67,7 @@ class Prototype(object):
 
         Args:
             header: Message header.
-            payload. Message playload.
+            payload: Message payload.
         """
         obs = Observation(payload)
 
@@ -78,11 +78,26 @@ class Prototype(object):
             self.publish_observation(obs)
 
     def do_handle_service(self, header: Dict, payload: Dict) -> None:
-        """Processes service messages.
+        """Processes service messages and starts or stops the receiving module.
 
         Args:
             header: Message header.
             payload: Message payload.
+
+        Example:
+            A message to stop a module can be, for instance::
+
+                {
+                    {
+                        "type": "service"
+                    },
+                    {
+                        "from": "foo",
+                        "action": "stop"
+                    }
+                }
+
+            Set `action` to `start` to start the module.
         """
         sender = header.get('from', '?')
         action = payload.get('action')

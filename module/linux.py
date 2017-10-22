@@ -28,6 +28,8 @@ class InterruptCounter(Prototype):
     InterruptCounter counts GPIO interrupts on a single pin of a Raspberry Pi
     single-board computer by using `RPi.GPIO`. Works on Linux only.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         bounceTime (float): Bounce time in ms.
         countTime (float): Observation time in s.
@@ -134,6 +136,7 @@ class InterruptCounter(Prototype):
         self.publish_observation(obs)
 
     def start(self) -> None:
+        """Starts the module."""
         if self._is_running:
             return
 
