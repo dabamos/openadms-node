@@ -17,7 +17,7 @@ Example:
     like Eclipse Mosquitto. The external broker has to be started before
     OpenADMS Node.
 
-    To start OpenADMS Node with the internal broker, run:
+    To start OpenADMS Node with the internal broker, run::
 
         $ python3 openadms.py -c ./config/my_config.json -m
 
@@ -158,7 +158,7 @@ def setup_logging(is_quiet: bool = False,
     Args:
         is_quiet: Disable output.
         is_debug: Print debug messages.
-        verbosity: Verbosity level (1 - 5).
+        verbosity: Verbosity level (1 - 9).
         log_file: Path of the log file.
     """
     # Enable verbose logging.
@@ -209,7 +209,7 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
     """Starts the internal MQTT message broker.
 
     Args:
-        host: IP address or FQDN.
+        host: FQDN or IP address.
         port: Port number.
     """
     broker = MQTTMessageBroker(host, port)
