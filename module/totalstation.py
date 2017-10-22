@@ -24,7 +24,7 @@ class DistanceCorrector(Prototype):
     """
     Corrects the slope distance of EDM measurements using atmospheric data.
 
-    Configuration::
+    Parameters:
         atmosphericCorrectionEnabled (bool): Enables atmospheric correction.
         seaLevelCorrectionEnabled (bool): Enables correction to sea level.
         distanceName (str): Name of the response set.
@@ -244,7 +244,7 @@ class HelmertTransformer(Prototype):
     HelmertTransformer calculates the 3-dimensional coordinates of a view point
     using the Helmert transformation.
 
-    Configuration::
+    Parameters:
         residualMismatchTransformationEnabled (bool): If True, prorate
             residual mismatches.
         fixedPoints (Dict[Dict]): Coordinates of fixed points.
@@ -711,7 +711,7 @@ class PolarTransformer(Prototype):
     It is possible to use multiple fixed points in order to improve the
     accuracy of the horizontal directions ('Abriss' in German).
 
-    Configuration::
+    Parameters:
         adjustmentEnabled (bool): If True, improve horizontal directions.
         azimuthAngle (float): Between local azimuth and global azimuth (in gon).
         azimuthPointName (str): Name of azimuth.

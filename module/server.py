@@ -26,7 +26,7 @@ class LocalControlServer(Prototype):
     configuration. It is recommended to run a reverse proxy in front of the
     LocalControlServer.
 
-    Configuration::
+    Parameters:
         host (str): FQDN or IP address of the server.
         port (int): Port number.
     """

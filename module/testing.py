@@ -18,7 +18,7 @@ class ErrorGenerator(Prototype):
     ErrorGenerates creates WARNING, ERROR, or CRITICAL log messages in a given
     interval for testing.
 
-    Configuration::
+    Parameters:
         warning (bool): Enable warning messages.
         error (bool): Enable error messages.
         critical (bool): Enable critical messages.

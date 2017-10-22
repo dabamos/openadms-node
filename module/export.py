@@ -33,7 +33,7 @@ class FileExporter(Prototype):
     """
     FileExporter writes sensor data to a flat file in CSV format.
 
-    Configuration::
+    Parameters:
         dateTimeFormat (str): Format of date and time (see `arrow` library).
         fileExtension (str): Extension of the file (`.txt` or `.csv`).
         fileName (str): File name with optional placeholders `{{date}}`,
@@ -158,9 +158,9 @@ class RealTimePublisher(Prototype):
     RealTimePublisher sends copies of `Observation` objects to a list of
     receivers.
 
-    Configuration:
-        receivers: List of modules to send the observation to.
-        enabled: Turns processing of observations on or off.
+    Parameters:
+        receivers (List): List of modules to send the observation to.
+        enabled (bool): Turns processing of observations on or off.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

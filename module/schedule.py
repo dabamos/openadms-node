@@ -171,7 +171,7 @@ class Scheduler(Prototype):
     stored in a jobs list and will be executed at the given date and time. A
     separate scheduler is necessary for each serial port.
 
-    Configuration::
+    Parameters:
         port (str): Name of the port module.
         sensor (str): Name of the sensor.
         schedules (List[Dict]): List of schedules.

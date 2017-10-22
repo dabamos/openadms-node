@@ -33,7 +33,7 @@ class BluetoothPort(Prototype):
     Python 3.3. At the moment, the class is not very useful and needs further
     testing.
 
-    Configuration::
+    Parameters:
         port (str): Port name.
         serverMacAddress (str): MAC address of the server.
     """
@@ -305,7 +305,7 @@ class SerialPort(Prototype):
     based on request/response. In passive mode, the port just listens for
     incoming data without sending any requests.
 
-    Configuration::
+    Parameters:
         port (str): Name of the port (e.g.: `COM1` or `/dev/tty0`).
         baudRate (int): Baud rate (e.g.: 4800, 9600, or 115200).
         byteSize (int): Start bits, either 5, 6, 7, or 8.

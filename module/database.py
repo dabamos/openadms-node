@@ -24,7 +24,7 @@ class CouchDriver(Prototype):
     a CouchDriver instance will be saved in the database set in the
     configuration. This module is for dumping observations only.
 
-    Configuration::
+    Parameters:
         server (str): FQDN or IP address of CouchDB server.
         port (int): Port number of CouchDB server.
         db (str): Database name.

@@ -220,7 +220,7 @@ class ResponseValueInspector(Prototype):
     ResponseValueInspector checks if response values of observations are within
     defined thresholds and creates critical log messages if not.
 
-    Configuration::
+    Parameters:
         observations (Dict): Observations to inspect.
 
     Example:
@@ -314,10 +314,10 @@ class ReturnCodes(object):
     Geosystems. The dictionary is static and has the following structure::
 
         {
-            return code: [
-                log level (int),
-                retry measurement (bool),
-                log message (str)
+            <return_code>: [
+                <log_level> (int),
+                <retry_measurement> (bool),
+                <log_message> (str)
             ]
         }
 
@@ -361,7 +361,7 @@ class ReturnCodeInspector(Prototype):
     ReturnCodeInspector inspects the return code in an observation sent by
     sensors of Leica Geosystems and creates an appropriate log message.
 
-    Configuration::
+    Parameters:
         responseSets (List): Names of response sets to inspect.
         retries (int): Number of retries in case of an error.
     """
@@ -433,8 +433,8 @@ class UnitConverter(Prototype):
     observations. For instance, a response in centimeters can be converted to
     meters by setting a scale factor.
 
-    Configuration::
-        "\S+" (Dict): Responses to convert.
+    Parameters:
+        "<responseSet>" (Dict): Responses to convert.
 
     Example:
         The configuration may be::

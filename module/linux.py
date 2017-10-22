@@ -28,7 +28,7 @@ class InterruptCounter(Prototype):
     InterruptCounter counts GPIO interrupts on a single pin of a Raspberry Pi
     single-board computer by using `RPi.GPIO`. Works on Linux only.
 
-    Configuration::
+    Parameters:
         bounceTime (float): Bounce time in ms.
         countTime (float): Observation time in s.
         pin (int): GPIO pin number of the Raspberry Pi.

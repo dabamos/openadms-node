@@ -40,7 +40,7 @@ class Alerter(Prototype):
     """
     Alerter is used to send warning and error messages to other modules.
 
-    Configuration::
+    Parameters:
         is_enabled (bool): If true, alerter is enabled.
         modules (Dict): Modules to send alert messages to.
     """
@@ -127,7 +127,7 @@ class AlertMessageFormatter(Prototype):
     AlertMessageFormatter caches and formats alerts. They are then forwarded to
     other modules for further processing and transmission.
 
-    Configuration::
+    Parameters:
         messageCollectionEnabled (bool): If true, cache alert messages.
         messageCollectionTime (float): Time to cache messages before sending.
         properties (Dict): Additional properties to add to the message.
@@ -303,7 +303,7 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker by using
     the message type `heartbeat`.
 
-    Configuration::
+    Parameters:
         interval (float): Interval for sending heartbeats.
         receivers (List): List of topics to send heartbeats to.
     """
@@ -374,7 +374,7 @@ class IrcAgent(Prototype):
     as a simple IRC bot which connects to an IRC server and sends text messages
     to a channel or user. Only a few commands of RFC 1459 are implemented.
 
-    Configuration::
+    Parameters:
         channel (str): IRC channel to join (e.g.: `#test`).
         host (str): FQDN or IP address of the IRC server.
         port (int): Port number of the IRC server.
@@ -563,7 +563,7 @@ class MailAgent(Prototype):
     """
     MailAgents sends e-mails via SMTP.
 
-    Configuration::
+    Parameters:
         charset (str): Character set of the email.
         defaultSubject (str): Default subject if no subject is given.
         host (str): FQDN or IP address of the SMTP server.
@@ -677,7 +677,7 @@ class MastodonAgent(Prototype):
     Mastodon sends toots to the Mastodon social network. Requires the Python
     module `Mastodon.py`.
 
-    Configuration::
+    Parameters:
         email (str): Login email address of Mastodon account.
         password (str): Login password of Mastodon account.
         url (str): URL of the Mastodon instance (e.g.: `https://mastodon.at`).
@@ -741,7 +741,7 @@ class RssAgent(Prototype):
     """
     RSSAgent creates an RSS 2.0 feed out of given data.
 
-    Configuration::
+    Parameters:
         author (str): Author of the RSS feed.
         description (str): Description of the RSS feed.
         language (str): Language of the RSS feed (e.g.: `en-gb`).
@@ -914,7 +914,7 @@ class ShortMessageAgent(Prototype):
     """
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
 
-    Configuration::
+    Parameters:
         host (str): FQDN or IP address of the SMS server.
         port (int): Port number of the SMS server.
     """
