@@ -112,6 +112,8 @@ $ gmake html
 $ gmake clean
 ```
 
+You will find the documentation in `doc/_build/html/`.
+
 ## Manual
 The [on-line manual](https://www.dabamos.de/manual/index.html) is available on
 the project website.
