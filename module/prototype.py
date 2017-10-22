@@ -63,7 +63,12 @@ class Prototype(object):
 
     def do_handle_observation(self, header: Dict, payload: Dict) -> None:
         """Handles an observation by forwarding it to the processing method and
-        prepares the result for publishing."""
+        prepares the result for publishing.
+
+        Args:
+            header: Message header.
+            payload. Message playload.
+        """
         obs = Observation(payload)
 
         if self._is_running:
@@ -76,8 +81,8 @@ class Prototype(object):
         """Processes service messages.
 
         Args:
-            header: The message header.
-            payload: The message payload.
+            header: Message header.
+            payload: Message payload.
         """
         sender = header.get('from', '?')
         action = payload.get('action')
@@ -96,7 +101,7 @@ class Prototype(object):
         handling.
 
         Args:
-            message: Header and payload of the message, both Dict.
+            message: Header and payload of the message.
         """
         if not self.is_sequence(message) or len(message) < 2:
             self.logger.warning('Received message is invalid')
@@ -163,8 +168,8 @@ class Prototype(object):
         JSON schema.
 
         Args:
-            data: The data.
-            data_type: The name of the data type.
+            data: Data to check.
+            data_type: Name of the data type.
 
         Returns:
             True if data is valid, False if not.
@@ -176,7 +181,7 @@ class Prototype(object):
         worker.
 
         Args:
-            obs: The observation object.
+            obs: Observation object.
 
         Returns:
             The processed observation object.
@@ -186,14 +191,14 @@ class Prototype(object):
     def publish(self, target: str, header: Dict, payload: Dict) -> None:
         """Appends header and payload to a list, converts the list to a JSON
         string and sends it to the designated target by using the callback
-        function `_uplink()`. The JSON string has the format:
+        function `_uplink()`. The JSON string has the format::
 
             [ { <header> }, { <payload> } ].
 
         Args:
-            target: The name of the target.
-            header: The header of the message.
-            payload: The payload of the message.
+            target: Name of the target.
+            header: Header of the message.
+            payload: Payload of the message.
         """
         if not self._uplink:
             self.logger.error('No uplink defined for module "{}"'

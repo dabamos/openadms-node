@@ -1,28 +1,7 @@
 #!/usr/bin/env python3.6
 
-"""             ,        ,         
-               /(        )`        
-               \ \___   / |        
-               /- _  `-/  '        
-              (/\/ \ \   /\        
-              / /   | `    \       
-              O O   ) /    |       
-              `-^--'`<     '       
-             (_.)  _  )   /        
-              `.___/`    /         
-                `-----' /          
-   <----.     __ / __   \          
-   <----|====O)))==) \) /====|      
-   <----'    `--' `.__,' \         
-                |        |         
-                 \       /       /\
-            ______( (_  / \______/ 
-          ,'  ,-----'   |          
-          `--{__________)
-          
-Module for BSD-specific features, which are not available on other operating
-systems.
-"""
+"""Module for BSD-specific features, which are not available on other operating
+systems."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -44,7 +23,7 @@ from module.prototype import Prototype
 
 class Unix(Enum):
     """
-    Type of BSD Unix derivate.
+    Type of BSD Unix derivate, either None, FreeBSD, NetBSD, or OpenBSD.
     """
 
     NONE = 0
@@ -58,6 +37,11 @@ class GpioController(Prototype):
     GpioController sets single pins of the General Purpose Input Output
     (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD,
     NetBSD, or OpenBSD. This module does not work on Linux.
+
+    Configuration::
+        defaultState (int): Default state of pin (either 0 or 1).
+        duration (float): Time span to change the state of the pin (in seconds).
+        pin (str): Name of the GPIO pin.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

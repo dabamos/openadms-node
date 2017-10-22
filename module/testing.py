@@ -17,15 +17,15 @@ class ErrorGenerator(Prototype):
     """
     ErrorGenerates creates WARNING, ERROR, or CRITICAL log messages in a given
     interval for testing.
+
+    Configuration::
+        warning (bool): Enable warning messages.
+        error (bool): Enable error messages.
+        critical (bool): Enable critical messages.
+        interval (float): Interval to create log messages (in seconds).
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
-        """
-        Args:
-            module_name: The name of the module.
-            module_type: The type of the module.
-            manager: The manager objects.
-        """
         super().__init__(module_name, module_type, manager)
         config = self.get_config(self._name)
 

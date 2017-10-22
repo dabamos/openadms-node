@@ -22,13 +22,13 @@ class LocalControlServer(Prototype):
     """
     LocalControlServer creates a web service for the remote control of
     OpenADMS. The server shows HTML page with system information and log
-    messages. The user can start and stop modules defined in the OpenADMS
+    messages. The user can start and stop modules defined in the OpenADMS Node
     configuration. It is recommended to run a reverse proxy in front of the
     LocalControlServer.
 
-    Configuration:
-        host: Host name (IP or FQDN).
-        port: Port number.
+    Configuration::
+        host (str): FQDN or IP address of the server.
+        port (int): Port number.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -70,6 +70,7 @@ class LocalControlServer(Prototype):
         self._httpd.serve_forever()
 
     def start(self) -> None:
+        """Starts the server."""
         if self._is_running:
             return
 
@@ -79,6 +80,7 @@ class LocalControlServer(Prototype):
         self._thread.start()
 
     def stop(self) -> None:
+        """Stops the server."""
         super().stop()
 
         if self._httpd:
@@ -146,7 +148,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
-    def do_action_query(self, query):
+    def do_action_query(self, query: Dict) -> None:
+        """Processes action query.
+
+        Args:
+            query: GET query to process.
+        """
         if not self._has_attribute(query, 'action'):
             return
 
@@ -182,10 +189,10 @@ class RequestHandler(BaseHTTPRequestHandler):
                 .format(openadms_version=System.get_openadms_string())
         )
 
-    def get_complete_path(self, path) -> Path:
+    def get_complete_path(self, path: str) -> Path:
         return Path('{}/{}'.format(self._root_dir, path))
 
-    def get_file_contents(self, path) -> str:
+    def get_file_contents(self, path: Path) -> str:
         """Opens a file and returns the contents.
 
         Args:
@@ -199,7 +206,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return file_contents
 
-    def get_index(self, template) -> str:
+    def get_index(self, template: str) -> str:
         """Returns the index page of this module in HTML format.
 
         Args:
@@ -305,7 +312,7 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         return content
 
-    def _has_attribute(self, query, name) -> bool:
+    def _has_attribute(self, query: Dict, name: str) -> bool:
         """Checks a GET query for a given argument.
 
         Args:

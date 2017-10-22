@@ -33,14 +33,14 @@ class FileExporter(Prototype):
     """
     FileExporter writes sensor data to a flat file in CSV format.
 
-    Configuration:
-        dateTimeFormat: Format of date and time (see Python strftime).
-        fileExtension: The extension of the file (`.txt` or `.csv`).
-        fileName: Placeholders are `{{date}}`, `{{target}}`, `{{name}}`,
-            `{{port}}`.
-        fileRotation: Either `none`, `daily`, `monthly`, or `yearly`.
-        paths: Paths to save files to (multiple paths possible).
-        separator: Separator between values within the CSV file.
+    Configuration::
+        dateTimeFormat (str): Format of date and time (see `arrow` library).
+        fileExtension (str): Extension of the file (`.txt` or `.csv`).
+        fileName (str): File name with optional placeholders `{{date}}`,
+            `{{target}}`, `{{name}}`, `{{port}}`.
+        fileRotation (str): Either `none`, `daily`, `monthly`, or `yearly`.
+        paths (List[str]): Paths to save files to (multiple paths possible).
+        separator (str): Separator between values within the CSV file.
 
     """
 
@@ -67,7 +67,7 @@ class FileExporter(Prototype):
             obs: The input observation object.
 
         Returns:
-            obs: The output observation object.
+            The output observation object.
         """
         ts = arrow.get(obs.get('timeStamp', 0))
 
@@ -160,7 +160,7 @@ class RealTimePublisher(Prototype):
 
     Configuration:
         receivers: List of modules to send the observation to.
-        enabled: If or if not enabled.
+        enabled: Turns processing of observations on or off.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

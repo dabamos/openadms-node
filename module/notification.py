@@ -371,15 +371,15 @@ class HeartbeatMonitor(Prototype):
 class IrcAgent(Prototype):
     """
     IrcAgent sends alert messages to the Internet Relay Chat. This module acts
-    as a simple IRC bot which connects to an IRC server and sends text to a
-    channel or user. IrcAgents implements only a few commands of RFC 1459.
+    as a simple IRC bot which connects to an IRC server and sends text messages
+    to a channel or user. Only a few commands of RFC 1459 are implemented.
 
     Configuration::
-        channel (str): IRC channel to join.
-        host (str): FQDN or IP of the IRC server.
+        channel (str): IRC channel to join (e.g.: `#test`).
+        host (str): FQDN or IP address of the IRC server.
         port (int): Port number of the IRC server.
         is_tls (bool): If true, use TLS encryption.
-        nickname (str): Nickname to use.
+        nickname (str): Nickname to use (default: `openadms`).
         password (str): Password of registered nickname (optional).
         target (str): IRC channel or user to send messages to.
     """
@@ -561,7 +561,18 @@ class IrcAgent(Prototype):
 
 class MailAgent(Prototype):
     """
-    MailAgents sends e-mail via SMTP.
+    MailAgents sends e-mails via SMTP.
+
+    Configuration::
+        charset (str): Character set of the email.
+        defaultSubject (str): Default subject if no subject is given.
+        host (str): FQDN or IP address of the SMTP server.
+        is_start_tls (bool): If true, use StartTLS encryption.
+        is_tls (bool): If true, use TLS encryption.
+        port (int): Port number of the SMTP server.
+        userMail (str): Email address of the sender.
+        userName (str): SMTP user name.
+        userPassword (str): SMTP user password.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -664,7 +675,12 @@ class MailAgent(Prototype):
 class MastodonAgent(Prototype):
     """
     Mastodon sends toots to the Mastodon social network. Requires the Python
-    module "Mastodon.py".
+    module `Mastodon.py`.
+
+    Configuration::
+        email (str): Login email address of Mastodon account.
+        password (str): Login password of Mastodon account.
+        url (str): URL of the Mastodon instance (e.g.: `https://mastodon.at`).
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -678,8 +694,8 @@ class MastodonAgent(Prototype):
         self._password = config.get('password')
         self._api_base_url = config.get('url', 'https://mastodon.social')
 
-        self._client_cred_file = 'openadms_clientcred.secret'
-        self._user_cred_file = 'openadms_usercred.secret'
+        self._client_cred_file = 'mastodon_client_cred.secret'
+        self._user_cred_file = 'mastodon_user_cred.secret'
 
         self._mastodon = None
 
@@ -724,6 +740,14 @@ class MastodonAgent(Prototype):
 class RssAgent(Prototype):
     """
     RSSAgent creates an RSS 2.0 feed out of given data.
+
+    Configuration::
+        author (str): Author of the RSS feed.
+        description (str): Description of the RSS feed.
+        language (str): Language of the RSS feed (e.g.: `en-gb`).
+        link (str): URL to the RSS feed.
+        size (int): Number of entries in the RSS feed.
+        title (str): Title of the RSS feed.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -749,7 +773,8 @@ class RssAgent(Prototype):
         manager.schema_manager.add_schema('rss', 'rss.json')
 
     def escape(self, html: str) -> str:
-        """Returns the given HTML with ampersands, quotes and carets encoded."""
+        """Returns the given HTML with ampersands, quotes, and carets
+        encoded."""
         return html.replace('&', '&amp;')\
                    .replace('<', '&lt;')\
                    .replace('>', '&gt;')\
@@ -792,7 +817,7 @@ class RssAgent(Prototype):
 
     def get_rfc_822(self, date: str = None) -> str:
         """Returns a date string formatted as RFC 822. If no date is given, the
-        current one is used.
+        current date is used.
 
         Args:
             date: A string with date and time in UTC.
@@ -888,6 +913,10 @@ class RssAgent(Prototype):
 class ShortMessageAgent(Prototype):
     """
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
+
+    Configuration::
+        host (str): FQDN or IP address of the SMS server.
+        port (int): Port number of the SMS server.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

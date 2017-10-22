@@ -22,8 +22,16 @@ from module.prototype import Prototype
 
 class DistanceCorrector(Prototype):
     """
-    Corrects the slope distance for EDM measurements using atmospheric
-    data.
+    Corrects the slope distance of EDM measurements using atmospheric data.
+
+    Configuration::
+        atmosphericCorrectionEnabled (bool): Enables atmospheric correction.
+        seaLevelCorrectionEnabled (bool): Enables correction to sea level.
+        distanceName (str): Name of the response set.
+        temperature (float): Default temperature (in °C).
+        pressure (float): Default pressure (in hPa/mbar).
+        humidity (float): Default humidity (0.0 ... 1.0).
+        sensorHeight (float): Height of sensor.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -235,6 +243,12 @@ class HelmertTransformer(Prototype):
     """
     HelmertTransformer calculates the 3-dimensional coordinates of a view point
     using the Helmert transformation.
+
+    Configuration::
+        residualMismatchTransformationEnabled (bool): If True, prorate
+            residual mismatches.
+        fixedPoints (Dict[Dict]): Coordinates of fixed points.
+        viewPoint (Dict): Target name and receivers of view point.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -626,14 +640,17 @@ class HelmertTransformer(Prototype):
         """Checks whether all fixed points have been measured at least once."""
         for fixed_point_id, fixed_point in self._fixed_points.items():
             if fixed_point.get('lastUpdate') is None:
-                # Fixed point has not been measured yet.
-                return False
+                return False    # Fixed point has not been measured yet.
 
         return True
 
     def _update_fixed_point(self, obs: Observation) -> None:
         """Adds horizontal direction, vertical angle, and slope distance
-        of the observation to a fixed point."""
+        of the observation to a fixed point.
+
+        Args:
+            obs: Observation object.
+        """
         hz = obs.get_response_value('hz')
         v = obs.get_response_value('v')
         dist = obs.get_response_value('slopeDist')
@@ -693,6 +710,13 @@ class PolarTransformer(Prototype):
 
     It is possible to use multiple fixed points in order to improve the
     accuracy of the horizontal directions ('Abriss' in German).
+
+    Configuration::
+        adjustmentEnabled (bool): If True, improve horizontal directions.
+        azimuthAngle (float): Between local azimuth and global azimuth (in gon).
+        azimuthPointName (str): Name of azimuth.
+        fixedPoints (Dict[Dict]): Coordinates of fixed points (X, Y, Z).
+        viewPoint (Dict): Coordinates of view point (X, Y, Z).
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -709,7 +733,7 @@ class PolarTransformer(Prototype):
             self.logger.error('Azimuth point "{}" doesn\'t exist'
                               .format(self._azimuth_point_name))
 
-        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle'))
+        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle', 0))
         self._is_adjustment_enabled = config.get('adjustmentEnabled')
 
     def _get_adjustment_value(self):
@@ -730,15 +754,30 @@ class PolarTransformer(Prototype):
 
         return r
 
-    def _is_fixed_point(self, obs):
+    def _is_fixed_point(self, obs: Observation) -> bool:
         """Checks if the given observation equals one of the defined fixed
-        points."""
+        points.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            True if observation is fixed point, False if not.
+        """
         if self._fixed_points.get(obs.get('target')):
             return True
         else:
             return False
 
-    def _is_valid_sensor_type(self, obs):
+    def _is_valid_sensor_type(self, obs: Observation) -> bool:
+        """Returns whether or not the sensor is supported.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            True if sensor is supported, False if not.
+        """
         sensor_type = obs.get('sensorType')
 
         if not SensorType.is_total_station(sensor_type):
@@ -748,7 +787,12 @@ class PolarTransformer(Prototype):
 
         return True
 
-    def _update_fixed_point(self, obs):
+    def _update_fixed_point(self, obs: Observation) -> None:
+        """Updates given fixed point.
+
+        Args:
+            obs: Observation object.
+        """
         fixed_point = self._fixed_points.get(obs.get('target'))
         hz = obs.get_response_value('hz')
 
@@ -772,11 +816,24 @@ class PolarTransformer(Prototype):
         fixed_point['deltaHz'] = delta_hz
 
     def get_azimuth_angle(self,
-                          view_point_azimuth,
-                          view_point_x, view_point_y,
-                          target_point_x, target_point_y):
+                          view_point_azimuth: float,
+                          view_point_x: float,
+                          view_point_y: float,
+                          target_point_x: float,
+                          target_point_y: float) -> float:
         """Calculates the azimuth angle to a target point by using the
-        direction and the distance from a view point."""
+        direction and the distance measured from a given view point.
+
+        Args:
+            view_point_azimuth: Global azimuth.
+            view_point_x: X coordinate of view point.
+            view_point_y: Y coordinate of view point.
+            target_point_x: X coordinate of target point.
+            target_point_y: Y coordinate of target point.
+
+        Returns:
+            The azimuth angle to target point.
+        """
         # Angle to the target point.
         azimuth = 0.0
 
@@ -881,12 +938,31 @@ class PolarTransformer(Prototype):
         return obs
 
     def transform(self,
-                  view_point_x, view_point_y, view_point_z,
-                  target_point_x, target_point_y,
-                  hz, v, dist):
+                  view_point_x: float,
+                  view_point_y: float,
+                  view_point_z: float,
+                  target_point_x: float,
+                  target_point_y: float,
+                  hz: float,
+                  v: float,
+                  dist: float) -> Tuple[float, float, float]:
         """Calculates coordinates (x, y, z) out of horizontal direction,
         vertical angle, and slope distance to a target point using a
-        3-dimensional polar transformation."""
+        3-dimensional polar transformation.
+
+        Args:
+            view_point_x: X coordinate of view point.
+            view_point_y: Y coordinate of view point.
+            view_point_z: Z coordinate of view point.
+            target_point_x: X coordinate of target point.
+            target_point_y: Y coordinate of target point.
+            hz: Horizontal direction between view point and target point.
+            v: Vertical angle between view point and target point.
+            dist: Horizontal direction between view point and target point.
+
+        Returns:
+            X, Y, and Z coordinates of transformed target.
+        """
         t = self.get_azimuth_angle(0,
                                    view_point_x,
                                    view_point_y,
@@ -907,12 +983,26 @@ class PolarTransformer(Prototype):
 
         return x, y, z
 
-    def gon_to_rad(self, a):
-        """Converts from gon (grad) to radiant."""
+    def gon_to_rad(self, a: float) -> float:
+        """Converts from gon (grad) to radiant.
+
+        Args:
+            a: Angle in gon.
+
+        Returns:
+            Converted angle in rad.
+        """
         return a * math.pi / 200
 
-    def rad_to_gon(self, a):
-        """Converts from radiant to gon (grad)."""
+    def rad_to_gon(self, a: float) -> float:
+        """Converts from radiant to gon (grad).
+
+        Args:
+            a: Angle in rad.
+
+        Returns:
+            Converted angle in gon.
+        """
         return a * 200 / math.pi
 
 
@@ -920,6 +1010,8 @@ class RefractionCorrector(Prototype):
     """
     RefractionCorrector removes the influence of the refraction from a measured
     distance and corrects the Z value of an observed target.
+
+    The module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -968,6 +1060,8 @@ class SerialMeasurementProcessor(Prototype):
     observations of one target in two faces. The two faces, consisting of
     horizontal directions, vertical angles, and slope distances, are
     averaged and stored in a new response set.
+
+    The module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

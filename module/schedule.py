@@ -171,10 +171,10 @@ class Scheduler(Prototype):
     stored in a jobs list and will be executed at the given date and time. A
     separate scheduler is necessary for each serial port.
 
-    Configuration:
-        port: Name of the port module.
-        sensor: Name of the sensor.
-        schedules: List of schedules.
+    Configuration::
+        port (str): Name of the port module.
+        sensor (str): Name of the sensor.
+        schedules (List[Dict]): List of schedules.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -189,7 +189,11 @@ class Scheduler(Prototype):
         self._jobs = []
 
     def add(self, job: Job) -> None:
-        """Appends a job to the jobs list."""
+        """Appends a job to the jobs list.
+
+        Args:
+            job: Job to add.
+        """
         self._jobs.append(job)
         self.logger.debug('Added job "{}" to scheduler "{}"'
                           .format(job.name, self._name))

@@ -20,11 +20,12 @@ class PreProcessor(Prototype):
     """
     PreProcessor extracts values from the raw responses of a given observation
     and converts them to the defined data types.
+
+    This module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        # This module has nothing to configure.
 
     def process_observation(self, obs: Observation) -> Observation:
         """Extracts the values from the raw responses of the observation
@@ -217,7 +218,24 @@ class PreProcessor(Prototype):
 class ResponseValueInspector(Prototype):
     """
     ResponseValueInspector checks if response values of observations are within
-    defined thresholds.
+    defined thresholds and creates critical log messages if not.
+
+    Configuration::
+        observations (Dict): Observations to inspect.
+
+    Example:
+        The configuration may be::
+
+            {
+                "observations": {
+                    "getDistance": {
+                        "slopeDist": {
+                            "min": 2.0,
+                            "max": 300.0
+                        }
+                    }
+                }
+            }
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -293,19 +311,19 @@ class ResponseValueInspector(Prototype):
 class ReturnCodes(object):
     """
     ReturnCodes stores a dictionary of return codes of sensors of Leica
-    Geosystems. The dictionary is static and has the following structure:
+    Geosystems. The dictionary is static and has the following structure::
 
         {
             return code: [
-                log level: int,
-                retry measurement: bool,
-                log message: str
+                log level (int),
+                retry measurement (bool),
+                log message (str)
             ]
         }
 
     The return code numbers and messages are take from the official GeoCOM
     reference manual of the Leica TPS1200, TS30, and TM30 total stations. The
-    log level can be set to these values:
+    log level can be set to these values::
 
         5: CRITICAL,
         4: ERROR,
@@ -342,6 +360,10 @@ class ReturnCodeInspector(Prototype):
     """
     ReturnCodeInspector inspects the return code in an observation sent by
     sensors of Leica Geosystems and creates an appropriate log message.
+
+    Configuration::
+        responseSets (List): Names of response sets to inspect.
+        retries (int): Number of retries in case of an error.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -410,6 +432,21 @@ class UnitConverter(Prototype):
     UnitConverter can be used to convert response values of arbitrary
     observations. For instance, a response in centimeters can be converted to
     meters by setting a scale factor.
+
+    Configuration::
+        "\S+" (Dict): Responses to convert.
+
+    Example:
+        The configuration may be::
+
+            {
+                "slopeDist": {
+                    "conversionType": "scale",
+                    "sourceUnit": "mm",
+                    "scalingValue": 0.01,
+                    "designatedUnit": "m"
+                }
+            }
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

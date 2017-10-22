@@ -33,37 +33,46 @@ class BluetoothPort(Prototype):
     Python 3.3. At the moment, the class is not very useful and needs further
     testing.
 
-    Configuration:
-        port: Port name.
-        serverMacAddress: MAC address of the server.
+    Configuration::
+        port (str): Port name.
+        serverMacAddress (str): MAC address of the server.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        self._config = self._config_manager.get('ports')\
-                                           .get('bluetooth')\
-                                           .get(self._name)
-        self._port = self._config.get('port')
+        config = self._config_manager.get('ports')\
+                                     .get('bluetooth')\
+                                     .get(self._name)
+        self._port = config.get('port')
         self._server_mac_address = None
         self._sock = None
 
-        valid_mac = self.get_mac_address(self._config.get('serverMacAddress'))
+        valid_mac = self.get_mac_address(config.get('serverMacAddress'))
 
         if not valid_mac:
-            self.logger.error('Invalid MAC address "{}"'
-                              .format(self._config.get('serverMacAddress')))
-        else:
-            self._server_mac_address = valid_mac
+            raise ValueError('Invalid MAC address "{}"'
+                             .format(config.get('serverMacAddress')))
+
+        self._server_mac_address = valid_mac
 
     def __del__(self):
         self.close()
 
     def close(self) -> None:
+        """Closes the socket connection."""
         if self._sock:
             self.logger.info('Closing port "{}"'.format(self._port))
             self._sock.close()
 
     def get_mac_address(self, s: str) -> Union[str, None]:
+        """Re-formats a given MAC address.
+
+        Args:
+            s: String with MAC address.
+
+        Returns:
+            String with valid MAC address or None if address is invalid.
+        """
         if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
             return s
         elif re.match(r'^[a-fA-F0-9]{12}$', s):
@@ -73,6 +82,14 @@ class BluetoothPort(Prototype):
             return
 
     def process_observation(self, obs: Observation) -> Union[Observation, None]:
+        """Sends a request to the attached sensor and forwards the response.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            The extended observation object or None if connection failed.
+        """
         if System.is_windows():
             self.logger.error('Operating system not supported (no '
                               'socket.AF_BLUETOOTH on Microsoft Windows)')
@@ -144,6 +161,7 @@ class BluetoothPort(Prototype):
         return obs
 
     def _open(self) -> None:
+        """Opens a Bluetooth socket connection to a sensor."""
         if not self._server_mac_address:
             self.logger.error('MAC address of server not set')
             return
@@ -186,20 +204,31 @@ class BluetoothPort(Prototype):
         return response
 
     def sanitize(self, s: str) -> str:
-        """Converts some non-printable characters of a given string."""
+        """Converts some non-printable characters of a given string.
+
+        Args:
+            s: String to sanitize.
+
+        Returns:
+            Sanitized string.
+        """
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')\
                 .strip()
 
     def _send(self, data: str) -> None:
-        """Sends command to sensor."""
+        """Sends command to sensor.
+
+        Args:
+            data: Data to send.
+        """
         self._sock.send(bytes(data, 'UTF-8'))
 
 
 class SerialPortConfiguration(object):
     """
-    SerialPortConfiguration saves a serial port configration.
+    SerialPortConfiguration saves a serial port configuration.
     """
 
     def __init__(self,
@@ -211,7 +240,7 @@ class SerialPortConfiguration(object):
                  timeout: float,
                  xonxoff: bool,
                  rtscts: bool):
-        """Converts data from JSON style to serial.Serial style."""
+        """Converts data from JSON format to serial.Serial format."""
         self._port = port
         self._baudrate = baudrate
         self._bytesize = {
@@ -276,16 +305,16 @@ class SerialPort(Prototype):
     based on request/response. In passive mode, the port just listens for
     incoming data without sending any requests.
 
-    Configuration:
-        port: Name of the port (COMX or /dev/ttyX).
-        maxAttempts: Maximum number of attempts.
-        baudRate: Baud rate (e.g., 4800, 9600, or 115200).
-        byteSize:: Start bits, either 5, 6, 7, or 8.
-        stopBits: Stop bits, either 1 or 2.
-        parity: Parity, either 'odd', 'even', or 'none'.
-        timeout: Timeout in seconds.
-        softwareFlowControl: XON/XOFF flow control.
-        hardwareFlowControl: RTS/CTS flow control.
+    Configuration::
+        port (str): Name of the port (e.g.: `COM1` or `/dev/tty0`).
+        baudRate (int): Baud rate (e.g.: 4800, 9600, or 115200).
+        byteSize (int): Start bits, either 5, 6, 7, or 8.
+        stopBits (float): Stop bits, either 1. 1.5, or 2.
+        parity (str): Parity, either `odd`, `even`, or `none`.
+        softwareFlowControl (bool): XON/XOFF flow control.
+        hardwareFlowControl (bool): RTS/CTS flow control.
+        maxAttempts (int): Maximum number of attempts.
+        timeout (float): Timeout in seconds.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
