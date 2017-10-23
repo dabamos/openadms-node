@@ -12,7 +12,7 @@ $ sphinx-apidoc -f -o docs/source ..
 $ gmake html
 ```
 
-You will find the documentation in `doc/_build/html/`.
+You will find the documentation in `./_build/html/`.
 
 ## Licence
 The documentation is licenced under the [Creative Commons Attribution-ShareAlike

@@ -16,6 +16,7 @@ Please make sure that all dependencies are installed (execute
 .. _openadms-launcher-screenshot:
 .. figure:: _static/openadms_graphical_launcher.png
    :alt: Graphical launcher for OpenADMS
+   :align: center
    :scale: 80%
 
    Graphical launcher for OpenADMS
@@ -48,6 +49,7 @@ can be executed directly once the proper permissions are set:
 .. _openadms-freebsd:
 .. figure:: _static/openadms_urxvt.png
    :alt: Running OpenADMS on FreeBSD
+   :align: center
 
    Running OpenADMS on FreeBSD
 
