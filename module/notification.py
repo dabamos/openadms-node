@@ -159,7 +159,7 @@ class AlertMessageFormatter(Prototype):
     def handle_alert_message(self,
                              header: Dict[str, Any],
                              payload: Dict[str, Any]) -> None:
-        """Handles messages of type`alert` and either caches them or forwards
+        """Handles messages of type `alert` and either caches them or forwards
         them to the `process_alert_messages()` method.
 
         Args:
