@@ -10,8 +10,8 @@ Microsoft Windows
 
 The easiest way to run OpenADMS on Microsoft Windows is to use the graphical
 launcher ``openadms-launcher.pyw`` (see :numref:`openadms-launcher-screenshot`).
-Please make sure that all dependencies are installed (execute
-``win_install.bat`` with administrator privileges).
+Please make sure that all dependencies are installed (execute ``install.bat``
+with administrator privileges).
 
 .. _openadms-launcher-screenshot:
 .. figure:: _static/openadms_graphical_launcher.png
