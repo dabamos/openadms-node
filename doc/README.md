@@ -3,7 +3,6 @@
 You can generate the documentation with [Sphinx](http://www.sphinx-doc.org/). At
 first, install Sphinx with `pip`:
 ```
-$ cd doc/
 $ python3 -m pip install -U -r requirements.txt
 ```
 
