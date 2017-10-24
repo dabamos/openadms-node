@@ -575,8 +575,8 @@ class MailAgent(Prototype):
         charset (str): Character set of the email.
         defaultSubject (str): Default subject if no subject is given.
         host (str): FQDN or IP address of the SMTP server.
-        is_start_tls (bool): If true, use StartTLS encryption.
-        is_tls (bool): If true, use TLS encryption.
+        startTls (bool): If true, use StartTLS encryption.
+        tls (bool): If true, use TLS encryption.
         port (int): Port number of the SMTP server.
         userMail (str): Email address of the sender.
         userName (str): SMTP user name.
@@ -755,7 +755,7 @@ class RssAgent(Prototype):
 
     Parameters:
         author (str): Author of the RSS feed.
-        description (str): Description of the RSS feed.
+        description (str): Description text of the RSS feed.
         language (str): Language of the RSS feed (e.g.: `en-gb`).
         link (str): URL to the RSS feed.
         size (int): Number of entries in the RSS feed.

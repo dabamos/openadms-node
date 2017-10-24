@@ -236,7 +236,7 @@ class SerialPortConfiguration(object):
         port: Name of the port (e.g.: `COM1` or `/dev/tty0`).
         baudrate: Baud rate (e.g.: 4800, 9600, or 115200).
         bytesize: Start bits, either 5, 6, 7, or 8.
-        stopbits: Stop bits, either 1. 1.5, or 2.
+        stopbits: Stop bits, either 1, 1.5, or 2.
         parity: Parity, either `none`, `even`, `odd`, `mark`, or `space`.
         timeout (float): Timeout in seconds.
         xonxoff: Software flow control.
@@ -323,7 +323,7 @@ class SerialPort(Prototype):
         port (str): Name of the port (e.g.: `COM1` or `/dev/tty0`).
         baudRate (int): Baud rate (e.g.: 4800, 9600, or 115200).
         byteSize (int): Start bits, either 5, 6, 7, or 8.
-        stopBits (float): Stop bits, either 1. 1.5, or 2.
+        stopBits (float): Stop bits, either 1, 1.5, or 2.
         parity (str): Parity, either `odd`, `even`, or `none`.
         softwareFlowControl (bool): XON/XOFF flow control.
         hardwareFlowControl (bool): RTS/CTS flow control.
