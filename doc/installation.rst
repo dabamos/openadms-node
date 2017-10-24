@@ -24,7 +24,7 @@ You can run OpenADMS Node by following these steps:
 2. Download and unpack `OpenADMS`_.
 
 3. In the OpenADMS Node directory, run ``python -m pip install -U -r
-   requirements.txt`` or execute ``win_install.bat`` as an administrator on
+   requirements.txt`` or execute ``install.bat`` as an administrator on
    Microsoft Windows.
 
 4. Write a configuration file for OpenADMS Node (see directory
@@ -119,7 +119,7 @@ Or if you prefer PyPy3.5:
 
 .. note::
 
-    On Microsoft Windows, the script ``win_install.bat`` will download
+    On Microsoft Windows, the script ``install.bat`` will download
     and install all neccessary dependencies on CPython. Run the script
     with administrator privileges.
 
