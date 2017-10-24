@@ -5,12 +5,12 @@ The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
 open-source software package for sensor control and observation data processing
 in geodesy and geotechnics.
 
-**OpenADMS Node** is an automatic deformation monitoring system used for control
-measurements of buildings, terrain, and geodetic nets. The software obtaines the
-observation data of arbitrary sensors, like total stations, digital levels,
-inclinometers, weather stations, or GNSS receivers. The raw sensor data is then
-processed, analysed, stored, and transmitted. The software can be used to
-monitor objects like:
+**OpenADMS Node** is a monitoring system used for control measurements of
+buildings, terrain, and geodetic nets. The software runs on sensor nodes and
+obtaines the observation data of arbitrary sensors, like total stations, digital
+levels, inclinometers, weather stations, or GNSS receivers. The raw sensor data
+is then processed, analysed, stored, and transmitted. The software can be used
+to monitor objects like:
 
 -  bridges, tunnels, dams;
 -  landslides, cliffs, glaciers;
