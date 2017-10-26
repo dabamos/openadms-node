@@ -6,5 +6,7 @@ jsonschema>=2.6.0
 Mastodon.py>=1.1.1
 paho-mqtt>=1.2
 pyserial>=3.2.1
+requests>=2.18.4
 uptime>=3.0.1
+tinydb>=3.6.0
 verboselogs>=1.7
