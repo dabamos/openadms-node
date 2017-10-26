@@ -19,7 +19,7 @@ Example:
 
     To start OpenADMS Node with the internal broker, run::
 
-        $ python3 openadms.py -c ./config/my_config.json -m
+        $ python3 openadms.py -c ./config/my_config.json -m -d
 
     The monitoring will begin automatically.
 """
@@ -52,7 +52,7 @@ from core.system import System
 root = logging.getLogger()
 
 LOG_FILE_BACKUP_COUNT = 1     # 1 log file only.
-MAX_LOG_FILE_SIZE = 10485760  # 10 MiB.
+LOG_FILE_MAX_SIZE = 10485760  # 10 MiB.
 
 
 def main(config_file_path: str) -> None:
@@ -186,7 +186,7 @@ def setup_logging(is_quiet: bool = False,
     }.get(verbosity, 6)
 
     fh = logging.handlers.RotatingFileHandler(log_file,
-                                              maxBytes=MAX_LOG_FILE_SIZE,
+                                              maxBytes=LOG_FILE_MAX_SIZE,
                                               backupCount=LOG_FILE_BACKUP_COUNT,
                                               encoding='utf8')
     fh.setLevel(file_level)
