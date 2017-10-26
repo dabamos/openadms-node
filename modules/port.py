@@ -206,7 +206,7 @@ class BluetoothPort(Prototype):
         return response
 
     def sanitize(self, s: str) -> str:
-        """Converts some non-printable characters of a given string.
+        """Escapes some non-printable characters in a given string.
 
         Args:
             s: String to sanitize.
@@ -620,7 +620,7 @@ class SerialPort(Prototype):
         return response
 
     def sanitize(self, s: str) -> str:
-        """Converts some non-printable characters of a given string."""
+        """Escapes some non-printable characters in a given string."""
         return s.replace('\n', '\\n')\
                 .replace('\r', '\\r')\
                 .replace('\t', '\\t')\

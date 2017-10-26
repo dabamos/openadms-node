@@ -166,7 +166,7 @@ class PreProcessor(Prototype):
             return False
 
     def sanitize(self, s: str) -> str:
-        """Removes some non-printable characters from a string.
+        """Escapes some non-printable characters in a given string.
 
         Args:
             s: String to sanitize.

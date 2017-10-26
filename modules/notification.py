@@ -376,11 +376,11 @@ class IrcAgent(Prototype):
     The JSON-based configuration for this modules:
 
     Parameters:
-        channel (str): IRC channel to join (e.g.: `#test`).
-        host (str): FQDN or IP address of the IRC server.
-        port (int): Port number of the IRC server.
+        channel (str): IRC channel to join (e.g.: ``#test``).
+        host (str): FQDN or IP address of IRC server.
+        port (int): Port number of IRC server.
         is_tls (bool): If true, use TLS encryption.
-        nickname (str): Nickname to use (default: `openadms`).
+        nickname (str): Nickname to use (default: ``openadms``).
         password (str): Password of registered nickname (optional).
         target (str): IRC channel or user to send messages to.
     """

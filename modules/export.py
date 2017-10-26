@@ -17,6 +17,7 @@ import arrow
 import requests
 
 from tinydb import TinyDB, Query
+from tinydb.storages import MemoryStorage
 
 from core.manager import Manager
 from core.observation import Observation
@@ -27,7 +28,7 @@ class CloudExporter(Prototype):
     """
     CloudExporter sends observation data to a RESTful on-line service.
     Observations are cached locally in case the service is temporary not
-    reachable.
+    reachable and then send again.
 
     The JSON-based configuration for this modules:
 
@@ -37,6 +38,7 @@ class CloudExporter(Prototype):
         password: Password for REST service.
         authMethod: Authentication method (`basic` or `jwt`).
         db: File name of the cache database (e.g.: ``cache.json``).
+        storage: Storage type (`memory` or `file`).
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -49,14 +51,17 @@ class CloudExporter(Prototype):
         self._user = config.get('user')
         self._password = config.get('password')
         self._auth_method = config.get('authMethod')
-
+        self._storage = config.get('storage')
         self._db_file = config.get('db')
 
-        try:
-            self._cache_db = TinyDB(self._db_file)
-        except Exception:
-            raise ValueError('Cache database "{}" cannot be opened'
-                             .format(self._db_file))
+        if self._storage == 'memory':
+            self._cache_db = TinyDB(storage=MemoryStorage)
+        else:
+            try:
+                self._cache_db = TinyDB(self._db_file)
+            except Exception:
+                raise ValueError('Cache database "{}" cannot be opened'
+                                 .format(self._db_file))
 
     def cache_observation(self, obs: Observation) -> str:
         """Caches the given observation in the local cache database.
