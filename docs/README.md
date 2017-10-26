@@ -8,7 +8,7 @@ $ python3 -m pip install -U -r requirements.txt
 
 Then, build the documentation:
 ```
-$ sphinx-apidoc -f -o docs/source ..
+$ sphinx-apidoc -f -e -T -o docs/source ../
 $ gmake html
 ```
 
