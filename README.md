@@ -40,41 +40,18 @@ Run OpenADMS Node from the command line:
 ```
 $ python3 openadms.py --config ./config/my_config.json --with-mqtt-broker --debug
 ```
-OpenADMS Node also features a graphical launcher. At first, run
-`win_install.bat` on Microsoft Windows or install the dependencies manually:
+OpenADMS Node also features a graphical launcher. At first, run `install.bat` on
+Microsoft Windows or install the dependencies manually:
 ```
 $ python3 -m pip install Gooey
 ```
 Execute `openadms-launcher.pyw` to start the graphical launcher.
-
-### Dependencies
-OpenADMS Node depends on the following Python libraries:
-
-* [arrow](https://pypi.python.org/pypi/arrow) (Apache 2.0 Licence)
-* [coloredlogs](https://pypi.python.org/pypi/coloredlogs) (MIT Licence)
-* [CouchDB](https://pypi.python.org/pypi/CouchDB) (BSD Licence)
-* [hbmqtt](https://pypi.python.org/pypi/hbmqtt) (MIT Licence)
-* [jsonschema](https://pypi.python.org/pypi/jsonschema) (MIT Licence)
-* [Mastodon.py](https://pypi.python.org/pypi/Mastodon.py) (MIT Licence)
-* [paho-mqtt](https://pypi.python.org/pypi/paho-mqtt) (Eclipse Public Licence)
-* [pyserial](https://pypi.python.org/pypi/pyserial) (Python Software Foundation Licence)
-* [uptime](https://pypi.python.org/pypi/uptime) (BSD-2-Clause Licence)
-* [verboselogs](https://pypi.python.org/pypi/verboselogs) (MIT Licence)
-
-The graphical launcher uses [Gooey](https://pypi.python.org/pypi/Gooey) (MIT
-Licence).
 
 ## Message Broker
 The MQTT protocol is used for the message exchange in OpenADMS Node. You can
 either use an external MQTT message broker, like
 [Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by using
 the parameter `--with-mqtt-broker`.
-
-For testing only, the public sandbox broker of
-[Eclipse IoT](https://iot.eclipse.org/getting-started) can be used. The server
-supports MQTT and WebSockets, both plain and TLS secured. Access the server
-using the hostname `iot.eclipse.org` and port `1883`. For encryption, use port
-`8883`. MQTT over WebSockets runs on the ports `80` and `443`.
 
 ## Configuration
 The configuration of OpenADMS Node is done by using a JSON-based text file,
@@ -85,20 +62,8 @@ configuration as an argument. For instance, run:
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
 
-## Virtual Environment
-The Python tool `venv` can create a virtual Python environment for development
-(with `csh`/`tcsh` on Unix):
-```
-$ python3 -m venv virtual-environment
-$ source ./virtual-environment/bin/activate.csh
-$ git clone https://github.com/dabamos/openadms-node
-$ cd openadms-node
-$ python3 -m pip install -U -r requirements.txt
-$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
-```
-
 ## Documentation
-The documentation can be found on the
+The documentation is hosted on the
 [project website](https://www.dabamos.de/manual/openadms-node/).
 See `./doc/` for how to build the documentation from source.
 
