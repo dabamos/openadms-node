@@ -1,43 +1,29 @@
 {
-    "modules": {
-        "com1": "module.port.SerialPort",
-        "fileExporter": "module.export.FileExporter",
-        "preProcessor": "module.processing.PreProcessor",
-        "scheduler1": "module.schedule.Scheduler",
-        "unitConverter": "module.processing.UnitConverter",
-        "couchDriver": "module.database.CouchDriver"
-    },
-    "project": {
-        "name": "Leica Disto pro4a Project",
-        "id": "167a790b51934ac5935340c981652d44",
-        "description": "Project for testing a Leica Disto pro4a."
-    },
-    "node": {
-        "name": "Sensor Node 1",
-        "id": "27cb8ba8b5a44b24897edbd3fe4fb736",
-        "description": "The only sensor node in this project."
-    },
-    "intercom": {
-        "mqtt": {
-            "host": "127.0.0.1",
-            "port": 1883,
-            "keepAlive": 60,
-            "topic": "openadms"
-        }
-    },
-    "ports": {
-        "serial": {
-            "com1": {
-                "port": "/dev/ttyU0",
-                "baudRate": 9600,
-                "byteSize": 8,
-                "stopBits": 1,
-                "parity": "none",
-                "timeout": 2.0,
-                "softwareFlowControl": false,
-                "hardwareFlowControl": false,
-                "maxAttempts": 1
-
+    "core": {
+        "modules": {
+            "com1": "modules.port.SerialPort",
+            "fileExporter": "modules.export.FileExporter",
+            "preProcessor": "modules.processing.PreProcessor",
+            "scheduler1": "modules.schedule.Scheduler",
+            "unitConverter": "modules.processing.UnitConverter",
+            "couchDriver": "modules.database.CouchDriver"
+        },
+        "project": {
+            "name": "Leica Disto pro4a Project",
+            "id": "167a790b51934ac5935340c981652d44",
+            "description": "Project for testing a Leica Disto pro4a."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "27cb8ba8b5a44b24897edbd3fe4fb736",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
             }
         }
     },
@@ -376,51 +362,68 @@
             ]
         }
     },
-    "schedulers": {
-        "scheduler1": {
-            "port": "com1",
-            "sensor": "disto",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2017-01-01",
-                    "endDate": "2030-12-31",
-                    "weekdays": {},
-                    "observations": [
-                        "init",
-                        "getStatus",
-                        "startTracking",
-                        "shutdown"
-                    ]
+    "modules": {
+        "ports": {
+            "serial": {
+                "com1": {
+                    "port": "/dev/ttyU0",
+                    "baudRate": 9600,
+                    "byteSize": 8,
+                    "stopBits": 1,
+                    "parity": "none",
+                    "timeout": 2.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false,
+                    "maxAttempts": 1
                 }
-            ]
+            }
+        },
+        "schedulers": {
+            "scheduler1": {
+                "port": "com1",
+                "sensor": "disto",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {},
+                        "observations": [
+                            "init",
+                            "getStatus",
+                            "startTracking",
+                            "shutdown"
+                        ]
+                    }
+                ]
+            }
+        },
+        "unitConverter": {
+            "distance": {
+                "conversionType": "scale",
+                "sourceUnit": "um",
+                "scalingValue": 0.0001,
+                "designatedUnit": "m"
+            }
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        },
+        "couchDriver": {
+            "server": "10.0.0.1",
+            "port": 5984,
+            "tls": false,
+            "user": "client",
+            "password": "openadms",
+            "db": "openadms"
         }
-    },
-    "unitConverter": {
-        "distance": {
-            "conversionType": "scale",
-            "sourceUnit": "um",
-            "scalingValue": 0.0001,
-            "designatedUnit": "m"
-        }
-    },
-    "fileExporter": {
-        "fileExtension": ".csv",
-        "fileName": "{{port}}_{{target}}_{{date}}",
-        "fileRotation": "monthly",
-        "paths": [
-            "./data"
-        ],
-        "separator": ",",
-        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
-        "saveObservationId": true
-    },
-    "couchDriver": {
-        "server": "10.0.0.1",
-        "port": 5984,
-        "tls": false,
-        "user": "client",
-        "password": "openadms",
-        "db": "openadms"
     }
 }

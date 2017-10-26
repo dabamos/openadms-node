@@ -1,41 +1,29 @@
 {
-    "modules": {
-        "com1": "module.port.SerialPort",
-        "scheduler": "module.schedule.Scheduler",
-        "preProcessor": "module.processing.PreProcessor",
-        "unitConverter": "module.processing.UnitConverter",
-        "fileExporter": "module.export.FileExporter",
-        "localControlServer": "module.server.LocalControlServer"
-    },
-    "project": {
-        "name": "DXL360S Project",
-        "id": "adb3e737ae174c1e9652b278b6182f11",
-        "description": "Project for testing a DLX360S."
-    },
-    "node": {
-        "name": "Sensor Node 1",
-        "id": "82ac5e091c734fcfb6294831d2c9e192",
-        "description": "The only sensor node in this project."
-    },
-    "intercom": {
-        "mqtt": {
-            "host": "127.0.0.1",
-            "port": 1883,
-            "keepAlive": 60,
-            "topic": "openadms"
-        }
-    },
-    "ports": {
-        "serial": {
-            "com1": {
-                "port": "COM1",
-                "baudRate": 9600,
-                "byteSize": 8,
-                "stopBits": 1,
-                "parity": "none",
-                "timeout": 2.0,
-                "softwareFlowControl": false,
-                "hardwareFlowControl": false
+    "core": {
+        "modules": {
+            "com1": "modules.port.SerialPort",
+            "scheduler": "modules.schedule.Scheduler",
+            "preProcessor": "modules.processing.PreProcessor",
+            "unitConverter": "modules.processing.UnitConverter",
+            "fileExporter": "modules.export.FileExporter",
+            "localControlServer": "modules.server.LocalControlServer"
+        },
+        "project": {
+            "name": "DXL360S Project",
+            "id": "adb3e737ae174c1e9652b278b6182f11",
+            "description": "Project for testing a DLX360S."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "82ac5e091c734fcfb6294831d2c9e192",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
             }
         }
     },
@@ -82,52 +70,68 @@
             ]
         }
     },
-    "schedulers": {
-        "scheduler": {
-            "port": "com1",
-            "sensor": "dxl360s",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2017-01-01",
-                    "endDate": "2030-12-31",
-                    "weekdays": {},
-                    "observations": [
-                        "getXY"
-                    ]
+    "modules": {
+        "ports": {
+            "serial": {
+                "com1": {
+                    "port": "COM1",
+                    "baudRate": 9600,
+                    "byteSize": 8,
+                    "stopBits": 1,
+                    "parity": "none",
+                    "timeout": 2.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false
                 }
-            ]
-        }
-    },
-    "fileExporter": {
-        "fileExtension": ".csv",
-        "fileName": "{{port}}_{{target}}_{{date}}",
-        "fileRotation": "monthly",
-        "paths": [
-            "./data"
-        ],
-        "separator": ",",
-        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
-        "saveObservationId": true
-    },
-    "unitConverter": {
-        "conversionTable": {
-            "x": {
-                "sourceUnit": "mdeg",
-                "designatedUnit": "deg",
-                "conversionType": "scale",
-                "scalingValue": 0.01
-            },
-            "y": {
-                "sourceUnit": "mdeg",
-                "designatedUnit": "deg",
-                "conversionType": "scale",
-                "scalingValue": 0.01
             }
+        },
+        "schedulers": {
+            "scheduler": {
+                "port": "com1",
+                "sensor": "dxl360s",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {},
+                        "observations": [
+                            "getXY"
+                        ]
+                    }
+                ]
+            }
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        },
+        "unitConverter": {
+            "conversionTable": {
+                "x": {
+                    "sourceUnit": "mdeg",
+                    "designatedUnit": "deg",
+                    "conversionType": "scale",
+                    "scalingValue": 0.01
+                },
+                "y": {
+                    "sourceUnit": "mdeg",
+                    "designatedUnit": "deg",
+                    "conversionType": "scale",
+                    "scalingValue": 0.01
+                }
+            }
+        },
+        "localControlServer": {
+            "host": "127.0.0.1",
+            "port": 8080
         }
-    },
-    "localControlServer": {
-        "host": "127.0.0.1",
-        "port": 8080
     }
 }

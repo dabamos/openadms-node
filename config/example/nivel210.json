@@ -1,41 +1,27 @@
 {
-    "modules": {
-        "com1": "module.port.SerialPort",
-        "fileExporter": "module.export.FileExporter",
-        "preProcessor": "module.processing.PreProcessor",
-        "scheduler1": "module.schedule.Scheduler"
-    },
-    "project": {
-        "name": "Nivel210 Project",
-        "id": "19481e0791604b489a8a9c4a25e9dd80",
-        "description": "Project for testing a Leica Nivel210."
-    },
-    "node": {
-        "name": "Sensor Node 1",
-        "id": "21bcf8c16a664b17bbc9cd4221fd8541",
-        "description": "The only sensor node in this project."
-    },
-    "intercom": {
-        "mqtt": {
-            "host": "127.0.0.1",
-            "port": 1883,
-            "keepAlive": 60,
-            "topic": "openadms"
-        }
-    },
-    "ports": {
-        "serial": {
-            "com1": {
-                "port": "COM1",
-                "baudRate": 9600,
-                "byteSize": 8,
-                "stopBits": 1,
-                "parity": "none",
-                "timeout": 2.0,
-                "softwareFlowControl": false,
-                "hardwareFlowControl": false,
-                "maxAttempts": 1
-
+    "core": {
+        "modules": {
+            "com1": "modules.port.SerialPort",
+            "fileExporter": "modules.export.FileExporter",
+            "preProcessor": "modules.processing.PreProcessor",
+            "scheduler1": "modules.schedule.Scheduler"
+        },
+        "project": {
+            "name": "Nivel210 Project",
+            "id": "19481e0791604b489a8a9c4a25e9dd80",
+            "description": "Project for testing a Leica Nivel210."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
             }
         }
     },
@@ -88,32 +74,49 @@
             ]
         }
     },
-    "schedulers": {
-        "scheduler1": {
-            "port": "com1",
-            "sensor": "nivel210",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2017-01-01",
-                    "endDate": "2030-12-31",
-                    "weekdays": {},
-                    "observations": [
-                        "getValues"
-                    ]
+    "modules": {
+        "ports": {
+            "serial": {
+                "com1": {
+                    "port": "COM1",
+                    "baudRate": 9600,
+                    "byteSize": 8,
+                    "stopBits": 1,
+                    "parity": "none",
+                    "timeout": 2.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false,
+                    "maxAttempts": 1
                 }
-            ]
+            }
+        },
+        "schedulers": {
+            "scheduler1": {
+                "port": "com1",
+                "sensor": "nivel210",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {},
+                        "observations": [
+                            "getValues"
+                        ]
+                    }
+                ]
+            }
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
         }
-    },
-    "fileExporter": {
-        "fileExtension": ".csv",
-        "fileName": "{{port}}_{{target}}_{{date}}",
-        "fileRotation": "monthly",
-        "paths": [
-            "./data"
-        ],
-        "separator": ",",
-        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
-        "saveObservationId": true
     }
 }

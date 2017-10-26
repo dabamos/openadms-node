@@ -1,37 +1,39 @@
 {
-    "modules": {
-        "alerter": "module.notification.Alerter",
-        "distanceCorrector": "module.totalstation.DistanceCorrector",
-        "fileExporter": "module.export.FileExporter",
-        "mailAgent": "module.notification.MailAgent",
-        "mailFormatter": "module.notification.AlertMessageFormatter",
-        "polarTransformer": "module.totalstation.PolarTransformer",
-        "preProcessor": "module.processing.PreProcessor",
-        "realTimePublisher": "module.export.RealTimePublisher",
-        "refractionCorrector": "module.totalstation.RefractionCorrector",
-        "returnCodeInspector": "module.processing.ReturnCodeInspector",
-        "scheduler1": "module.schedule.Scheduler",
-        "scheduler2": "module.schedule.Scheduler",
-        "virtualDTM": "module.virtual.VirtualDTM",
-        "virtualTotalStationTM30": "module.virtual.VirtualTotalStationTM30",
-        "localControlServer": "module.server.LocalControlServer"
-    },
-    "project": {
-        "name": "Virtual Project",
-        "id": "4a2e8b9d87d849e38bb6911b9f2364ea",
-        "description": "Project for testing virtual sensors."
-    },
-    "node": {
-        "name": "Sensor Node 1",
-        "id": "6426bf58c20840768912f116740c4974",
-        "description": "The only sensor node in this project."
-    },
-    "intercom": {
-        "mqtt": {
-            "host": "127.0.0.1",
-            "port": 1883,
-            "keepAlive": 60,
-            "topic": "openadms"
+    "core": {
+        "modules": {
+            "alerter": "modules.notification.Alerter",
+            "distanceCorrector": "modules.totalstation.DistanceCorrector",
+            "fileExporter": "modules.export.FileExporter",
+            "mailAgent": "modules.notification.MailAgent",
+            "mailFormatter": "modules.notification.AlertMessageFormatter",
+            "polarTransformer": "modules.totalstation.PolarTransformer",
+            "preProcessor": "modules.processing.PreProcessor",
+            "realTimePublisher": "modules.export.RealTimePublisher",
+            "refractionCorrector": "modules.totalstation.RefractionCorrector",
+            "returnCodeInspector": "modules.processing.ReturnCodeInspector",
+            "scheduler1": "modules.schedule.Scheduler",
+            "scheduler2": "modules.schedule.Scheduler",
+            "virtualDTM": "modules.virtual.VirtualDTM",
+            "virtualTotalStationTM30": "modules.virtual.VirtualTotalStationTM30",
+            "localControlServer": "modules.server.LocalControlServer"
+        },
+        "project": {
+            "name": "Virtual Project",
+            "id": "4a2e8b9d87d849e38bb6911b9f2364ea",
+            "description": "Project for testing virtual sensors."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "6426bf58c20840768912f116740c4974",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
+            }
         }
     },
     "sensors": {
@@ -1373,206 +1375,216 @@
             ]
         }
     },
-    "schedulers": {
-        "scheduler1": {
-            "port": "virtualDTM",
-            "sensor": "stsDTM",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2016-02-01",
-                    "endDate": "2019-07-30",
-                    "weekdays": {},
-                    "observations": [
-                        "initialize",
-                        "getValues"
-                    ]
-                }
-            ]
-        },
-        "scheduler2": {
-            "port": "virtualTotalStationTM30",
-            "sensor": "leicaTM30",
-            "schedules": [
-                {
-                    "enabled": false,
-                    "startDate": "2016-02-01",
-                    "endDate": "2019-07-30",
-                    "weekdays": {
-                        "monday": [
-                            {
-                                "startTime": "00:00:00",
-                                "endTime": "23:59:59"
-                            }
-                        ],
-                        "tuesday": [],
-                        "wednesday": [],
-                        "thursday": [],
-                        "friday": [],
-                        "saturday": [],
-                        "sunday": []
-                    },
-                    "observations": [
-                        "wait10",
-                        "initialize",
-                        "getP1",
-                        "getP2",
-                        "getP3",
-                        "getP4",
-                        "wait60"
-                    ]
-                }
-            ]
-        }
-    },
-    "alerter": {
-        "enabled": false,
-        "modules": {
-            "mailFormatter": {
-                "enabled": false,
-                "receivers": {
-                    "error": ["monitoring@example.com"]
-                }
+    "modules": {
+        "schedulers": {
+            "scheduler1": {
+                "port": "virtualDTM",
+                "sensor": "stsDTM",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2016-02-01",
+                        "endDate": "2019-07-30",
+                        "weekdays": {},
+                        "observations": [
+                            "initialize",
+                            "getValues"
+                        ]
+                    }
+                ]
             },
-            "shortMessageFormatter": {
-                "enabled": false,
-                "receivers": {
-                    "error": ["+49152 0987654"],
-                    "critical": ["+49152 0987654"]
+            "scheduler2": {
+                "port": "virtualTotalStationTM30",
+                "sensor": "leicaTM30",
+                "schedules": [
+                    {
+                        "enabled": false,
+                        "startDate": "2016-02-01",
+                        "endDate": "2019-07-30",
+                        "weekdays": {
+                            "monday": [
+                                {
+                                    "startTime": "00:00:00",
+                                    "endTime": "23:59:59"
+                                }
+                            ],
+                            "tuesday": [],
+                            "wednesday": [],
+                            "thursday": [],
+                            "friday": [],
+                            "saturday": [],
+                            "sunday": []
+                        },
+                        "observations": [
+                            "wait10",
+                            "initialize",
+                            "getP1",
+                            "getP2",
+                            "getP3",
+                            "getP4",
+                            "wait60"
+                        ]
+                    }
+                ]
+            }
+        },
+        "alerter": {
+            "enabled": false,
+            "modules": {
+                "mailFormatter": {
+                    "enabled": false,
+                    "receivers": {
+                        "error": [
+                            "monitoring@example.com"
+                        ]
+                    }
+                },
+                "shortMessageFormatter": {
+                    "enabled": false,
+                    "receivers": {
+                        "error": [
+                            "+49152 0987654"
+                        ],
+                        "critical": [
+                            "+49152 0987654"
+                        ]
+                    }
                 }
             }
-        }
-    },
-    "mailFormatter": {
-        "messageCollectionEnabled": false,
-        "messageCollectionTime": 0,
-        "type": "email",
-        "receiver": "mailAgent",
-        "templates": {
-            "header": "The following incident(s) occurred:\n\n",
-            "body": "{{dt}} - {{level}} - {{message}}\n",
-            "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
         },
-        "properties": {
-            "subject": "[OpenADMS] Alert Message - Virtual Project",
-            "from": "OpenADMS",
-            "to": "{{receiver}}"
-        }
-    },
-    "ircFormatter": {
-        "messageCollectionEnabled": false,
-        "messageCollectionTime": 0,
-        "type": "irc",
-        "receiver": "ircClient",
-        "templates": {
-            "body": "{{dt}} - {{level}} - {{message}}"
+        "mailFormatter": {
+            "messageCollectionEnabled": false,
+            "messageCollectionTime": 0,
+            "type": "email",
+            "receiver": "mailAgent",
+            "templates": {
+                "header": "The following incident(s) occurred:\n\n",
+                "body": "{{dt}} - {{level}} - {{message}}\n",
+                "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
+            },
+            "properties": {
+                "subject": "[OpenADMS] Alert Message - Virtual Project",
+                "from": "OpenADMS",
+                "to": "{{receiver}}"
+            }
         },
-        "properties": {
-            "target": "{{receiver}}"
-        }
-    },
-    "shortMessageFormatter": {
-        "messageCollectionEnabled": false,
-        "messageCollectionTime": 0,
-        "type": "sms",
-        "receiver": "smsAgent",
-        "templates": {
-            "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
-            "body": "{{dt}} - {{level}} - {{message}}",
-            "footer": "</cmgs>"
+        "ircFormatter": {
+            "messageCollectionEnabled": false,
+            "messageCollectionTime": 0,
+            "type": "irc",
+            "receiver": "ircClient",
+            "templates": {
+                "body": "{{dt}} - {{level}} - {{message}}"
+            },
+            "properties": {
+                "target": "{{receiver}}"
+            }
         },
-        "properties": {
-            "number": "{{receiver}}"
-        }
-    },
-    "shortMessageAgent": {
-        "host": "10.59.0.40",
-        "port": 1432
-    },
-    "heartbeat": {
-        "receivers": ["heartbeat"],
-        "interval": 10
-    },
-    "mailAgent": {
-        "defaultSubject": "[OpenADMS] Message",
-        "charset": "utf-8",
-        "userMail": "monitoring@example.com",
-        "userName": "monitoring@example.com",
-        "userPassword": "secret",
-        "host": "smtp.example.com",
-        "port": 465,
-        "tls": true,
-        "startTls": false
-    },
-    "distanceCorrector": {
-        "distanceName": "slopeDist",
-        "temperature": 20.0,
-        "pressure": 1010.0,
-        "humidity": 0.6,
-        "atmosphericCorrectionEnabled": true,
-        "sealevelCorrectionEnabled": false,
-        "sensorHeight": 100.0
-    },
-    "returnCodeInspector": {
-        "retries": 1,
-        "responseSets": [
-            "returnCode",
-            "rcChangeFace",
-            "rcGetFace0",
-            "rcGetFace1",
-            "rcGetValues0",
-            "rcGetValues1",
-            "rcMeasureDistance0",
-            "rcMeasureDistance1",
-            "rcSetDirection"
-        ]
-    },
-    "polarTransformer": {
-        "viewPoint": {
-            "x": 2000.0000,
-            "y": 992.5100,
-            "z": 100.0000
+        "shortMessageFormatter": {
+            "messageCollectionEnabled": false,
+            "messageCollectionTime": 0,
+            "type": "sms",
+            "receiver": "smsAgent",
+            "templates": {
+                "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
+                "body": "{{dt}} - {{level}} - {{message}}",
+                "footer": "</cmgs>"
+            },
+            "properties": {
+                "number": "{{receiver}}"
+            }
         },
-        "fixedPoints": {
-            "p1": {
+        "shortMessageAgent": {
+            "host": "10.59.0.40",
+            "port": 1432
+        },
+        "heartbeat": {
+            "receivers": [
+                "heartbeat"
+            ],
+            "interval": 10
+        },
+        "mailAgent": {
+            "defaultSubject": "[OpenADMS] Message",
+            "charset": "utf-8",
+            "userMail": "monitoring@example.com",
+            "userName": "monitoring@example.com",
+            "userPassword": "secret",
+            "host": "smtp.example.com",
+            "port": 465,
+            "tls": true,
+            "startTls": false
+        },
+        "distanceCorrector": {
+            "distanceName": "slopeDist",
+            "temperature": 20.0,
+            "pressure": 1010.0,
+            "humidity": 0.6,
+            "atmosphericCorrectionEnabled": true,
+            "sealevelCorrectionEnabled": false,
+            "sensorHeight": 100.0
+        },
+        "returnCodeInspector": {
+            "retries": 1,
+            "responseSets": [
+                "returnCode",
+                "rcChangeFace",
+                "rcGetFace0",
+                "rcGetFace1",
+                "rcGetValues0",
+                "rcGetValues1",
+                "rcMeasureDistance0",
+                "rcMeasureDistance1",
+                "rcSetDirection"
+            ]
+        },
+        "polarTransformer": {
+            "viewPoint": {
                 "x": 2000.0000,
-                "y": 1000.0000,
+                "y": 992.5100,
                 "z": 100.0000
             },
-            "p2": {
-                "x": 1995.4880,
-                "y": 1003.7680,
-                "z": 100.0080
+            "fixedPoints": {
+                "p1": {
+                    "x": 2000.0000,
+                    "y": 1000.0000,
+                    "z": 100.0000
+                },
+                "p2": {
+                    "x": 1995.4880,
+                    "y": 1003.7680,
+                    "z": 100.0080
+                },
+                "p3": {
+                    "x": 1994.4900,
+                    "y": 996.2600,
+                    "z": 100.0210
+                }
             },
-            "p3": {
-                "x": 1994.4900,
-                "y": 996.2600,
-                "z": 100.0210
-            }
+            "azimuthPointName": "p1",
+            "azimuthAngle": 100.00000,
+            "adjustmentEnabled": true
         },
-        "azimuthPointName": "p1",
-        "azimuthAngle": 100.00000,
-        "adjustmentEnabled": true
-    },
-    "realTimePublisher": {
-        "enabled": true,
-        "receivers": [
-            "onlineViewer"
-        ]
-    },
-    "fileExporter": {
-        "fileExtension": ".csv",
-        "fileName": "{{port}}_{{target}}_{{date}}",
-        "fileRotation": "monthly",
-        "paths": [
-            "./data"
-        ],
-        "separator": ",",
-        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
-        "saveObservationId": true
-    },
-    "localControlServer": {
-        "host": "127.0.0.1",
-        "port": 8080
+        "realTimePublisher": {
+            "enabled": true,
+            "receivers": [
+                "onlineViewer"
+            ]
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        },
+        "localControlServer": {
+            "host": "127.0.0.1",
+            "port": 8080
+        }
     }
 }

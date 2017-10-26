@@ -1,66 +1,42 @@
 {
-    "modules": {
-        "alerter": "module.notification.Alerter",
-        "com1": "module.port.SerialPort",
-        "com2": "module.port.SerialPort",
-        "distanceCorrector": "module.totalstation.DistanceCorrector",
-        "fileExporter": "module.export.FileExporter",
-        "helmertTransformer": "module.totalstation.HelmertTransformer",
-        "localControlServer": "module.server.LocalControlServer",
-        "mailAgent": "module.notification.MailAgent",
-        "mailFormatter": "module.notification.AlertMessageFormatter",
-        "polarTransformer": "module.totalstation.PolarTransformer",
-        "preProcessor": "module.processing.PreProcessor",
-        "realTimePublisher": "module.export.RealTimePublisher",
-        "refractionCorrector": "module.totalstation.RefractionCorrector",
-        "returnCodeInspector": "module.processing.ReturnCodeInspector",
-        "scheduler1": "module.schedule.Scheduler",
-        "scheduler2": "module.schedule.Scheduler",
-        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor",
-        "shortMessageAgent": "module.notification.ShortMessageAgent",
-        "shortMessageFormatter": "module.notification.AlertMessageFormatter"
-    },
-    "project": {
-        "name": "Total Station Project",
-        "id": "f27b9bcc31164390a2f8bd07aa1babd9",
-        "description": "Project for testing a total station."
-    },
-    "node": {
-        "name": "Sensor Node 1",
-        "id": "82438c8fdaf049e2aea790bddda5a90b",
-        "description": "The only sensor node in this project."
-    },
-    "intercom": {
-        "mqtt": {
-            "host": "127.0.0.1",
-            "port": 1883,
-            "keepAlive": 60,
-            "topic": "openadms"
-        }
-    },
-    "ports": {
-        "serial": {
-            "com1": {
-                "port": "COM1",
-                "baudRate": 4800,
-                "byteSize": 8,
-                "stopBits": 1,
-                "parity": "none",
-                "timeout": 2.0,
-                "softwareFlowControl": false,
-                "hardwareFlowControl": false,
-                "maxAttempts": 1
-            },
-            "com2": {
-                "port": "COM2",
-                "baudRate": 115200,
-                "byteSize": 8,
-                "stopBits": 1,
-                "parity": "none",
-                "timeout": 2.0,
-                "softwareFlowControl": false,
-                "hardwareFlowControl": false,
-                "maxAttempts": 1
+    "core": {
+        "modules": {
+            "alerter": "modules.notification.Alerter",
+            "com1": "modules.port.SerialPort",
+            "com2": "modules.port.SerialPort",
+            "distanceCorrector": "modules.totalstation.DistanceCorrector",
+            "fileExporter": "modules.export.FileExporter",
+            "helmertTransformer": "modules.totalstation.HelmertTransformer",
+            "localControlServer": "modules.server.LocalControlServer",
+            "mailAgent": "modules.notification.MailAgent",
+            "mailFormatter": "modules.notification.AlertMessageFormatter",
+            "polarTransformer": "modules.totalstation.PolarTransformer",
+            "preProcessor": "modules.processing.PreProcessor",
+            "realTimePublisher": "modules.export.RealTimePublisher",
+            "refractionCorrector": "modules.totalstation.RefractionCorrector",
+            "returnCodeInspector": "modules.processing.ReturnCodeInspector",
+            "scheduler1": "modules.schedule.Scheduler",
+            "scheduler2": "modules.schedule.Scheduler",
+            "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor",
+            "shortMessageAgent": "modules.notification.ShortMessageAgent",
+            "shortMessageFormatter": "modules.notification.AlertMessageFormatter"
+        },
+        "project": {
+            "name": "Total Station Project",
+            "id": "f27b9bcc31164390a2f8bd07aa1babd9",
+            "description": "Project for testing a total station."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "82438c8fdaf049e2aea790bddda5a90b",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
             }
         }
     },
@@ -1510,220 +1486,256 @@
             ]
         }
     },
-    "schedulers": {
-        "scheduler1": {
-            "port": "com1",
-            "sensor": "stsDTM",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2017-01-01",
-                    "endDate": "2030-12-31",
-                    "weekdays": {},
-                    "observations": [
-                        "initialize",
-                        "getValues"
-                    ]
+    "modules": {
+        "ports": {
+            "serial": {
+                "com1": {
+                    "port": "COM1",
+                    "baudRate": 4800,
+                    "byteSize": 8,
+                    "stopBits": 1,
+                    "parity": "none",
+                    "timeout": 2.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false,
+                    "maxAttempts": 1
+                },
+                "com2": {
+                    "port": "COM2",
+                    "baudRate": 115200,
+                    "byteSize": 8,
+                    "stopBits": 1,
+                    "parity": "none",
+                    "timeout": 2.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false,
+                    "maxAttempts": 1
                 }
-            ]
+            }
         },
-        "scheduler2": {
-            "port": "com2",
-            "sensor": "leicaTM30",
-            "schedules": [
-                {
-                    "enabled": true,
-                    "startDate": "2017-01-01",
-                    "endDate": "2030-12-31",
-                    "weekdays": {
-                        "monday": [
-                            {
-                                "startTime": "00:00:00",
-                                "endTime": "23:59:59"
-                            }
+        "schedulers": {
+            "scheduler1": {
+                "port": "com1",
+                "sensor": "stsDTM",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {},
+                        "observations": [
+                            "initialize",
+                            "getValues"
+                        ]
+                    }
+                ]
+            },
+            "scheduler2": {
+                "port": "com2",
+                "sensor": "leicaTM30",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {
+                            "monday": [
+                                {
+                                    "startTime": "00:00:00",
+                                    "endTime": "23:59:59"
+                                }
+                            ],
+                            "tuesday": [],
+                            "wednesday": [],
+                            "thursday": [],
+                            "friday": [],
+                            "saturday": [],
+                            "sunday": []
+                        },
+                        "observations": [
+                            "wait10",
+                            "initialize",
+                            "getP1",
+                            "getP2",
+                            "getP3",
+                            "getP4",
+                            "wait10"
+                        ]
+                    }
+                ]
+            }
+        },
+        "alerter": {
+            "modules": {
+                "shortMessageFormatter": {
+                    "enabled": false,
+                    "receivers": {
+                        "error": [
+                            "+49152 0987654"
                         ],
-                        "tuesday": [],
-                        "wednesday": [],
-                        "thursday": [],
-                        "friday": [],
-                        "saturday": [],
-                        "sunday": []
-                    },
-                    "observations": [
-                        "wait10",
-                        "initialize",
-                        "getP1",
-                        "getP2",
-                        "getP3",
-                        "getP4",
-                        "wait10"
-                    ]
-                }
-            ]
-        }
-    },
-    "alerter": {
-        "modules": {
-            "shortMessageFormatter": {
-                "enabled": false,
-                "receivers": {
-                    "error": ["+49152 0987654"],
-                    "critical": ["+49152 0987654"]
-                }
-            },
-            "mailFormatter": {
-                "enabled": false,
-                "receivers": {
-                    "error": ["engineer@example.com"]
+                        "critical": [
+                            "+49152 0987654"
+                        ]
+                    }
+                },
+                "mailFormatter": {
+                    "enabled": false,
+                    "receivers": {
+                        "error": [
+                            "engineer@example.com"
+                        ]
+                    }
                 }
             }
-        }
-    },
-    "mailFormatter": {
-        "messageCollectionEnabled": true,
-        "messageCollectionTime": 600,
-        "type": "email",
-        "receiver": "mailAgent",
-        "templates": {
-            "header": "The following incident(s) occurred:\n\n",
-            "body": "{{dt}} - {{level}} - {{message}}\n",
-            "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
         },
-        "properties": {
-            "subject": "[OpenADMS] Alert Message - Project X",
-            "from": "OpenADMS",
-            "to": "{{receiver}}"
-        }
-    },
-    "shortMessageFormatter": {
-        "messageCollectionEnabled": false,
-        "messageCollectionTime": 0,
-        "type": "sms",
-        "receiver": "shortMessageAgent",
-        "templates": {
-            "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
-            "body": "{{dt}} - {{level}} - {{message}}",
-            "footer": "</cmgs>"
+        "mailFormatter": {
+            "messageCollectionEnabled": true,
+            "messageCollectionTime": 600,
+            "type": "email",
+            "receiver": "mailAgent",
+            "templates": {
+                "header": "The following incident(s) occurred:\n\n",
+                "body": "{{dt}} - {{level}} - {{message}}\n",
+                "footer": "\nPlease do not reply as this e-mail was sent from an automated alerting system."
+            },
+            "properties": {
+                "subject": "[OpenADMS] Alert Message - Project X",
+                "from": "OpenADMS",
+                "to": "{{receiver}}"
+            }
         },
-        "properties": {
-            "number": "{{receiver}}"
-        }
-    },
-    "shortMessageAgent": {
-        "host": "10.59.0.40",
-        "port": 1432
-    },
-    "heartbeat": {
-        "receivers": ["heartbeat"],
-        "interval": 10
-    },
-    "mailAgent": {
-        "defaultSubject": "[OpenADMS] Message",
-        "charset": "utf-8",
-        "userMail": "monitoring@example.com",
-        "userName": "monitoring@example.com",
-        "userPassword": "secret",
-        "host": "smtp.example.com",
-        "port": 465,
-        "tls": true,
-        "startTls": false
-    },
-    "distanceCorrector": {
-        "distanceName": "slopeDist",
-        "temperature": 20.0,
-        "pressure": 1010.0,
-        "humidity": 0.6,
-        "atmosphericCorrectionEnabled": true,
-        "sealevelCorrectionEnabled": false,
-        "sensorHeight": 100.0
-    },
-    "helmertTransformer": {
-        "residualMismatchTransformationEnabled": true,
-        "viewPoint": {
-            "target": "p5",
+        "shortMessageFormatter": {
+            "messageCollectionEnabled": false,
+            "messageCollectionTime": 0,
+            "type": "sms",
+            "receiver": "shortMessageAgent",
+            "templates": {
+                "header": "<?xml version=\"1.0\"?><cmgs destaddr=\"{{receiver}}\">",
+                "body": "{{dt}} - {{level}} - {{message}}",
+                "footer": "</cmgs>"
+            },
+            "properties": {
+                "number": "{{receiver}}"
+            }
+        },
+        "shortMessageAgent": {
+            "host": "10.59.0.40",
+            "port": 1432
+        },
+        "heartbeat": {
             "receivers": [
-                "fileExporter",
-                "onlineViewer/p5"
+                "heartbeat"
+            ],
+            "interval": 10
+        },
+        "mailAgent": {
+            "defaultSubject": "[OpenADMS] Message",
+            "charset": "utf-8",
+            "userMail": "monitoring@example.com",
+            "userName": "monitoring@example.com",
+            "userPassword": "secret",
+            "host": "smtp.example.com",
+            "port": 465,
+            "tls": true,
+            "startTls": false
+        },
+        "distanceCorrector": {
+            "distanceName": "slopeDist",
+            "temperature": 20.0,
+            "pressure": 1010.0,
+            "humidity": 0.6,
+            "atmosphericCorrectionEnabled": true,
+            "sealevelCorrectionEnabled": false,
+            "sensorHeight": 100.0
+        },
+        "helmertTransformer": {
+            "residualMismatchTransformationEnabled": true,
+            "viewPoint": {
+                "target": "p5",
+                "receivers": [
+                    "fileExporter",
+                    "onlineViewer/p5"
+                ]
+            },
+            "fixedPoints": {
+                "p1": {
+                    "x": 2000.0000,
+                    "y": 1000.0000,
+                    "z": 100.0000
+                },
+                "p2": {
+                    "x": 1995.4880,
+                    "y": 1003.7680,
+                    "z": 100.0080
+                },
+                "p3": {
+                    "x": 1994.4900,
+                    "y": 996.2600,
+                    "z": 100.0210
+                }
+            }
+        },
+        "returnCodeInspector": {
+            "retries": 1,
+            "responseSets": [
+                "returnCode",
+                "rcChangeFace",
+                "rcGetFace0",
+                "rcGetFace1",
+                "rcGetValues0",
+                "rcGetValues1",
+                "rcMeasureDistance0",
+                "rcMeasureDistance1",
+                "rcSetDirection"
             ]
         },
-        "fixedPoints": {
-            "p1": {
-                "x": 2000.0000,
-                "y": 1000.0000,
-                "z": 100.0000
+        "polarTransformer": {
+            "viewPoint": {
+                "x": 1997.2320,
+                "y": 986.7530,
+                "z": 100.0140
             },
-            "p2": {
-                "x": 1995.4880,
-                "y": 1003.7680,
-                "z": 100.0080
+            "fixedPoints": {
+                "p1": {
+                    "x": 2000.0000,
+                    "y": 1000.0000,
+                    "z": 100.0000
+                },
+                "p2": {
+                    "x": 1995.4880,
+                    "y": 1003.7680,
+                    "z": 100.0080
+                },
+                "p3": {
+                    "x": 1994.4900,
+                    "y": 996.2600,
+                    "z": 100.0210
+                }
             },
-            "p3": {
-                "x": 1994.4900,
-                "y": 996.2600,
-                "z": 100.0210
-            }
+            "azimuthPointName": "p1",
+            "azimuthAngle": 86.88632,
+            "adjustmentEnabled": true
+        },
+        "realTimePublisher": {
+            "enabled": true,
+            "receivers": [
+                "onlineViewer"
+            ]
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        },
+        "localControlServer": {
+            "host": "127.0.0.1",
+            "port": 8080
         }
-    },
-    "returnCodeInspector": {
-        "retries": 1,
-        "responseSets": [
-            "returnCode",
-            "rcChangeFace",
-            "rcGetFace0",
-            "rcGetFace1",
-            "rcGetValues0",
-            "rcGetValues1",
-            "rcMeasureDistance0",
-            "rcMeasureDistance1",
-            "rcSetDirection"
-        ]
-    },
-    "polarTransformer": {
-        "viewPoint": {
-            "x": 1997.2320,
-            "y": 986.7530,
-            "z": 100.0140
-        },
-        "fixedPoints": {
-            "p1": {
-                "x": 2000.0000,
-                "y": 1000.0000,
-                "z": 100.0000
-            },
-            "p2": {
-                "x": 1995.4880,
-                "y": 1003.7680,
-                "z": 100.0080
-            },
-            "p3": {
-                "x": 1994.4900,
-                "y": 996.2600,
-                "z": 100.0210
-            }
-        },
-        "azimuthPointName": "p1",
-        "azimuthAngle": 86.88632,
-        "adjustmentEnabled": true
-    },
-    "realTimePublisher": {
-        "enabled": true,
-        "receivers": [
-            "onlineViewer"
-        ]
-    },
-    "fileExporter": {
-        "fileExtension": ".csv",
-        "fileName": "{{port}}_{{target}}_{{date}}",
-        "fileRotation": "monthly",
-        "paths": [
-            "./data"
-        ],
-        "separator": ",",
-        "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
-        "saveObservationId": true
-    },
-    "localControlServer": {
-        "host": "127.0.0.1",
-        "port": 8080
     }
 }
