@@ -1,11 +1,29 @@
-.. _modules:
+modules package
+===============
 
-Python Modules
-==============
+Submodules
+----------
 
 .. toctree::
-   :maxdepth: 4
 
-   core
-   module
-   openadms
+   modules.database
+   modules.export
+   modules.linux
+   modules.notification
+   modules.port
+   modules.processing
+   modules.prototype
+   modules.schedule
+   modules.server
+   modules.testing
+   modules.totalstation
+   modules.unix
+   modules.virtual
+
+Module contents
+---------------
+
+.. automodule:: modules
+    :members:
+    :undoc-members:
+    :show-inheritance:

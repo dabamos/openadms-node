@@ -104,8 +104,8 @@ Node configuration file. In the example below, the modules
 
     {
       "modules": {
-        "fileExporter": "module.export.FileExporter",
-        "schedulerCom1": "module.schedule.Scheduler"
+        "fileExporter": "modules.export.FileExporter",
+        "schedulerCom1": "modules.schedule.Scheduler"
       }
     }
 
@@ -149,7 +149,7 @@ load the CouchDriver:
 
     {
       "modules": {
-        "couchDriver": "module.database.CouchDriver"
+        "couchDriver": "modules.database.CouchDriver"
       }
     }
 
@@ -245,7 +245,7 @@ load the FileExporter:
 
     {
       "modules": {
-        "fileExporter": "module.export.FileExporter"
+        "fileExporter": "modules.export.FileExporter"
       }
     }
 
@@ -315,7 +315,7 @@ load the RealTimePublisher:
 
     {
       "modules": {
-        "realTimePublisher": "module.export.RealTimePublisher"
+        "realTimePublisher": "modules.export.RealTimePublisher"
       }
     }
 
@@ -364,7 +364,7 @@ load the InterruptCounter:
 
     {
       "modules": {
-        "interruptCounter": "module.linux.InterruptCounter"
+        "interruptCounter": "modules.linux.InterruptCounter"
       }
     }
 
@@ -433,7 +433,7 @@ load the Alerter:
 
     {
       "modules": {
-        "alerter": "module.notification.Alerter"
+        "alerter": "modules.notification.Alerter"
       }
     }
 
@@ -553,7 +553,7 @@ load the AlertMessageFormatter:
 
     {
       "modules": {
-        "alertMessageFormatter": "module.notification.AlertMessageFormatter"
+        "alertMessageFormatter": "modules.notification.AlertMessageFormatter"
       }
     }
 
@@ -567,8 +567,8 @@ Given are two AlertMessageFormatter, ``mailFormatter`` and
 
     {
       "modules": {
-        "mailFormatter": "module.notify.AlertMessageFormatter",
-        "shortMessageFormatter": "module.notify.AlertMessageFormatter"
+        "mailFormatter": "modules.notify.AlertMessageFormatter",
+        "shortMessageFormatter": "modules.notify.AlertMessageFormatter"
       }
     }
 
@@ -667,7 +667,7 @@ load the Heartbeat:
 
     {
       "modules": {
-        "heartbeat": "module.notification.Heartbeat"
+        "heartbeat": "modules.notification.Heartbeat"
       }
     }
 
@@ -709,7 +709,7 @@ load the IrcAgent:
 
     {
       "modules": {
-        "ircAgent": "module.notification.IrcAgent"
+        "ircAgent": "modules.notification.IrcAgent"
       }
     }
 
@@ -845,7 +845,7 @@ load the MailAgent:
 
     {
       "modules": {
-        "mailAgent": "module.notification.MailAgent"
+        "mailAgent": "modules.notification.MailAgent"
       }
     }
 
@@ -941,7 +941,7 @@ load the MastodonAgent:
 
     {
       "modules": {
-        "mastodonAgent": "module.notification.MastodonAgent"
+        "mastodonAgent": "modules.notification.MastodonAgent"
       }
     }
 
@@ -1071,7 +1071,7 @@ load the RssAgent:
 
     {
       "modules": {
-        "rssAgent": "module.notification.RssAgent"
+        "rssAgent": "modules.notification.RssAgent"
       }
     }
 
@@ -1222,7 +1222,7 @@ load the ShortMessageAgent:
 
     {
       "modules": {
-        "shortMessageAgent": "module.notification.ShortMessageAgent"
+        "shortMessageAgent": "modules.notification.ShortMessageAgent"
       }
     }
 
@@ -1295,7 +1295,7 @@ load a Bluetooth module:
 
     {
       "modules": {
-        "bt3": "module.port.BluetoothPort"
+        "bt3": "modules.port.BluetoothPort"
       }
     }
 
@@ -1365,8 +1365,8 @@ load two SerialPort modules:
 
     {
       "modules": {
-        "com1": "module.port.SerialPort",
-        "com2": "module.port.SerialPort"
+        "com1": "modules.port.SerialPort",
+        "com2": "modules.port.SerialPort"
       }
     }
 
@@ -1538,7 +1538,7 @@ load the PreProcessor:
 
     {
       "modules": {
-        "preProcessor": "module.processing.PreProcessor"
+        "preProcessor": "modules.processing.PreProcessor"
       }
     }
 
@@ -1595,7 +1595,7 @@ load the ResponseValueInspector:
 
     {
       "modules": {
-        "responseValueInspector": "module.processing.ResponseValueInspector"
+        "responseValueInspector": "modules.processing.ResponseValueInspector"
       }
     }
 
@@ -1704,7 +1704,7 @@ load the ReturnCodeInspector:
 
     {
       "modules": {
-        "returnCodeInspector": "module.processing.ReturnCodeInspector"
+        "returnCodeInspector": "modules.processing.ReturnCodeInspector"
       }
     }
 
@@ -1752,7 +1752,7 @@ load the UnitConverter:
 
     {
       "modules": {
-        "unitConverter": "module.processing.UnitConverter"
+        "unitConverter": "modules.processing.UnitConverter"
       }
     }
 
@@ -1829,8 +1829,8 @@ load two Scheduler instances:
 
     {
       "modules": {
-        "schedulerCom1": "module.schedule.Scheduler",
-        "schedulerCom2": "module.schedule.Scheduler"
+        "schedulerCom1": "modules.schedule.Scheduler",
+        "schedulerCom2": "modules.schedule.Scheduler"
       }
     }
 
@@ -1945,7 +1945,7 @@ load the LocalControlServer:
 
     {
       "modules": {
-        "localControlServer": "module.server.LocalControlServer"
+        "localControlServer": "modules.server.LocalControlServer"
       }
     }
 
@@ -1993,7 +1993,7 @@ load the ErrorGenerator:
 
     {
       "modules": {
-        "errorGenerator": "module.testing.ErrorGenerator"
+        "errorGenerator": "modules.testing.ErrorGenerator"
       }
     }
 
@@ -2061,7 +2061,7 @@ load the DistanceCorrector:
 
     {
       "modules": {
-        "distanceCorrector": "module.totalstation.DistanceCorrector"
+        "distanceCorrector": "modules.totalstation.DistanceCorrector"
       }
     }
 
@@ -2131,7 +2131,7 @@ load the HelmertTransformer:
 
     {
       "modules": {
-        "helmertTransformer": "module.totalstation.HelmertTransformer"
+        "helmertTransformer": "modules.totalstation.HelmertTransformer"
       }
     }
 
@@ -2200,7 +2200,7 @@ load the PolarTransformer:
 
     {
       "modules": {
-        "polarTransformer": "module.totalstation.PolarTransformer"
+        "polarTransformer": "modules.totalstation.PolarTransformer"
       }
     }
 
@@ -2276,7 +2276,7 @@ the RefractionCorrector:
 
     {
       "modules": {
-        "refractionCorrector": "module.totalstation.RefractionCorrector"
+        "refractionCorrector": "modules.totalstation.RefractionCorrector"
       }
     }
 
@@ -2527,7 +2527,7 @@ load the SerialMeasurementProcessor:
 
     {
       "modules": {
-        "serialMeasurementProcessor": "module.totalstation.SerialMeasurementProcessor"
+        "serialMeasurementProcessor": "modules.totalstation.SerialMeasurementProcessor"
       }
     }
 
@@ -2566,7 +2566,7 @@ load the GpioController:
 
     {
       "modules": {
-        "gpioController": "module.unix.GpioController"
+        "gpioController": "modules.unix.GpioController"
       }
     }
 
@@ -2646,7 +2646,7 @@ load the VirtualDTM:
 
     {
       "modules": {
-        "virtualDtm": "module.virtual.VirtualDTM"
+        "virtualDtm": "modules.virtual.VirtualDTM"
       }
     }
 
@@ -2677,7 +2677,7 @@ load the VirtualIndicatorOne:
 
     {
       "modules": {
-        "virtualIndicatorOne": "module.virtual.VirtualIndicatorOne"
+        "virtualIndicatorOne": "modules.virtual.VirtualIndicatorOne"
       }
     }
 
@@ -2727,7 +2727,7 @@ load the VirtualTotalStationTM30:
 
     {
       "modules": {
-        "virtualTotalStationTM30": "module.virtual.VirtualTotalStationTM30"
+        "virtualTotalStationTM30": "modules.virtual.VirtualTotalStationTM30"
       }
     }
 

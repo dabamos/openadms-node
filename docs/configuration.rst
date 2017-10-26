@@ -21,7 +21,7 @@ for sensor configuration files.
 
     {
       "modules": {
-        "myModule": "module.example.MyModule"
+        "myModule": "modules.example.MyModule"
       },
       "project": {
         "name": "Example Project",

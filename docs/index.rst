@@ -40,13 +40,12 @@ Table of Contents
    running
    configuration
    system
-   modules
+   openadms-node-modules
 
 Indices and Tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modules`
 * :ref:`modindex`
 
 .. _project website: https://www.dabamos.de/
