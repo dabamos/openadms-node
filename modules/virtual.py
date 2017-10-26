@@ -67,7 +67,7 @@ class VirtualSensor(Prototype):
         return obs
 
     def sanitize(self, s: str) -> str:
-        """Converts some non-printable characters of a given string.
+        """Escapes some non-printable characters in a given string.
 
         Args:
             s: The string to sanitize.
