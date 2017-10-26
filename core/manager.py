@@ -20,7 +20,7 @@ import arrow
 from core.intercom import MQTTMessenger
 from core.module import Module
 from core.sensor import Sensor
-from module.prototype import Prototype
+from modules.prototype import Prototype
 
 
 class Manager(object):
@@ -145,29 +145,29 @@ class ConfigManager(object):
                          schema_name: str,
                          *args) -> Dict[str, Any]:
         """
-        Returns the validated configuration of a module. Raises a ValueError
+        Returns the validated configuration of a modules. Raises a ValueError
         exception if the configuration is invalid.
 
         Args:
             schema_name: Name of the JSON schema.
-            *args: Key names to the module's configuration.
+            *args: Key names to the modules's configuration.
 
         Returns:
-            A dictionary with the module's configuration.
+            A dictionary with the modules's configuration.
 
         Raises:
-            ValueError: If module configuration is invalid.
+            ValueError: If modules configuration is invalid.
         """
         config = self._config
 
-        # Get module's configuration from dictionary.
+        # Get modules's configuration from dictionary.
         for key in args:
             try:
                 config = config[key]
             except AttributeError:
                 break
 
-        # Check whether module's configuration is valid.
+        # Check whether modules's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
             self.logger.error('Configuration "{}" is invalid'
                               .format(schema_name))
@@ -204,7 +204,9 @@ class ModuleManager(object):
         self._schema_manager = manager.schema_manager
 
         self._schema_manager.add_schema('modules', 'core/modules.json')
-        config = self._config_manager.get_valid_config('modules', 'modules')
+        config = self._config_manager.get_valid_config('modules',
+                                                       'core',
+                                                       'modules')
 
         # Start-time of the monitoring software.
         self._start_time = arrow.now()
@@ -220,17 +222,17 @@ class ModuleManager(object):
 
     def add(self, module_name: str, class_path: str):
         """Instantiates a worker, instantiates a messenger, and bundles both
-        to a module. The module will be added to the modules dictionary.
+        to a modules. The modules will be added to the modules dictionary.
 
         Args:
-            module_name: Name of the module.
+            module_name: Name of the modules.
             class_path: Path to the Python class.
 
         Returns:
-            True if module has been added, False if not.
+            True if modules has been added, False if not.
 
         Raises:
-            ValueError: If module file not exists.
+            ValueError: If modules file not exists.
         """
         if not self.module_exists(class_path):
             raise ValueError('Module "{}" not found'.format(class_path))
@@ -240,18 +242,18 @@ class ModuleManager(object):
         self._modules[module_name] = Module(messenger, worker)
 
     def delete(self, name: str) -> None:
-        """Removes a module from the modules dictionary.
+        """Removes a modules from the modules dictionary.
 
         Args:
-            name: The name of the module.
+            name: The name of the modules.
         """
         self._modules[name] = None
 
     def get(self, name: str) -> Module:
-        """Returns a specific module.
+        """Returns a specific modules.
 
         Args:
-            name: The name of the module.
+            name: The name of the modules.
         """
         return self._modules.get(name)
 
@@ -259,7 +261,7 @@ class ModuleManager(object):
         """Returns a list with all names of all modules.
 
         Returns:
-            List of module names.
+            List of modules names.
         """
         return self._modules.keys()
 
@@ -283,7 +285,7 @@ class ModuleManager(object):
         """Loads a Python class from a given path and returns the instance.
 
         Args:
-            module_name: Name of the module.
+            module_name: Name of the modules.
             class_path: Path to the Python class.
 
         Returns:
@@ -298,13 +300,13 @@ class ModuleManager(object):
                             self._manager)
 
     def has_module(self, name: str) -> bool:
-        """Returns whether or not module is found.
+        """Returns whether or not modules is found.
 
         Args:
-            name: The name of the module.
+            name: The name of the modules.
 
         Returns:
-            True if module is found, False if not.
+            True if modules is found, False if not.
         """
         if self.modules.get(name):
             return True
@@ -312,14 +314,14 @@ class ModuleManager(object):
             return False
 
     def module_exists(self, class_path: str) -> bool:
-        """Returns whether or not a OpenADMS Node module exists at the given
+        """Returns whether or not a OpenADMS Node modules exists at the given
         class path.
 
         Args:
             class_path: The path to the class.
 
         Returns:
-            True if module exists, False if not.
+            True if modules exists, False if not.
         """
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = Path(module_path.replace('.', '/') + '.py')
@@ -330,10 +332,10 @@ class ModuleManager(object):
         return True
 
     def start(self, module_name: str) -> None:
-        """Starts a module.
+        """Starts a modules.
 
         Args:
-            module_name: The name of the module.
+            module_name: The name of the modules.
         """
         self._modules.get(module_name).start()
         self._modules.get(module_name).start_worker()
@@ -344,10 +346,10 @@ class ModuleManager(object):
             self.start(module_name)
 
     def stop(self, module_name: str) -> None:
-        """Stops a module.
+        """Stops a modules.
 
         Args:
-            module_name: The name of the module.
+            module_name: The name of the modules.
         """
         self._modules.get(module_name).stop_worker()
 
@@ -409,7 +411,7 @@ class NodeManager(object):
 
         # Configuration of the node.
         self._schema_manager.add_schema('node', 'core/node.json')
-        config = self._config_manager.get_valid_config('node', 'node')
+        config = self._config_manager.get_valid_config('node', 'core', 'node')
 
         # Node information.
         self._node = Node(config.get('name'),
@@ -474,7 +476,9 @@ class ProjectManager(object):
 
         # Configuration of the project.
         self._schema_manager.add_schema('project', 'core/project.json')
-        config = self._config_manager.get_valid_config('project', 'project')
+        config = self._config_manager.get_valid_config('project',
+                                                       'core',
+                                                       'project')
 
         # Project information.
         self._project = Project(config.get('name'),
@@ -542,17 +546,17 @@ class SchemaManager(object):
         return True
 
     def get_schema_path(self, class_path: str) -> Path:
-        """Uses the class path of a module to generate the path to the
+        """Uses the class path of a modules to generate the path to the
         configuration schema file.
 
-        For instance, the given class path `module.schedule.Scheduler` will be
-        converted to the file path `module/schedule/scheduler.json`.
+        For instance, the given class path `modules.schedule.Scheduler` will be
+        converted to the file path `modules/schedule/scheduler.json`.
 
         Args:
-            class_path: The class path of a module.
+            class_path: The class path of a modules.
 
         Returns:
-            The path to the JSON schema of the module's configuration.
+            The path to the JSON schema of the modules's configuration.
         """
         return Path(class_path.replace('.', '/').lower() + '.json')
 
