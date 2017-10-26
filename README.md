@@ -65,7 +65,7 @@ $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ## Documentation
 The documentation is hosted on the
 [project website](https://www.dabamos.de/manual/openadms-node/).
-See `./doc/` for how to build the documentation from source.
+See `./docs` for how to build the documentation from source.
 
 ## Licence
 OpenADMS is licenced under BSD (2-clause).
