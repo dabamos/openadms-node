@@ -13,7 +13,7 @@ from typing import *
 
 
 class RootFilter(logging.Filter):
-    """s
+    """
     RootFilter is a helper class to filter unwanted log messages from external
     Python modules.
     """
