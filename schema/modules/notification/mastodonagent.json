@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/notification/mastodonagent.json",
+    "id": "schema/modules/notification/mastodonagent.json",
     "properties": {
         "email": {
             "id": "/properties/email",

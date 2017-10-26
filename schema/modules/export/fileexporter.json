@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/export/fileexporter.json",
+    "id": "schema/modules/export/fileexporter.json",
     "properties": {
         "dateTimeFormat": {
             "id": "/properties/dateTimeFormat",

@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/export/realtimepublisher.json",
+    "id": "schema/modules/export/realtimepublisher.json",
     "properties": {
         "enabled": {
             "id": "/properties/enabled",

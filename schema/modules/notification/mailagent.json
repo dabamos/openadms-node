@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "id": "schema/modules/notification/mailagent.json",
+    "properties": {
+        "charset": {
+            "id": "/properties/charset",
+            "type": "string"
+        },
+        "defaultSubject": {
+            "id": "/properties/defaultSubject",
+            "type": "string"
+        },
+        "host": {
+            "id": "/properties/host",
+            "type": "string"
+        },
+        "port": {
+            "id": "/properties/port",
+            "type": "integer"
+        },
+        "startTls": {
+            "id": "/properties/startTls",
+            "type": "boolean"
+        },
+        "tls": {
+            "id": "/properties/tls",
+            "type": "boolean"
+        },
+        "userMail": {
+            "id": "/properties/userMail",
+            "type": "string"
+        },
+        "userName": {
+            "id": "/properties/userName",
+            "type": "string"
+        },
+        "userPassword": {
+            "id": "/properties/userPassword",
+            "type": "string"
+        }
+    },
+    "required": [
+        "userName",
+        "tls",
+        "defaultSubject",
+        "startTls",
+        "userPassword",
+        "charset",
+        "userMail",
+        "host",
+        "port"
+    ],
+    "type": "object"
+}

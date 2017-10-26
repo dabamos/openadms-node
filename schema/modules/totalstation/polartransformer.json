@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/totalstation/polartransformer.json",
+    "id": "schema/modules/totalstation/polartransformer.json",
     "properties": {
         "adjustmentEnabled": {
             "id": "/properties/adjustmentEnabled",

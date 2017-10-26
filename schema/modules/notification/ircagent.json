@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/notification/ircagent.json",
+    "id": "schema/modules/notification/ircagent.json",
     "properties": {
         "channel": {
             "id": "/properties/channel",

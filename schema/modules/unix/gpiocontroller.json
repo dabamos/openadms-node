@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/module/io/gpiocontroller.json",
+    "id": "schema/modules/io/gpiocontroller.json",
     "properties": {
         "defaultState": {
             "id": "/properties/defaultState",

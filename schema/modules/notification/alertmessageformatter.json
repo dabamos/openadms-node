@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "id": "schema/modules/notification/alertmessageformatter.json",
+    "properties": {
+        "messageCollectionEnabled": {
+            "id": "/properties/messageCollectionEnabled",
+            "type": "boolean"
+        },
+        "messageCollectionTime": {
+            "id": "/properties/messageCollectionTime",
+            "type": "integer"
+        },
+        "properties": {
+            "id": "/properties/properties",
+            "patternProperties": {
+                "^[a-zA-Z0-9]+$": {
+                    "id": "/properties/modules/properties/property",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "receiver": {
+            "id": "/properties/receiver",
+            "type": "string"
+        },
+        "templates": {
+            "id": "/properties/templates",
+            "properties": {
+                "body": {
+                    "id": "/properties/templates/properties/body",
+                    "type": "string"
+                },
+                "footer": {
+                    "id": "/properties/templates/properties/footer",
+                    "type": "string"
+                },
+                "header": {
+                    "id": "/properties/templates/properties/header",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "type": {
+            "id": "/properties/type",
+            "type": "string"
+        }
+    },
+    "required": [
+        "templates",
+        "messageCollectionTime",
+        "messageCollectionEnabled",
+        "receiver",
+        "type"
+    ],
+    "type": "object"
+}
