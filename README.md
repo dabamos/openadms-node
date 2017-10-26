@@ -54,10 +54,9 @@ either use an external MQTT message broker, like
 the parameter `--with-mqtt-broker`.
 
 ## Configuration
-The configuration of OpenADMS Node is done by using a JSON-based text file,
-located in the directory `./config`. Please define modules, serial ports,
-sensors, and so on there. OpenADMS Node takes the file name of your custom
-configuration as an argument. For instance, run:
+OpenADMS Node must be configured by a JSON-based text file. Please define
+modules, serial ports, sensors, etc. in there. The file name of your custom
+configuration is taken as an argument. For instance, run:
 ```
 $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 ```
