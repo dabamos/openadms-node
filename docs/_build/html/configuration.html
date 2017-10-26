@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Configuration &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="index.html"/>
+        <link rel="next" title="System Description" href="system.html"/>
+        <link rel="prev" title="Running OpenADMS Node" href="running.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Configuration</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/configuration.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h1>
+<p>The monitoring system OpenADMS Node is configured by a single configuration file
+in JavaScript Object Notation (JSON). The file is loaded once at the start of
+OpenADMS Node. The path to the configuration file is passed as a command-line
+argument. Example configuration files are located in directory
+<code class="docutils literal"><span class="pre">./config/example/</span></code>. At the moment, configuration files have to be written
+manually. This will change in future, once a visual configuration tool will be
+available.</p>
+<p>The configuration consists of several sections. The order of the sections is
+arbitrary, but it is recommended to start with a list of modules to be used for
+the monitoring (<code class="docutils literal"><span class="pre">modules</span></code>), followed by meta information about the project
+(<code class="docutils literal"><span class="pre">project</span></code>) and the sensor node (<code class="docutils literal"><span class="pre">node</span></code>). In the <code class="docutils literal"><span class="pre">intercom</span></code> section the
+settings for the MQTT messaging protocol are defined. All used sensors with
+their commands have to be listed under <code class="docutils literal"><span class="pre">sensors</span></code>. See directory <code class="docutils literal"><span class="pre">./sensors/</span></code>
+for sensor configuration files.</p>
+<div class="code javascript highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;modules&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;myModule&quot;</span><span class="p">:</span> <span class="s2">&quot;module.example.MyModule&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;project&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Example Project&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;4a2e8b9d87d849e38bb6911b9f2364ea&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Project for testing virtual sensors.&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;node&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Sensor Node 1&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;6426bf58c20840768912f116740c4974&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The only sensor node in this project.&quot;</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;intercom&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;mqtt&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;127.0.0.1&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;port&quot;</span><span class="p">:</span> <span class="mi">1883</span><span class="p">,</span>
+      <span class="s2">&quot;keepAlive&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+      <span class="s2">&quot;topic&quot;</span><span class="p">:</span> <span class="s2">&quot;openadms&quot;</span>
+    <span class="p">}</span>
+  <span class="p">},</span>
+  <span class="s2">&quot;sensors&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;mySensor&quot;</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;My Example Sensor&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;generic&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;observations&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+          <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;doMeasure&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Does a measurement.&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="s2">&quot;point1&quot;</span><span class="p">,</span>
+          <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+          <span class="s2">&quot;onetime&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
+          <span class="s2">&quot;receivers&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;preProcessor&quot;</span> <span class="p">],</span>
+          <span class="s2">&quot;nextReceiver&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+          <span class="s2">&quot;requestSets&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;doMeasure&quot;</span><span class="p">:</span> <span class="p">{</span>
+              <span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="n">true</span><span class="p">,</span>
+              <span class="s2">&quot;request&quot;</span><span class="p">:</span> <span class="s2">&quot;m</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;responsePattern&quot;</span><span class="p">:</span> <span class="s2">&quot;(?P&lt;x&gt;[+-]?</span><span class="se">\\</span><span class="s2">d+</span><span class="se">\\</span><span class="s2">.+</span><span class="se">\\</span><span class="s2">d)&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;responseDelimiter&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span>
+              <span class="s2">&quot;sleepTime&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+              <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="mf">1.0</span>
+            <span class="p">}</span>
+           <span class="p">},</span>
+           <span class="s2">&quot;requestsOrder&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;doMeasure&quot;</span> <span class="p">],</span>
+           <span class="s2">&quot;responseSets&quot;</span><span class="p">:</span> <span class="p">{</span>
+             <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">{</span>
+               <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;float&quot;</span><span class="p">,</span>
+               <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;m&quot;</span>
+             <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;sleepTime&quot;</span><span class="p">:</span> <span class="mf">5.0</span>
+        <span class="p">}</span>
+      <span class="p">]</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="system.html" class="btn btn-neutral float-right" title="System Description" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="running.html" class="btn btn-neutral" title="Running OpenADMS Node" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

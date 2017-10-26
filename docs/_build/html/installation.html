@@ -1,0 +1,382 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation of OpenADMS Node &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="index.html"/>
+        <link rel="next" title="Running OpenADMS Node" href="running.html"/>
+        <link rel="prev" title="OpenADMS Node 0.7" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation of OpenADMS Node</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-code">Source Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python">Python</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#additional-modules">Additional Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-environment">Virtual Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#mqtt-message-broker">MQTT Message Broker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation of OpenADMS Node</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation-of-openadms-node">
+<span id="installation"></span><h1>Installation of OpenADMS Node<a class="headerlink" href="#installation-of-openadms-node" title="Permalink to this headline">¶</a></h1>
+<p>The following dependencies have to be installed at first in order to run
+OpenADMS Node:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.python.org/">CPython 3.6</a> or <a class="reference external" href="https://pypy.org/">PyPy3.5</a>,</li>
+<li>some additional Python modules (as described below),</li>
+<li><em>optional:</em> an MQTT message broker,</li>
+<li><em>optional:</em> the <a class="reference external" href="https://git-scm.com/">Git</a> version control system.</li>
+</ul>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>You can run OpenADMS Node by following these steps:</p>
+<ol class="arabic simple">
+<li>Download and install <a class="reference external" href="https://www.python.org/">Python 3.6</a> or higher.</li>
+<li>Download and unpack <a class="reference external" href="https://github.com/dabamos/openadms-node/releases">OpenADMS</a>.</li>
+<li>In the OpenADMS Node directory, run <code class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">-r</span>
+<span class="pre">requirements.txt</span></code> or execute <code class="docutils literal"><span class="pre">install.bat</span></code> as an administrator on
+Microsoft Windows.</li>
+<li>Write a configuration file for OpenADMS Node (see directory
+<code class="docutils literal"><span class="pre">./config/example/</span></code> for examples).</li>
+<li>Run <code class="docutils literal"><span class="pre">python3</span> <span class="pre">openadms.py</span> <span class="pre">--config</span> <span class="pre">config/my_config.json</span> <span class="pre">--with-mqtt-broker</span>
+<span class="pre">--debug</span></code> or start the graphical launcher <code class="docutils literal"><span class="pre">openadms-launcher.pyw</span></code>.</li>
+</ol>
+</div>
+<div class="section" id="source-code">
+<h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>The latest release of OpenADMS Node can be downloaded from <a class="reference external" href="https://github.com/dabamos/openadms-node/releases">GitHub</a>. If you
+want to use a more recent version of OpenADMS Node, you can get the master
+branch from the <a class="reference external" href="https://github.com/dabamos/openadms-node">GitHub repository</a> using the Git version control system. Clone
+the master branch with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/dabamos/openadms-node.git
+</pre></div>
+</div>
+<p>The master branch is available as a <a class="reference external" href="https://github.com/dabamos/openadms-node/archive/master.zip">Zip archive</a> on the GitHub website for
+those who do not want to use Git.</p>
+</div>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<p>The software is written in the Python programming language. A recent Python 3
+interpreter is required to run the programme. <a class="reference external" href="https://www.python.org/">CPython 3.6</a> and <a class="reference external" href="https://pypy.org/">PyPy3.5</a> are
+supported.</p>
+<dl class="docutils">
+<dt>Microsoft Windows Vista/7/8/10</dt>
+<dd>Download the latest release from the Python website and execute the
+installer. Please refer to the official <a class="reference external" href="https://docs.python.org/3/using/windows.html">installation notes</a> of the Python
+documentation. It is strongly recommended to add Python to the <code class="docutils literal"><span class="pre">PATH</span></code>
+variable of the system (see <a class="reference internal" href="#python-path"><span class="std std-numref">Fig. 1</span></a>).</dd>
+<dt>Linux and Unix</dt>
+<dd>Install Python 3.6 by using your favourite package managing system or
+compile it from source.</dd>
+<dt>macOS</dt>
+<dd>The latest version of Python is also available for download on the Python
+website.</dd>
+</dl>
+<div class="figure" id="id1">
+<span id="python-path"></span><a class="reference internal image-reference" href="_images/python_path.png"><img alt="Add Python to the ``PATH`` variable of Microsoft Windows" src="_images/python_path.png" style="width: 536.0px; height: 329.6px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Add Python to the <code class="docutils literal"><span class="pre">PATH</span></code> variable of Microsoft Windows</span></p>
+</div>
+<div class="section" id="additional-modules">
+<h3>Additional Modules<a class="headerlink" href="#additional-modules" title="Permalink to this headline">¶</a></h3>
+<p>OpenADMS Node depends on the following Python modules:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://pypi.python.org/pypi/arrow">arrow</a> (Apache 2.0 Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/coloredlogs">coloredlogs</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/CouchDB">CouchDB</a> (BSD Licence),</li>
+<li><a class="reference external" href="https://github.com/beerfactory/hbmqtt">HBMQTT</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/jsonschema">jsonschema</a> (MIT Licence)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/Mastodon.py">Mastodon.py</a> (MIT Licence)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/paho-mqtt">paho-mqtt</a> (Eclipse Public Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/pyserial">pyserial</a> (Python Software Foundation Licence).</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/requests">requests</a> (Apache 2.0 Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/tinydb">tinydb</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/uptime">uptime</a> (BSD-2-Clause Licence).</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/verboselogs">verboselogs</a> (MIT Licence).</li>
+</ul>
+<p>The (optional) graphical launcher requires <a class="reference external" href="https://pypi.python.org/pypi/Gooey">Gooey</a> (MIT Licence).</p>
+<p>All modules can be installed with the Python package management system
+(<code class="docutils literal"><span class="pre">pip</span></code>). Open the OpenADMS Node directory in your terminal (or <code class="docutils literal"><span class="pre">cmd.exe</span></code> as
+an administrator on Microsoft Windows) and then run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python3 -m pip install -U -r requirements.txt
+</pre></div>
+</div>
+<p>Or if you prefer PyPy3.5:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pypy3 -m pip install -U -r requirements.txt
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Microsoft Windows, the script <code class="docutils literal"><span class="pre">install.bat</span></code> will download
+and install all necessary dependencies on CPython. Run the script
+with administrator privileges.</p>
+</div>
+</div>
+<div class="section" id="virtual-environment">
+<h3>Virtual Environment<a class="headerlink" href="#virtual-environment" title="Permalink to this headline">¶</a></h3>
+<p>The tool <code class="docutils literal"><span class="pre">venv</span></code> creates an independent Python environment. Further information
+is given in the <a class="reference external" href="https://docs.python.org/3/library/venv.html">Python online manual</a>. On Linux/Unix with <code class="docutils literal"><span class="pre">csh</span></code>/<code class="docutils literal"><span class="pre">tcsh</span></code>,
+run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -m venv virtual-environment
+$ source virtual-environment/bin/activate.csh
+$ git clone https://github.com/dabamos/openadms-node
+$ cd openadms-node
+$ python -m pip install -U -r requirements.txt
+$ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="mqtt-message-broker">
+<h2>MQTT Message Broker<a class="headerlink" href="#mqtt-message-broker" title="Permalink to this headline">¶</a></h2>
+<p>The MQTT protocol is used for the internal and external message exchange in
+OpenADMS Node. Therefore, it is necessary to install and run an MQTT message
+broker before starting the monitoring system. Many implementations of message
+brokers are available (<a class="reference external" href="https://github.com/mqtt/mqtt.github.io/wiki/servers">list of servers</a>), some of them are open-source, for
+instance:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://mosquitto.org/">Eclipse Mosquitto</a>,</li>
+<li><a class="reference external" href="https://github.com/beerfactory/hbmqtt">HBMQTT</a>,</li>
+<li><a class="reference external" href="http://www.rabbitmq.com/">RabbitMQ</a> (MQTT via plug-in).</li>
+</ul>
+<p>HBMQTT is installed as a dependency. The broker will be started by OpenADMS Node
+if the parameter <code class="docutils literal"><span class="pre">--with-mqtt-broker</span></code> is used. It is also possible to start
+HBMQTT manually in the command line with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ hbmqtt
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For testing only, the public sandbox broker of <a class="reference external" href="https://iot.eclipse.org/">Eclipse IoT</a> can be used.
+The server supports MQTT and WebSockets, both plain and TLS secured.  Access
+the server using the hostname <code class="docutils literal"><span class="pre">iot.eclipse.org</span></code> and port <code class="docutils literal"><span class="pre">1883</span></code>. For
+encryption, use port <code class="docutils literal"><span class="pre">8883</span></code>. MQTT over WebSockets runs on the ports <code class="docutils literal"><span class="pre">80</span></code>
+and <code class="docutils literal"><span class="pre">443</span></code>.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="running.html" class="btn btn-neutral float-right" title="Running OpenADMS Node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="OpenADMS Node 0.7" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

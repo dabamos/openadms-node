@@ -1,0 +1,126 @@
+System Description
+==================
+
+.. note::
+
+    This section is still under construction.
+
+Observation Entity
+------------------
+
+All information regarding a single measurement of a sensor is stored in a
+JSON-based observation entity. This means, every time a request to a sensor
+should be made, the request has to be embedded in an observation entity together
+with all necessary meta data, like name and target of the observation, name of
+the serial port, regular expression pattern of the sensor’s raw response, and so
+on.
+
+These settings are stored in a configuration file in JSON format. OpenADMS Node
+reads the configuration file and processes the observations according to their
+definition.
+
+Observation entities can be extended by simply adding new key-value pairs.
+Please be aware that most elements in an observation entity are mandatory. The
+following basic observation describes a temperature measurement with an STS DTM
+meteorological sensor.
+
+.. code:: javascript
+
+    {
+      "name": "getValues",
+      "description": "get sensor values (temperature, pressure)",
+      "target": "TempPress",
+      "id": "6dc84c06018043ba84ac90636ed0f677",
+      "project": "6600055d61ce4d8698f77596e436785f",
+      "node": "21bcf8c16a664b17bbc9cd4221fd8541",
+      "enabled": true,
+      "onetime": false,
+      "receivers": [
+        "com1",
+        "preProcessor",
+        "distanceCorrector",
+        "fileExporter"
+      ],
+      "nextReceiver": 4,
+      "portName": "COM1",
+      "passiveMode": false,
+      "requestsOrder": [
+        "getTemperature",
+        "getPressure"
+      ],
+      "requestSets": {
+        "getTemperature": {
+          "enabled": true,
+          "request": "TEMP ?\r",
+          "response": ">+23.1",
+          "responseDelimiter": "\r",
+          "responsePattern": "(?P<temperature>[+-]?\\d+\\.+\\d)",
+          "sleepTime": 1.0,
+          "timeout": 1.0
+        },
+        "getPressure": {
+          "enabled": true,
+          "request": "PRES ?\r",
+          "response": ">+1011.3",
+          "responseDelimiter": "\r",
+          "responsePattern": "(?P<pressure>[+-]?\\d+\\.+\\d)",
+          "sleepTime": 1.0,
+          "timeout": 1.0
+        }
+      },
+      "responseSets": {
+        "temperature": {
+          "type": "float",
+          "unit": "C",
+          "value": "23.1"
+        },
+        "pressure": {
+          "type": "float",
+          "unit": "mbar",
+          "value": "1011.3"
+        }
+      },
+      "sleepTime": 20.0
+    }
+
+The single elements of this observation entity are explained below.
+
++-------------------+-----------+-------------------------------------------------------------------------+
+| Name              | Data Type | Description                                                             |
++===================+===========+=========================================================================+
+| ``description``   | String    | Short description of the observation (optional).                        |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``enabled``       | Boolean   | Condition of the observation (enabled/disabled).                        |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``id``            | String    | ID of the observation (UUID4 hex).                                      |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``name``          | String    | Name of the observation.                                                |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``nextReceiver``  | Integer   | Index of the next receiver (0 … n).                                     |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``node``          | String    | ID of the sensor node (UUID4 hex).                                      |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``onetime``       | Boolean   | If true, observation will be send one time only.                        |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``passiveMode``   | Boolean   | If true, serial port communication is passive only (depends on sensor). |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``portName``      | String    | Name of the serial port (will be added automatically).                  |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``project``       | String    | ID of the project (UUID4 hex).                                          |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``receivers``     | List      | List of modules the observation will be send to sequentially.           |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``requestSets``   | Dict      | Requests to the sensor, response patterns, etc.                         |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``requestsOrder`` | List      | Defines the order of the requests.                                      |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``responseSets``  | Dict      | Response units, types, and values.                                      |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``sensorName``    | String    | Name of the sensor (will be added by the scheduler).                    |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``sensorType``    | String    | Type of sensor (e.g., total station, inclinometer, …).                  |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``sleepTime``     | Float     | Time in seconds to wait before the next observation.                    |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``target``        | String    | Target name of the observation (e.g., point name, target location).     |
++-------------------+-----------+-------------------------------------------------------------------------+
