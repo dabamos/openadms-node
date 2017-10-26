@@ -97,21 +97,23 @@ before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 
 Modules can be loaded by adding them to the ``modules`` section of the OpenADMS
-Node configuration file. In the example below, the modules
-:ref:`scheduler` and :ref:`file-exporter` will be loaded:
+Node core configuration. In the example below, the modules :ref:`scheduler` and
+:ref:`file-exporter` will be loaded:
 
 .. code:: javascript
 
     {
-      "modules": {
-        "fileExporter": "modules.export.FileExporter",
-        "schedulerCom1": "modules.schedule.Scheduler"
+      "core":
+        "modules": {
+          "fileExporter": "modules.export.FileExporter",
+          "schedulerCom1": "modules.schedule.Scheduler"
+        }
       }
     }
 
 The key ``fileExporter`` sets the name of the instance, the value
-``module.export.FileExporter`` the path to the module (class ``FileExporter`` in
-``./module/export.py``). The name of an instance can be chosen freely. For
+``modules.export.FileExporter`` the path to the module (class ``FileExporter``
+in ``./modules/export.py``). The name of an instance can be chosen freely. For
 instance, instead of ``fileExporter`` the name ``myFileExporter`` is also valid,
 but the key of the FileExporter module configuration has to be renamed as well.
 Multiple instances of a module are possible, if they have different names (e.g.,
@@ -238,8 +240,7 @@ Additional response sets will be appended at the end of the line.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the FileExporter:
+Add the FileExporter to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -308,8 +309,7 @@ published under the MQTT topic ``onlineViewer/target1``.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the RealTimePublisher:
+Add the RealTimePublisher to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -357,8 +357,7 @@ the Python package `RPi.GPIO`_ before using InterruptCounter. Please run:
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the InterruptCounter:
+Add the InterruptCounter to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -426,8 +425,7 @@ The sequences could be:
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the Alerter:
+Add the Alerter to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -546,8 +544,7 @@ header and footer. An example e-mail message is:
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the AlertMessageFormatter:
+Add the AlertMessageFormatter to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -660,8 +657,7 @@ is still alive (see `Wikipedia`_).
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the Heartbeat:
+Add the Heartbeat to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -702,8 +698,7 @@ to a given channel or user. The module accepts messages of type ``irc``.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the IrcAgent:
+Add the IrcAgent to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -838,8 +833,7 @@ below.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the MailAgent:
+Add the MailAgent to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -934,8 +928,7 @@ messages send to the Mastodon network is limited to 500 characters.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the MastodonAgent:
+Add the MastodonAgent to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1064,8 +1057,7 @@ The RSS format is based on XML. The module accepts messages of type ``rss``.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the RssAgent:
+Add the RssAgent to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1215,8 +1207,7 @@ other socket-based SMS servers.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the ShortMessageAgent:
+Add the ShortMessageAgent to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1288,8 +1279,7 @@ port as a local serial port.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following lines to the ``modules`` section of the configuration file to
-load a Bluetooth module:
+Add the BluetoothPort to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1358,8 +1348,7 @@ creates new observations as fast as incoming data from a sensor is received.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following lines to the ``modules`` section of the configuration file to
-load two SerialPort modules:
+Add the SerialPort to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1531,8 +1520,7 @@ The observation data object is then forwarded to the next receiver.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the PreProcessor:
+Add the PreProcessor to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1588,8 +1576,7 @@ numerical values (integer or float) as well.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the ResponseValueInspector:
+Add the ResponseValueInspector to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1697,8 +1684,7 @@ it will generate a log message.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the ReturnCodeInspector:
+Add the ReturnCodeInspector to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1745,8 +1731,7 @@ the response is used as an identifier in the configuration.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the UnitConverter:
+Add the UnitConverter to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1822,8 +1807,7 @@ bind port instance, using the according schedule.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following lines to the ``modules`` section of the configuration file to
-load two Scheduler instances:
+Add the Scheduler to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1938,8 +1922,7 @@ log messages.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the LocalControlServer:
+Add the LocalControlServer to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -1986,8 +1969,7 @@ used to test the processing of warning, error, and critical log messages.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the ErrorGenerator:
+Add the ErrorGenerator to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2054,8 +2036,7 @@ the corrected distance).
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the DistanceCorrector:
+Add the DistanceCorrector to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2124,8 +2105,7 @@ response sets in the observations (``x``, ``y``, and ``z``).
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the HelmertTransformer:
+Add the HelmertTransformer to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2193,8 +2173,7 @@ response sets in the observation.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the PolarTransformer:
+Add the PolarTransformer to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2269,8 +2248,7 @@ distance and corrects the Z value of an observed target.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the modules section of the configuration file to load
-the RefractionCorrector:
+Add the RefractionCorrector to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2520,8 +2498,8 @@ response sets for each face.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the SerialMeasurementProcessor:
+Add the SerialMeasurementProcessor to the ``modules`` section of the core
+configuration:
 
 .. code:: javascript
 
@@ -2559,8 +2537,7 @@ the module instance. After the set duration the pin changes back to the default.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the GpioController:
+Add the GpioController to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2639,8 +2616,7 @@ the name of the sensor to the name of the VirtualDTM instance.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the VirtualDTM:
+Add the VirtualDTM to the ``modules`` section of the core configuration:
 
 .. code:: javascript
 
@@ -2670,8 +2646,8 @@ and set the name of the sensor to the name of the VirtualIndicatorOne instance.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the VirtualIndicatorOne:
+Add the VirtualIndicatorOne to the ``modules`` section of the core
+configuration:
 
 .. code:: javascript
 
@@ -2720,8 +2696,8 @@ VirtualTotalStationTM30 instance.
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
 
-Add the following line to the ``modules`` section of the configuration file to
-load the VirtualTotalStationTM30:
+Add the VirtualTotalStationTM30 to the ``modules`` section of the core
+configuration:
 
 .. code:: javascript
 

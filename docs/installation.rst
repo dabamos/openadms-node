@@ -132,8 +132,8 @@ run:
     $ python -m pip install -U -r requirements.txt
     $ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
 
-MQTT Message Broker
--------------------
+Message Broker
+--------------
 
 The MQTT protocol is used for the internal and external message exchange in
 OpenADMS Node. Therefore, it is necessary to install and run an MQTT message
