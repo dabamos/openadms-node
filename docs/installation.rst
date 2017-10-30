@@ -7,11 +7,8 @@ The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
 -  `CPython 3.6`_ or `PyPy3.5`_,
-
 -  some additional Python modules (as described below),
-
 -  *optional:* an MQTT message broker,
-
 -  *optional:* the `Git`_ version control system.
 
 Quick Start
@@ -36,24 +33,23 @@ You can run OpenADMS Node by following these steps:
 Source Code
 -----------
 
-The latest release of OpenADMS Node can be downloaded from `GitHub`_. If you
-want to use a more recent version of OpenADMS Node, you can get the master
-branch from the `GitHub repository`_ using the Git version control system. Clone
-the master branch with:
+The release versions of OpenADMS Node are hosted on `GitHub`_. If you like to
+download a more recent version, you can clone the master branch from the
+`GitHub repository`_ using the Git version control system:
 
 ::
 
     $ git clone https://github.com/dabamos/openadms-node.git
 
-The master branch is available as a `Zip archive`_ on the GitHub website for
-those who do not want to use Git.
+The master branch is available as a `Zip archive`_ for those who do not want to
+use Git.
 
 Python
 ------
 
-The software is written in the Python programming language. A recent Python 3
-interpreter is required to run the programme. `CPython 3.6`_ and `PyPy3.5`_ are
-supported.
+OpenADMS Node is written in Python. A recent Python 3 interpreter is required to
+run the software. `CPython 3.6`_ and `PyPy3.5`_ are supported. Interpreters are
+available for all modern operating systems.
 
 Microsoft Windows Vista/7/8/10
     Download the latest release from the Python website and execute the
@@ -89,6 +85,7 @@ OpenADMS Node depends on the following Python modules:
 -  `Mastodon.py`_ (MIT Licence)
 -  `paho-mqtt`_ (Eclipse Public Licence),
 -  `pyserial`_ (Python Software Foundation Licence).
+-  `pytest`_ (MIT Licence)
 -  `requests`_ (Apache 2.0 Licence),
 -  `tinydb`_ (MIT Licence),
 -  `uptime`_ (BSD-2-Clause Licence).
@@ -97,14 +94,14 @@ OpenADMS Node depends on the following Python modules:
 The (optional) graphical launcher requires `Gooey`_ (MIT Licence).
 
 All modules can be installed with the Python package management system
-(``pip``). Open the OpenADMS Node directory in your terminal (or ``cmd.exe`` as
-an administrator on Microsoft Windows) and then run:
+(``pip``). Open the OpenADMS Node directory in your terminal (or ``cmd.exe``
+with administrator privileges on Microsoft Windows) and then run:
 
 ::
 
     $ python3 -m pip install -U -r requirements.txt
 
-Or if you prefer PyPy3.5:
+Or, if you prefer PyPy3.5:
 
 ::
 
@@ -114,7 +111,7 @@ Or if you prefer PyPy3.5:
 
     On Microsoft Windows, the script ``install.bat`` will download
     and install all necessary dependencies on CPython. Run the script
-    with administrator privileges.
+    with administrator rights.
 
 Virtual Environment
 ~~~~~~~~~~~~~~~~~~~
@@ -139,7 +136,7 @@ The MQTT protocol is used for the internal and external message exchange in
 OpenADMS Node. Therefore, it is necessary to install and run an MQTT message
 broker before starting the monitoring system. Many implementations of message
 brokers are available (`list of servers`_), some of them are open-source, for
-instance:
+example:
 
 -  `Eclipse Mosquitto`_,
 -  `HBMQTT`_,
@@ -180,6 +177,7 @@ HBMQTT manually in the command line with:
 .. _Mastodon.py: https://pypi.python.org/pypi/Mastodon.py
 .. _paho-mqtt: https://pypi.python.org/pypi/paho-mqtt
 .. _pyserial: https://pypi.python.org/pypi/pyserial
+.. _pytest: https://pypi.python.org/pypi/pytest
 .. _requests: https://pypi.python.org/pypi/requests
 .. _tinydb: https://pypi.python.org/pypi/tinydb
 .. _uptime: https://pypi.python.org/pypi/uptime
