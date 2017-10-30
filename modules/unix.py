@@ -36,9 +36,9 @@ class GpioController(Prototype):
     """
     GpioController sets single pins of the General Purpose Input Output
     (GPIO) interface of a Raspberry Pi single-board computer running FreeBSD,
-    NetBSD, or OpenBSD. This modules does not work on Linux.
+    NetBSD, or OpenBSD. This module does not work on Linux.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         defaultState (int): Default state of pin (either 0 or 1).

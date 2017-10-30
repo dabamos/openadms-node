@@ -18,7 +18,7 @@ class ErrorGenerator(Prototype):
     ErrorGenerates creates `warning`, `error`, or `critical` log messages in a
     given interval for testing purposes.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         warning (bool): Enable warning messages.
@@ -63,7 +63,7 @@ class ErrorGenerator(Prototype):
                 self._critical_count += 1
 
     def start(self) -> None:
-        """Starts the modules."""
+        """Starts the module."""
         if self._is_running:
             return
 

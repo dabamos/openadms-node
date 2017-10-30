@@ -33,7 +33,7 @@ class BluetoothPort(Prototype):
     Python 3.3. At the moment, the class is not very useful and needs further
     testing.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         port (str): Port name.
@@ -317,7 +317,7 @@ class SerialPort(Prototype):
     based on request/response. In passive mode, the port just listens for
     incoming data without sending any requests.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         port (str): Name of the port (e.g.: `COM1` or `/dev/tty0`).
@@ -427,7 +427,7 @@ class SerialPort(Prototype):
             self._serial.reset_output_buffer()
             self._serial.reset_input_buffer()
 
-        # Add the name of this serial port modules to the observation.
+        # Add the name of this serial port module to the observation.
         obs.set('portName', self._name)
 
         requests_order = obs.get('requestsOrder', [])

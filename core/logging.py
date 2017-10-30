@@ -40,6 +40,9 @@ class RingBuffer(object):
         """
         self._deque = deque(maxlen=max_length)
 
+    def __len__(self):
+        return len(self._deque)
+
     def append(self, x: Any) -> None:
         """Appends an element to the deque.
 
@@ -134,6 +137,10 @@ class RingBufferLogHandler(logging.Handler):
             All log messages.
         """
         return self._buffer.to_string()
+
+    @property
+    def buffer(self) -> RingBuffer:
+        return self._buffer
 
     @property
     def size(self) -> int:

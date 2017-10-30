@@ -30,7 +30,7 @@ class CloudExporter(Prototype):
     Observations are cached locally in case the service is temporary not
     reachable and then send again.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         url: URL of the REST service.
@@ -92,7 +92,7 @@ class CloudExporter(Prototype):
             time.sleep(10)
 
     def start(self) -> None:
-        """Starts the modules."""
+        """Starts the module."""
         if self._is_running:
             return
 
@@ -118,7 +118,7 @@ class FileExporter(Prototype):
     """
     FileExporter writes sensor data to a flat file in CSV format.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         dateTimeFormat (str): Format of date and time (see `arrow` library).
@@ -245,7 +245,7 @@ class RealTimePublisher(Prototype):
     RealTimePublisher sends copies of `Observation` objects to a list of
     receivers.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         receivers (List): List of modules to send the observation to.

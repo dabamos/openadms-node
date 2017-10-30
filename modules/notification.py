@@ -40,7 +40,7 @@ class Alerter(Prototype):
     """
     Alerter is used to send warning and error messages to other modules.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         is_enabled (bool): If true, alerter is enabled.
@@ -77,7 +77,7 @@ class Alerter(Prototype):
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
-                self.logger.notice('Skipped modules "{}" (not enabled)'
+                self.logger.notice('Skipped module "{}" (not enabled)'
                                    .format(module_name))
                 continue
 
@@ -128,7 +128,7 @@ class AlertMessageFormatter(Prototype):
         messageCollectionEnabled (bool): If true, cache alert messages.
         messageCollectionTime (float): Time to cache messages before sending.
         properties (Dict): Additional properties to add to the message.
-        receiver (str): Name of the receiving modules.
+        receiver (str): Name of the receiving module.
         templates (Dict): Templates for `header`, `body`, and `footer`.
         type (str): Type of the message to be send (`email`, `sms`, etc.).
     """
@@ -300,7 +300,7 @@ class Heartbeat(Prototype):
     Heartbeat sends heartbeat messages ("pings") to the message broker by using
     the message type `heartbeat`.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         interval (float): Interval for sending heartbeats.
@@ -369,11 +369,11 @@ class HeartbeatMonitor(Prototype):
 
 class IrcAgent(Prototype):
     """
-    IrcAgent sends alert messages to the Internet Relay Chat. This modules acts
+    IrcAgent sends alert messages to the Internet Relay Chat. This module acts
     as a simple IRC bot which connects to an IRC server and sends text messages
     to a channel or user. Only a few commands of RFC 1459 are implemented.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         channel (str): IRC channel to join (e.g.: ``#test``).
@@ -564,7 +564,7 @@ class MailAgent(Prototype):
     """
     MailAgents sends e-mails via SMTP.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         charset (str): Character set of the email.
@@ -678,9 +678,9 @@ class MailAgent(Prototype):
 class MastodonAgent(Prototype):
     """
     Mastodon sends toots to the Mastodon social network. Requires the Python
-    modules `Mastodon.py`.
+    module `Mastodon.py`.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         email (str): Login email address of Mastodon account.
@@ -746,7 +746,7 @@ class RssAgent(Prototype):
     """
     RSSAgent creates an RSS 2.0 feed out of given data.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         author (str): Author of the RSS feed.
@@ -921,7 +921,7 @@ class ShortMessageAgent(Prototype):
     """
     ShortMessageAgent uses a socket connection to a GSM modem to send SMS.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         host (str): FQDN or IP address of the SMS server.

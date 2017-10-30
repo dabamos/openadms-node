@@ -129,7 +129,8 @@ def stay_alive() -> None:
 
 
 def valid_path(string: str) -> str:
-    """Checks whether a given string is a valid file path.
+    """Checks whether a given string is a valid file path. Used as a validator
+    for ``argparse.ArgumentParser``.
 
     Args:
         string: The string.
@@ -203,6 +204,10 @@ def setup_logging(is_quiet: bool = False,
                         datefmt=date_fmt,
                         logger=root)
 
+    # Add filter to log handlers, to exclude log messages from HBMQTT.
+    for handler in logging.root.handlers:
+        handler.addFilter(RootFilter())
+
 
 def start_mqtt_message_broker(host: str = '127.0.0.1',
                               port: int = 1883) -> None:
@@ -214,10 +219,6 @@ def start_mqtt_message_broker(host: str = '127.0.0.1',
     """
     broker = MQTTMessageBroker(host, port)
     broker.start()
-
-    # Add filter to log handlers, to exclude log messages from HBMQTT.
-    for handler in logging.root.handlers:
-        handler.addFilter(RootFilter())
 
 
 if __name__ == '__main__':
@@ -292,11 +293,13 @@ if __name__ == '__main__':
                                required=True)
 
     try:
+        # Parse arguments.
         args = parser.parse_args()
     except argparse.ArgumentTypeError as e:
         root.error(e)
         sys.exit(0)
 
+    # Initialize the logger.
     setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)
 
     if args.is_mqtt_broker:

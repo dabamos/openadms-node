@@ -23,8 +23,8 @@ class Prototype(object):
     def __init__(self, module_name: str, module_type: str, manager: Any):
         """
         Args:
-            module_name: The name of the modules.
-            module_type: The type of the modules.
+            module_name: The name of the module.
+            module_type: The type of the module.
             manager: The manager objects.
         """
         self.logger = logging.getLogger(module_name)
@@ -78,14 +78,14 @@ class Prototype(object):
             self.publish_observation(obs)
 
     def do_handle_service(self, header: Dict, payload: Dict) -> None:
-        """Processes service messages and starts or stops the receiving modules.
+        """Processes service messages and starts or stops the receiving module.
 
         Args:
             header: Message header.
             payload: Message payload.
 
         Example:
-            A message to stop a modules can be, for instance::
+            A message to stop a module can be, for instance::
 
                 {
                     {
@@ -97,18 +97,18 @@ class Prototype(object):
                     }
                 }
 
-            Set `action` to `start` to start the modules.
+            Set `action` to `start` to start the module.
         """
         sender = header.get('from', '?')
         action = payload.get('action')
 
         if action is 'stop':
             self._is_running = False
-            self.logger.debug('Stopped modules "{}" by call from "{}"'
+            self.logger.debug('Stopped module "{}" by call from "{}"'
                               .format(self._name, sender))
         elif action is 'start':
             self._is_running = True
-            self.logger.debug('Started modules "{}" by call from "{}"'
+            self.logger.debug('Started module "{}" by call from "{}"'
                               .format(self._name, sender))
 
     def handle(self, message: List[Dict]) -> None:
@@ -153,20 +153,20 @@ class Prototype(object):
         handler_func(header, payload)
 
     def get_module_config(self, *args):
-        """Returns the validated configuration of the modules. If no JSON schema
+        """Returns the validated configuration of the module. If no JSON schema
         is available, the function just returns an unchecked configuration.
 
         Args:
             *args: Key names to the configuration in the dictionary.
 
         Returns:
-            A dictionary with the modules's configuration.
+            A dictionary with the module's configuration.
         """
         # Add the JSON schema to the Schema Manager.
         schema_path = self._schema_manager.get_schema_path(self._type)
         self._schema_manager.add_schema(self._type, schema_path)
 
-        # Return a valid configuration for the modules or raise an exception.
+        # Return a valid configuration for the module or raise an exception.
         return self._config_manager.get_valid_config(self._type,
                                                      'modules',
                                                      *args)
@@ -218,7 +218,7 @@ class Prototype(object):
             payload: Payload of the message.
         """
         if not self._uplink:
-            self.logger.error('No uplink defined for modules "{}"'
+            self.logger.error('No uplink defined for module "{}"'
                               .format(self._name))
             return
 
@@ -260,7 +260,7 @@ class Prototype(object):
                                                obs.get('target')))
             return
 
-        # Name of the sending modules.
+        # Name of the sending module.
         sender = receivers[index - 1]
 
         # Increase the receivers index.
@@ -275,7 +275,7 @@ class Prototype(object):
 
         payload = obs.data
 
-        # Send the observation to the next modules.
+        # Send the observation to the next module.
         self.publish(next_receiver, header, payload)
 
     def start(self) -> None:

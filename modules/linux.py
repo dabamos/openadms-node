@@ -16,7 +16,7 @@ import arrow
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    logging.getLogger().critical('Importing Python modules "RPi.GPIO" failed')
+    logging.getLogger().critical('Importing Python module "RPi.GPIO" failed')
 
 from core.observation import Observation
 from core.manager import Manager
@@ -28,13 +28,13 @@ class InterruptCounter(Prototype):
     InterruptCounter counts GPIO interrupts on a single pin of a Raspberry Pi
     single-board computer by using `RPi.GPIO`. Works on Linux only.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         bounceTime (float): Bounce time in ms.
         countTime (float): Observation time in s.
         pin (int): GPIO pin number of the Raspberry Pi.
-        receiver (str): Name of the receiving modules.
+        receiver (str): Name of the receiving module.
         sensorName (str): Name of the connected sensor.
     """
 
@@ -136,7 +136,7 @@ class InterruptCounter(Prototype):
         self.publish_observation(obs)
 
     def start(self) -> None:
-        """Starts the modules."""
+        """Starts the module."""
         if self._is_running:
             return
 

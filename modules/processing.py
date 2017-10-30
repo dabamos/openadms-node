@@ -21,7 +21,7 @@ class PreProcessor(Prototype):
     PreProcessor extracts values from the raw responses of a given observation
     and converts them to the defined data types.
 
-    This modules has nothing to configure.
+    This module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -220,7 +220,7 @@ class ResponseValueInspector(Prototype):
     ResponseValueInspector checks if response values of observations are within
     defined thresholds and creates critical log messages if not.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         observations (Dict): Observations to inspect.
@@ -255,7 +255,9 @@ class ResponseValueInspector(Prototype):
             The untouched observation object.
         """
         if not obs.get('name') in self._observations:
-            # Nothing defined for this observation.
+            self.logger.warning('Observation "{}" with target "{}" is not '
+                                'defined'.format(obs.get('name'),
+                                                 obs.get('target')))
             return obs
 
         response_sets = self._observations.get(obs.get('name'))
@@ -263,18 +265,24 @@ class ResponseValueInspector(Prototype):
         for response_name, limits in response_sets.items():
             response_value = obs.get_response_value(response_name)
 
-            if not response_value or not self.is_number(response_value):
+            if response_value is None or not self.is_number(response_value):
+                self.logger.warning('Response value "{}" of observation "{}" '
+                                    'with target "{}" is not a number'
+                                    .format(response_name,
+                                            obs.get('name'),
+                                            obs.get('target')))
                 continue
 
             min_value = limits.get('min')
             max_value = limits.get('max')
 
-            self.logger.debug('Checking response "{}" of observation "{}" with '
-                              'target "{}"'.format(response_name,
-                                                   obs.get('name'),
-                                                   obs.get('target')))
-
-            if min_value and response_value < min_value:
+            if min_value <= response_value <= max_value:
+                self.logger.debug('Response value "{}" of observation "{}" '
+                                  'with target "{}" is within the limits'
+                                  .format(response_name,
+                                          obs.get('name'),
+                                          obs.get('target')))
+            elif response_value < min_value:
                 self.logger.critical('Response value "{}" of observation "{}" '
                                      'with target "{}" is less than minimum '
                                      '({} < {})'.format(response_name,
@@ -282,8 +290,7 @@ class ResponseValueInspector(Prototype):
                                                         obs.get('target'),
                                                         response_value,
                                                         min_value))
-
-            if max_value and response_value > max_value:
+            elif response_value > max_value:
                 self.logger.critical('Response value "{}" of observation "{}" '
                                      'with target "{}" is greater than maximum '
                                      '({} > {})'.format(response_name,
@@ -294,7 +301,7 @@ class ResponseValueInspector(Prototype):
 
         return obs
 
-    def is_number(self, value: Any) -> bool:
+    def is_number(self, value: str) -> bool:
         """Returns whether a value is a number or not.
 
         Args:
@@ -363,7 +370,7 @@ class ReturnCodeInspector(Prototype):
     ReturnCodeInspector inspects the return code in an observation sent by
     sensors of Leica Geosystems and creates an appropriate log message.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         responseSets (List): Names of response sets to inspect.
@@ -437,7 +444,7 @@ class UnitConverter(Prototype):
     observations. For instance, a response in centimeters can be converted to
     meters by setting a scale factor.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         <responseSetName> (Dict): Responses to convert.

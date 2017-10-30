@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 
-"""Main monitoring modules. Everything starts here."""
+"""Main monitoring module. Everything starts here."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -12,7 +12,7 @@ from core.manager import *
 class Monitor(object):
     """
     Monitor is used to manage the monitoring process by creating a
-    configuration manager, a sensor manager, and a modules manager.
+    configuration manager, a sensor manager, and a module manager.
     """
 
     def __init__(self, config_file_path: str):

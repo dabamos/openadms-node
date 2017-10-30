@@ -145,29 +145,29 @@ class ConfigManager(object):
                          schema_name: str,
                          *args) -> Dict[str, Any]:
         """
-        Returns the validated configuration of a modules. Raises a ValueError
+        Returns the validated configuration of a module. Raises a ValueError
         exception if the configuration is invalid.
 
         Args:
             schema_name: Name of the JSON schema.
-            *args: Key names to the modules's configuration.
+            *args: Key names to the module's configuration.
 
         Returns:
-            A dictionary with the modules's configuration.
+            A dictionary with the module's configuration.
 
         Raises:
-            ValueError: If modules configuration is invalid.
+            ValueError: If module configuration is invalid.
         """
         config = self._config
 
-        # Get modules's configuration from dictionary.
+        # Get module's configuration from dictionary.
         for key in args:
             try:
                 config = config[key]
             except AttributeError:
                 break
 
-        # Check whether modules's configuration is valid.
+        # Check whether module's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
             self.logger.error('Configuration "{}" is invalid'
                               .format(schema_name))
@@ -222,17 +222,17 @@ class ModuleManager(object):
 
     def add(self, module_name: str, class_path: str):
         """Instantiates a worker, instantiates a messenger, and bundles both
-        to a modules. The modules will be added to the modules dictionary.
+        to a module. The module will be added to the modules dictionary.
 
         Args:
-            module_name: Name of the modules.
+            module_name: Name of the module.
             class_path: Path to the Python class.
 
         Returns:
-            True if modules has been added, False if not.
+            True if module has been added, False if not.
 
         Raises:
-            ValueError: If modules file not exists.
+            ValueError: If module file not exists.
         """
         if not self.module_exists(class_path):
             raise ValueError('Module "{}" not found'.format(class_path))
@@ -242,18 +242,18 @@ class ModuleManager(object):
         self._modules[module_name] = Module(messenger, worker)
 
     def delete(self, name: str) -> None:
-        """Removes a modules from the modules dictionary.
+        """Removes a module from the modules dictionary.
 
         Args:
-            name: The name of the modules.
+            name: The name of the module.
         """
         self._modules[name] = None
 
     def get(self, name: str) -> Module:
-        """Returns a specific modules.
+        """Returns a specific module.
 
         Args:
-            name: The name of the modules.
+            name: The name of the module.
         """
         return self._modules.get(name)
 
@@ -285,7 +285,7 @@ class ModuleManager(object):
         """Loads a Python class from a given path and returns the instance.
 
         Args:
-            module_name: Name of the modules.
+            module_name: Name of the module.
             class_path: Path to the Python class.
 
         Returns:
@@ -300,28 +300,28 @@ class ModuleManager(object):
                             self._manager)
 
     def has_module(self, name: str) -> bool:
-        """Returns whether or not modules is found.
+        """Returns whether or not module is found.
 
         Args:
-            name: The name of the modules.
+            name: The name of the module.
 
         Returns:
-            True if modules is found, False if not.
+            True if module is found, False if not.
         """
-        if self.modules.get(name):
+        if self._modules.get(name):
             return True
         else:
             return False
 
     def module_exists(self, class_path: str) -> bool:
-        """Returns whether or not a OpenADMS Node modules exists at the given
+        """Returns whether or not a OpenADMS Node module exists at the given
         class path.
 
         Args:
             class_path: The path to the class.
 
         Returns:
-            True if modules exists, False if not.
+            True if module exists, False if not.
         """
         module_path, class_name = class_path.rsplit('.', 1)
         file_path = Path(module_path.replace('.', '/') + '.py')
@@ -332,10 +332,10 @@ class ModuleManager(object):
         return True
 
     def start(self, module_name: str) -> None:
-        """Starts a modules.
+        """Starts a module.
 
         Args:
-            module_name: The name of the modules.
+            module_name: The name of the module.
         """
         self._modules.get(module_name).start()
         self._modules.get(module_name).start_worker()
@@ -346,10 +346,10 @@ class ModuleManager(object):
             self.start(module_name)
 
     def stop(self, module_name: str) -> None:
-        """Stops a modules.
+        """Stops a module.
 
         Args:
-            module_name: The name of the modules.
+            module_name: The name of the module.
         """
         self._modules.get(module_name).stop_worker()
 
@@ -495,23 +495,22 @@ class SchemaManager(object):
     SchemaManager stores JSON schema and validates given data with them.
     """
 
-    def __init__(self):
+    def __init__(self, schema_root_path: str = 'schema'):
         self.logger = logging.getLogger('schemaManager')
         self._schema = {}
+        self._schema_root_path = schema_root_path
 
         self.add_schema('observation', 'observation.json')
 
     def add_schema(self,
                    data_type: str,
-                   path: str,
-                   root: str = 'schema') -> bool:
+                   path: str) -> bool:
         """Reads a JSON schema file from the given path and stores it in the
         internal dictionary.
 
         Args:
             data_type: The name of the data type (e.g., 'observation').
             path: The path to the JSON schema file.
-            root: The root directory (default: './schema').
 
         Returns:
             True if schema has been added, False if not.
@@ -519,7 +518,7 @@ class SchemaManager(object):
         if self._schema.get(data_type):
             return False
 
-        schema_path = Path(root, path)
+        schema_path = Path(self._schema_root_path, path)
 
         if not schema_path.exists():
             self.logger.error('Schema file "{}" not found.'
@@ -546,17 +545,17 @@ class SchemaManager(object):
         return True
 
     def get_schema_path(self, class_path: str) -> Path:
-        """Uses the class path of a modules to generate the path to the
+        """Uses the class path of a module to generate the path to the
         configuration schema file.
 
         For instance, the given class path `modules.schedule.Scheduler` will be
         converted to the file path `modules/schedule/scheduler.json`.
 
         Args:
-            class_path: The class path of a modules.
+            class_path: The class path of a module.
 
         Returns:
-            The path to the JSON schema of the modules's configuration.
+            The path to the JSON schema of the module's configuration.
         """
         return Path(class_path.replace('.', '/').lower() + '.json')
 

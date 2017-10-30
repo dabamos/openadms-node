@@ -24,7 +24,7 @@ class DistanceCorrector(Prototype):
     """
     Corrects the slope distance of EDM measurements using atmospheric data.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         atmosphericCorrectionEnabled (bool): Enables atmospheric correction.
@@ -246,7 +246,7 @@ class HelmertTransformer(Prototype):
     HelmertTransformer calculates the 3-dimensional coordinates of a view point
     using the Helmert transformation.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         residualMismatchTransformationEnabled (bool): If True, prorate
@@ -715,7 +715,7 @@ class PolarTransformer(Prototype):
     It is possible to use multiple fixed points in order to improve the
     accuracy of the horizontal directions ('Abriss' in German).
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         adjustmentEnabled (bool): If True, improve horizontal directions.
@@ -1023,7 +1023,7 @@ class RefractionCorrector(Prototype):
     RefractionCorrector removes the influence of the refraction from a measured
     distance and corrects the Z value of an observed target.
 
-    The modules has nothing to configure.
+    The module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -1073,7 +1073,7 @@ class SerialMeasurementProcessor(Prototype):
     horizontal directions, vertical angles, and slope distances, are
     averaged and stored in a new response set.
 
-    The modules has nothing to configure.
+    The module has nothing to configure.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):

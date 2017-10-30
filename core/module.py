@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.6
 
-"""The modules class to bundle an OpenADMS Node worker with a messenger."""
+"""The module class to bundle an OpenADMS Node worker with a messenger."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
@@ -71,7 +71,7 @@ class Module(threading.Thread):
     def run(self) -> None:
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
-        self.logger.verbose('Connecting modules "{}" to {}:{}'
+        self.logger.verbose('Connecting module "{}" to {}:{}'
                             .format(self._worker.name,
                                     self._messenger.host,
                                     self._messenger.port))

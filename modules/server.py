@@ -26,7 +26,7 @@ class LocalControlServer(Prototype):
     configuration. It is recommended to run a reverse proxy in front of the
     LocalControlServer.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         host (str): FQDN or IP address of the server.
@@ -159,10 +159,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         if not self._has_attribute(query, 'action'):
             return
 
-        if not self._has_attribute(query, 'modules'):
+        if not self._has_attribute(query, 'module'):
             return
 
-        module_name = query.get('modules')[0]
+        module_name = query.get('module')[0]
         action_value = query.get('action')[0]
 
         if not self._module_manager.has_module(module_name):
@@ -209,7 +209,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return file_contents
 
     def get_index(self, template: str) -> str:
-        """Returns the index page of this modules in HTML format.
+        """Returns the index page of this module in HTML format.
 
         Args:
             template: The template.
@@ -255,7 +255,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                     '<td><code>$module_name</code></td>'
                     '<td><code>$module_type</code></td>'
                     '<td><span style="color: $color">$status</span></td>'
-                    '<td><a href="/?modules=$module_name&action='
+                    '<td><a href="/?module=$module_name&action='
                     '$button_action" class="btn $button_class sml confirm">'
                     '$button_action</a></td></tr>\n')
         content = ''

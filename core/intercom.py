@@ -12,7 +12,7 @@ import paho.mqtt.client as mqtt
 try:
     from hbmqtt.broker import Broker
 except ImportError:
-    logging.getLogger().critical('Importing Python modules "HBMQTT" failed')
+    logging.getLogger().critical('Importing Python module "HBMQTT" failed')
 
 
 class MQTTMessageBroker(Thread):
@@ -98,20 +98,20 @@ class MQTTMessenger(object):
             self.disconnect()
 
     def _get_config(self, *args):
-        """Returns the validated configuration of the modules. If no JSON schema
+        """Returns the validated configuration of the module. If no JSON schema
         is available, the function just returns an unchecked configuration.
 
         Args:
             *args: Key names to the configuration in the dictionary.
 
         Returns:
-            A dictionary with the modules's configuration.
+            A dictionary with the module's configuration.
         """
         # Add the JSON schema to the Schema Manager.
         schema_path = self._schema_manager.get_schema_path(self._type)
         self._schema_manager.add_schema(self._type, schema_path)
 
-        # Return a valid configuration for the modules or raise an exception.
+        # Return a valid configuration for the module or raise an exception.
         return self._config_manager.get_valid_config(self._type, 'core', *args)
 
     def _on_connect(self,

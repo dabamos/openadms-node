@@ -11,7 +11,7 @@ import logging
 try:
     import couchdb
 except ImportError:
-    logging.getLogger().critical('Importing Python modules "couchdb" failed')
+    logging.getLogger().critical('Importing Python module "couchdb" failed')
 
 from core.manager import Manager
 from core.observation import Observation
@@ -22,9 +22,9 @@ class CouchDriver(Prototype):
     """
     CouchDriver provides connectivity for Apache CouchDB. Observations send to
     a CouchDriver instance will be saved in the database set in the
-    configuration. This modules is for dumping observations only.
+    configuration. This module is for dumping observations only.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
         server (str): FQDN or IP address of CouchDB server.

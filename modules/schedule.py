@@ -52,7 +52,7 @@ class Job(object):
         self._name = name               # Name of the job.
         self._project_id = project_id   # Project ID.
         self._node_id = node_id         # Node ID.
-        self._port_name = port_name     # Name of the port modules.
+        self._port_name = port_name     # Name of the port module.
         self._obs = obs                 # Observation object.
         self._is_enabled = is_enabled   # Job is enabled or not.
         self._weekdays = weekdays       # The time sheet.
@@ -139,13 +139,13 @@ class Job(object):
         obs_copy.set('project', self._project_id)
         obs_copy.set('node', self._node_id)
 
-        # Insert the name of the port modules or the virtual sensor at the
+        # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
         receivers = obs_copy.get('receivers')
         receivers.insert(0, self._port_name)
         obs_copy.set('receivers', receivers)
 
-        # Set the next receiver to the modules following the port.
+        # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
         self.logger.info('Starting job "{}" for port "{}"'
@@ -183,10 +183,10 @@ class Scheduler(Prototype):
     stored in a jobs list and will be executed at the given date and time. A
     separate scheduler is necessary for each serial port.
 
-    The JSON-based configuration for this modules:
+    The JSON-based configuration for this module:
 
     Parameters:
-        port (str): Name of the port modules.
+        port (str): Name of the port module.
         sensor (str): Name of the sensor.
         schedules (List[Dict]): List of schedules.
     """
