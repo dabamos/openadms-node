@@ -9,5 +9,6 @@ pyserial>=3.2.1
 pytest>=3.2.3
 requests>=2.18.4
 uptime>=3.0.1
+testfixtures>=5.3.0
 tinydb>=3.6.0
 verboselogs>=1.7
