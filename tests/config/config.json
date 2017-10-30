@@ -1,0 +1,38 @@
+{
+    "core": {
+        "modules": {
+            "preProcessor": "modules.processing.PreProcessor",
+            "responseValueInspector": "modules.processing.ResponseValueInspector"
+        },
+        "project": {
+            "name": "pytest",
+            "id": "f27b9bcc31164390a2f8bd07aa1babd9",
+            "description": "Project for pytest."
+        },
+        "node": {
+            "name": "pytest node 1",
+            "id": "82438c8fdaf049e2aea790bddda5a90b",
+            "description": "Sensor Node 1."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
+            }
+        }
+    },
+    "modules": {
+        "responseValueInspector": {
+            "observations": {
+                "getDistance": {
+                    "slopeDist": {
+                        "min": 10.0,
+                        "max": 100.0
+                    }
+                }
+            }
+        }
+    }
+}
