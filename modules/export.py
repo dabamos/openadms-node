@@ -12,6 +12,7 @@ import time
 
 from enum import Enum
 from pathlib import Path
+from typing import *
 
 import arrow
 import requests
@@ -38,7 +39,19 @@ class CloudExporter(Prototype):
         password: Password for REST service.
         authMethod: Authentication method (`basic` or `jwt`).
         db: File name of the cache database (e.g.: ``cache.json``).
-        storage: Storage type (`memory` or `file`).
+        storage: Storage type (`file` or `memory`).
+
+    Example:
+        The configuration may be::
+
+            {
+                "url": "https://api.example.com/",
+                "user": "test",
+                "password": "secret",
+                "authMethod": "basic",
+                "db": "cache.json",
+                "storage": "file"
+            }
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -54,24 +67,77 @@ class CloudExporter(Prototype):
         self._storage = config.get('storage')
         self._db_file = config.get('db')
 
+        if self._storage not in ['file', 'memory']:
+            raise ValueError('Invalid storage method')
+
         if self._storage == 'memory':
             self._cache_db = TinyDB(storage=MemoryStorage)
-        else:
+            self.logger.info('Created in-memory cache database')
+
+        if self._storage == 'file':
             try:
                 self._cache_db = TinyDB(self._db_file)
+                self.logger.info('Opened cache database "{}"'
+                                 .format(self._db_file))
             except Exception:
-                raise ValueError('Cache database "{}" cannot be opened'
+                raise ValueError('Cache database "{}" could not be opened'
                                  .format(self._db_file))
 
-    def cache_observation(self, obs: Observation) -> str:
+    def _cache_observation(self, obs: Observation) -> str:
         """Caches the given observation in the local cache database.
 
         Args:
             obs: Observation object.
         """
-        obs.set('sent', False)
-        id = self._cache_db.insert(obs)
+        obs.set('transferred', False)
+        id = self._cache_db.insert(obs.data)
+        self.logger.debug('Cached observation "{}" with target "{}"'
+                          .format(obs.get('name'),
+                                  obs.get('target')))
         return id
+
+    def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
+        """"Returns a random cached observation.
+
+        Returns:
+            Observation data or None if cache is empty.
+        """
+        query = Query()
+        return self._cache_db.get(query.transferred == False)
+
+    def _get_cache_size(self) -> int:
+        """Returns the number of documents in the cache database.
+
+        Returns:
+            Number of documents.
+        """
+        query = Query()
+        return self._cache_db.count(query.transferred == False)
+
+    def _has_cached_observation_data(self) -> bool:
+        """Returns whether or not a cached observation exists in the database.
+
+        Returns:
+            True if cached observation exists, False if not.
+        """
+        query = Query()
+        return self._cache_db.contains(query.transferred == False)
+
+    def _remove_observation_data(self, doc_id: int) -> None:
+        """Removes a single observations from the cache database.
+
+        Args:
+            doc_id: Document id.
+        """
+        self._cache_db.remove(doc_ids=[doc_id])
+        self.logger.debug('Removed observation from cache database '
+                          '(document id = {})'.format(doc_id))
+
+    def _transfer_observation_data(self, obs_data: Dict[str, Any]) -> bool:
+        self.logger.info('Transferred observation "{}" with target "{}"'
+                         .format(obs_data.get('name'),
+                                 obs_data.get('target')))
+        return True
 
     def process_observation(self, obs: Observation) -> Observation:
         """Caches observation object locally.
@@ -82,14 +148,27 @@ class CloudExporter(Prototype):
         Returns:
             The observation object.
         """
-        self.cache_observation(obs)
+        self._cache_observation(copy.deepcopy(obs))
 
         return obs
 
     def run(self):
         """Sends cached observation to RESTful service."""
         while self.is_running:
-            time.sleep(10)
+            if not self._has_cached_observation_data():
+                time.sleep(1)
+                continue
+
+            size = self._get_cache_size()
+
+            if size > 100:
+                self.logger.warning('Cache has more than 100 documents')
+
+            obs_data = self._get_cached_observation_data()
+            is_transferred = self._transfer_observation_data(obs_data)
+
+            if is_transferred:
+                self._remove_observation_data(obs_data.doc_id)
 
     def start(self) -> None:
         """Starts the module."""
