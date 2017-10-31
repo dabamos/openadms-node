@@ -388,8 +388,13 @@ class ReturnCodeInspector(Prototype):
         for response_set in self._response_sets:
             return_code = obs.get_value('responseSets', response_set, 'value')
 
-            # Return code is zero or not in response set.
-            if return_code is None or return_code == 0:
+            if return_code is None:
+                continue
+
+            if return_code == 0:
+                if obs.get('corrupted') is True:
+                    obs.set('corrupted', False)
+
                 continue
 
             # Get level and error message of the return code.
@@ -401,8 +406,8 @@ class ReturnCodeInspector(Prototype):
             # Retry measurement.
             if retry and attempts < self._retries:
                 obs.set('attempts', attempts + 1)
-                obs.set('nextReceiver', 0)
                 obs.set('corrupted', False)
+                obs.set('nextReceiver', 0)
 
                 self.logger.info('Retrying observation "{}" of target "{}" due '
                                  'to return code {} of response "{}" '
@@ -457,7 +462,7 @@ class UnitConverter(Prototype):
                     "conversionType": "scale",
                     "sourceUnit": "mm",
                     "scalingValue": 0.01,
-                    "designatedUnit": "m"
+                    "targetUnit": "m"
                 }
             }
     """
@@ -473,16 +478,16 @@ class UnitConverter(Prototype):
             if not response_set:
                 continue
 
-            src_value = response_set.get('value')
-            src_unit = response_set.get('unit')
+            source_value = response_set.get('value')
+            source_unit = response_set.get('unit')
 
-            if not src_value or not src_unit:
+            if not source_value or not source_unit:
                 continue
 
-            if src_unit != properties.get('sourceUnit'):
+            if source_unit != properties.get('sourceUnit'):
                 self.logger.warning('Unit "{}" of response "{}" of observation '
                                     '"{}" of target "{}" does not match "{}"'
-                                    .format(src_unit,
+                                    .format(source_unit,
                                             name,
                                             obs.get('name'),
                                             obs.get('target'),
@@ -490,24 +495,24 @@ class UnitConverter(Prototype):
                 continue
 
             if properties.get('conversionType') == 'scale':
-                dgn_value = self.scale(float(src_value),
-                                       properties.get('scalingValue'))
-                dgn_unit = properties.get('designatedUnit')
+                target_value = self.scale(float(source_value),
+                                          properties.get('scalingValue'))
+                target_unit = properties.get('targetUnit')
 
                 self.logger.info('Converted response "{}" of observation "{}" '
                                  'of target "{}" from {:.4f} {} to {:.4f} {}'
                                  .format(name,
                                          obs.get('name'),
                                          obs.get('target'),
-                                         src_value,
-                                         src_unit,
-                                         dgn_value,
-                                         dgn_unit))
+                                         source_value,
+                                         source_unit,
+                                         target_value,
+                                         target_unit))
 
                 response_set = Observation.create_response_set(
                     'float',
-                    dgn_unit,
-                    round(dgn_value, 5)
+                    target_unit,
+                    round(target_value, 5)
                 )
 
                 obs.data['responseSets'][name] = response_set
