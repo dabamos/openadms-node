@@ -66,5 +66,11 @@ The documentation is hosted on the
 [project website](https://www.dabamos.de/manual/openadms-node/).
 See `./docs` for how to build the documentation from source.
 
+## Running Tests
+You can start the unit tests with:
+```
+$ python3 -m pytest
+```
+
 ## Licence
 OpenADMS is licenced under BSD (2-clause).
