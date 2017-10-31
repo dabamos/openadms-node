@@ -100,6 +100,16 @@ class VirtualTotalStationTM30(VirtualSensor):
         }
 
     def do_complete_measurement(self, request: str) -> str:
+        """Does a complete measurement of slope distance, horizontal direction,
+        and vertical angle to a target. The values are randomly selected within
+        boundaries. Just a quick and dirty approach to get fake sensor data.
+
+        Args:
+            request: GeoCOM request string.
+
+        Returns:
+            GeoCOM string with encapsulated sensor data.
+        """
         return_code = '0'
         hz = '{:0.15f}'.format(random.uniform(0, 2 * math.pi))
         v = '{:0.15f}'.format(random.uniform(1, 2))
@@ -110,38 +120,70 @@ class VirtualTotalStationTM30(VirtualSensor):
         slope_dist = '{:0.15f}'.format(random.uniform(1, 2000))
         dist_time = '{:8.0f}'.format(random.uniform(4, 5) * 10e8)
 
-        response = '%R1P,0,0:{},{},{},{},{},{},{},{},{}\r\n'.format(
-            return_code,
-            hz,
-            v,
-            acc_angle,
-            c,
-            l,
-            acc_incl,
-            slope_dist,
-            dist_time)
+        response = '%R1P,0,0:{},{},{},{},{},{},{},{},{}\r\n' \
+                   .format(return_code,
+                           hz,
+                           v,
+                           acc_angle,
+                           c,
+                           l,
+                           acc_incl,
+                           slope_dist,
+                           dist_time)
 
         return response
 
     def get_sensor_id(self, request: str) -> str:
+        """Returns the sensor id.
+
+        Args:
+            request: GeoCOM request string.
+
+        Returns:
+            GeoCOM string with encapsulated sensor id.
+        """
         return_code = '0'
         response = '%R1P,0,0:{},999999\r\n'.format(return_code)
 
         return response
 
     def get_sensor_name(self, request: str) -> str:
+        """Returns the sensor name.
+
+        Args:
+            request: GeoCOM request string.
+
+        Returns:
+            GeoCOM string with encapsulated sensor name.
+        """
         return_code = '0'
         response = '%R1P,0,0:{},"TM30 0.5"\r\n'.format(return_code)
 
         return response
 
     def measure_distance(self, request: str) -> str:
+        """Returns the return code for distance measurement.
+
+        Args:
+            request: GeoCOM request string.
+
+        Returns:
+            GeoCOM string with return code.
+        """
         return_code = '0'
         response = '%R1P,0,0:{}\r\n'.format(return_code)
 
         return response
 
     def set_direction(self, request: str) -> str:
+        """Returns the return code for direction setting.
+
+        Args:
+            request: GeoCOM request string.
+
+        Returns:
+            GeoCOM string with return code.
+        """
         return_code = '0'
         response = '%R1P,0,0:{}\r\n'.format(return_code)
 
@@ -165,12 +207,28 @@ class VirtualDTM(VirtualSensor):
         }
 
     def get_pressure(self, request: str) -> str:
+        """Returns pressure value between 980 and 1150 hPa.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            String with pressure value.
+        """
         high = 1150
         low = 980
 
         return '+{:06.1f}\r'.format(random.uniform(low, high))
 
     def get_temperature(self, request: str) -> str:
+        """Returns temperature value between -20 and 40 °C.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            String with temperature value.
+        """
         high = 40
         low = -20
 
@@ -182,12 +240,36 @@ class VirtualDTM(VirtualSensor):
             return '+{:06.1f}\r'.format(t)
 
     def power_on(self, request: str) -> str:
+        """Simulates power-on.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            Response string.
+        """
         return '#\r'
 
     def save(self, request: str) -> str:
+        """Simulates saving of changes.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            Response string.
+        """
         return '*\r'
 
     def set_command_set(self, request: str) -> str:
+        """Simulates change of command set.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            Response string.
+        """
         return '*\r'
 
 
@@ -206,8 +288,15 @@ class VirtualIndicatorOne(VirtualSensor):
         }
 
     def get_distance(self, request: str) -> str:
+        """Returns fake distance.
+
+        Args:
+            request: Request string.
+
+        Returns:
+            Response string with distance.
+        """
         x = (1.0 + math.sin(self._current_value)) * 12.5
         self._current_value += 0.25
 
         return '{:7.3f}\r'.format(x)
-
