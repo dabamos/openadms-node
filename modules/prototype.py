@@ -153,7 +153,7 @@ class Prototype(object):
         handler_func(header, payload)
 
     def get_module_config(self, *args):
-        """Returns the validated configuration of the module. If no JSON schema
+        """Returns the validated configuration of the module. If no JSON schemes
         is available, the function just returns an unchecked configuration.
 
         Args:
@@ -162,7 +162,7 @@ class Prototype(object):
         Returns:
             A dictionary with the module's configuration.
         """
-        # Add the JSON schema to the Schema Manager.
+        # Add the JSON schemes to the Schema Manager.
         schema_path = self._schema_manager.get_schema_path(self._type)
         self._schema_manager.add_schema(self._type, schema_path)
 
@@ -182,7 +182,7 @@ class Prototype(object):
 
     def is_valid(self, data: Dict, data_type: str) -> bool:
         """Returns whether or not given data is valid by checking against the
-        JSON schema.
+        JSON schemes.
 
         Args:
             data: Data to check.
