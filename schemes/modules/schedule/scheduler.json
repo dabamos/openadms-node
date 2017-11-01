@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/modules/schedule/scheduler.json",
+    "id": "schemes/modules/schedule/scheduler.json",
     "properties": {
         "port": {
             "id": "/properties/port",

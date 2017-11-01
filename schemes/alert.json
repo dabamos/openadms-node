@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/alert.json",
+    "id": "schemes/alert.json",
     "properties": {
         "dt": {
             "id": "/properties/dt",

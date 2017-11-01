@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/modules/totalstation/distancecorrector.json",
+    "id": "schemes/modules/totalstation/distancecorrector.json",
     "properties": {
         "atmosphericCorrectionEnabled": {
             "default": false,

@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/modules/notification/rssagent.json",
+    "id": "schemes/modules/notification/rssagent.json",
     "properties": {
         "author": {
             "id": "/properties/author",

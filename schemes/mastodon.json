@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/mastodon.json",
+    "id": "schemes/mastodon.json",
     "properties": {
         "message": {
             "id": "/properties/message",

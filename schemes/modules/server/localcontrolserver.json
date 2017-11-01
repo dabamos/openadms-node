@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/modules/server/localcontrolserver.json",
+    "id": "schemes/modules/server/localcontrolserver.json",
     "properties": {
         "host": {
             "id": "/properties/host",

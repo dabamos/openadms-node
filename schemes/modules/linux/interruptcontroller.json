@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/modules/linux/interruptcontroller.json",
+    "id": "schemes/modules/linux/interruptcontroller.json",
     "properties": {
         "bounceTime": {
             "id": "/properties/bounceTime",

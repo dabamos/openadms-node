@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schema/email.json",
+    "id": "schemes/email.json",
     "properties": {
         "subject": {
             "id": "/properties/subject",
