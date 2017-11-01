@@ -28,7 +28,7 @@ logger = logging.getLogger()
                      .format(System.get_openadms_version())),
        default_size=(610, 580),
        monospace_display=True,
-       image_dir='./res/img')
+       image_dir='./extra')
 def mainw() -> None:
     parser = GooeyParser(
         description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
