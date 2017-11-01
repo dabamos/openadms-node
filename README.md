@@ -15,7 +15,7 @@ used to observe objects like:
 * construction sites, mining areas;
 * churches, monasteries, and other historic buildings.
 
-The software is written in Python 3 and has been tested on:
+The software is written in Python 3.6 and has been tested on:
 
 * Microsoft Windows 7 (x86, x86-64)
 * Debian 9, Raspbian Jessie (ARMv7)
