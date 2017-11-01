@@ -149,7 +149,7 @@ class ConfigManager(object):
         exception if the configuration is invalid.
 
         Args:
-            schema_name: Name of the JSON schema.
+            schema_name: Name of the JSON schemes.
             *args: Key names to the module's configuration.
 
         Returns:
@@ -492,10 +492,10 @@ class ProjectManager(object):
 
 class SchemaManager(object):
     """
-    SchemaManager stores JSON schema and validates given data with them.
+    SchemaManager stores JSON schemes and validates given data with them.
     """
 
-    def __init__(self, schema_root_path: str = 'schema'):
+    def __init__(self, schema_root_path: str = 'schemes'):
         self.logger = logging.getLogger('schemaManager')
         self._schema = {}
         self._schema_root_path = schema_root_path
@@ -505,15 +505,15 @@ class SchemaManager(object):
     def add_schema(self,
                    data_type: str,
                    path: str) -> bool:
-        """Reads a JSON schema file from the given path and stores it in the
+        """Reads a JSON schemes file from the given path and stores it in the
         internal dictionary.
 
         Args:
             data_type: The name of the data type (e.g., 'observation').
-            path: The path to the JSON schema file.
+            path: The path to the JSON schemes file.
 
         Returns:
-            True if schema has been added, False if not.
+            True if schemes has been added, False if not.
         """
         if self._schema.get(data_type):
             return False
@@ -531,14 +531,14 @@ class SchemaManager(object):
                 jsonschema.Draft4Validator.check_schema(schema)
 
                 self._schema[data_type] = schema
-                self.logger.debug('Loaded schema "{}"'
+                self.logger.debug('Loaded schemes "{}"'
                                   .format(data_type))
             except json.JSONDecodeError:
                 self.logger.error('Invalid JSON file "{}"'
                                   .format(schema_path))
                 return False
             except jsonschema.SchemaError:
-                self.logger.error('Invalid JSON schema "{}"'
+                self.logger.error('Invalid JSON schemes "{}"'
                                   .format(schema_path))
                 return False
 
@@ -546,7 +546,7 @@ class SchemaManager(object):
 
     def get_schema_path(self, class_path: str) -> Path:
         """Uses the class path of a module to generate the path to the
-        configuration schema file.
+        configuration schemes file.
 
         For instance, the given class path `modules.schedule.Scheduler` will be
         converted to the file path `modules/schedule/scheduler.json`.
@@ -555,18 +555,18 @@ class SchemaManager(object):
             class_path: The class path of a module.
 
         Returns:
-            The path to the JSON schema of the module's configuration.
+            The path to the JSON schemes of the module's configuration.
         """
         return Path(class_path.replace('.', '/').lower() + '.json')
 
     def has_schema(self, name: str) -> bool:
-        """Returns whether or not a JSON schema for the given name exists.
+        """Returns whether or not a JSON schemes for the given name exists.
 
         Args:
-            name: Name of the schema (e.g., 'observation').
+            name: Name of the schemes (e.g., 'observation').
 
         Returns:
-            True if schema exists, False if not.
+            True if schemes exists, False if not.
         """
         if self._schema.get(name):
             return True
@@ -574,17 +574,17 @@ class SchemaManager(object):
             return False
 
     def is_valid(self, data: Dict, schema_name: str) -> bool:
-        """Validates data with JSON schema and returns result.
+        """Validates data with JSON schemes and returns result.
 
         Args:
             data: The data.
-            schema_name: The name of the schema used for validation.
+            schema_name: The name of the schemes used for validation.
 
         Returns:
             True if data is valid, False if not.
         """
         if not self.has_schema(schema_name):
-            self.logger.warning('JSON schema "{}" not found'
+            self.logger.warning('JSON schemes "{}" not found'
                                 .format(schema_name))
             return False
 
