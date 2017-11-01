@@ -83,7 +83,7 @@ class VirtualSensor(Prototype):
 
 class VirtualTotalStationTM30(VirtualSensor):
     """
-    VirtualTotalStationTM30 simulates a Leica TM30 totalstation by processing
+    VirtualTotalStationTM30 simulates the Leica TM30 totalstation by processing
     GeoCOM commands.
     """
 
@@ -192,7 +192,7 @@ class VirtualTotalStationTM30(VirtualSensor):
 
 class VirtualDTM(VirtualSensor):
     """
-    VirtualDTM simulates an STS DTM meteorological sensor.
+    VirtualDTM simulates the STS DTM meteorological sensor.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -275,7 +275,7 @@ class VirtualDTM(VirtualSensor):
 
 class VirtualIndicatorOne(VirtualSensor):
     """
-    VirtualIndicatorOne simulates a Sylvac S_Dial One digital
+    VirtualIndicatorOne simulates the Sylvac S_Dial One digital
     indicator/extensometer.
     """
 

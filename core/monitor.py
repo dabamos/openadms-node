@@ -11,8 +11,8 @@ from core.manager import *
 
 class Monitor(object):
     """
-    Monitor is used to manage the monitoring process by creating a
-    configuration manager, a sensor manager, and a module manager.
+    Monitor is used to manage the monitoring process by creating a schema
+    manager, configuration manager, a sensor manager, and a module manager.
     """
 
     def __init__(self, config_file_path: str):

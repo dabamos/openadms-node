@@ -608,18 +608,18 @@ class SensorManager(object):
             config_manager: The configuration manager.
         """
         self.logger = logging.getLogger('sensorManager')
-        self._sensor_config = config_manager.get('sensors')
+        self._sensors_config = config_manager.get('sensors')
         self._sensors = {}
 
         self.load_sensors()
 
     def load_sensors(self) -> None:
         """Creates the sensors defined in the configuration."""
-        if not self._sensor_config:
+        if not self._sensors_config:
             self.logger.info('No sensors defined')
             return
 
-        for sensor_name, sensor_config in self._sensor_config.items():
+        for sensor_name, sensor_config in self._sensors_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
             self.add_sensor(sensor_name, sensor_obj)
             self.logger.info('Loaded sensor "{}"'.format(sensor_name))

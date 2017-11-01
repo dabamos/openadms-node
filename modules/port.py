@@ -146,7 +146,7 @@ class BluetoothPort(Prototype):
             response = self._receive(response_delimiter, timeout)
 
             self.logger.verbose('Received response "{}" for request "{}" '
-                                'of observation "{}" from sensor "{}"'
+                                'of observation "{}" from sensorz "{}"'
                                 .format(self.sanitize(response),
                                         request_name,
                                         obs.get('name'),
