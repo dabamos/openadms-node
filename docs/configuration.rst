@@ -5,7 +5,7 @@ The monitoring system OpenADMS Node is configured by a single configuration file
 in JavaScript Object Notation (JSON). The file is loaded once at the start of
 OpenADMS Node. The path to the configuration file is passed as a command-line
 argument. Example configuration files are located in directory
-``./config/example/``. At the moment, configuration files have to be written
+``./config/examples/``. At the moment, configuration files have to be written
 manually. This will change in future, once a visual configuration tool will be
 available.
 

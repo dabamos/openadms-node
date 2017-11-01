@@ -1724,7 +1724,7 @@ UnitConverter
 
 The UnitConverter module can be used to convert observation values from one unit
 to another. For instance, a given distance in millimetres can be converted to
-metres by scaling it with the factor ``1000``. Add a definition to the
+metres by scaling it with the factor ``0.001``. Add a definition to the
 configuration of the module for each response you want to convert. The name of
 the response is used as an identifier in the configuration.
 
@@ -1755,7 +1755,7 @@ The configuration below shows the definition of a unit conversion from ``mm`` to
           "conversionType": "scale",
           "sourceUnit": "mm",
           "scalingValue": 0.01,
-          "designatedUnit": "m"
+          "targetUnit": "m"
         }
       }
     }
@@ -1770,7 +1770,7 @@ The configuration below shows the definition of a unit conversion from ``mm`` to
 +--------------------+-------------+------------------------------------------------------+
 | ``scalingValue``   | Float       | Scaling value (e.g., ``0.1`` or ``1000.0``).         |
 +--------------------+-------------+------------------------------------------------------+
-| ``designatedUnit`` | String      | New unit of the result value (e.g., ``m``).          |
+| ``targetUnit``     | String      | New unit of the result value (e.g., ``m``).          |
 +--------------------+-------------+------------------------------------------------------+
 
 Prototype
@@ -1947,8 +1947,8 @@ Configuration
 +----------+-------------+--------------------------------------------------------------+
 | Name     | Data Type   | Description                                                  |
 +==========+=============+==============================================================+
-| ``host`` | String      | IP address or FQDN. Use a public IP if the server should be  |
-|          |             | accessible from outside.                                     |
+| ``host`` | String      | FQDN or IP address. Use a public IP or ``0.0.0.0`` if the    |
+|          |             | server should be accessible from outside.                    |
 +----------+-------------+--------------------------------------------------------------+
 | ``port`` | Integer     | Port number (e.g., ``80`` or ``8080``).                      |
 +----------+-------------+--------------------------------------------------------------+
