@@ -335,7 +335,7 @@ Python scripts. Install it with ``pip`` at first:
 
 ::
 
-    > python -m pip install cx_Freeze
+    > python -m pip install cx_Freeze appdirs packaging
 
 Create a file ``setup.py`` with the following contents:
 
@@ -356,7 +356,7 @@ Create a file ``setup.py`` with the following contents:
 
     from cx_Freeze import setup, Executable
 
-    from core import version
+    from core.version import *
 
 
     build_exe_options = {
@@ -398,7 +398,7 @@ Create a file ``setup.py`` with the following contents:
     ]
 
     setup(name='OpenADMS Node',
-          version=OPENADMS_VERSION,
+          version=str(OPENADMS_VERSION),
           description='OpenADMS Node',
           options={
               'build_exe': build_exe_options
