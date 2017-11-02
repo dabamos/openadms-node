@@ -336,8 +336,9 @@ class SerialPort(Prototype):
         self._config = self._config_manager.config.get('ports')\
                                                   .get('serial')\
                                                   .get(self.name)
-
         self._max_attempts = self._config.get('maxAttempts')
+
+        # Serial port.
         self._serial = None
         self._serial_port_config = None
 
@@ -348,7 +349,7 @@ class SerialPort(Prototype):
     def __del__(self):
         self._is_running = False
 
-        if self._serial:
+        if self._serial is not None:
             self.close()
 
     def close(self) -> None:
