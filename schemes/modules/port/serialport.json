@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "type": "object",
+    "$id": "schemes/modules/port/serialport.json",
+    "required": [
+        "port",
+        "baudRate",
+        "byteSize",
+        "stopBits",
+        "parity",
+        "timeout",
+        "softwareFlowControl",
+        "hardwareFlowControl",
+        "maxAttempts"
+    ],
+    "properties": {
+        "port": {
+            "type": "string",
+            "$id": "/properties/port"
+        },
+        "baudRate": {
+            "type": "integer",
+            "$id": "/properties/baudRate"
+        },
+        "byteSize": {
+            "type": "integer",
+            "$id": "/properties/byteSize"
+        },
+        "stopBits": {
+            "type": "integer",
+            "$id": "/properties/stopBits"
+        },
+        "parity": {
+            "type": "string",
+            "$id": "/properties/parity"
+        },
+        "timeout": {
+            "type": "integer",
+            "$id": "/properties/timeout"
+        },
+        "softwareFlowControl": {
+            "type": "boolean",
+            "$id": "/properties/softwareFlowControl"
+        },
+        "hardwareFlowControl": {
+            "type": "boolean",
+            "$id": "/properties/hardwareFlowControl"
+        },
+        "maxAttempts": {
+            "type": "integer",
+            "$id": "/properties/maxAttempts"
+        }
+    }
+}
