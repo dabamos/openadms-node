@@ -2,7 +2,7 @@ OpenADMS Node Modules
 =====================
 
 The logic of the OpenADMS Node software is located in several modules, which are
-stored in the directory ``./module/``. New features can be added to the
+stored in the directory ``module/``. New features can be added to the
 monitoring system by writing additional modules.  Each module must be loaded
 before it can be used.
 
@@ -113,7 +113,7 @@ Node core configuration. In the example below, the modules :ref:`scheduler` and
 
 The key ``fileExporter`` sets the name of the instance, the value
 ``modules.export.FileExporter`` the path to the module (class ``FileExporter``
-in ``./modules/export.py``). The name of an instance can be chosen freely. For
+in ``modules/export.py``). The name of an instance can be chosen freely. For
 instance, instead of ``fileExporter`` the name ``myFileExporter`` is also valid,
 but the key of the FileExporter module configuration has to be renamed as well.
 Multiple instances of a module are possible, if they have different names (e.g.,

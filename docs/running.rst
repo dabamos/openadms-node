@@ -60,14 +60,14 @@ OpenADMS Node can be started with parameters, for instance:
 
 ::
 
-    $ python3 openadms.py -c ./config/my_config.json -m -d
+    $ python3 openadms.py -c config/my_config.json -m -d
 
 The following parameters will be accepted:
 
 +------------------------+------------+--------------------------+---------------------------+
 | Parameter              | Short form | Default value            | Description               |
 +========================+============+==========================+===========================+
-| ``--config``           | ``-c``     | ``./config/config.json`` | Path to the configuration |
+| ``--config``           | ``-c``     | ``config/config.json``   | Path to the configuration |
 |                        |            |                          | file.                     |
 +------------------------+------------+--------------------------+---------------------------+
 | ``--debug``            | ``-d``     | off                      | Print debug messages.     |
@@ -75,7 +75,7 @@ The following parameters will be accepted:
 | ``--verbosity``        | ``-v``     | ``6`` (info)             | Log more diagnostic       |
 |                        |            |                          | messages (level 1 to 9).  |
 +------------------------+------------+--------------------------+---------------------------+
-| ``--log-file``         | ``-l``     | ``./openadms.log``       | Path and name of the log  |
+| ``--log-file``         | ``-l``     | ``openadms.log``         | Path and name of the log  |
 |                        |            |                          | file.                     |
 +------------------------+------------+--------------------------+---------------------------+
 | ``--with-mqtt-broker`` | ``-m``     | off                      | Start internal MQTT       |
@@ -312,17 +312,17 @@ Build OpenADMS Node by running:
 
 ::
 
-    > pyinstaller --clean --noconfirm --icon="res\img\dabamos.ico" --hidden-import "module.database" --hidden-import "module.export" --hidden-import "module.notification" --hidden-import "module.port" --hidden-import "module.processing" --hidden-import "module.prototype" --hidden-import "module.schedule" --hidden-import "module.server" --hidden-import "module.testing" --hidden-import "module.totalstation" --hidden-import "module.virtual" openadms.py
+    > pyinstaller --clean --noconfirm --icon="extra\dabamos.ico" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms.py
 
 Build the graphical launcher with:
 
 ::
 
-    > pyinstaller --clean --windowed --noconfirm --icon="res\img\dabamos.ico" --hidden-import "gooey" --hidden-import "openadms" --hidden-import "module.database" --hidden-import "module.export" --hidden-import "module.notification" --hidden-import "module.port" --hidden-import "module.processing" --hidden-import "module.prototype" --hidden-import "module.schedule" --hidden-import "module.server" --hidden-import "module.testing" --hidden-import "module.totalstation" --hidden-import "module.virtual" openadms-launcher.pyw
+    > pyinstaller --clean --windowed --noconfirm --icon="extra\dabamos.ico" --hidden-import "gooey" --hidden-import "openadms" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms-launcher.pyw
 
 
 The binaries will be located in the sub-folder ``dist``. Copy the folders
-``data``, ``config``, ``core``, ``module``, ``res``, ``schema``, and ``sensor``
+``data``, ``config``, ``core``, ``modules``, ``schemes``, and ``sensors``
 into ``dist``. Furthermore, copy folder ``C:\Python36\Lib\site-packages\gooey``
 to ``dist\openadms-launcher\``. Execute ``openadms-launcher.exe`` to start the
 OpenADMS graphical launcher.
@@ -350,7 +350,7 @@ Create a file ``setup.py`` with the following contents:
 
         $ python setup.py build
 
-    All files will be stored under `./dist/`."""
+    All files will be stored under ``dist/``."""
 
     import sys
 
@@ -364,26 +364,25 @@ Create a file ``setup.py`` with the following contents:
         'packages': ['asyncio',
                      'appdirs',
                      'packaging',
-                     'module.database',
-                     'module.export',
-                     'module.notification',
-                     'module.port',
-                     'module.processing',
-                     'module.prototype',
-                     'module.schedule',
-                     'module.server',
-                     'module.testing',
-                     'module.totalstation',
-                     'module.virtual'],
+                     'modules.database',
+                     'modules.export',
+                     'modules.notification',
+                     'modules.port',
+                     'modules.processing',
+                     'modules.prototype',
+                     'modules.schedule',
+                     'modules.server',
+                     'modules.testing',
+                     'modules.totalstation',
+                     'modules.virtual'],
         'excludes': ['tkinter'],
         'include_files': [
             'config',
             'data',
             'extra',
-            'module',
-            'schema',
-            'sensor',
-            'res'
+            'modules',
+            'schemes',
+            'sensors'
         ],
         'silent': True
     }
@@ -414,7 +413,7 @@ Build OpenADMS Node by running:
 
 
 You can then start the graphical launcher ``openadms-launcher.exe`` in
-directory ``./dist/``.
+directory ``dist/``.
 
 Nuitka
 ~~~~~~
@@ -435,7 +434,7 @@ Build OpenADMS Node with:
 
 ::
 
-    > nuitka --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=module --recurse-not-to=module.tests --recurse-not-to=module.linux --recurse-not-to=module.unix --show-progress --windows-disable-console --windows-icon=extra/dabamos.ico openadms-launcher.pyw
+    > nuitka --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.linux --recurse-not-to=modules.unix --show-progress --windows-disable-console --windows-icon=extra\dabamos.ico openadms-launcher.pyw
 
 The compilation may take some time.
 

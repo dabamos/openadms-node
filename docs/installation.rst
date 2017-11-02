@@ -25,7 +25,7 @@ You can run OpenADMS Node by following these steps:
    Microsoft Windows.
 
 4. Write a configuration file for OpenADMS Node (see directory
-   ``./config/examples/`` for examples).
+   ``config/examples/`` for examples).
 
 5. Run ``python3 openadms.py --config config/my_config.json --with-mqtt-broker
    --debug`` or start the graphical launcher ``openadms-launcher.pyw``.
