@@ -169,7 +169,7 @@ class ConfigManager(object):
 
         # Check whether module's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
-            self.logger.error('Configuration "{}" is invalid'
+            self.logger.error('Configuration of "{}" is invalid'
                               .format(schema_name))
             raise ValueError
 

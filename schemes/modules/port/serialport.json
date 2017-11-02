@@ -35,7 +35,7 @@
             "$id": "/properties/parity"
         },
         "timeout": {
-            "type": "integer",
+            "type": "number",
             "$id": "/properties/timeout"
         },
         "softwareFlowControl": {
