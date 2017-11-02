@@ -167,9 +167,14 @@ class Prototype(object):
         self._schema_manager.add_schema(self._type, schema_path)
 
         # Return a valid configuration for the module or raise an exception.
-        return self._config_manager.get_valid_config(self._type,
-                                                     'modules',
-                                                     *args)
+        config = self._config_manager.get_valid_config(self._type,
+                                                       'modules',
+                                                       *args)
+
+        if not config:
+            raise ValueError('No configuration found')
+
+        return config
 
     def is_sequence(self, arg: Any) -> bool:
         """Checks whether the argument is a list/a tuple or not.
