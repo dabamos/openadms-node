@@ -23,7 +23,8 @@ The software is written in Python 3.6 and has been tested on:
 * FreeBSD 11 (x86-64, ARMv7)
 * NetBSD 7 (ARMv7)
 
-OpenADMS Node can either be used with CPython 3.6+ or PyPy3.5.
+OpenADMS Node can either be used with [CPython 3.6+](https://www.python.org/) or
+[PyPy3.5](https://pypy.org/).
 
 The current development version of OpenADMS Node is 0.7 (code name “Geneva”).
 For more information, see https://www.dabamos.de/.
@@ -65,6 +66,9 @@ $ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
 The documentation is hosted on the
 [project website](https://www.dabamos.de/manual/openadms-node/).
 See `./docs` for how to build the documentation from source.
+
+## Supported Sensors
+For a list of tested sensors, see https://dabamos.de/sensors.
 
 ## Running Tests
 You can start the unit tests with:
