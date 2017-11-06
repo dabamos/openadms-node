@@ -171,9 +171,6 @@ class Prototype(object):
                                                        'modules',
                                                        *args)
 
-        if not config:
-            raise ValueError('No configuration found')
-
         return config
 
     def is_sequence(self, arg: Any) -> bool:
