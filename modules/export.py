@@ -188,6 +188,188 @@ class FileRotation(Enum):
     MONTHLY = 2
     YEARLY = 3
 
+class RTKExporter(Prototype):
+    """
+    RTKExporter connects an OpenADMS-Node instance to a MQTT broker topic,
+    which may be subscribed by a RTK-Cloud Data-Center service. It transforms
+    incoming observations to a specific RTK-Cloud time series format and
+    publishes the resulting JSON to the specified topic.
+    Reflecting the similarity to the CloudExporter, this module also provides
+    the functionality of caching several observation for the case of the broker
+    being unavailable.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self.get_module_config(self._name)
+
+        self._broker = config.get('broker')
+        self._topic = config.get('topic')
+        self._storage = config.get('storage')
+        self._db_file = config.get('db')
+
+        self._jwt_token = None
+        self._thread = None
+
+        if self._storage not in ['file', 'memory']:
+            raise ValueError('Invalid storage method')
+
+        if self._storage == 'memory':
+            self._cache_db = TinyDB(storage=MemoryStorage)
+            self.logger.info('Created in-memory cache database')
+
+        if self._storage == 'file':
+            try:
+                self._cache_db = TinyDB(self._db_file)
+                self.logger.info('Opened cache database "{}"'
+                                 .format(self._db_file))
+            except Exception:
+                raise ValueError('Cache database "{}" could not be opened'
+                                 .format(self._db_file))
+
+    def _cache_observation(self, obs: Observation) -> str:
+        """Caches the given observation in the local cache database.
+
+        Args:
+            obs: Observation object.
+        """
+        doc_id = self._cache_db.insert(obs.data)
+        self.logger.debug('Cached observation "{}" with target "{}" '
+                          '(document id = {})'.format(obs.get('name'),
+                                                      obs.get('target'),
+                                                      doc_id))
+        return doc_id
+
+    def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
+        """"Returns a random observation data set from the cache database.
+
+        Returns:
+            Observation data or None if cache is empty.
+        """
+        if len(self._cache_db) > 0:
+            return self._cache_db.all()[0]
+
+        return None
+
+    def _remove_observation_data(self, doc_id: int) -> None:
+        """Removes a single observations from the cache database.
+
+        Args:
+            doc_id: Document id.
+        """
+        self._cache_db.remove(doc_ids=[doc_id])
+        self.logger.debug('Removed observation from cache database '
+                          '(document id = {})'.format(doc_id))
+
+    def _process_observation_data(self, obs_data: Dict[str, Any]) -> bool:
+        # TODO
+        # transform obervation into time series JSON
+        # publish JSON to MQTT topic
+
+        self.logger.info('Published observation "{}" with target "{} '
+                         'to the analysis service"'
+                         .format(obs_data.get('name'),
+                                 obs_data.get('target')))
+        return True
+
+    def has_cached_observation_data(self) -> bool:
+        """Returns whether or not a cached observation exists in the database.
+
+        Returns:
+            True if cached observation exists, False if not.
+        """
+        return True if len(self._cache_db) > 0 else False
+
+    def process_observation(self, obs: Observation) -> Observation:
+        """Caches observation object locally.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            The observation object.
+        """
+        self._cache_observation(copy.deepcopy(obs))
+        return obs
+
+    def run(self) -> None:
+
+        """Sends cached observation to RESTful service."""
+        while self.is_running:
+            if not self.has_cached_observation_data():
+                time.sleep(1)
+                continue
+
+            if len(self._cache_db) > 500:
+                self.logger.warning('Cache is running full '
+                                    '(> 500 observations)')
+
+            # transform cached observation data  and send it to MQTT topic.
+            obs_data = self._get_cached_observation_data()
+            is_transferred = self._process_observation_data(obs_data)
+
+            if is_transferred:
+                # Remove the transferred observation data from cache.
+                self._remove_observation_data(obs_data.doc_id)
+
+    def start(self) -> None:
+        """Starts the module."""
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+
+class FileRotation(Enum):
+    """
+    Enumeration of file rotation times of flat files.
+    """
+
+    NONE = 0
+    DAILY = 1
+    MONTHLY = 2
+    YEARLY = 3
+        time.sleep(1)
+                continue
+
+            if len(self._cache_db) > 500:
+                self.logger.warning('Cache is running full '
+                                    '(> 500 observations)')
+
+            # Send cached observation data to OpenADMS Server.
+            obs_data = self._get_cached_observation_data()
+            is_transferred = self._transfer_observation_data(obs_data)
+
+            if is_transferred:
+                # Remove the transferred observation data from cache.
+                self._remove_observation_data(obs_data.doc_id)
+
+    def start(self) -> None:
+        """Starts the module."""
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+
+class FileRotation(Enum):
+    """
+    Enumeration of file rotation times of flat files.
+    """
+
+    NONE = 0
+    DAILY = 1
+    MONTHLY = 2
+    YEARLY = 3
+
 
 class FileExporter(Prototype):
     """
