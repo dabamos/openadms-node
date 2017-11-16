@@ -29,6 +29,7 @@ meteorological sensor.
     {
       "name": "getValues",
       "description": "get sensor values (temperature, pressure)",
+      "timeStamp": "2017-04-05T21:48:00.805527",
       "target": "TempPress",
       "id": "6dc84c06018043ba84ac90636ed0f677",
       "project": "6600055d61ce4d8698f77596e436785f",
@@ -123,4 +124,6 @@ The single elements of this observation entity are explained below.
 | ``sleepTime``     | Float     | Time in seconds to wait before the next observation.                    |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``target``        | String    | Target name of the observation (e.g., point name, target location).     |
++-------------------+-----------+-------------------------------------------------------------------------+
+| ``timeStamp``     | String    | Time stamp of the observation (UTC in ISO 8601).                        |
 +-------------------+-----------+-------------------------------------------------------------------------+
