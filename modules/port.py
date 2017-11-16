@@ -155,7 +155,7 @@ class BluetoothPort(Prototype):
             request_set['response'] = response
 
             # Add the timestamp to the observation.
-            obs.set('timeStamp', str(arrow.utcnow()))
+            obs.set('timestamp', str(arrow.utcnow()))
 
             # Sleep until the next request.
             time.sleep(sleep_time)
@@ -502,7 +502,7 @@ class SerialPort(Prototype):
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
             # Add the timestamp to the observation.
-            obs.set('timeStamp', str(arrow.utcnow()))
+            obs.set('timestamp', str(arrow.utcnow()))
             # Sleep until the next request.
             time.sleep(sleep_time)
 
@@ -576,7 +576,7 @@ class SerialPort(Prototype):
                                                   obs.get('sensorName'),
                                                   self._name))
                 draft['response'] = response
-                obs.set('timeStamp', str(arrow.utcnow()))
+                obs.set('timestamp', str(arrow.utcnow()))
                 self.publish_observation(obs)
 
     def _read(self,

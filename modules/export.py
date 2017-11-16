@@ -232,7 +232,7 @@ class FileExporter(Prototype):
         Returns:
             The observation object.
         """
-        ts = arrow.get(obs.get('timeStamp', 0))
+        ts = arrow.get(obs.get('timestamp', 0))
 
         file_date = {
             # No file rotation, i.e., all data is stored in a single file.

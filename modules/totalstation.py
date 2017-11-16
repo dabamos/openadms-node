@@ -613,7 +613,7 @@ class HelmertTransformer(Prototype):
         view_point.set('sensorName', obs.get('sensorName'))
         view_point.set('sensorType', obs.get('sensorType'))
         view_point.set('target', self._view_point.get('target'))
-        view_point.set('timeStamp', str(arrow.utcnow()))
+        view_point.set('timestamp', str(arrow.utcnow()))
 
         # Return the Observation object of the view point.
         return view_point

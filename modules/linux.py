@@ -131,7 +131,7 @@ class InterruptCounter(Prototype):
         obs.set('sensorType', 'gpio')
         obs.set('sleepTime', 0.0)
         obs.set('target', gpio)
-        obs.set('timeStamp', str(arrow.utcnow()))
+        obs.set('timestamp', str(arrow.utcnow()))
 
         self.publish_observation(obs)
 

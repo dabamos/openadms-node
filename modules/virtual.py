@@ -62,7 +62,7 @@ class VirtualSensor(Prototype):
             time.sleep((timeout * 0.25) + sleep_time)
 
         obs.set('portName', self._name)
-        obs.set('timeStamp', str(arrow.utcnow()))
+        obs.set('timestamp', str(arrow.utcnow()))
 
         return obs
 
