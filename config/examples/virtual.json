@@ -4,6 +4,7 @@
             "alerter": "modules.notification.Alerter",
             "distanceCorrector": "modules.totalstation.DistanceCorrector",
             "fileExporter": "modules.export.FileExporter",
+            "rtkExporter": "modules.export.RTKExporter",
             "mailAgent": "modules.notification.MailAgent",
             "mailFormatter": "modules.notification.AlertMessageFormatter",
             "polarTransformer": "modules.totalstation.PolarTransformer",
@@ -107,7 +108,8 @@
                     "receivers": [
                         "preProcessor",
                         "distanceCorrector",
-                        "fileExporter"
+                        "fileExporter",
+                        "rtkExporter"
                     ],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -1585,6 +1587,14 @@
         "localControlServer": {
             "host": "127.0.0.1",
             "port": 8080
+        },
+        "rtkExporter": {
+          "broker": "iot.eclipse.org",
+          "port": 1883,
+          "topic": "/rtkcloud/data-center/data/",
+          "keepalive": 60,
+          "db": "cache.json",
+          "storage": "file"
         }
     }
 }

@@ -14,6 +14,8 @@ from enum import Enum
 from pathlib import Path
 from typing import *
 
+import paho.mqtt.client as mqtt
+
 import arrow
 import requests
 
@@ -192,24 +194,44 @@ class RTKExporter(Prototype):
     """
     RTKExporter connects an OpenADMS-Node instance to a MQTT broker topic,
     which may be subscribed by a RTK-Cloud Data-Center service. It transforms
-    incoming observations to a specific RTK-Cloud time series format and
+    incoming observations to a specific RTK-Cloud data point format and
     publishes the resulting JSON to the specified topic.
-    Reflecting the similarity to the CloudExporter, this module also provides
-    the functionality of caching several observation for the case of the broker
-    being unavailable.
-    """
+    Reflecting the similarity to the CloudExporter module, this module also
+    provides the functionality of caching several observations for the case of
+    the broker being unavailable.
 
+    The JSON-based configuration for this module:
+
+    Parameters:
+        broker: Address of the MQTT Broker.
+        port: Port to communicate with the MQTT Broker (usually `1883`).
+        topic: Topic the data is published to.
+        keepalive: Amount of seconds until the connection times out.
+        db: File name of the cache database (e.g.: ``cache.json``).
+        storage: Storage type (`file` or `memory`).
+
+    Example:
+        The configuration may be::
+
+            {
+                "broker": "iot.eclipse.org",
+                "port": 1883,
+                "topic": "/rtkcloud/data-center/data/",
+                "keepalive": 60,
+                "db": "cache.json",
+                "storage": "file"
+            }
+    """
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
         self._broker = config.get('broker')
+        self._port = config.get('port')
         self._topic = config.get('topic')
+        self._keepalive = config.get('keepalive')
         self._storage = config.get('storage')
         self._db_file = config.get('db')
-
-        self._jwt_token = None
-        self._thread = None
 
         if self._storage not in ['file', 'memory']:
             raise ValueError('Invalid storage method')
@@ -262,14 +284,57 @@ class RTKExporter(Prototype):
                           '(document id = {})'.format(doc_id))
 
     def _process_observation_data(self, obs_data: Dict[str, Any]) -> bool:
-        # TODO
-        # transform obervation into time series JSON
-        # publish JSON to MQTT topic
 
-        self.logger.info('Published observation "{}" with target "{} '
-                         'to the analysis service"'
-                         .format(obs_data.get('name'),
-                                 obs_data.get('target')))
+        # TODO analyse errors to make sure data is cached if not transmitted.
+
+        # get the timestamp
+        ts = arrow.get(obs_data.get('timestamp', 0))
+        timestamp = ts.timestamp
+
+        # add meta information to basic topic to tell the data-center which
+        # project and sensor the dataset is from
+        project = obs_data.get('project')
+        sensor = obs_data.get('sensorName')
+        topic = self._topic + format(project) + "/" + format(sensor)
+
+        # in case target is set, it has to be added to the topic
+        target = obs_data.get('target')
+        if target is not None:
+            topic = topic + "-" + format(target)
+
+        # open the client connection
+        client = mqtt.Client()
+        client.connect(self._broker, self._port, self._keepalive)
+
+        # transform an observation and its response set into DataPoints
+        response_sets = obs_data.get('responseSets')
+
+        for response_set_id in sorted(response_sets.keys()):
+            response_set = response_sets.get(response_set_id)
+
+            value = response_set.get('value')
+            unit = response_set.get('unit')
+
+            dataPoint = "{"
+            dataPoint += "\"uuid\":" + "\"" + obs_data.get('id') + "\","
+            dataPoint += "\"name\":" + "\"" + format(response_set_id) +"\"," #TODO
+            dataPoint += "\"description\":" + "\"" + "Test" +"\"," #TODO
+            # "calculate" nano seconds
+            dataPoint += "\"date\":" + format(timestamp) +"000000000,"
+            dataPoint += "\"value\":" + format(value) +","
+            dataPoint += "\"unit\":" + "\"" + format(unit) +"\""
+            dataPoint += "}"
+
+            # publish the JSON to topic
+            client.publish(topic, dataPoint)
+
+        client.disconnect()
+
+        self.logger.info('Published data of "{}" and target "{}" '
+                         'to the data-center topic ("{}")"'
+                         .format(obs_data.get('sensorName'),
+                                 obs_data.get('target'),
+                                 topic))
         return True
 
     def has_cached_observation_data(self) -> bool:
@@ -294,7 +359,7 @@ class RTKExporter(Prototype):
 
     def run(self) -> None:
 
-        """Sends cached observation to RESTful service."""
+        """Sends cached observation to MQTT broker topic."""
         while self.is_running:
             if not self.has_cached_observation_data():
                 time.sleep(1)
@@ -333,32 +398,6 @@ class FileRotation(Enum):
     DAILY = 1
     MONTHLY = 2
     YEARLY = 3
-        time.sleep(1)
-                continue
-
-            if len(self._cache_db) > 500:
-                self.logger.warning('Cache is running full '
-                                    '(> 500 observations)')
-
-            # Send cached observation data to OpenADMS Server.
-            obs_data = self._get_cached_observation_data()
-            is_transferred = self._transfer_observation_data(obs_data)
-
-            if is_transferred:
-                # Remove the transferred observation data from cache.
-                self._remove_observation_data(obs_data.doc_id)
-
-    def start(self) -> None:
-        """Starts the module."""
-        if self._is_running:
-            return
-
-        super().start()
-
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
-        self._thread.start()
-
 
 class FileRotation(Enum):
     """
