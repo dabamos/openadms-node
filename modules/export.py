@@ -206,7 +206,7 @@ class RTKExporter(Prototype):
         The configuration may be::
 
             {
-                "topic": "/rtkcloud/data-center/data/",
+                "topic": "rtkcloud/data-center/data/",
             }
     """
     def __init__(self, module_name: str, module_type: str, manager: Manager):
