@@ -200,10 +200,7 @@ class RTKExporter(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
-        broker: Address of the MQTT Broker.
-        port: Port to communicate with the MQTT Broker (usually `1883`).
         topic: Topic the data is published to.
-        keepalive: Amount of seconds until the connection times out.
 
     Example:
         The configuration may be::
