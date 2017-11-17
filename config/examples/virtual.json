@@ -1589,10 +1589,7 @@
             "port": 8080
         },
         "rtkExporter": {
-          "broker": "iot.eclipse.org",
-          "port": 1883,
-          "topic": "/rtkcloud/data-center/data/",
-          "keepalive": 60
+          "topic": "/rtkcloud/data-center/data/"
         }
     }
 }

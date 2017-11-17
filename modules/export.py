@@ -209,24 +209,16 @@ class RTKExporter(Prototype):
         The configuration may be::
 
             {
-                "broker": "iot.eclipse.org",
-                "port": 1883,
                 "topic": "/rtkcloud/data-center/data/",
-                "keepalive": 60
             }
     """
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
-        self._broker = config.get('broker')
-        self._port = config.get('port')
         self._topic = config.get('topic')
-        self._keepalive = config.get('keepalive')
 
     def process_observation(self, observation: Observation) -> Observation:
-
-        # TODO analyse errors to make sure data is cached if not transmitted.
 
         # get the timestamp
         ts = arrow.get(observation.get('timeStamp', 0))
@@ -243,10 +235,6 @@ class RTKExporter(Prototype):
         if target is not None:
             topic = topic + "-" + format(target)
 
-        # open the client connection
-        client = mqtt.Client()
-        client.connect(self._broker, self._port, self._keepalive)
-
         # transform an observation and its response set into DataPoints
         response_sets = observation.get('responseSets')
 
@@ -256,20 +244,17 @@ class RTKExporter(Prototype):
             value = response_set.get('value')
             unit = response_set.get('unit')
 
-            dataPoint = "{"
-            dataPoint += "\"uuid\":" + "\"" + observation.get('id') + "\","
-            dataPoint += "\"name\":" + "\"" + format(response_set_id) +"\","
-            dataPoint += "\"description\":" + "\"" + "Test" +"\"," #TODO
-            # "calculate" nano seconds
-            dataPoint += "\"date\":" + format(timestamp) +"000000000,"
-            dataPoint += "\"value\":" + format(value) +","
-            dataPoint += "\"unit\":" + "\"" + format(unit) +"\""
-            dataPoint += "}"
+            header = None
+            payload = {
+                "uuid" : observation.get('id'),
+                "name": response_set_id,
+                "description": "schwarz",
+                "date" : format(timestamp) + "000000000",
+                "value": value,
+                "unit": unit
+            }
 
-            # publish the JSON to topic
-            client.publish(topic, dataPoint)
-
-        client.disconnect()
+            self.publish(topic, header, payload)
 
         self.logger.info('Published data of "{}" and target "{}" '
                          'to the data-center topic ("{}")"'

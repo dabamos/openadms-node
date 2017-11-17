@@ -3,27 +3,12 @@
     "type": "object",
     "$id": "modules/export/rtkexporter.json",
     "required": [
-        "broker",
-        "port",
-        "topic",
-        "keepalive"
+        "topic"
     ],
     "properties": {
-        "broker": {
-            "$id": "/properties/broker",
-            "type": "string"
-        },
-        "port": {
-            "$id": "/properties/port",
-            "type": "integer"
-        },
         "topic": {
             "$id": "/properties/topic",
             "type": "string"
-        },
-        "keepalive": {
-            "$id": "/properties/keepalive",
-            "type": "integer"
         }
     }
 }
