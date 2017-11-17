@@ -1589,7 +1589,7 @@
             "port": 8080
         },
         "rtkExporter": {
-          "topic": "/rtkcloud/data-center/data/"
+          "topic": "rtkcloud/data-center/data/"
         }
     }
 }
