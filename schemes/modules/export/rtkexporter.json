@@ -6,9 +6,7 @@
         "broker",
         "port",
         "topic",
-        "keepalive",
-        "db",
-        "storage"
+        "keepalive"
     ],
     "properties": {
         "broker": {
@@ -26,14 +24,6 @@
         "keepalive": {
             "$id": "/properties/keepalive",
             "type": "integer"
-        },
-        "db": {
-            "$id": "/properties/db",
-            "type": "string"
-        },
-        "storage": {
-            "$id": "/properties/storage",
-            "type": "string"
         }
     }
 }

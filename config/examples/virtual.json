@@ -1592,9 +1592,7 @@
           "broker": "iot.eclipse.org",
           "port": 1883,
           "topic": "/rtkcloud/data-center/data/",
-          "keepalive": 60,
-          "db": "cache.json",
-          "storage": "file"
+          "keepalive": 60
         }
     }
 }
