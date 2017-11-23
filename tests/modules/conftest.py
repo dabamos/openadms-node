@@ -4,7 +4,7 @@
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'BSD (2-Clause)'
+__license__ = 'BSD-2-Clause'
 
 import pytest
 
@@ -14,10 +14,10 @@ from core.observation import *
 
 @pytest.fixture(scope='module')
 def observations() -> List[Observation]:
-    """Returns a List with example observation objects.
+    """Returns a List with examples observation objects.
 
     Returns:
-        List of example observations.
+        List of examples observations.
     """
     file_path = Path('tests/data/observations.json')
 

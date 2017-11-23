@@ -80,8 +80,8 @@
             "id": "/properties/target",
             "type": "string"
         },
-        "timeStamp": {
-            "id": "/properties/timeStamp",
+        "timestamp": {
+            "id": "/properties/timestamp",
             "type": "string"
         }
     },

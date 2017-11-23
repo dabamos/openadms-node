@@ -4,7 +4,7 @@
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (C) 2017 Hochschule Neubrandenburg'
-__license__ = 'BSD (2-Clause)'
+__license__ = 'BSD-2-Clause'
 
 import json
 import logging
@@ -42,7 +42,7 @@ class Observation(object):
                 'responseSets': {},
                 'sleepTime': 0,
                 'target': 'default',
-                'timeStamp': None
+                'timestamp': None
             }
         else:
             self._data = data

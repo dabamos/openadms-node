@@ -5,7 +5,7 @@ systems (pre-processing, atmospheric corrections, transformations)."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'BSD (2-Clause)'
+__license__ = 'BSD-2-Clause'
 
 import math
 import time

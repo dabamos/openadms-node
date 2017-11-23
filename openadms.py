@@ -26,7 +26,7 @@ Example:
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'BSD (2-Clause)'
+__license__ = 'BSD-2-Clause'
 
 import argparse
 import logging.handlers
@@ -72,7 +72,7 @@ def main(config_file_path: str) -> None:
     logger.info('      |_|                        Node {}'.format(v))
     logger.info('')
     logger.info('Copyright (c) Hochschule Neubrandenburg')
-    logger.info('Licenced under BSD (2-Clause)')
+    logger.info('Licenced under BSD-2-Clause')
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
     # Start the monitoring.
@@ -239,7 +239,7 @@ if __name__ == '__main__':
                     'System'.format(System.get_openadms_version()),
         epilog='OpenADMS Node has been developed at the Neubrandenburg '
                'University of Applied Sciences (Germany). Licenced under '
-               'BSD (2-Clause). For further information, visit '
+               'BSD-2-Clause. For further information, visit '
                'https://www.dabamos.de/.')
 
     # Optional arguments.

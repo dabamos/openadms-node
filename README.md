@@ -68,7 +68,7 @@ The documentation is hosted on the
 See `./docs` for how to build the documentation from source.
 
 ## Supported Sensors
-For a list of tested sensors, see https://dabamos.de/sensors.
+For a list of tested sensors, see https://dabamos.de/sensors/.
 
 ## Running Tests
 You can start the unit tests with:
@@ -77,4 +77,4 @@ $ python3 -m pytest
 ```
 
 ## Licence
-OpenADMS is licenced under BSD (2-clause).
+OpenADMS is licenced under BSD-2-Clause.

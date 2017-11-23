@@ -2,7 +2,9 @@
     "core": {
         "modules": {
             "preProcessor": "modules.processing.PreProcessor",
-            "responseValueInspector": "modules.processing.ResponseValueInspector"
+            "responseValueInspector": "modules.processing.ResponseValueInspector",
+            "returnCodeInspector": "modules.processing.ReturnCodeInspector",
+            "unitConverter": "modules.processing.UnitConverter"
         },
         "project": {
             "name": "pytest",
@@ -32,6 +34,20 @@
                         "max": 100.0
                     }
                 }
+            }
+        },
+        "returnCodeInspector": {
+            "retries": 1,
+            "responseSets": [
+                "returnCode"
+            ]
+        },
+        "unitConverter": {
+            "distance": {
+                "conversionType": "scale",
+                "sourceUnit": "m",
+                "scalingValue": 1000,
+                "targetUnit": "mm"
             }
         }
     }

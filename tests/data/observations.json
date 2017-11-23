@@ -69,6 +69,11 @@
         "requestsOrder": [],
         "requestSets": {},
         "responseSets": {
+            "returnCode": {
+                "type": "integer",
+                "unit": "none",
+                "value": 2
+            },
             "slopeDist": {
                 "type": "float",
                 "unit": "m",

@@ -7,7 +7,7 @@ interface has been finished."""
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
-__license__ = 'BSD (2-Clause)'
+__license__ = 'BSD-2-Clause'
 
 import coloredlogs
 import copy
@@ -93,7 +93,7 @@ if __name__ == '__main__':
         usage='%prog [options]',
         description='Target Generator',
         epilog='\nTarget file generator for OpenADMS.\n'
-               'Licenced under BSD (2-Clause),'
+               'Licenced under BSD-2-Clause,'
                '\nFor further information visit https://www.dabamos.de/.\n')
 
     parser.add_option('-t', '--targets',
