@@ -190,12 +190,12 @@ class FileRotation(Enum):
     MONTHLY = 2
     YEARLY = 3
 
-class RTKExporter(Prototype):
+class ContextExporter(Prototype):
     """
-    RTKExporter connects an OpenADMS-Node instance to a MQTT broker topic,
-    which may be subscribed by a RTK-Cloud Data-Center service. It transforms
-    incoming observations to a specific RTK-Cloud data point format and
-    publishes the resulting JSON to the specified topic.
+    ContextExporter connects an OpenADMS-Node instance to a MQTT broker topic,
+    which may be subscribed by a DABAMOS-Context DataCenter service. It
+    transforms incoming observations to a specific DABAMOS-Context data point
+    format and publishes the resulting JSON to the specified topic.
 
     The JSON-based configuration for this module:
 
