@@ -1,0 +1,14 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "type": "object",
+    "$id": "modules/export/contextexporter.json",
+    "required": [
+        "topic"
+    ],
+    "properties": {
+        "topic": {
+            "$id": "/properties/topic",
+            "type": "string"
+        }
+    }
+}
