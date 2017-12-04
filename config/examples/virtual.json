@@ -4,7 +4,7 @@
             "alerter": "modules.notification.Alerter",
             "distanceCorrector": "modules.totalstation.DistanceCorrector",
             "fileExporter": "modules.export.FileExporter",
-            "rtkExporter": "modules.export.RTKExporter",
+            "contextExporter": "modules.export.ContextExporter",
             "mailAgent": "modules.notification.MailAgent",
             "mailFormatter": "modules.notification.AlertMessageFormatter",
             "polarTransformer": "modules.totalstation.PolarTransformer",
@@ -109,7 +109,7 @@
                         "preProcessor",
                         "distanceCorrector",
                         "fileExporter",
-                        "rtkExporter"
+                        "contextExporter"
                     ],
                     "nextReceiver": 0,
                     "enabled": true,
