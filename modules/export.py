@@ -200,25 +200,89 @@ class ContextExporter(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
+        broker: Address of the MQTT Broker.
+        port: Port to communicate with the MQTT Broker (usually `1883`).
         topic: Topic the data is published to.
+        keepalive: Amount of seconds until the connection times out.
+        db: File name of the cache database (e.g.: ``cache.json``).
+        storage: Storage type (`file` or `memory`).
 
     Example:
         The configuration may be::
 
             {
+                "broker": "iot.eclipse.org",
+                "port": 1883,
                 "topic": "dabamos-context/datacenter/data/",
+                "keepalive": 60,
+                "db": "cache.json",
+                "storage": "file"
             }
     """
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
+        self._broker = config.get('broker')
+        self._port = config.get('port')
         self._topic = config.get('topic')
+        self._keepalive = config.get('keepalive')
+        self._storage = config.get('storage')
+        self._db_file = config.get('db')
 
-    def process_observation(self, observation: Observation) -> Observation:
+        if self._storage not in ['file', 'memory']:
+             raise ValueError('Invalid storage method')
+
+        if self._storage == 'memory':
+            self._cache_db = TinyDB(storage=MemoryStorage)
+            self.logger.info('Created in-memory cache database')
+
+        if self._storage == 'file':
+            try:
+                self._cache_db = TinyDB(self._db_file)
+                self.logger.info('Opened cache database "{}"'
+                                 .format(self._db_file))
+            except Exception:
+                raise ValueError('Cache database "{}" could not be opened'
+                                 .format(self._db_file))
+
+    def _cache_observation(self, obs: Observation) -> str:
+        """Caches the given observation in the local cache database.
+        Args:
+            obs: Observation object.
+        """
+        doc_id = self._cache_db.insert(obs.data)
+        self.logger.debug('Cached observation "{}" with target "{}" '
+                          '(document id = {})'.format(obs.get('name'),
+                                                      obs.get('target'),
+                                                      doc_id))
+        return doc_id
+
+    def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
+        """"Returns a random observation data set from the cache database.
+        Returns:
+            Observation data or None if cache is empty.
+        """
+        if len(self._cache_db) > 0:
+            return self._cache_db.all()[0]
+
+        return None
+
+    def _remove_observation_data(self, doc_id: int) -> None:
+        """Removes a single observations from the cache database.
+        Args:
+            doc_id: Document id.
+        """
+        self._cache_db.remove(doc_ids=[doc_id])
+        self.logger.debug('Removed observation from cache database '
+                        '(document id = {})'.format(doc_id))
+
+    def _process_observation_data(self, observation: Dict[str, Any]) -> bool:
+
+        # TODO analyse errors to make sure data is cached if not transmitted.
 
         # get the timestamp
-        ts = arrow.get(observation.get('timeStamp', 0))
+        ts = arrow.get(observation.get('timestamp', 0))
         timestamp = ts.timestamp
 
         # add meta information to basic topic to tell the data-center which
@@ -232,6 +296,10 @@ class ContextExporter(Prototype):
         if target is not None:
             topic = topic + "-" + format(target)
 
+        # open the client connection
+        client = mqtt.Client()
+        client.connect(self._broker, self._port, self._keepalive)
+
         # transform an observation and its response set into DataPoints
         response_sets = observation.get('responseSets')
 
@@ -241,25 +309,85 @@ class ContextExporter(Prototype):
             value = response_set.get('value')
             unit = response_set.get('unit')
 
-            header = None
-            payload = {
-                "uuid" : observation.get('id'),
-                "name": response_set_id,
-                "description": "schwarz",
-                "date" : format(timestamp) + "000000000",
-                "value": value,
-                "unit": unit
-            }
+            dataPoint = "{"
+            dataPoint += "\"uuid\":" + "\"" + observation.get('id') + "\","
+            dataPoint += "\"name\":" + "\"" + format(response_set_id) +"\","
+            dataPoint += "\"description\":" + "\"" + "Test" +"\"," #TODO
+            # "calculate" nano seconds
+            dataPoint += "\"date\":" + format(timestamp) +"000000000,"
+            dataPoint += "\"value\":" + format(value) +","
+            dataPoint += "\"unit\":" + "\"" + format(unit) +"\""
+            dataPoint += "}"
 
-            self.publish(topic, header, payload)
+            # publish the JSON to topic
+            client.publish(topic, dataPoint)
+
+        client.disconnect()
 
         self.logger.info('Published data of "{}" and target "{}" '
                          'to the data-center topic ("{}")"'
                          .format(observation.get('sensorName'),
                                  observation.get('target'),
                                  topic))
+        return True
 
-        return observation
+    def has_cached_observation_data(self) -> bool:
+        """Returns whether or not a cached observation exists in the database.
+        Returns:
+            True if cached observation exists, False if not.
+        """
+        return True if len(self._cache_db) > 0 else False
+
+    def process_observation(self, obs: Observation) -> Observation:
+        """Caches observation object locally.
+        Args:
+            obs: Observation object.
+        Returns:
+            The observation object.
+        """
+        self._cache_observation(copy.deepcopy(obs))
+        return obs
+
+    def run(self) -> None:
+
+        """Sends cached observation to MQTT broker topic."""
+        while self.is_running:
+            if not self.has_cached_observation_data():
+                time.sleep(1)
+                continue
+
+            if len(self._cache_db) > 500:
+                self.logger.warning('Cache is running full '
+                                    '(> 500 observations)')
+
+            # transform cached observation data  and send it to MQTT topic.
+            obs_data = self._get_cached_observation_data()
+            is_transferred = self._process_observation_data(obs_data)
+
+            if is_transferred:
+                # Remove the transferred observation data from cache.
+                self._remove_observation_data(obs_data.doc_id)
+
+    def start(self) -> None:
+        """Starts the module."""
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+class FileRotation(Enum):
+    """
+    Enumeration of file rotation times of flat files.
+    """
+
+    NONE = 0
+    DAILY = 1
+    MONTHLY = 2
+    YEARLY = 3
 
 class FileExporter(Prototype):
     """

@@ -1,14 +1,39 @@
 {
-    "$schema": "http://json-schema.org/draft-06/schema#",
-    "type": "object",
-    "$id": "modules/export/contextexporter.json",
-    "required": [
-        "topic"
-    ],
-    "properties": {
-        "topic": {
-            "$id": "/properties/topic",
-            "type": "string"
-        }
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "type": "object",
+  "$id": "modules/export/contextexporter.json",
+  "required": [
+    "broker",
+    "port",
+    "topic",
+    "keepalive",
+    "db",
+    "storage"
+  ],
+  "properties": {
+    "broker": {
+      "$id": "/properties/broker",
+      "type": "string"
+    },
+    "port": {
+      "$id": "/properties/port",
+      "type": "integer"
+    },
+    "topic": {
+      "$id": "/properties/topic",
+      "type": "string"
+    },
+    "keepalive": {
+      "$id": "/properties/keepalive",
+      "type": "integer"
+    },
+    "db": {
+      "$id": "/properties/db",
+      "type": "string"
+    },
+    "storage": {
+      "$id": "/properties/storage",
+      "type": "string"
     }
+  }
 }

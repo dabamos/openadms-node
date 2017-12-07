@@ -1589,7 +1589,12 @@
             "port": 8080
         },
         "contextExporter": {
-          "topic": "dabamos-context/datacenter/data/"
+          "broker": "iot.eclipse.org",
+          "port": 1883,
+          "topic": "dabamos-context/datacenter/data/",
+          "keepalive": 60,
+          "db": "cache.json",
+          "storage": "file"
         }
     }
 }
