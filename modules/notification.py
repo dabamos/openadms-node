@@ -930,7 +930,7 @@ class ShortMessageAgent(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_module_config(self._name)
 
         self._host = config.get('host')
         self._port = config.get('port')

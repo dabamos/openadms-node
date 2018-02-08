@@ -207,8 +207,8 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if temperature is not None:
-            self.logger.verbose('Updated temperature to {} C'
-                                .format(round(temperature, 2)))
+            self.logger.verbose('Updated temperature to {:.2f} C'
+                                .format(temperature))
 
     @pressure.setter
     def pressure(self, pressure: float) -> None:
@@ -217,8 +217,8 @@ class DistanceCorrector(Prototype):
         self._last_update = time.time()
 
         if pressure is not None:
-            self.logger.verbose('Updated pressure to {} hPa'
-                                .format(round(pressure, 2)))
+            self.logger.verbose('Updated pressure to {:.2f} hPa'
+                                .format(pressure))
 
     @humidity.setter
     def humidity(self, humidity: float) -> None:
@@ -257,7 +257,7 @@ class HelmertTransformer(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_module_config(self._name)
 
         self._is_residual = config.get('residualMismatchTransformationEnabled')
         self._fixed_points = config.get('fixedPoints')
@@ -399,7 +399,7 @@ class HelmertTransformer(Prototype):
             self._o)
 
         self.logger.info('Calculated coordinates of target point "{}" '
-                         '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5g})'
+                         '(X = {:4.5f}, Y = {:4.5f}, Z = {:4.5f})'
                          .format(obs.get('target'), x, y, z))
 
         # Do residual mismatch transformation.
@@ -559,7 +559,7 @@ class HelmertTransformer(Prototype):
             sum_wy_wy += wy_i * wy_i
             sum_wz_wz += math.pow(view_point_z - (global_z - local_z), 2)
 
-        # Sum of discrepancies should be 0, i.e. [W_x] = [W_y] = 0.
+        # Sum of discrepancies should be 0, i.e., [W_x] = [W_y] = 0.
         r_sum_wx = abs(round(sum_wx, 5))
         r_sum_wy = abs(round(sum_wy, 5))
 
@@ -736,7 +736,7 @@ class PolarTransformer(Prototype):
         self._azimuth_point = self._fixed_points.get(self._azimuth_point_name)
 
         if not self._azimuth_point:
-            self.logger.error('Azimuth point "{}" doesn\'t exist'
+            self.logger.error('Azimuth point "{}" does not exist'
                               .format(self._azimuth_point_name))
 
         self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle', 0))
