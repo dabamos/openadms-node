@@ -6,6 +6,24 @@
             "id": "/properties/residualMismatchTransformationEnabled",
             "type": "boolean"
         },
+        "viewPoint": {
+            "id": "/properties/viewPoint",
+            "properties": {
+                "target": {
+                    "id": "/properties/viewPoint/properties/target",
+                    "type": "string"
+                },
+                "receivers": {
+                    "id": "/properties/viewPoint/properties/receivers",
+                    "items": {
+                        "id": "/properties/viewPoints/properties/receivers/properties/id/items",
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "fixedPoints": {
             "id": "/properties/fixedPoints",
             "minProperties": 1,
@@ -26,20 +44,6 @@
                         }
                     },
                     "type": "object"
-                }
-            },
-            "type": "object"
-        },
-        "viewPoint": {
-            "id": "/properties/viewPoint",
-            "properties": {
-                "target": {
-                    "id": "/properties/viewPoint/properties/target",
-                    "type": "string"
-                },
-                "receivers": {
-                    "id": "/properties/viewPoint/properties/receivers",
-                    "type": "string"
                 }
             },
             "type": "object"
