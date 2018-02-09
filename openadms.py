@@ -229,10 +229,10 @@ if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
-    # Use a signal handler to catch ^C and quit the program gracefully.
+    # Use a signal handler to catch ^C and quit the programme gracefully.
     signal.signal(signal.SIGINT, signal_handler)
 
-    # Parse command line options.
+    # Parse command-line options.
     parser = argparse.ArgumentParser(
         usage='%(prog)s [options]',
         description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
@@ -269,7 +269,7 @@ if __name__ == '__main__':
                         help='use internal MQTT message broker',
                         dest='is_mqtt_broker',
                         action='store_true',
-                        default=True)
+                        default=False)
     parser.add_argument('-b', '--bind',
                         help='host of MQTT message broker (IP address or FQDN)',
                         dest='host',
@@ -299,7 +299,7 @@ if __name__ == '__main__':
         root.error(e)
         sys.exit(0)
 
-    # Initialize the logger.
+    # Initialise the logger.
     setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)
 
     if args.is_mqtt_broker:
