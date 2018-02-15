@@ -79,7 +79,7 @@ class PreProcessor(Prototype):
                                                    obs.get('portName')))
                 return obs
 
-            # The regular expression pattern needs a least one named group
+            # The regular expression pattern needs at least one named group
             # defined. Otherwise, the extraction of the values fails.
             #
             # Right: "(?P<id>.*)"
@@ -341,7 +341,8 @@ class ReturnCodes(object):
         1: DEBUG,
         0: NONE.
 
-    Please choose a proper value for each return code.
+    Please choose a proper value for each return code. Please be aware that the
+    code list is not complete yet.
     """
     codes = {
         2:    [4, False, 'Unknown error, result unspecified'],
@@ -361,6 +362,7 @@ class ReturnCodes(object):
         8708: [4, True,  'Position not exactly reached'],
         8710: [4, True,  'No target detected'],
         8711: [4, False, 'Multiple targets detected'],
+        8714: [4, False, 'Target acquisition not enabled'],
         8716: [4, True,  'Target position not exactly reached'],
     }
 
@@ -399,12 +401,14 @@ class ReturnCodeInspector(Prototype):
 
             # Get level and error message of the return code.
             error_values = ReturnCodes.codes.get(return_code)
-            lvl, retry, msg = error_values
+
+            if (error_values):
+                lvl, retry, msg = error_values
 
             attempts = obs.get('attempts', 0)
 
             # Retry measurement.
-            if retry and attempts < self._retries:
+            if error_values and retry and attempts < self._retries:
                 obs.set('attempts', attempts + 1)
                 obs.set('corrupted', False)
                 obs.set('nextReceiver', 0)
