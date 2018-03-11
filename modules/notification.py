@@ -648,31 +648,38 @@ class MailAgent(Prototype):
                               self._charset)
         msg.attach(plain_text)
 
-        try:
-            if self._is_tls and not self._is_start_tls:
-                # Use TLS encryption.
-                smtp = smtplib.SMTP_SSL(self._host, self._port)
-            else:
-                smtp = smtplib.SMTP(self._host, self._port)
+        done = False
 
-            smtp.set_debuglevel(False)
-            smtp.ehlo()
+        while not done:
+            try:
+                if self._is_tls and not self._is_start_tls:
+                    # Use TLS encryption.
+                    smtp = smtplib.SMTP_SSL(self._host, self._port)
+                else:
+                    # Use no or StartTLS encryption.
+                    smtp = smtplib.SMTP(self._host, self._port)
 
-            if not self._is_tls and self._is_start_tls:
-                # Use TLS via StartTLS.
-                smtp.starttls()
+                smtp.set_debuglevel(False)
                 smtp.ehlo()
 
-            smtp.login(self._user_name, self._user_password)
-            smtp.sendmail(self._user_mail, [mail_to], msg.as_string())
-            smtp.quit()
+                if not self._is_tls and self._is_start_tls:
+                    # Use TLS via StartTLS.
+                    smtp.starttls()
+                    smtp.ehlo()
 
-            self.logger.info('E-mail has been send successfully to {}'
-                             .format(mail_to))
-        except smtplib.SMTPException:
-            self.logger.warning('E-mail could not be sent (SMTP error)')
-        except TimeoutError:
-            self.logger.warning('E-mail could not be sent (timeout)')
+                smtp.login(self._user_name, self._user_password)
+                smtp.sendmail(self._user_mail, [mail_to], msg.as_string())
+                smtp.quit()
+
+                done = True
+                self.logger.info('E-mail has been send successfully to {}'
+                                 .format(mail_to))
+            except smtplib.SMTPException:
+                self.logger.warning('E-mail could not be sent (SMTP error)')
+            except socket.gaierror
+                self.logger.warning('E-mail could not be sent (connection error)')
+            except TimeoutError:
+                self.logger.warning('E-mail could not be sent (timeout)')
 
 
 class MastodonAgent(Prototype):
