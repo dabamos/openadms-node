@@ -126,7 +126,7 @@ run:
     $ source virtual-environment/bin/activate.csh
     $ git clone https://github.com/dabamos/openadms-node
     $ cd openadms-node
-    $ python -m pip install -U -r requirements.txt
+    $ python -m pip install --user -U -r requirements.txt
     $ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
 
 Message Broker
@@ -205,7 +205,7 @@ Stop the OpenADMS unit manually:
 
 ::
 
-    $ systemctl start openadms
+    $ systemctl stop openadms
 
 Show the status of the OpenADMS unit, including whether it is running or not:
 
