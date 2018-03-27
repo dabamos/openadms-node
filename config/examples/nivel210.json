@@ -50,7 +50,7 @@
                             "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
                             "response": "",
                             "responseDelimiter": "\\x03",
-                            "responsePattern": "X:(?P<x>[-+]?[0-9]*\\.?[0-9]+) Y:(?P<y>[-+]?[0-9]*\\.?[0-9]+) T:(?P<temperature>[-+]?[0-9]*\\.?[0-9]+)",
+                            "responsePattern": "X:(?P<x>[-+]?[0-9]*\\.?[0-9]+) Y:(?P<y>[-+]?[0-9]*\\.?[0-9]+) T:\\s*(?P<temperature>[-+]?[0-9]*\\.?[0-9]+)",
                             "sleepTime": 0.0,
                             "timeout": 1.0
                         }
