@@ -676,7 +676,7 @@ class MailAgent(Prototype):
                                  .format(mail_to))
             except smtplib.SMTPException:
                 self.logger.warning('E-mail could not be sent (SMTP error)')
-            except socket.gaierror
+            except socket.gaierror:
                 self.logger.warning('E-mail could not be sent (connection error)')
             except TimeoutError:
                 self.logger.warning('E-mail could not be sent (timeout)')
