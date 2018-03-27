@@ -1,0 +1,659 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation of OpenADMS Node &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="index.html"/>
+        <link rel="next" title="Running OpenADMS Node" href="running.html"/>
+        <link rel="prev" title="OpenADMS Node 0.7" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation of OpenADMS Node</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#source-code">Source Code</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#python">Python</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#additional-modules">Additional Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#virtual-environment">Virtual Environment</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#message-broker">Message Broker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#system-service">System Service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#microsoft-windows">Microsoft Windows</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#freebsd">FreeBSD</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#netbsd">NetBSD</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#stand-alone-executables-for-microsoft-windows">Stand-Alone Executables for Microsoft Windows</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#pyinstaller">PyInstaller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cx-freeze">cx_Freeze</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#nuitka">Nuitka</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation of OpenADMS Node</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation-of-openadms-node">
+<span id="installation"></span><h1>Installation of OpenADMS Node<a class="headerlink" href="#installation-of-openadms-node" title="Permalink to this headline">¶</a></h1>
+<p>The following dependencies have to be installed at first in order to run
+OpenADMS Node:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://www.python.org/">CPython 3.6</a> or <a class="reference external" href="https://pypy.org/">PyPy3.5</a>,</li>
+<li>some additional Python modules (as described below),</li>
+<li><em>optional:</em> an MQTT message broker,</li>
+<li><em>optional:</em> the <a class="reference external" href="https://git-scm.com/">Git</a> version control system.</li>
+</ul>
+<div class="section" id="quick-start">
+<h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>You can run OpenADMS Node by following these steps:</p>
+<ol class="arabic simple">
+<li>Download and install <a class="reference external" href="https://www.python.org/">Python 3.6</a> or higher.</li>
+<li>Download and unpack <a class="reference external" href="https://github.com/dabamos/openadms-node/releases">OpenADMS</a>.</li>
+<li>In the OpenADMS Node directory, run <code class="docutils literal"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-U</span> <span class="pre">-r</span>
+<span class="pre">requirements.txt</span></code> or execute <code class="docutils literal"><span class="pre">install.bat</span></code> as an administrator on
+Microsoft Windows.</li>
+<li>Write a configuration file for OpenADMS Node (see directory
+<code class="docutils literal"><span class="pre">config/examples/</span></code> for examples).</li>
+<li>Run <code class="docutils literal"><span class="pre">python3</span> <span class="pre">openadms.py</span> <span class="pre">--config</span> <span class="pre">config/my_config.json</span> <span class="pre">--with-mqtt-broker</span>
+<span class="pre">--debug</span></code> or start the graphical launcher <code class="docutils literal"><span class="pre">openadms-launcher.pyw</span></code>.</li>
+</ol>
+</div>
+<div class="section" id="source-code">
+<h2>Source Code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<p>The release versions of OpenADMS Node are hosted on <a class="reference external" href="https://github.com/dabamos/openadms-node/releases">GitHub</a>. If you like to
+download a more recent version, you can clone the master branch from the
+<a class="reference external" href="https://github.com/dabamos/openadms-node">GitHub repository</a> using the Git version control system:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ git clone https://github.com/dabamos/openadms-node.git
+</pre></div>
+</div>
+<p>The master branch is available as a <a class="reference external" href="https://github.com/dabamos/openadms-node/archive/master.zip">Zip archive</a> for those who do not want to
+use Git.</p>
+</div>
+<div class="section" id="python">
+<h2>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h2>
+<p>OpenADMS Node is written in Python. A recent Python 3 interpreter is required to
+run the software. <a class="reference external" href="https://www.python.org/">CPython 3.6</a> and <a class="reference external" href="https://pypy.org/">PyPy3.5</a> are supported. Interpreters are
+available for all modern operating systems.</p>
+<dl class="docutils">
+<dt>Microsoft Windows Vista/7/8/10</dt>
+<dd>Download the latest release from the Python website and execute the
+installer. Please refer to the official <a class="reference external" href="https://docs.python.org/3/using/windows.html">installation notes</a> of the Python
+documentation. It is strongly recommended to add Python to the <code class="docutils literal"><span class="pre">PATH</span></code>
+variable of the system (see <a class="reference internal" href="#python-path"><span class="std std-numref">Fig. 1</span></a>).</dd>
+<dt>Linux and Unix</dt>
+<dd>Install Python 3.6 by using your favourite package managing system or
+compile it from source.</dd>
+<dt>macOS</dt>
+<dd>The latest version of Python is also available for download on the Python
+website.</dd>
+</dl>
+<div class="figure" id="id4">
+<span id="python-path"></span><a class="reference internal image-reference" href="_images/python_path.png"><img alt="Add Python to the ``PATH`` variable of Microsoft Windows" src="_images/python_path.png" style="width: 536.0px; height: 329.6px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 1 </span><span class="caption-text">Add Python to the <code class="docutils literal"><span class="pre">PATH</span></code> variable of Microsoft Windows</span></p>
+</div>
+<div class="section" id="additional-modules">
+<h3>Additional Modules<a class="headerlink" href="#additional-modules" title="Permalink to this headline">¶</a></h3>
+<p>OpenADMS Node depends on the following Python modules:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://pypi.python.org/pypi/arrow">arrow</a> (Apache 2.0 Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/coloredlogs">coloredlogs</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/CouchDB">CouchDB</a> (BSD Licence),</li>
+<li><a class="reference external" href="https://github.com/beerfactory/hbmqtt">HBMQTT</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/jsonschema">jsonschema</a> (MIT Licence)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/Mastodon.py">Mastodon.py</a> (MIT Licence)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/paho-mqtt">paho-mqtt</a> (Eclipse Public Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/pyserial">pyserial</a> (Python Software Foundation Licence).</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/pytest">pytest</a> (MIT Licence)</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/requests">requests</a> (Apache 2.0 Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/tinydb">tinydb</a> (MIT Licence),</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/uptime">uptime</a> (BSD-2-Clause Licence).</li>
+<li><a class="reference external" href="https://pypi.python.org/pypi/verboselogs">verboselogs</a> (MIT Licence).</li>
+</ul>
+<p>The (optional) graphical launcher requires <a class="reference external" href="https://pypi.python.org/pypi/Gooey">Gooey</a> (MIT Licence).</p>
+<p>All modules can be installed with the Python package management system
+(<code class="docutils literal"><span class="pre">pip</span></code>). Open the OpenADMS Node directory in your terminal (or <code class="docutils literal"><span class="pre">cmd.exe</span></code>
+with administrator privileges on Microsoft Windows) and then run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python3 -m pip install -U -r requirements.txt
+</pre></div>
+</div>
+<p>Or, if you prefer PyPy3.5:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pypy3 -m pip install -U -r requirements.txt
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On Microsoft Windows, the script <code class="docutils literal"><span class="pre">install.bat</span></code> will download
+and install all necessary dependencies on CPython. Run the script
+with administrator rights.</p>
+</div>
+</div>
+<div class="section" id="virtual-environment">
+<h3>Virtual Environment<a class="headerlink" href="#virtual-environment" title="Permalink to this headline">¶</a></h3>
+<p>The tool <code class="docutils literal"><span class="pre">venv</span></code> creates an independent Python environment. Further information
+is given in the <a class="reference external" href="https://docs.python.org/3/library/venv.html">Python online manual</a>. On Linux/Unix with <code class="docutils literal"><span class="pre">csh</span></code>/<code class="docutils literal"><span class="pre">tcsh</span></code>,
+run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python -m venv virtual-environment
+$ source virtual-environment/bin/activate.csh
+$ git clone https://github.com/dabamos/openadms-node
+$ cd openadms-node
+$ python -m pip install -U -r requirements.txt
+$ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="message-broker">
+<h2>Message Broker<a class="headerlink" href="#message-broker" title="Permalink to this headline">¶</a></h2>
+<p>The MQTT protocol is used for the internal and external message exchange in
+OpenADMS Node. Therefore, it is necessary to install and run an MQTT message
+broker before starting the monitoring system. Many implementations of message
+brokers are available (<a class="reference external" href="https://github.com/mqtt/mqtt.github.io/wiki/servers">list of servers</a>), some of them are open-source, for
+example:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://mosquitto.org/">Eclipse Mosquitto</a>,</li>
+<li><a class="reference external" href="https://github.com/beerfactory/hbmqtt">HBMQTT</a>,</li>
+<li><a class="reference external" href="http://www.rabbitmq.com/">RabbitMQ</a> (MQTT via plug-in).</li>
+</ul>
+<p>HBMQTT is installed as a dependency. The broker will be started by OpenADMS Node
+if the parameter <code class="docutils literal"><span class="pre">--with-mqtt-broker</span></code> is used. It is also possible to start
+HBMQTT manually in the command line with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ hbmqtt
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For testing only, the public sandbox broker of <a class="reference external" href="https://iot.eclipse.org/">Eclipse IoT</a> can be used.
+The server supports MQTT and WebSockets, both plain and TLS secured.  Access
+the server using the hostname <code class="docutils literal"><span class="pre">iot.eclipse.org</span></code> and port <code class="docutils literal"><span class="pre">1883</span></code>. For
+encryption, use port <code class="docutils literal"><span class="pre">8883</span></code>. MQTT over WebSockets runs on the ports <code class="docutils literal"><span class="pre">80</span></code>
+and <code class="docutils literal"><span class="pre">443</span></code>.</p>
+</div>
+</div>
+<div class="section" id="system-service">
+<h2>System Service<a class="headerlink" href="#system-service" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="microsoft-windows">
+<h3>Microsoft Windows<a class="headerlink" href="#microsoft-windows" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This section is still under construction.</p>
+</div>
+</div>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<p>In case you are running a Linux distribution with the systemd init system, you
+can use the provided unit file to start OpenADMS as a daemon. Copy the file
+<code class="docutils literal"><span class="pre">openadms.service</span></code> to <code class="docutils literal"><span class="pre">/etc/systemd/system/</span></code>.  OpenADMS must be installed in
+<code class="docutils literal"><span class="pre">/usr/local/sbin/openadms/</span></code>. The config will be loaded from
+<code class="docutils literal"><span class="pre">/usr/local/etc/openadms/config.json</span></code>. You can alter these values in the
+service file.</p>
+<p>Be aware that no MQTT message broker will be started by this service.  You may
+want to use an external broker, like Eclipse Mosquitto, or append the parameter
+<code class="docutils literal"><span class="pre">-m</span></code> to <code class="docutils literal"><span class="pre">ExecStart</span></code> in the service file to enable the internal broker.</p>
+<p>The OpenADMS unit has to be loaded with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ systemctl daemon-reload
+</pre></div>
+</div>
+<p>Enable the unit to run OpenADMS as a service:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ systemctl enable openadms
+</pre></div>
+</div>
+<p>Start the OpenADMS unit manually:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ systemctl start openadms
+</pre></div>
+</div>
+<p>Stop the OpenADMS unit manually:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ systemctl start openadms
+</pre></div>
+</div>
+<p>Show the status of the OpenADMS unit, including whether it is running or not:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ systemctl status openadms
+</pre></div>
+</div>
+<p>For more information regarding systemd, see the <a class="reference external" href="https://wiki.archlinux.org/index.php/systemd">Arch Linux Wiki</a>.</p>
+</div>
+<div class="section" id="freebsd">
+<h3>FreeBSD<a class="headerlink" href="#freebsd" title="Permalink to this headline">¶</a></h3>
+<p>An rc.d script (<code class="docutils literal"><span class="pre">freebsd.rc</span></code>) is provided for FreeBSD to start OpenADMS Node
+automatically at boot time. The script has to be moved and renamed to
+<code class="docutils literal"><span class="pre">/usr/local/etc/rc.d/openadms</span></code>. It is recommended to run the install script
+<code class="docutils literal"><span class="pre">freebsd_install.sh</span></code>, as it also creates the user <code class="docutils literal"><span class="pre">openadms</span></code> and all
+necessary directories:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sh ./freebsd_install.sh
+</pre></div>
+</div>
+<p>Then, add the following line to your <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">openadms_enable</span><span class="o">=</span><span class="s2">&quot;YES&quot;</span>
+</pre></div>
+</div>
+<p>You can alter the default configuration of the daemon by adding the following
+lines to <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>openadms_user=&quot;openadms&quot; ➊
+openadms_config=&quot;/usr/local/etc/openadms/openadms.json&quot; ➋
+openadms_path=&quot;/usr/local/sbin/openadms/openadms.py&quot; ➌
+openadms_log=&quot;/var/log/openadms.log&quot; ➍
+openadms_args=&quot;&quot; ➎
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>User to run OpenADMS Node as.</li>
+<li>File path of the configuration.</li>
+<li>File path of the Python script.</li>
+<li>File path of the log file.</li>
+<li>Additional command-line arguments.</li>
+</ol>
+<p>OpenADMS Node can be started manually with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ service openadms onestart
+</pre></div>
+</div>
+<p>To stop it, run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ service openadms onestop
+</pre></div>
+</div>
+<p>Please note, that an MQTT message broker, like <a class="reference external" href="http://www.freshports.org/net/mosquitto/">Mosquitto</a>, has to be started
+first. Add the following line to your <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code> to start Mosquitto
+automatically:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">mosquitto_enable</span><span class="o">=</span><span class="s2">&quot;YES&quot;</span>
+</pre></div>
+</div>
+<p>The daemon can be started manually with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ service mosquitto onestart
+</pre></div>
+</div>
+<p>Instead of using an external MQTT message broker, you can also enable
+the internal broker by adding the appropriate command-line argument to
+<code class="docutils literal"><span class="pre">openadms_args</span></code> in <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">openadms_args</span><span class="o">=</span><span class="s2">&quot;--with-mqtt-broker&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="netbsd">
+<h3>NetBSD<a class="headerlink" href="#netbsd" title="Permalink to this headline">¶</a></h3>
+<p>For NetBSD, the rc.d script <code class="docutils literal"><span class="pre">netbsd.rc</span></code> can be used to start OpenADMS Node as
+a service. The script has to be moved and renamed to <code class="docutils literal"><span class="pre">/etc/rc.d/openadms</span></code>.
+OpenADMS must be installed to <code class="docutils literal"><span class="pre">/usr/sbin/openadms/</span></code>. The configuration is
+expected to be in <code class="docutils literal"><span class="pre">/usr/etc/openadms/openadms.json</span></code> and the log file will be
+located at <code class="docutils literal"><span class="pre">/var/log/openadms.log</span></code>. OpenADMS starts with the privileges of
+user <code class="docutils literal"><span class="pre">openadms</span></code>. You can add the user with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ useradd -m -G dialer openadms
+$ passwd openadms
+</pre></div>
+</div>
+<p>Enable OpenADMS in <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">openadms</span><span class="o">=</span><span class="n">YES</span>
+</pre></div>
+</div>
+<p>Add the following lines to <code class="docutils literal"><span class="pre">/etc/rc.conf</span></code> to alter the default configuration:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>openadms_user=&quot;openadms&quot; ➊
+openadms_path=&quot;/usr/sbin/openadms/&quot; ➋
+openadms_config=&quot;/usr/etc/openadms/openadms.json&quot; ➌
+openadms_log=&quot;/var/log/openadms.log&quot; ➍
+</pre></div>
+</div>
+<ol class="arabic simple">
+<li>User to run OpenADMS Node as.</li>
+<li>File path of the configuration file.</li>
+<li>Path of the OpenADMS Node directory.</li>
+<li>File path of the log file.</li>
+</ol>
+<p>Start OpenADMS manually with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ service openadms onestart
+</pre></div>
+</div>
+<p>To stop it, run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ service openadms onestop
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="stand-alone-executables-for-microsoft-windows">
+<h2>Stand-Alone Executables for Microsoft Windows<a class="headerlink" href="#stand-alone-executables-for-microsoft-windows" title="Permalink to this headline">¶</a></h2>
+<p>OpenADMS can be compiled to a stand-alone executable (<code class="docutils literal"><span class="pre">.exe</span></code> file) that does
+not depend on a globally installed Python interpreter by using either
+<a class="reference external" href="http://www.pyinstaller.org/">PyInstaller</a>, <a class="reference external" href="https://anthony-tuininga.github.io/cx_Freeze/">cx_Freeze</a>, or <a class="reference external" href="http://nuitka.net/">Nuitka</a>.</p>
+<div class="section" id="pyinstaller">
+<h3>PyInstaller<a class="headerlink" href="#pyinstaller" title="Permalink to this headline">¶</a></h3>
+<p>PyInstaller is capable of creating executables for many operating systems,
+including Microsoft Windows. In order to use PyInstaller, <a class="reference external" href="https://www.microsoft.com/de-de/download/details.aspx?id=14632">Microsoft Visual C++
+2010 Redistributable Package</a> and the Python module itself have to be installed
+at first. PyInstaller can be obtained with <code class="docutils literal"><span class="pre">pip</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">PyInstaller</span>
+</pre></div>
+</div>
+<p>Build OpenADMS Node by running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">pyinstaller</span> <span class="o">--</span><span class="n">clean</span> <span class="o">--</span><span class="n">noconfirm</span> <span class="o">--</span><span class="n">icon</span><span class="o">=</span><span class="s2">&quot;extra\dabamos.ico&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.database&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.export&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.notification&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.port&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.processing&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.prototype&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.schedule&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.server&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.testing&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.totalstation&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.virtual&quot;</span> <span class="n">openadms</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>Build the graphical launcher with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">pyinstaller</span> <span class="o">--</span><span class="n">clean</span> <span class="o">--</span><span class="n">windowed</span> <span class="o">--</span><span class="n">noconfirm</span> <span class="o">--</span><span class="n">icon</span><span class="o">=</span><span class="s2">&quot;extra\dabamos.ico&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;gooey&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;openadms&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.database&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.export&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.notification&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.port&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.processing&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.prototype&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.schedule&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.server&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.testing&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.totalstation&quot;</span> <span class="o">--</span><span class="n">hidden</span><span class="o">-</span><span class="kn">import</span> <span class="s2">&quot;modules.virtual&quot;</span> <span class="n">openadms</span><span class="o">-</span><span class="n">launcher</span><span class="o">.</span><span class="n">pyw</span>
+</pre></div>
+</div>
+<p>The binaries will be located in the sub-folder <code class="docutils literal"><span class="pre">dist</span></code>. Copy the folders
+<code class="docutils literal"><span class="pre">data</span></code>, <code class="docutils literal"><span class="pre">config</span></code>, <code class="docutils literal"><span class="pre">core</span></code>, <code class="docutils literal"><span class="pre">modules</span></code>, <code class="docutils literal"><span class="pre">schemes</span></code>, and <code class="docutils literal"><span class="pre">sensors</span></code>
+into <code class="docutils literal"><span class="pre">dist</span></code>. Furthermore, copy folder <code class="docutils literal"><span class="pre">C:\Python36\Lib\site-packages\gooey</span></code>
+to <code class="docutils literal"><span class="pre">dist\openadms-launcher\</span></code>. Execute <code class="docutils literal"><span class="pre">openadms-launcher.exe</span></code> to start the
+OpenADMS graphical launcher.</p>
+</div>
+<div class="section" id="cx-freeze">
+<h3>cx_Freeze<a class="headerlink" href="#cx-freeze" title="Permalink to this headline">¶</a></h3>
+<p>Like PyInstaller, cx_Freeze is cross platform library to create executables of
+Python scripts. Install it with <code class="docutils literal"><span class="pre">pip</span></code> at first:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="n">cx_Freeze</span> <span class="n">appdirs</span> <span class="n">packaging</span>
+</pre></div>
+</div>
+<p>Create a file <code class="docutils literal"><span class="pre">setup.py</span></code> with the following contents:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python3.6</span>
+
+<span class="sd">&quot;&quot;&quot;Setup for cx_Freeze</span>
+
+<span class="sd">This script creates executables for Microsoft Windows by using cx_Freeze.</span>
+<span class="sd">Just run::</span>
+
+<span class="sd">    $ python setup.py build</span>
+
+<span class="sd">All files will be stored under ``dist/``.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">cx_Freeze</span> <span class="k">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">Executable</span>
+
+<span class="kn">from</span> <span class="nn">core.version</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<span class="n">build_exe_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;build_exe&#39;</span><span class="p">:</span> <span class="s1">&#39;dist&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;packages&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;asyncio&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;appdirs&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;packaging&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.database&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.export&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.notification&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.port&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.processing&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.prototype&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.schedule&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.server&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.testing&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.totalstation&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;modules.virtual&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;excludes&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;tkinter&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;include_files&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;data&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;extra&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;modules&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schemes&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;sensors&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;silent&#39;</span><span class="p">:</span> <span class="kc">True</span>
+<span class="p">}</span>
+
+<span class="n">base</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s1">&#39;win32&#39;</span><span class="p">:</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;Win32GUI&#39;</span>
+
+<span class="n">executables</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Executable</span><span class="p">(</span><span class="s1">&#39;openadms.py&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">),</span>
+    <span class="n">Executable</span><span class="p">(</span><span class="s1">&#39;openadms-launcher.pyw&#39;</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">base</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="n">setup</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;OpenADMS Node&#39;</span><span class="p">,</span>
+      <span class="n">version</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">OPENADMS_VERSION</span><span class="p">),</span>
+      <span class="n">description</span><span class="o">=</span><span class="s1">&#39;OpenADMS Node&#39;</span><span class="p">,</span>
+      <span class="n">options</span><span class="o">=</span><span class="p">{</span>
+          <span class="s1">&#39;build_exe&#39;</span><span class="p">:</span> <span class="n">build_exe_options</span>
+      <span class="p">},</span>
+      <span class="n">executables</span><span class="o">=</span><span class="n">executables</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Build OpenADMS Node by running:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
+</pre></div>
+</div>
+<p>You can then start the graphical launcher <code class="docutils literal"><span class="pre">openadms-launcher.exe</span></code> in
+directory <code class="docutils literal"><span class="pre">dist/</span></code>.</p>
+</div>
+<div class="section" id="nuitka">
+<h3>Nuitka<a class="headerlink" href="#nuitka" title="Permalink to this headline">¶</a></h3>
+<p>Nuitka is a Python compiler that translates Python code into a C program that
+is linked against <code class="docutils literal"><span class="pre">libpython</span></code> to execute it in the same way as CPython does.
+Before OpenADMS Node can be compiled, install:</p>
+<ul class="simple">
+<li>Python 3.6,</li>
+<li>Python 2.7 (for <a class="reference external" href="http://scons.org/">SCons</a>),</li>
+<li>Microsoft Visual Studio 2017 (and pywin32) or MinGW-w64,</li>
+<li>Nuitka for Python 3.6.</li>
+</ul>
+<p>If you prefer MinGW over Visual Studio, install it to <code class="docutils literal"><span class="pre">C:\MinGW64</span></code> and set the
+environment variable <code class="docutils literal"><span class="pre">CC</span></code> to <code class="docutils literal"><span class="pre">C:\MinGW64\mingw64\bin\gcc.exe</span></code>.</p>
+<p>Build OpenADMS Node with:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">nuitka</span> <span class="o">--</span><span class="n">standalone</span> <span class="o">--</span><span class="n">python</span><span class="o">-</span><span class="n">version</span><span class="o">=</span><span class="mf">3.6</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="nb">all</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="n">plugins</span><span class="o">=</span><span class="n">core</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="n">plugins</span><span class="o">=</span><span class="n">modules</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="ow">not</span><span class="o">-</span><span class="n">to</span><span class="o">=</span><span class="n">modules</span><span class="o">.</span><span class="n">tests</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="ow">not</span><span class="o">-</span><span class="n">to</span><span class="o">=</span><span class="n">modules</span><span class="o">.</span><span class="n">linux</span> <span class="o">--</span><span class="n">recurse</span><span class="o">-</span><span class="ow">not</span><span class="o">-</span><span class="n">to</span><span class="o">=</span><span class="n">modules</span><span class="o">.</span><span class="n">unix</span> <span class="o">--</span><span class="n">show</span><span class="o">-</span><span class="n">progress</span> <span class="o">--</span><span class="n">windows</span><span class="o">-</span><span class="n">disable</span><span class="o">-</span><span class="n">console</span> <span class="o">--</span><span class="n">windows</span><span class="o">-</span><span class="n">icon</span><span class="o">=</span><span class="n">extra</span>\<span class="n">dabamos</span><span class="o">.</span><span class="n">ico</span> <span class="n">openadms</span><span class="o">-</span><span class="n">launcher</span><span class="o">.</span><span class="n">pyw</span>
+</pre></div>
+</div>
+<p>The compilation may take some time.</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="running.html" class="btn btn-neutral float-right" title="Running OpenADMS Node" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral" title="OpenADMS Node 0.7" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,457 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>modules.virtual module &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>modules.virtual module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/docs/source/modules.virtual.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-modules.virtual">
+<span id="modules-virtual-module"></span><h1>modules.virtual module<a class="headerlink" href="#module-modules.virtual" title="Permalink to this headline">¶</a></h1>
+<p>Module for virtual sensors.</p>
+<dl class="class">
+<dt id="modules.virtual.VirtualDTM">
+<em class="property">class </em><code class="descclassname">modules.virtual.</code><code class="descname">VirtualDTM</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.virtual.VirtualDTM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.virtual.VirtualSensor" title="modules.virtual.VirtualSensor"><code class="xref py py-class docutils literal"><span class="pre">modules.virtual.VirtualSensor</span></code></a></p>
+<p>VirtualDTM simulates the STS DTM meteorological sensor.</p>
+<dl class="method">
+<dt id="modules.virtual.VirtualDTM.get_pressure">
+<code class="descname">get_pressure</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualDTM.get_pressure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pressure value between 980 and 1150 hPa.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String with pressure value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualDTM.get_temperature">
+<code class="descname">get_temperature</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualDTM.get_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns temperature value between -20 and 40 °C.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String with temperature value.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualDTM.power_on">
+<code class="descname">power_on</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualDTM.power_on" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates power-on.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualDTM.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualDTM.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates saving of changes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualDTM.set_command_set">
+<code class="descname">set_command_set</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualDTM.set_command_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates change of command set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.virtual.VirtualIndicatorOne">
+<em class="property">class </em><code class="descclassname">modules.virtual.</code><code class="descname">VirtualIndicatorOne</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.virtual.VirtualIndicatorOne" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.virtual.VirtualSensor" title="modules.virtual.VirtualSensor"><code class="xref py py-class docutils literal"><span class="pre">modules.virtual.VirtualSensor</span></code></a></p>
+<p>VirtualIndicatorOne simulates the Sylvac S_Dial One digital
+indicator/extensometer.</p>
+<dl class="method">
+<dt id="modules.virtual.VirtualIndicatorOne.get_distance">
+<code class="descname">get_distance</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualIndicatorOne.get_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns fake distance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – Request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Response string with distance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.virtual.VirtualSensor">
+<em class="property">class </em><code class="descclassname">modules.virtual.</code><code class="descname">VirtualSensor</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.virtual.VirtualSensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>VirtualSensor is a prototype class for virtual sensors.</p>
+<dl class="method">
+<dt id="modules.virtual.VirtualSensor.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.virtual.VirtualSensor.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualSensor.sanitize">
+<code class="descname">sanitize</code><span class="sig-paren">(</span><em>s: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualSensor.sanitize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Escapes some non-printable characters in a given string.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> – The string to sanitize.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The sanitized string.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.virtual.VirtualTotalStationTM30">
+<em class="property">class </em><code class="descclassname">modules.virtual.</code><code class="descname">VirtualTotalStationTM30</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#modules.virtual.VirtualSensor" title="modules.virtual.VirtualSensor"><code class="xref py py-class docutils literal"><span class="pre">modules.virtual.VirtualSensor</span></code></a></p>
+<p>VirtualTotalStationTM30 simulates the Leica TM30 totalstation by processing
+GeoCOM commands.</p>
+<dl class="method">
+<dt id="modules.virtual.VirtualTotalStationTM30.do_complete_measurement">
+<code class="descname">do_complete_measurement</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30.do_complete_measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does a complete measurement of slope distance, horizontal direction,
+and vertical angle to a target. The values are randomly selected within
+boundaries. Just a quick and dirty approach to get fake sensor data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – GeoCOM request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">GeoCOM string with encapsulated sensor data.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualTotalStationTM30.get_sensor_id">
+<code class="descname">get_sensor_id</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30.get_sensor_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sensor id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – GeoCOM request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">GeoCOM string with encapsulated sensor id.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualTotalStationTM30.get_sensor_name">
+<code class="descname">get_sensor_name</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30.get_sensor_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the sensor name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – GeoCOM request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">GeoCOM string with encapsulated sensor name.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualTotalStationTM30.measure_distance">
+<code class="descname">measure_distance</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30.measure_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the return code for distance measurement.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – GeoCOM request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">GeoCOM string with return code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.virtual.VirtualTotalStationTM30.set_direction">
+<code class="descname">set_direction</code><span class="sig-paren">(</span><em>request: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.virtual.VirtualTotalStationTM30.set_direction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the return code for direction setting.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> – GeoCOM request string.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">GeoCOM string with return code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

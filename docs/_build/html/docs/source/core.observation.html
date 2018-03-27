@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>core.observation module &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>core.observation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/docs/source/core.observation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-core.observation">
+<span id="core-observation-module"></span><h1>core.observation module<a class="headerlink" href="#module-core.observation" title="Permalink to this headline">¶</a></h1>
+<p>Structures to store observation data from sensors.</p>
+<dl class="class">
+<dt id="core.observation.Observation">
+<em class="property">class </em><code class="descclassname">core.observation.</code><code class="descname">Observation</code><span class="sig-paren">(</span><em>data=None</em><span class="sig-paren">)</span><a class="headerlink" href="#core.observation.Observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Observation stores all information regarding a request to and a response by
+a sensor in a dictionary. Filled with initial information from the
+configuration file and later supplemented by data of the processing modules.
+Can easily be transformed to JSON format.</p>
+<dl class="staticmethod">
+<dt id="core.observation.Observation.create_response_set">
+<em class="property">static </em><code class="descname">create_response_set</code><span class="sig-paren">(</span><em>type: str</em>, <em>unit: str</em>, <em>value: ResponseType</em><span class="sig-paren">)</span> &#x2192; typing.Dict[str, ResponseType]<a class="headerlink" href="#core.observation.Observation.create_response_set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a response set containing type, unit, and value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>type</strong> – Type of the response (e.g., ‘float’).</li>
+<li><strong>unit</strong> – Unit of the response (e.g., ‘m’).</li>
+<li><strong>value</strong> – The value of the response (e.g., ‘17.53’).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Dictionary with type, unit, and value.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.observation.Observation.data">
+<code class="descname">data</code><a class="headerlink" href="#core.observation.Observation.data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>key: str</em>, <em>default: typing.Any = None</em><span class="sig-paren">)</span> &#x2192; ValueType<a class="headerlink" href="#core.observation.Observation.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value to a given key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> – The key of the value.</li>
+<li><strong>default</strong> – Default return value.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Single value from the observation data.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="core.observation.Observation.get_header">
+<em class="property">static </em><code class="descname">get_header</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; typing.Dict[str, str]<a class="headerlink" href="#core.observation.Observation.get_header" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the header of an observation message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary with header information.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="core.observation.Observation.get_new_id">
+<em class="property">static </em><code class="descname">get_new_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#core.observation.Observation.get_new_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a new observation id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">New UUID4.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.get_response_type">
+<code class="descname">get_response_type</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; typing.Union[str, NoneType]<a class="headerlink" href="#core.observation.Observation.get_response_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the type of a given response set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Type of the response set.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.get_response_unit">
+<code class="descname">get_response_unit</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; typing.Union[str, NoneType]<a class="headerlink" href="#core.observation.Observation.get_response_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit of a given response set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Unit of the response set.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.get_response_value">
+<code class="descname">get_response_value</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; typing.Union[~ResponseType, NoneType]<a class="headerlink" href="#core.observation.Observation.get_response_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of a given response set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Value of the response set.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><em>*args: str</em><span class="sig-paren">)</span> &#x2192; typing.Union[~ResponseType, NoneType]<a class="headerlink" href="#core.observation.Observation.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of a set of keys.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>*args</strong> – The keys.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Single value from the observation data.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.has_response_type">
+<code class="descname">has_response_type</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#core.observation.Observation.has_response_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the type of a given response set exists or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if type exists, else if not.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.has_response_unit">
+<code class="descname">has_response_unit</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#core.observation.Observation.has_response_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the unit of a given response set exists or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if unit exists, else if not.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.has_response_value">
+<code class="descname">has_response_value</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#core.observation.Observation.has_response_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether the value of a given response set exists or not.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – Name of the response set.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">True if value exists, else if not.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>key: str</em>, <em>value: typing.Any</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#core.observation.Observation.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets key and value in the data set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> – The key of the data set value.</li>
+<li><strong>value</strong> – The data set value.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.observation.Observation.to_json">
+<code class="descname">to_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#core.observation.Observation.to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a dump of the data set in JSON format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Data in JSON format.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Running OpenADMS Node &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="index.html"/>
+        <link rel="next" title="Configuration" href="configuration.html"/>
+        <link rel="prev" title="Installation of OpenADMS Node" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Running OpenADMS Node</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#microsoft-windows">Microsoft Windows</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#linux-unix-and-macos">Linux, Unix, and macOS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#additional-parameters">Additional Parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Running OpenADMS Node</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/running.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="running-openadms-node">
+<h1>Running OpenADMS Node<a class="headerlink" href="#running-openadms-node" title="Permalink to this headline">¶</a></h1>
+<p>OpenADMS can either be started from the command-line or by executing the
+graphical launcher <code class="docutils literal"><span class="pre">openadms-launcher.pyw</span></code>. The path to the configuration file
+as well as additional options have to be set by using command-line parameters.</p>
+<div class="section" id="microsoft-windows">
+<h2>Microsoft Windows<a class="headerlink" href="#microsoft-windows" title="Permalink to this headline">¶</a></h2>
+<p>The easiest way to run OpenADMS on Microsoft Windows is to use the graphical
+launcher <code class="docutils literal"><span class="pre">openadms-launcher.pyw</span></code> (see <a class="reference internal" href="#openadms-launcher-screenshot"><span class="std std-numref">Fig. 2</span></a>).
+Please make sure that all dependencies are installed (execute <code class="docutils literal"><span class="pre">install.bat</span></code>
+with administrator privileges).</p>
+<div class="figure align-center" id="id1">
+<span id="openadms-launcher-screenshot"></span><a class="reference internal image-reference" href="_images/openadms_graphical_launcher.png"><img alt="Graphical launcher for OpenADMS" src="_images/openadms_graphical_launcher.png" style="width: 552.8000000000001px; height: 496.0px;" /></a>
+<p class="caption"><span class="caption-number">Fig. 2 </span><span class="caption-text">Graphical launcher for OpenADMS</span></p>
+</div>
+<p>Run <code class="docutils literal"><span class="pre">cmd.exe</span></code> or <code class="docutils literal"><span class="pre">PowerShell.exe</span></code> to start OpenADMS from command-line:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">openadms</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">config</span> <span class="n">config</span>\<span class="n">myconfig</span><span class="o">.</span><span class="n">json</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">mqtt</span><span class="o">-</span><span class="n">broker</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linux-unix-and-macos">
+<h2>Linux, Unix, and macOS<a class="headerlink" href="#linux-unix-and-macos" title="Permalink to this headline">¶</a></h2>
+<p>OpenADMS can be started with an installed Python 3.6 interpreter
+(<a class="reference internal" href="#openadms-freebsd"><span class="std std-numref">Fig. 3</span></a>):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python openadms.py --config config/myconfig.json --with-mqtt-broker
+</pre></div>
+</div>
+<p>Depending on the used operating system, the name of the Python binary may be
+<code class="docutils literal"><span class="pre">python36</span></code> or <code class="docutils literal"><span class="pre">python3.6</span></code>. On Unix-like operating systems, <code class="docutils literal"><span class="pre">openadms.py</span></code>
+can be executed directly once the proper permissions are set:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ chmod ug+x openadms.py
+$ ./openadms.py --config config/my_config.json --with-mqtt-broker
+</pre></div>
+</div>
+<div class="figure align-center" id="id2">
+<span id="openadms-freebsd"></span><img alt="Running OpenADMS on FreeBSD" src="_images/openadms_urxvt.png" />
+<p class="caption"><span class="caption-number">Fig. 3 </span><span class="caption-text">Running OpenADMS on FreeBSD</span></p>
+</div>
+</div>
+<div class="section" id="additional-parameters">
+<h2>Additional Parameters<a class="headerlink" href="#additional-parameters" title="Permalink to this headline">¶</a></h2>
+<p>OpenADMS Node can be started with parameters, for instance:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python3 openadms.py -c config/my_config.json -m -d
+</pre></div>
+</div>
+<p>The following parameters will be accepted:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="13%" />
+<col width="29%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Short form</th>
+<th class="head">Default value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--config</span></code></td>
+<td><code class="docutils literal"><span class="pre">-c</span></code></td>
+<td><code class="docutils literal"><span class="pre">config/config.json</span></code></td>
+<td>Path to the configuration
+file.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--debug</span></code></td>
+<td><code class="docutils literal"><span class="pre">-d</span></code></td>
+<td>off</td>
+<td>Print debug messages.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--verbosity</span></code></td>
+<td><code class="docutils literal"><span class="pre">-v</span></code></td>
+<td><code class="docutils literal"><span class="pre">6</span></code> (info)</td>
+<td>Log more diagnostic
+messages (level 1 to 9).</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--log-file</span></code></td>
+<td><code class="docutils literal"><span class="pre">-l</span></code></td>
+<td><code class="docutils literal"><span class="pre">openadms.log</span></code></td>
+<td>Path and name of the log
+file.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--with-mqtt-broker</span></code></td>
+<td><code class="docutils literal"><span class="pre">-m</span></code></td>
+<td>off</td>
+<td>Start internal MQTT
+message broker.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--bind</span></code></td>
+<td><code class="docutils literal"><span class="pre">-b</span></code></td>
+<td><code class="docutils literal"><span class="pre">127.0.0.1</span></code></td>
+<td>IP address or FQDN of
+internal MQTT message
+broker.</td>
+</tr>
+<tr class="row-even"><td><code class="docutils literal"><span class="pre">--port</span></code></td>
+<td><code class="docutils literal"><span class="pre">-p</span></code></td>
+<td><code class="docutils literal"><span class="pre">1883</span></code></td>
+<td>Port of internal MQTT
+message broker.</td>
+</tr>
+<tr class="row-odd"><td><code class="docutils literal"><span class="pre">--quiet</span></code></td>
+<td><code class="docutils literal"><span class="pre">-q</span></code></td>
+<td>off</td>
+<td>Disable logging.</td>
+</tr>
+</tbody>
+</table>
+<p>Available verbosity levels for the <code class="docutils literal"><span class="pre">--verbosity</span></code> parameter:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="41%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Level</th>
+<th class="head">Name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>1</td>
+<td>critical</td>
+</tr>
+<tr class="row-odd"><td>2</td>
+<td>error</td>
+</tr>
+<tr class="row-even"><td>3</td>
+<td>success</td>
+</tr>
+<tr class="row-odd"><td>4</td>
+<td>warning</td>
+</tr>
+<tr class="row-even"><td>5</td>
+<td>notice</td>
+</tr>
+<tr class="row-odd"><td>6</td>
+<td>info</td>
+</tr>
+<tr class="row-even"><td>7</td>
+<td>verbose</td>
+</tr>
+<tr class="row-odd"><td>8</td>
+<td>debug</td>
+</tr>
+<tr class="row-even"><td>9</td>
+<td>spam</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="configuration.html" class="btn btn-neutral float-right" title="Configuration" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Installation of OpenADMS Node" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

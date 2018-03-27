@@ -114,3 +114,4 @@ Available verbosity levels for the ``--verbosity`` parameter:
 +-------+----------+
 | 9     | spam     |
 +-------+----------+
+

@@ -1,0 +1,518 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>modules.totalstation module &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>modules.totalstation module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/docs/source/modules.totalstation.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-modules.totalstation">
+<span id="modules-totalstation-module"></span><h1>modules.totalstation module<a class="headerlink" href="#module-modules.totalstation" title="Permalink to this headline">¶</a></h1>
+<p>Module for the processing of observations of total station positioning
+systems (pre-processing, atmospheric corrections, transformations).</p>
+<dl class="class">
+<dt id="modules.totalstation.DistanceCorrector">
+<em class="property">class </em><code class="descclassname">modules.totalstation.</code><code class="descname">DistanceCorrector</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.totalstation.DistanceCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>Corrects the slope distance of EDM measurements using atmospheric data.</p>
+<p>The JSON-based configuration for this module:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>atmosphericCorrectionEnabled</strong> (<em>bool</em>) – Enables atmospheric correction.</li>
+<li><strong>seaLevelCorrectionEnabled</strong> (<em>bool</em>) – Enables correction to sea level.</li>
+<li><strong>distanceName</strong> (<em>str</em>) – Name of the response set.</li>
+<li><strong>temperature</strong> (<em>float</em>) – Default temperature (in °C).</li>
+<li><strong>pressure</strong> (<em>float</em>) – Default pressure (in hPa/mbar).</li>
+<li><strong>humidity</strong> (<em>float</em>) – Default humidity (0.0 … 1.0).</li>
+<li><strong>sensorHeight</strong> (<em>float</em>) – Height of sensor.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="modules.totalstation.DistanceCorrector.get_atmospheric_correction">
+<code class="descname">get_atmospheric_correction</code><span class="sig-paren">(</span><em>temperature: float</em>, <em>pressure: float</em>, <em>humidity: float</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#modules.totalstation.DistanceCorrector.get_atmospheric_correction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the atmospheric correction value in parts per million
+(ppm) for the reduction of distances gained by electronic distance
+measurement (EDM).</p>
+<p>The formulas are taken from the official manual of the Leica TM30
+robotic total station. They should be valid for all modern total
+stations of Leica Geosystems. For further information, please see
+Leica TM30 manual on page 76.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.DistanceCorrector.get_sea_level_correction">
+<code class="descname">get_sea_level_correction</code><span class="sig-paren">(</span><em>sensor_height: float</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#modules.totalstation.DistanceCorrector.get_sea_level_correction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.totalstation.DistanceCorrector.humidity">
+<code class="descname">humidity</code><a class="headerlink" href="#modules.totalstation.DistanceCorrector.humidity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.totalstation.DistanceCorrector.last_update">
+<code class="descname">last_update</code><a class="headerlink" href="#modules.totalstation.DistanceCorrector.last_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.totalstation.DistanceCorrector.pressure">
+<code class="descname">pressure</code><a class="headerlink" href="#modules.totalstation.DistanceCorrector.pressure" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.DistanceCorrector.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.totalstation.DistanceCorrector.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.totalstation.DistanceCorrector.sensor_height">
+<code class="descname">sensor_height</code><a class="headerlink" href="#modules.totalstation.DistanceCorrector.sensor_height" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="modules.totalstation.DistanceCorrector.temperature">
+<code class="descname">temperature</code><a class="headerlink" href="#modules.totalstation.DistanceCorrector.temperature" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.totalstation.HelmertTransformer">
+<em class="property">class </em><code class="descclassname">modules.totalstation.</code><code class="descname">HelmertTransformer</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.totalstation.HelmertTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>HelmertTransformer calculates the 3-dimensional coordinates of a view point
+using the Helmert transformation.</p>
+<p>The JSON-based configuration for this module:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>residualMismatchTransformationEnabled</strong> (<em>bool</em>) – If True, prorate
+residual mismatches.</li>
+<li><strong>fixedPoints</strong> (<em>Dict</em><em>[</em><em>Dict</em><em>]</em>) – Coordinates of fixed points.</li>
+<li><strong>viewPoint</strong> (<em>Dict</em>) – Target name and receivers of view point.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="modules.totalstation.HelmertTransformer.calculate_point_coordinates">
+<code class="descname">calculate_point_coordinates</code><span class="sig-paren">(</span><em>hz: float</em>, <em>v: float</em>, <em>dist: float</em>, <em>view_point_x: float</em>, <em>view_point_y: float</em>, <em>view_point_z: float</em>, <em>a: float</em>, <em>o: float</em><span class="sig-paren">)</span> &#x2192; typing.Tuple[[float, float], float]<a class="headerlink" href="#modules.totalstation.HelmertTransformer.calculate_point_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates Cartesian coordinates out of polar coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>hz</strong> – Horizontal direction.</li>
+<li><strong>v</strong> – Vertical angle.</li>
+<li><strong>dist</strong> – Horizontal distance.</li>
+<li><strong>view_point_x</strong> – X coordinate of the view point.</li>
+<li><strong>view_point_y</strong> – Y coordinate of the view point.</li>
+<li><strong>view_point_z</strong> – Z coordinate of the view point.</li>
+<li><strong>a</strong> – Transformation parameter a.</li>
+<li><strong>o</strong> – Transformation parameter o.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">X, Y, and Z coordinates.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.HelmertTransformer.get_cartesian_coordinates">
+<code class="descname">get_cartesian_coordinates</code><span class="sig-paren">(</span><em>hz: float</em>, <em>v: float</em>, <em>slope_dist: float</em><span class="sig-paren">)</span> &#x2192; typing.Tuple[[float, float], float]<a class="headerlink" href="#modules.totalstation.HelmertTransformer.get_cartesian_coordinates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.HelmertTransformer.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.totalstation.HelmertTransformer.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the coordinates of the view point and further target
+points by using the Helmert transformation. The given observation can
+either be of a fixed point or of a target point.</p>
+<p>Measured polar coordinates of the fixed points are used to determine the
+Cartesian coordinates of the view point and the given target points.</p>
+<p>An <cite>Observation</cite> object will be created for the view point and send
+to the receivers defined in the configuration.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.totalstation.PolarTransformer">
+<em class="property">class </em><code class="descclassname">modules.totalstation.</code><code class="descname">PolarTransformer</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.totalstation.PolarTransformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>PolarTransformer calculates 3-dimensional coordinates of a target using the
+sensor position and the azimuth position from the configuration together
+with the horizontal direction, the vertical angle, and the distance of a
+total station observation. The result (Y, X, Z) is added to the observation
+data set.</p>
+<p>It is possible to use multiple fixed points in order to improve the
+accuracy of the horizontal directions (‘Abriss’ in German).</p>
+<p>The JSON-based configuration for this module:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>adjustmentEnabled</strong> (<em>bool</em>) – If True, improve horizontal directions.</li>
+<li><strong>azimuthAngle</strong> (<em>float</em>) – Between local azimuth and global azimuth (in gon).</li>
+<li><strong>azimuthPointName</strong> (<em>str</em>) – Name of azimuth.</li>
+<li><strong>fixedPoints</strong> (<em>Dict</em><em>[</em><em>Dict</em><em>]</em>) – Coordinates of fixed points (X, Y, Z).</li>
+<li><strong>viewPoint</strong> (<em>Dict</em>) – Coordinates of view point (X, Y, Z).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="modules.totalstation.PolarTransformer.get_azimuth_angle">
+<code class="descname">get_azimuth_angle</code><span class="sig-paren">(</span><em>view_point_azimuth: float</em>, <em>view_point_x: float</em>, <em>view_point_y: float</em>, <em>target_point_x: float</em>, <em>target_point_y: float</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#modules.totalstation.PolarTransformer.get_azimuth_angle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the azimuth angle to a target point by using the
+direction and the distance measured from a given view point.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>view_point_azimuth</strong> – Global azimuth.</li>
+<li><strong>view_point_x</strong> – X coordinate of view point.</li>
+<li><strong>view_point_y</strong> – Y coordinate of view point.</li>
+<li><strong>target_point_x</strong> – X coordinate of target point.</li>
+<li><strong>target_point_y</strong> – Y coordinate of target point.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The azimuth angle to target point.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.PolarTransformer.gon_to_rad">
+<code class="descname">gon_to_rad</code><span class="sig-paren">(</span><em>a: float</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#modules.totalstation.PolarTransformer.gon_to_rad" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts from gon (grad) to radiant.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> – Angle in gon.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Converted angle in rad.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.PolarTransformer.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.totalstation.PolarTransformer.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.PolarTransformer.rad_to_gon">
+<code class="descname">rad_to_gon</code><span class="sig-paren">(</span><em>a: float</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#modules.totalstation.PolarTransformer.rad_to_gon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts from radiant to gon (grad).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>a</strong> – Angle in rad.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Converted angle in gon.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.totalstation.PolarTransformer.transform">
+<code class="descname">transform</code><span class="sig-paren">(</span><em>view_point_x: float</em>, <em>view_point_y: float</em>, <em>view_point_z: float</em>, <em>target_point_x: float</em>, <em>target_point_y: float</em>, <em>hz: float</em>, <em>v: float</em>, <em>dist: float</em><span class="sig-paren">)</span> &#x2192; typing.Tuple[[float, float], float]<a class="headerlink" href="#modules.totalstation.PolarTransformer.transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates coordinates (x, y, z) out of horizontal direction,
+vertical angle, and slope distance to a target point using a
+3-dimensional polar transformation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>view_point_x</strong> – X coordinate of view point.</li>
+<li><strong>view_point_y</strong> – Y coordinate of view point.</li>
+<li><strong>view_point_z</strong> – Z coordinate of view point.</li>
+<li><strong>target_point_x</strong> – X coordinate of target point.</li>
+<li><strong>target_point_y</strong> – Y coordinate of target point.</li>
+<li><strong>hz</strong> – Horizontal direction between view point and target point.</li>
+<li><strong>v</strong> – Vertical angle between view point and target point.</li>
+<li><strong>dist</strong> – Horizontal direction between view point and target point.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">X, Y, and Z coordinates of transformed target.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.totalstation.RefractionCorrector">
+<em class="property">class </em><code class="descclassname">modules.totalstation.</code><code class="descname">RefractionCorrector</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.totalstation.RefractionCorrector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>RefractionCorrector removes the influence of the refraction from a measured
+distance and corrects the Z value of an observed target.</p>
+<p>The module has nothing to configure.</p>
+<dl class="method">
+<dt id="modules.totalstation.RefractionCorrector.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.totalstation.RefractionCorrector.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.totalstation.SerialMeasurementProcessor">
+<em class="property">class </em><code class="descclassname">modules.totalstation.</code><code class="descname">SerialMeasurementProcessor</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.totalstation.SerialMeasurementProcessor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>SerialMeasurementProcessor calculates serial measurements by using
+observations of one target in two faces. The two faces, consisting of
+horizontal directions, vertical angles, and slope distances, are
+averaged and stored in a new response set.</p>
+<p>The module has nothing to configure.</p>
+<dl class="method">
+<dt id="modules.totalstation.SerialMeasurementProcessor.process_observation">
+<code class="descname">process_observation</code><span class="sig-paren">(</span><em>obs: core.observation.Observation</em><span class="sig-paren">)</span> &#x2192; core.observation.Observation<a class="headerlink" href="#modules.totalstation.SerialMeasurementProcessor.process_observation" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

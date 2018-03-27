@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>modules.server module &mdash; OpenADMS Node 0.7 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="OpenADMS Node 0.7 documentation" href="../../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> OpenADMS Node
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../running.html">Running OpenADMS Node</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../system.html">System Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../openadms-node-modules.html">OpenADMS Node Modules</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">OpenADMS Node</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>modules.server module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/docs/source/modules.server.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-modules.server">
+<span id="modules-server-module"></span><h1>modules.server module<a class="headerlink" href="#module-modules.server" title="Permalink to this headline">¶</a></h1>
+<p>Module for network services.</p>
+<dl class="class">
+<dt id="modules.server.LocalControlServer">
+<em class="property">class </em><code class="descclassname">modules.server.</code><code class="descname">LocalControlServer</code><span class="sig-paren">(</span><em>module_name: str</em>, <em>module_type: str</em>, <em>manager: core.manager.Manager</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.server.LocalControlServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="modules.prototype.html#modules.prototype.Prototype" title="modules.prototype.Prototype"><code class="xref py py-class docutils literal"><span class="pre">modules.prototype.Prototype</span></code></a></p>
+<p>LocalControlServer creates a web service for the remote control of
+OpenADMS. The server shows HTML page with system information and log
+messages. The user can start and stop modules defined in the OpenADMS Node
+configuration. It is recommended to run a reverse proxy in front of the
+LocalControlServer.</p>
+<p>The JSON-based configuration for this module:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>host</strong> (<em>str</em>) – FQDN or IP address of the server.</li>
+<li><strong>port</strong> (<em>int</em>) – Port number.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="modules.server.LocalControlServer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.LocalControlServer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs HTTPServer within a thread to avoid blocking.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.LocalControlServer.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.LocalControlServer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the server.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.LocalControlServer.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.LocalControlServer.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the server.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="modules.server.RequestHandler">
+<em class="property">class </em><code class="descclassname">modules.server.</code><code class="descname">RequestHandler</code><span class="sig-paren">(</span><em>manager: core.manager.Manager</em>, <em>log_handler: core.logging.RingBufferLogHandler</em>, <em>*args</em><span class="sig-paren">)</span><a class="headerlink" href="#modules.server.RequestHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">http.server.BaseHTTPRequestHandler</span></code></p>
+<p>Custom HTTP request handler.</p>
+<dl class="method">
+<dt id="modules.server.RequestHandler.do_GET">
+<code class="descname">do_GET</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.RequestHandler.do_GET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates the response to a GET request.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.do_HEAD">
+<code class="descname">do_HEAD</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.RequestHandler.do_HEAD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates HTTP header.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.do_action_query">
+<code class="descname">do_action_query</code><span class="sig-paren">(</span><em>query: typing.Dict</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.RequestHandler.do_action_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Processes action query.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>query</strong> – GET query to process.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_404">
+<code class="descname">get_404</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.get_404" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a “file not found” page (error 404).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">String with HTML page.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_complete_path">
+<code class="descname">get_complete_path</code><span class="sig-paren">(</span><em>path: str</em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="headerlink" href="#modules.server.RequestHandler.get_complete_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_file_contents">
+<code class="descname">get_file_contents</code><span class="sig-paren">(</span><em>path: pathlib.Path</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.get_file_contents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Opens a file and returns the contents.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> – File path.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String with file contents.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_index">
+<code class="descname">get_index</code><span class="sig-paren">(</span><em>template: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.get_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the index page of this module in HTML format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>template</strong> – The template.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">String with the parsed index page.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_modules_table">
+<code class="descname">get_modules_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.get_modules_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns table rows with all modules of the current configuration in
+HTML format. Rather quick and dirty with hard-coded template, but does
+the job.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">String with modules as HTML table rows.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.get_sensors_table">
+<code class="descname">get_sensors_table</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.get_sensors_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns table rows with all sensors of the current configuration in
+HTML format. Rather quick and dirty with hard-coded template, but does
+the job.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">String with sensors as HTML table rows.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.log_message">
+<code class="descname">log_message</code><span class="sig-paren">(</span><em>format: str</em>, <em>*args</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.RequestHandler.log_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prevents HTTP request handler from adding log messages to the root
+logger.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>template: str</em>, <em>**kwargs</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#modules.server.RequestHandler.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Substitutes placeholders in the template with variables from the
+given arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>template</strong> – The (HTML) template.</li>
+<li><strong>kwargs</strong> – The key-value pairs.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">String with parsed template.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="modules.server.RequestHandler.respond">
+<code class="descname">respond</code><span class="sig-paren">(</span><em>opts: typing.Dict[str, str]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#modules.server.RequestHandler.respond" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responds to an HTTP request.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>opts</strong> – Status code, mime type, return data.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hochschule Neubrandenburg – University of Applied Sciences.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.7',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
