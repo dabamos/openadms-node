@@ -477,7 +477,7 @@ Build OpenADMS Node with:
 
 ::
 
-    > nuitka --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.linux --recurse-not-to=modules.unix --show-progress --windows-disable-console --windows-icon=extra\dabamos.ico openadms-launcher.pyw
+    > nuitka --standalone --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.linux --recurse-not-to=modules.unix --show-progress --windows-disable-console --windows-icon=extra\dabamos.ico openadms-launcher.pyw
 
 The compilation may take some time.
 

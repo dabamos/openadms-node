@@ -29,8 +29,8 @@ class Prototype(object):
         """
         self.logger = logging.getLogger(module_name)
 
-        self._name = module_name  # Module name, e.g., 'com5'.
-        self._type = module_type  # Module type, e.g., 'modules.port.SerialPort'.
+        self._name = module_name  # Name, e.g., 'com5'.
+        self._type = module_type  # Type, e.g., 'modules.port.SerialPort'.
 
         self._config_manager = manager.config_manager
         self._module_manager = manager.module_manager

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3.6
 
-"""OpenADMS Node with Graphical Launcher
+"""OpenADMS Node Graphical Launcher
 
 This Python script starts OpenADMS Node by using a graphical launcher. You have
 to install the Python modules `wxPython` and `Gooey` with pip at first::
 
     $ python -m pip install gooey
 
-For more information, please see https://www.dabamos.de/.
+For more information, please visit https://www.dabamos.de/.
 """
 
 __author__ = 'Philipp Engel'
@@ -100,5 +100,6 @@ def mainw() -> None:
 if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
-    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGINT, sighup_handler)
     mainw()

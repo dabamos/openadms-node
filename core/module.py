@@ -34,6 +34,7 @@ class Module(threading.Thread):
 
         self.logger = logging.getLogger(worker.name)
         self.daemon = True
+        self._is_running = True
 
         self._messenger = messenger                 # MQTT messenger.
         self._worker = worker                       # Worker instance.
@@ -77,16 +78,22 @@ class Module(threading.Thread):
                                     self._messenger.port))
         self._messenger.connect()
 
-        while True:
+        while self._is_running:
             message = self._inbox.get()   # Blocking I/O.
             self._worker.handle(message)  # Fire and forget.
 
         self._messenger.disconnect()
 
     def start_worker(self) -> None:
+        """Starts the worker."""
         self._worker.start()
 
+    def stop(self) -> None:
+        """Stops the thread."""
+        self._is_running = False
+
     def stop_worker(self) -> None:
+        """Stops the worker."""
         self._worker.stop()
 
     @property

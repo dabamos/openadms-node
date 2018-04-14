@@ -100,6 +100,12 @@ class ConfigManager(object):
         self._path = path   # Path to the configuration file.
         self._config = {}   # The actual configuration.
 
+        self.load_all()
+
+    def load_all(self):
+        """Loads the configuration."""
+        self._config = {}
+
         if self._path:
             self.load_config_from_file(self._path)
         else:
@@ -175,6 +181,10 @@ class ConfigManager(object):
 
         return config
 
+    def remove_all(self) -> None:
+        """Clears everything."""
+        self._config = {}
+
     @property
     def config(self) -> Dict[str, Any]:
         return self._config
@@ -203,30 +213,18 @@ class ModuleManager(object):
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
 
-        self._schema_manager.add_schema('modules', 'core/modules.json')
-        config = self._config_manager.get_valid_config('modules',
-                                                       'core',
-                                                       'modules')
-
-        # Start-time of the monitoring software.
-        self._start_time = arrow.now()
+        self._start_time = None
         self._modules = {}
 
-        for module_name, class_path in config.items():
-            try:
-                self.add(module_name, class_path)
-            except Exception as e:
-                self.logger.error('Module "{}" not loaded{}'
-                                  .format(module_name, ': ' + str(e)))
-                continue
+        self.load_all()
 
-    def add(self, module_name: str, class_path: str):
+    def add(self, name: str, class_path: str):
         """Instantiates a worker, instantiates a messenger, and bundles both
         to a module. The module will be added to the modules dictionary.
 
         Args:
-            module_name: Name of the module.
-            class_path: Path to the Python class.
+            name: The name of the module.
+            class_path: The path to the Python class.
 
         Returns:
             True if module has been added, False if not.
@@ -237,17 +235,11 @@ class ModuleManager(object):
         if not self.module_exists(class_path):
             raise ValueError('Module "{}" not found'.format(class_path))
 
-        messenger = MQTTMessenger(self._manager, module_name)
-        worker = self.get_worker(module_name, class_path)
-        self._modules[module_name] = Module(messenger, worker)
+        messenger = MQTTMessenger(self._manager, name)
+        worker = self.get_worker(name, class_path)
 
-    def delete(self, name: str) -> None:
-        """Removes a module from the modules dictionary.
-
-        Args:
-            name: The name of the module.
-        """
-        self._modules[name] = None
+        self._modules[name] = Module(messenger, worker)
+        self.logger.debug('Loaded module "{}"'.format(name))
 
     def get(self, name: str) -> Module:
         """Returns a specific module.
@@ -313,6 +305,39 @@ class ModuleManager(object):
         else:
             return False
 
+    def kill(self, name: str) -> None:
+        """Kills a module (stops worker and messenger).
+
+        Args:
+            name: The name of the module.
+        """
+        self._modules.get(name).stop_worker()
+        self._modules.get(name).stop()
+
+    def kill_all(self) -> None:
+        """Kills all modules (stops all workers and messengers)."""
+        for module_name in self._modules.keys():
+            self.kill(module_name)
+
+    def load_all(self) -> None:
+        """Loads all modules."""
+        self._modules = {}
+        self._schema_manager.add_schema('modules', 'core/modules.json')
+        config = self._config_manager.get_valid_config('modules',
+                                                       'core',
+                                                       'modules')
+
+        for module_name, class_path in config.items():
+            try:
+                self.add(module_name, class_path)
+            except Exception as e:
+                self.logger.error('Module "{}" not loaded{}'
+                                  .format(module_name, ': ' + str(e)))
+                continue
+
+        # Start-time of the monitoring software.
+        self._start_time = arrow.now()
+
     def module_exists(self, class_path: str) -> bool:
         """Returns whether or not a OpenADMS Node module exists at the given
         class path.
@@ -331,27 +356,52 @@ class ModuleManager(object):
 
         return True
 
-    def start(self, module_name: str) -> None:
+    def remove(self, name: str) -> None:
+        """Removes a module.
+
+        Args:
+            name: The name of the module.
+        """
+        self._modules[name].stop_worker()
+        self._modules[name].stop()
+
+        self.logger.info('Removing module "{}" ...'.format(name))
+        self._modules[name] = None
+
+    def remove_all(self) -> None:
+        """Removes all modules."""
+        for module_name in self._modules.keys():
+            self.remove(module_name)
+
+        self._modules = {}
+
+    def start(self, name: str) -> None:
         """Starts a module.
 
         Args:
-            module_name: The name of the module.
+            name: The name of the module.
         """
-        self._modules.get(module_name).start()
-        self._modules.get(module_name).start_worker()
+        self.logger.debug('Starting module "{}" ...'.format(name))
+        self._modules.get(name).start()
+        self._modules.get(name).start_worker()
 
     def start_all(self) -> None:
         """Starts all modules."""
-        for module_name in self._modules.keys():
-            self.start(module_name)
+        for name in self._modules.keys():
+            self.start(name)
 
-    def stop(self, module_name: str) -> None:
+    def stop(self, name: str) -> None:
         """Stops a module.
 
         Args:
-            module_name: The name of the module.
+            name: The name of the module.
         """
-        self._modules.get(module_name).stop_worker()
+        self._modules.get(name).stop_worker()
+
+    def stop_all(self) -> None:
+        """Stops all modules."""
+        for module_name in self._modules.keys():
+            self.stop(module_name)
 
     @property
     def modules(self) -> Dict[str, Module]:
@@ -366,7 +416,7 @@ class Node(object):
     def __init__(self, name: str, id: str, description: str):
         self._name = name
         self._description = description
-        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+        self._id = re.sub('[^a-zA-Z0-9_-]', '', id)
 
     @property
     def description(self) -> str:
@@ -387,7 +437,7 @@ class Node(object):
     @id.setter
     def id(self, id: str) -> None:
         # Remove non-word characters from node id.
-        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+        self._id = re.sub('[^a-zA-Z0-9_-]', '', id)
 
     @name.setter
     def name(self, name: str) -> None:
@@ -408,6 +458,13 @@ class NodeManager(object):
         self._manager = manager
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
+        self._node = None
+
+        self.load_all()
+
+    def load_all(self) -> None:
+        """Loads node configuration."""
+        self._node = None
 
         # Configuration of the node.
         self._schema_manager.add_schema('node', 'core/node.json')
@@ -417,6 +474,11 @@ class NodeManager(object):
         self._node = Node(config.get('name'),
                           config.get('id'),
                           config.get('description'))
+
+    def remove_all(self) -> None:
+        """Clears everything."""
+        self.logger.info('Removing node "{}" ...'.format(self._node.name))
+        self._node = None
 
     @property
     def node(self) -> Node:
@@ -431,7 +493,7 @@ class Project(object):
     def __init__(self, name: str, id: str, description: str):
         self._name = name
         self._description = description
-        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+        self._id = re.sub('[^a-zA-Z0-9_-]', '', id)
 
     @property
     def description(self) -> str:
@@ -452,7 +514,7 @@ class Project(object):
     @id.setter
     def id(self, id: str) -> None:
         # Remove non-word characters from project id.
-        self._id = re.sub('[^a-zA-Z0-9]', '', id)
+        self._id = re.sub('[^a-zA-Z0-9_-]', '', id)
 
     @name.setter
     def name(self, name: str) -> None:
@@ -473,17 +535,27 @@ class ProjectManager(object):
         self._manager = manager
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
+        self._project = None
 
+        self.load_all()
+
+    def load_all(self) -> None:
+        """Loads the project configuration."""
         # Configuration of the project.
+        self._project = None
         self._schema_manager.add_schema('project', 'core/project.json')
         config = self._config_manager.get_valid_config('project',
                                                        'core',
                                                        'project')
-
         # Project information.
         self._project = Project(config.get('name'),
                                 config.get('id'),
                                 config.get('description'))
+
+    def remove_all(self) -> None:
+        """Clears everything."""
+        self.logger.info('Removing project "{}" ...'.format(self._project.name))
+        self._project = None
 
     @property
     def project(self) -> Project:
@@ -495,12 +567,12 @@ class SchemaManager(object):
     SchemaManager stores JSON schemes and validates given data with them.
     """
 
-    def __init__(self, schema_root_path: str = 'schemes'):
+    def __init__(self, schemes_root_path: str = 'schemes'):
         self.logger = logging.getLogger('schemaManager')
-        self._schema = {}
-        self._schema_root_path = schema_root_path
+        self._schemes = {}
+        self._schemes_root_path = schemes_root_path
 
-        self.add_schema('observation', 'observation.json')
+        self.load_all()
 
     def add_schema(self,
                    data_type: str,
@@ -515,10 +587,10 @@ class SchemaManager(object):
         Returns:
             True if schemes has been added, False if not.
         """
-        if self._schema.get(data_type):
+        if self._schemes.get(data_type):
             return False
 
-        schema_path = Path(self._schema_root_path, path)
+        schema_path = Path(self._schemes_root_path, path)
 
         if not schema_path.exists():
             self.logger.error('Schema file "{}" not found.'
@@ -530,7 +602,7 @@ class SchemaManager(object):
                 schema = json.loads(data_file.read())
                 jsonschema.Draft4Validator.check_schema(schema)
 
-                self._schema[data_type] = schema
+                self._schemes[data_type] = schema
                 self.logger.debug('Loaded schema "{}"'
                                   .format(data_type))
             except json.JSONDecodeError:
@@ -568,7 +640,7 @@ class SchemaManager(object):
         Returns:
             True if schemes exists, False if not.
         """
-        if self._schema.get(name):
+        if self._schemes.get(name):
             return True
         else:
             return False
@@ -589,12 +661,33 @@ class SchemaManager(object):
             return False
 
         try:
-            schema = self._schema.get(schema_name)
+            schema = self._schemes.get(schema_name)
             jsonschema.validate(data, schema)
         except jsonschema.ValidationError:
             return False
 
         return True
+
+    def load_all(self) -> None:
+        """Initialises the schemes dictionary."""
+        self._schemes = {}
+        self.add_schema('observation', 'observation.json')
+
+    def remove(self, name: str) -> None:
+        """Removes a schema.
+
+        Args:
+            name: The name of the schema.
+        """
+        self.logger.info('Removing schema "{}" ...'.format(name))
+        self._schemes[name] = None
+
+    def remove_all(self) -> None:
+        """Removes all schemes."""
+        for schema_name in self._schemes.keys():
+            self.remove(schema_name)
+
+        self._schemes = {}
 
 
 class SensorManager(object):
@@ -611,10 +704,12 @@ class SensorManager(object):
         self._sensors_config = config_manager.get('sensors')
         self._sensors = {}
 
-        self.load_sensors()
+        self.load_all()
 
-    def load_sensors(self) -> None:
+    def load_all(self) -> None:
         """Creates the sensors defined in the configuration."""
+        self._sensors = {}
+
         if not self._sensors_config:
             self.logger.info('No sensors defined')
             return
@@ -633,9 +728,17 @@ class SensorManager(object):
         """
         self._sensors[name] = sensor
 
-    def delete(self, name: str) -> None:
+    def remove(self, name: str) -> None:
         """Removes a sensor from the sensors dictionary."""
+        self.logger.info('Removing sensor "{}" ...'.format(name))
         self._sensors[name] = None
+
+    def remove_all(self) -> None:
+        """Removes all sensors."""
+        for sensor_name in self._sensors.keys():
+            self.remove(sensor_name)
+
+        self._sensors = {}
 
     def get(self, name: str) -> Sensor:
         """Returns the sensor object with the given name."""

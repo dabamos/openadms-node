@@ -13,6 +13,9 @@ try:
 except ImportError:
     logging.getLogger().critical('Importing Python module "couchdb" failed')
 
+from tinydb import TinyDB
+from tinydb.storages import MemoryStorage
+
 from core.manager import Manager
 from core.observation import Observation
 from modules.prototype import Prototype

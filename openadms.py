@@ -51,6 +51,9 @@ from core.system import System
 # Get root logger.
 root = logging.getLogger()
 
+# Global Monitor.
+monitor = None
+
 LOG_FILE_BACKUP_COUNT = 1     # 1 log file only.
 LOG_FILE_MAX_SIZE = 10485760  # 10 MiB.
 
@@ -61,6 +64,7 @@ def main(config_file_path: str) -> None:
     Args:
         config_file_path: The path to the configuration file.
     """
+    global monitor
     v = 'v.{}'.format(System.get_openadms_version())
 
     logger = logging.getLogger('openadms')
@@ -116,8 +120,22 @@ def exception_hook(type: BaseException,
                   .format(' '.join(fmt_exception.split())))
 
 
-def signal_handler(signalnum: int, frame: Any) -> None:
+def sighup_handler(signalnum: int, frame: Any) -> None:
+    global monitor
+    root.info('Caught SIGHUP')
+
+    if monitor:
+        monitor.restart()
+
+def sigint_handler(signalnum: int, frame: Any) -> None:
     """Outputs a message before quitting the application."""
+    global monitor
+    root.info('Caught SIGINT')
+
+    if monitor:
+        monitor.kill()
+        time.sleep(3.0)
+
     root.info('Exiting ...')
     sys.exit(0)
 
@@ -198,7 +216,7 @@ def setup_logging(is_quiet: bool = False,
         # Silence logger output.
         console_level = 100
 
-    # Colorized output of log messages.
+    # Colourised output of log messages.
     coloredlogs.install(level=console_level,
                         fmt=fmt,
                         datefmt=date_fmt,
@@ -229,8 +247,9 @@ if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
-    # Use a signal handler to catch ^C and quit the programme gracefully.
-    signal.signal(signal.SIGINT, signal_handler)
+    # Use signal handlers to quit gracefully and restart on SIGUP.
+    signal.signal(signal.SIGINT, sigint_handler)
+    signal.signal(signal.SIGHUP, sighup_handler)
 
     # Parse command-line options.
     parser = argparse.ArgumentParser(
