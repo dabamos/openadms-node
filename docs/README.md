@@ -17,5 +17,5 @@ $ gmake html "SPHINXBUILD=pypy3 -msphinx"
 You will find the compiled documentation in `./_build/html/`.
 
 ## Licence
-The documentation is licenced under the [Creative Commons Attribution-ShareAlike
-3.0 Germany](https://creativecommons.org/licenses/by-sa/3.0/de/) (CC BY-SA 3.0 DE).
+The documentation is licenced under the [Creative Commons Attribution
+3.0 Germany](https://creativecommons.org/licenses/by/3.0/de/) (CC BY 3.0 DE).

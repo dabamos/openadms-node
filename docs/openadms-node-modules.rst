@@ -1460,7 +1460,7 @@ The PreProcessor performs the following steps:
 1. Read raw sensor data ``>+25.1203`` from field ``response`` of request set
    ``getValue``.
 
-2. Extract ``+25.1203`` using the regular expression
+2. Extract ``+25.1203`` using the (escaped) regular expression
    ``(?P<distance>[-]?\\d\\.\\d+)``.
 
 3. Convert the string ``+25.1203`` to the float ``25.1203``.

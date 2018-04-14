@@ -125,7 +125,7 @@ run:
     $ python -m venv virtual-environment
     $ source virtual-environment/bin/activate.csh
     $ git clone https://github.com/dabamos/openadms-node
-    $ cd openadms-node
+    $ cd openadms-node/
     $ python -m pip install --user -U -r requirements.txt
     $ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
 

@@ -27,8 +27,8 @@ More information is provided on the official `project website`_.
 Licence
 -------
 
-This work is licenced under the `Creative Commons Attribution-ShareAlike 3.0
-Germany`_ (CC BY-SA 3.0 DE).
+This work is licenced under the `Creative Commons Attribution 3.0 Germany`_
+(CC BY 3.0 DE).
 
 Table of Contents
 =================
@@ -49,4 +49,4 @@ Indices and Tables
 * :ref:`modindex`
 
 .. _project website: https://www.dabamos.de/
-.. _Creative Commons Attribution-ShareAlike 3.0 Germany: https://creativecommons.org/licenses/by-sa/3.0/de/
+.. _Creative Commons Attribution 3.0 Germany: https://creativecommons.org/licenses/by/3.0/de/
