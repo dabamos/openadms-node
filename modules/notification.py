@@ -582,6 +582,7 @@ class MailAgent(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
+        self._timeout = 30.0
         self._charset = config.get('charset')
         self._default_subject = config.get('defaultSubject',
                                            '[OpenADMS] Notification')
@@ -651,6 +652,7 @@ class MailAgent(Prototype):
         done = False
 
         while not done:
+            # Repeat in case of error.
             try:
                 if self._is_tls and not self._is_start_tls:
                     # Use TLS encryption.
@@ -676,10 +678,14 @@ class MailAgent(Prototype):
                                  .format(mail_to))
             except smtplib.SMTPException:
                 self.logger.warning('E-mail could not be sent (SMTP error)')
+                time.sleep(self._timeout)
             except socket.gaierror:
-                self.logger.warning('E-mail could not be sent (connection error)')
+                self.logger.warning('E-mail could not be sent '
+                                    '(connection error)')
+                time.sleep(self._timeout)
             except TimeoutError:
                 self.logger.warning('E-mail could not be sent (timeout)')
+                time.sleep(self._timeout)
 
 
 class MastodonAgent(Prototype):
