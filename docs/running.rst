@@ -5,14 +5,6 @@ OpenADMS can either be started from the command-line or by executing the
 graphical launcher ``openadms-launcher.pyw``. The path to the configuration file
 as well as additional options have to be set by using command-line parameters.
 
-Microsoft Windows
------------------
-
-The easiest way to run OpenADMS on Microsoft Windows is to use the graphical
-launcher ``openadms-launcher.pyw`` (see :numref:`openadms-launcher-screenshot`).
-Please make sure that all dependencies are installed (execute ``install.bat``
-with administrator privileges).
-
 .. _openadms-launcher-screenshot:
 .. figure:: _static/openadms_graphical_launcher.png
    :alt: Graphical launcher for OpenADMS
@@ -21,11 +13,21 @@ with administrator privileges).
 
    Graphical launcher for OpenADMS
 
+Microsoft Windows
+-----------------
+
+The easiest way to run OpenADMS on Microsoft Windows is to use the graphical
+launcher ``openadms-launcher.pyw`` (see :numref:`openadms-launcher-screenshot`).
+Please make sure that all dependencies are installed (execute ``install.bat``
+with administrator privileges).
+
 Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
 
 ::
 
     > python openadms.py --config config\myconfig.json --with-mqtt-broker
+
+Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
 Linux, Unix, and macOS
 ----------------------
@@ -45,6 +47,15 @@ can be executed directly once the proper permissions are set:
 
     $ chmod ug+x openadms.py
     $ ./openadms.py --config config/my_config.json --with-mqtt-broker
+
+A running instance of OpenADMS can be restarted by sending a HUP signal:
+
+::
+
+    $ kill -s HUP $PID
+
+``$PID`` is the process ID of the Python interpreter running OpenADMS Node.
+Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
 .. _openadms-freebsd:
 .. figure:: _static/openadms_urxvt.png
@@ -75,8 +86,7 @@ The following parameters will be accepted:
 | ``--verbosity``        | ``-v``     | ``6`` (info)             | Log more diagnostic       |
 |                        |            |                          | messages (level 1 to 9).  |
 +------------------------+------------+--------------------------+---------------------------+
-| ``--log-file``         | ``-l``     | ``openadms.log``         | Path and name of the log  |
-|                        |            |                          | file.                     |
+| ``--log-file``         | ``-l``     | ``openadms.log``         | Path to the log file.     |
 +------------------------+------------+--------------------------+---------------------------+
 | ``--with-mqtt-broker`` | ``-m``     | off                      | Start internal MQTT       |
 |                        |            |                          | message broker.           |

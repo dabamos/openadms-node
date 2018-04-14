@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'OpenADMS Node'
-copyright = '2017, Hochschule Neubrandenburg – University of Applied Sciences'
+copyright = '2018, Hochschule Neubrandenburg – University of Applied Sciences'
 author = 'Philipp Engel'
 
 # The version info for the project you're documenting, acts as replacement for
