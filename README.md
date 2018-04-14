@@ -37,6 +37,8 @@ $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node
 $ python3 -m pip install -U -r requirements.txt
 ```
+
+## Run
 Run OpenADMS Node from the command line:
 ```
 $ python3 openadms.py --config ./config/my_config.json --with-mqtt-broker --debug
@@ -59,7 +61,7 @@ OpenADMS Node must be configured by a JSON-based text file. Please define
 modules, serial ports, sensors, etc. in there. The file name of your custom
 configuration is taken as an argument. For instance, run:
 ```
-$ python3 openadms.py --config ./config/myconfig.json --with-mqtt-broker --debug
+$ python3 openadms.py --config ./config/myconfig.json
 ```
 
 ## Documentation
