@@ -7,6 +7,7 @@ $ python3 -m pip install -U -r requirements.txt
 ```
 Then, build the HTML files:
 ```
+$ gmake clean
 $ sphinx-apidoc -f -e -T -o docs/source ../
 $ gmake html
 ```
