@@ -674,17 +674,19 @@ class MailAgent(Prototype):
                 smtp.quit()
 
                 done = True
-                self.logger.info('E-mail has been send successfully to {}'
+                self.logger.info('E-mail has been send successfully to "{}"'
                                  .format(mail_to))
             except smtplib.SMTPException:
-                self.logger.warning('E-mail could not be sent (SMTP error)')
+                self.logger.warning('E-mail could not be sent to "{}" '
+                                    '(SMTP error)'.format(mail_to))
                 time.sleep(self._timeout)
             except socket.gaierror:
-                self.logger.warning('E-mail could not be sent '
-                                    '(connection error)')
+                self.logger.warning('E-mail could not be sent to "{}"'
+                                    '(connection error)'.format(mail_to))
                 time.sleep(self._timeout)
             except TimeoutError:
-                self.logger.warning('E-mail could not be sent (timeout)')
+                self.logger.warning('E-mail could not be sent to "{}" '
+                                    '(timeout)'.format(mail_to))
                 time.sleep(self._timeout)
 
 
