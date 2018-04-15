@@ -17,10 +17,6 @@ before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`real-time-publisher`          | Distributes observations in real time over a network.  | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
-| **Linux**                           |                                                        |     |
-+-------------------------------------+--------------------------------------------------------+-----+
-| :ref:`interrupt-counter`            | Counts interrupts on a GPIO pin of the Raspberry Pi.   | 0.5 |
-+-------------------------------------+--------------------------------------------------------+-----+
 | **Notification**                    |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`alerter`                      | Collects alert messages.                               | 0.3 |
@@ -58,6 +54,10 @@ before it can be used.
 | **Prototype**                       |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`prototype`                    | Blueprint for new OpenADMS module.                     | 0.3 |
++-------------------------------------+--------------------------------------------------------+-----+
+| **Raspberry Pi**                    |                                                        |     |
++-------------------------------------+--------------------------------------------------------+-----+
+| :ref:`interrupt-counter`            | Counts interrupts on a GPIO pin of the Raspberry Pi.   | 0.5 |
 +-------------------------------------+--------------------------------------------------------+-----+
 | **Schedule**                        |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
@@ -168,12 +168,12 @@ may has the following configuration.
       "couchDriver": {
         "server": "db.example.com",
         "path": "couchdb/",
-        "port": 443,
+        "port": 5984,
         "tls": true,
         "user": "alice",
         "password": "secret",
         "db": "openadms",
-        "cache": "cache.json"
+        "cacheFile": "cache.json"
       }
     }
 
@@ -184,7 +184,7 @@ may has the following configuration.
 +--------------+-------------+---------------------------------------------------------+
 | ``path``     | String      | URI path (if available).                                |
 +--------------+-------------+---------------------------------------------------------+
-| ``port``     | String      | Port number (default is ``5984``).                      |
+| ``port``     | String      | Port number (CouchDB default is ``5984``).              |
 +--------------+-------------+---------------------------------------------------------+
 | ``tls``      | Boolean     | If true, uses encrypted HTTPS instead of HTTP (depends  |
 |              |             | on server).                                             |
@@ -303,7 +303,6 @@ Configuration
 | ``saveObservationId`` | Boolean     | If ``true``, save the ID of each observation.   |
 +-----------------------+-------------+-------------------------------------------------+
 
-
 .. _real-time-publisher:
 
 RealTimePublisher
@@ -343,70 +342,6 @@ Configuration
         ]
       }
     }
-
-Linux
------
-
-Modules in this package are only compatible with Linux operating systems. This
-can be due to dependencies or system calls that are available on Linux only.
-Further restrictions may apply.
-
-.. _interrupt-counter:
-
-InterruptCounter
-~~~~~~~~~~~~~~~~
-
-The InterruptCounter counts interrupts on one of the GPIO pins of the Raspberry
-Pi single-board computer. This module should be compatible with all Raspberry Pi
-models and ARMv6/ARMv7-based Linux operating systems. It is necessary to install
-the Python package `RPi.GPIO`_ before using InterruptCounter. Please run:
-
-::
-
-    $ python3 -m pip install RPi.GPIO
-
-Loading the Module
-^^^^^^^^^^^^^^^^^^
-
-Add the InterruptCounter to the ``modules`` section of the core configuration:
-
-.. code:: javascript
-
-    {
-      "modules": {
-        "interruptCounter": "modules.linux.InterruptCounter"
-      }
-    }
-
-Configuration
-^^^^^^^^^^^^^
-
-.. code:: javascript
-
-    {
-      "interruptCounter": {
-        "gpio": 4,
-        "bounceTime": 250,
-        "countTime": 60,
-        "receiver": "fileExporter",
-        "sensorName": "Tipping Spoon"
-      }
-    }
-
-+------------------+-------------+------------------------------------------------------+
-| Name             | Data Type   | Description                                          |
-+==================+=============+======================================================+
-| ``gpio``         | Integer     | GPIO pin to observe.                                 |
-+------------------+-------------+------------------------------------------------------+
-| ``bounceTime``   | Integer     | Time to wait after each interrupt to prevent         |
-|                  |             | bouncing (in milliseconds).                          |
-+------------------+-------------+------------------------------------------------------+
-| ``countTime``    | Float       | Collection time (in seconds).                        |
-+------------------+-------------+------------------------------------------------------+
-| ``receiver``     | String      | Name of the receiving module.                        |
-+------------------+-------------+------------------------------------------------------+
-| ``sensorName``   | String      | Name of the connected sensor.                        |
-+------------------+-------------+------------------------------------------------------+
 
 Notification
 ------------
@@ -754,7 +689,7 @@ Configuration
         "server": "irc.freenode.net",
         "port": 6697,
         "tls": true,
-        "nickname": "openadms___",
+        "nickname": "iot_bot",
         "password": "",
         "target": "#flood",
         "channel": "#flood"
@@ -1793,10 +1728,84 @@ All modules are a subclass of the module ``Prototype``.
 
 Prototype
 ~~~~~~~~~
+The Prototype class is used for prototypal inheritance only. All OpenADMS Node
+modules are based on Prototype. A minimal OpenADMS Node module is defined as:
 
-.. note::
+::
 
-    This section is still under construction.
+class MyModule(Prototype):
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+
+    def process_observation(self, obs: Observation) -> Observation:
+        return obs
+
+The (changed) Observation object has always to be returned to the calling
+routine.
+
+Raspberry Pi
+-----
+
+Modules in this package are compatible with the Raspberry Pi single-board
+computer running Linux only.
+
+.. _interrupt-counter:
+
+InterruptCounter
+~~~~~~~~~~~~~~~~
+
+The InterruptCounter counts interrupts on one of the GPIO pins of the Raspberry
+Pi single-board computer. This module should be compatible with all Raspberry Pi
+models and ARMv6/ARMv7-based Linux operating systems. It is necessary to install
+the Python package `RPi.GPIO`_ before using InterruptCounter. Please run:
+
+::
+
+    $ python3 -m pip install RPi.GPIO
+
+Loading the Module
+^^^^^^^^^^^^^^^^^^
+
+Add the InterruptCounter to the ``modules`` section of the core configuration:
+
+.. code:: javascript
+
+    {
+      "modules": {
+        "interruptCounter": "modules.rpi.InterruptCounter"
+      }
+    }
+
+Configuration
+^^^^^^^^^^^^^
+
+.. code:: javascript
+
+    {
+      "interruptCounter": {
+        "gpio": 4,
+        "bounceTime": 250,
+        "countTime": 60,
+        "receiver": "fileExporter",
+        "sensorName": "Tipping Spoon"
+      }
+    }
+
++------------------+-------------+------------------------------------------------------+
+| Name             | Data Type   | Description                                          |
++==================+=============+======================================================+
+| ``gpio``         | Integer     | GPIO pin to observe.                                 |
++------------------+-------------+------------------------------------------------------+
+| ``bounceTime``   | Integer     | Time to wait after each interrupt to prevent         |
+|                  |             | bouncing (in milliseconds).                          |
++------------------+-------------+------------------------------------------------------+
+| ``countTime``    | Float       | Collection time (in seconds).                        |
++------------------+-------------+------------------------------------------------------+
+| ``receiver``     | String      | Name of the receiving module.                        |
++------------------+-------------+------------------------------------------------------+
+| ``sensorName``   | String      | Name of the connected sensor.                        |
++------------------+-------------+------------------------------------------------------+
 
 Schedule
 --------
