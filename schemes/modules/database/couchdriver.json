@@ -2,8 +2,16 @@
     "$schema": "http://json-schema.org/draft-06/schema#",
     "id": "schemes/modules/export/couchdriver.json",
     "properties": {
+        "cacheFile": {
+            "id": "/properties/cacheFile",
+            "type": "string"
+        },
         "db": {
             "id": "/properties/db",
+            "type": "string"
+        },
+        "path": {
+            "id": "/properties/path",
             "type": "string"
         },
         "password": {
@@ -29,6 +37,7 @@
     },
     "required": [
         "db",
+        "path",
         "password",
         "port",
         "server",
