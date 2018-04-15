@@ -7,7 +7,7 @@ storage, and data exchange in the Internet of Things (IoT).
 The **OpenADMS Node** software runs on single sensor node instances in a sensor
 network to obtain the measured data of total stations, digital levels,
 inclinometers, weather stations, GNSS receivers, and other sensors.  The raw
-data is then processed, analysed, stored, and transmitted.  OpenADMS Node can be
+data is then processed, analysed, stored, and transmitted. OpenADMS Node can be
 used to observe objects like:
 
 * bridges, tunnels, dams;
@@ -35,7 +35,7 @@ master branch and installing the required dependencies with `pip`:
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node
-$ python3 -m pip install -U -r requirements.txt
+$ python3 -m pip install --user -U -r requirements.txt
 ```
 
 ## Run
@@ -64,12 +64,11 @@ configuration is taken as an argument. For instance, run:
 $ python3 openadms.py --config ./config/myconfig.json
 ```
 
-## Documentation
+## Documentation and Supported Sensors
 The documentation is hosted on the
 [project website](https://www.dabamos.de/manual/openadms-node/).
 See `./docs` for how to build the documentation from source.
 
-## Supported Sensors
 For a list of tested sensors, see https://dabamos.de/sensors/.
 
 ## Running Tests
@@ -77,6 +76,7 @@ You can start the unit tests with:
 ```
 $ python3 -m pytest
 ```
+These are work in progress.
 
 ## Licence
 OpenADMS is licenced under BSD-2-Clause.
