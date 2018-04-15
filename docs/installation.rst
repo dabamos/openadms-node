@@ -126,7 +126,7 @@ run:
     $ source virtual-environment/bin/activate.csh
     $ git clone https://github.com/dabamos/openadms-node
     $ cd openadms-node/
-    $ python -m pip install --user -U -r requirements.txt
+    $ python -m pip install -U -r requirements.txt
     $ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
 
 Message Broker
@@ -179,7 +179,7 @@ can use the provided unit file to start OpenADMS as a daemon. Copy the file
 ``/usr/local/etc/openadms/config.json``. You can alter these values in the
 service file.
 
-Be aware that no MQTT message broker will be started by this service.  You may
+Be aware that no MQTT message broker will be started by this service. You may
 want to use an external broker, like Eclipse Mosquitto, or append the parameter
 ``-m`` to ``ExecStart`` in the service file to enable the internal broker.
 

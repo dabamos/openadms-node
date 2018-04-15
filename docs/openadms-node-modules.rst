@@ -130,10 +130,12 @@ Drivers for various database management systems are provided in this package.
 CouchDriver
 ~~~~~~~~~~~
 
-CouchDriver is a connectivity module for `Apache CouchDB`_. It is used to store
-observation data sets in a CouchDB database (see :numref:`couchdb`).
-Observations send to a CouchDriver instance will be saved in the CouchDB
-database defined in the module’s configuration.
+CouchDriver is a connectivity module for `Apache CouchDB`_ (see
+:numref:`couchdb`). It is used to store observation data sets inside a CouchDB
+database defined in the module’s configuration. Observations are cached before
+inserting them into the database. On server error, the cached observations are
+send again. If a file-based cache database is used, observation stay persistent
+between restarts of OpenADMS Node.
 
 .. _couchdb:
 .. figure:: _static/couchdb.png
@@ -157,17 +159,21 @@ load the CouchDriver:
 
 Configuration
 ^^^^^^^^^^^^^
+An example CouchDB server ``https://alice:secret@db.example.com:443/couchdb/``
+may has the following configuration.
 
 .. code:: javascript
 
     {
       "couchDriver": {
-        "server": "192.168.0.100",
-        "port": 5984,
-        "tls": false,
-        "user": "joe",
+        "server": "db.example.com",
+        "path": "couchdb/",
+        "port": 443,
+        "tls": true,
+        "user": "alice",
         "password": "secret",
-        "db": "openadms"
+        "db": "openadms",
+        "cache": "cache.json"
       }
     }
 
@@ -175,6 +181,8 @@ Configuration
 | Name         | Data Type   | Description                                             |
 +==============+=============+=========================================================+
 | ``server``   | String      | IP address or FQDN of the CouchDB server.               |
++--------------+-------------+---------------------------------------------------------+
+| ``path``     | String      | URI path (if available).                                |
 +--------------+-------------+---------------------------------------------------------+
 | ``port``     | String      | Port number (default is ``5984``).                      |
 +--------------+-------------+---------------------------------------------------------+
@@ -186,6 +194,9 @@ Configuration
 | ``password`` | String      | Password of the CouchDB user.                           |
 +--------------+-------------+---------------------------------------------------------+
 | ``db``       | String      | Name of the CouchDB database.                           |
++--------------+-------------+---------------------------------------------------------+
+| ``cacheFile``| String      | File name of the local cache database. If not set, an   |
+|              |             | in-memory database is used instead.                     |
 +--------------+-------------+---------------------------------------------------------+
 
 Export

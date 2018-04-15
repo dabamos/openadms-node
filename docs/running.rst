@@ -55,6 +55,8 @@ A running instance of OpenADMS can be restarted by sending a HUP signal:
     $ kill -s HUP $PID
 
 ``$PID`` is the process ID of the Python interpreter running OpenADMS Node.
+The configuration will be re-read from file.
+
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
 .. _openadms-freebsd:
