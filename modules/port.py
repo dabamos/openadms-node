@@ -57,13 +57,17 @@ class BluetoothPort(Prototype):
 
         self._server_mac_address = valid_mac
 
+        if System.is_windows():
+            raise EnvironmentError('Operating system not supported (no '
+                                   'socket.AF_BLUETOOTH on Microsoft Windows)')
+
     def __del__(self):
         self.close()
 
     def close(self) -> None:
         """Closes the socket connection."""
         if self._sock:
-            self.logger.info('Closing port "{}"'.format(self._port))
+            self.logger.info('Closing port "{}" ...'.format(self._port))
             self._sock.close()
 
     def get_mac_address(self, s: str) -> Union[str, None]:
@@ -92,17 +96,12 @@ class BluetoothPort(Prototype):
         Returns:
             The extended observation object or None if connection failed.
         """
-        if System.is_windows():
-            self.logger.error('Operating system not supported (no '
-                              'socket.AF_BLUETOOTH on Microsoft Windows)')
-            return
-
         if not self._sock:
             # Open socket connection.
             if not self._open():
                 return
 
-        # Add the name of this Bluetooth port to the observation.
+        # Add the name of the Bluetooth port to the observation.
         obs.set('portName', self.name)
 
         requests_order = obs.get('requestsOrder', [])
@@ -113,7 +112,7 @@ class BluetoothPort(Prototype):
                                'of target "{}"'.format(obs.get('name'),
                                                        obs.get('target')))
 
-        # Send requests one by one to the sensor.
+        # Send requests sequentially to the sensor.
         for request_name in requests_order:
             request_set = request_sets.get(request_name)
 
@@ -136,10 +135,10 @@ class BluetoothPort(Prototype):
 
             # Send the request of the observation to the attached sensor.
             self.logger.verbose('Sending request "{}" of observation "{}" to '
-                                'sensor "{}"'.format(request_name,
-                                                     obs.get('name'),
-                                                     obs.get('sensorName')))
-            # Write to the Bluetooth port.
+                                'sensor "{}" ...'.format(request_name,
+                                                         obs.get('name'),
+                                                         obs.get('sensorName')))
+            # Write to Bluetooth port.
             self._send(request)
 
             # Get the response of the sensor.
@@ -354,7 +353,7 @@ class SerialPort(Prototype):
 
     def close(self) -> None:
         if self._serial:
-            self.logger.verbose('Closing port "{}"'
+            self.logger.verbose('Closing port "{}" ...'
                                 .format(self._serial_port_config.port))
             self._serial.close()
 
@@ -363,7 +362,7 @@ class SerialPort(Prototype):
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
 
-        self.logger.verbose('Opening port "{}"'
+        self.logger.verbose('Opening port "{}" ...'
                             .format(self._serial_port_config.port))
 
         try:
@@ -422,7 +421,7 @@ class SerialPort(Prototype):
             return
 
         if not self._serial.is_open:
-            self.logger.verbose('Re-opening port "{}"'
+            self.logger.verbose('Re-opening port "{}" ...'
                                 .format(self._serial_port_config.port))
             self._serial.open()
             self._serial.reset_output_buffer()
@@ -462,9 +461,9 @@ class SerialPort(Prototype):
 
             # Send the request of the observation to the attached sensor.
             self.logger.verbose('Sending request "{}" of observation "{}" to '
-                                'sensor "{}"'.format(request_name,
-                                                     obs.get('name'),
-                                                     obs.get('sensorName')))
+                                'sensor "{}" ...'.format(request_name,
+                                                         obs.get('name'),
+                                                         obs.get('sensorName')))
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
@@ -547,7 +546,7 @@ class SerialPort(Prototype):
                 return
 
             if not self._serial.is_open:
-                self.logger.info('Re-opening port "{}"'
+                self.logger.info('Re-opening port "{}" ...'
                                  .format(self._serial_port_config.port))
                 self._serial.open()
                 self._serial.reset_input_buffer()

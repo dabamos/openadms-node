@@ -127,7 +127,7 @@ class CloudExporter(Prototype):
                                  obs_data.get('target')))
         return True
 
-    def has_cached_observation_data(self) -> bool:
+    def has_cached_observation(self) -> bool:
         """Returns whether or not a cached observation exists in the database.
 
         Returns:
@@ -151,7 +151,7 @@ class CloudExporter(Prototype):
         """Sends cached observation to RESTful service."""
         while self.is_running:
             if not self.has_cached_observation_data():
-                time.sleep(1)
+                time.sleep(1.0)
                 continue
 
             if len(self._cache_db) > 500:
