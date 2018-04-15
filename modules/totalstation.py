@@ -4,7 +4,7 @@
 systems (pre-processing, atmospheric corrections, transformations)."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import math
@@ -83,6 +83,9 @@ class DistanceCorrector(Prototype):
         dist = obs.get_response_value(self._distance_name)
 
         if dist is None:
+            self.logger.error('No distance set in observation "{}" with '
+                              'target "{}"'.format(obs.get('name'),
+                                                   obs.get('target')))
             return obs
 
         d_dist_1 = 0
@@ -111,7 +114,7 @@ class DistanceCorrector(Prototype):
                                                            round(d_dist_2, 5))
             response_sets['seaLevelDelta'] = response_set
 
-        # Add reduced distance to the observation set.
+        # Add corrected distance to the observation set.
         if d_dist_1 != 0 or d_dist_2 != 0:
             r_dist = dist + d_dist_1 + d_dist_2
 
@@ -152,6 +155,14 @@ class DistanceCorrector(Prototype):
         return c
 
     def get_sea_level_correction(self, sensor_height: float) -> float:
+        """Calculates sea level correction value.
+
+        Args:
+            sensor_height: Height of sensor in metres.
+
+        Returns:
+            Correction value.
+        """
         earth_radius = 6.378 * math.pow(10, 6)
         c = -1 * (sensor_height / earth_radius)
 
@@ -275,13 +286,19 @@ class HelmertTransformer(Prototype):
     def process_observation(self, obs: Observation) -> Observation:
         """Calculates the coordinates of the view point and further target
         points by using the Helmert transformation. The given observation can
-        either be of a fixed point or of a target point.
-
-        Measured polar coordinates of the fixed points are used to determine the
-        Cartesian coordinates of the view point and the given target points.
+        either be of a fixed point or of a target point. Measured polar
+        coordinates of the fixed points are used to determine the Cartesian
+        coordinates of the view point and the given target points.
 
         An `Observation` object will be created for the view point and send
-        to the receivers defined in the configuration."""
+        to the receivers defined in the configuration.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            The Observation object.
+        """
         # Update the fixed point data of the configuration (Hz, V, slope
         # distance) by using the current observation.
         if self._is_fixed_point(obs):
@@ -327,7 +344,7 @@ class HelmertTransformer(Prototype):
             o: Transformation parameter o.
 
         Returns:
-            X, Y, and Z coordinates.
+            Three-dimensional coordinates x, y, z.
 
         """
         local_x, local_y, local_z = self.get_cartesian_coordinates(hz,
@@ -342,6 +359,16 @@ class HelmertTransformer(Prototype):
     def _calculate_residual_mismatches(self,
                                        global_x: float,
                                        global_y: float) -> Tuple[float, float]:
+        """Calculates the residual mismatches of view point coordinates due to
+        redundant fixed points.
+
+        Args:
+            global_x: X coordinate of view point.
+            global_y: Y coordinate of view point.
+
+        Returns:
+            Residual mismatches in x and y.
+        """
         sum_p = 0
         sum_p_vx = 0
         sum_p_vy = 0
@@ -377,6 +404,15 @@ class HelmertTransformer(Prototype):
         return vx, vy
 
     def _calculate_target_point(self, obs: Observation) -> Observation:
+        """Calculates the coordinates of a target point and updates the
+        given Observation object.
+
+        Args:
+            obs: Observation object.
+
+        Returns:
+            The Observation object with calculated coordinates.
+        """
         hz = obs.get_response_value('hz')
         v = obs.get_response_value('v')
         dist = obs.get_response_value('slopeDist')
@@ -427,6 +463,14 @@ class HelmertTransformer(Prototype):
 
     def _calculate_view_point(self,
                               obs: Observation) -> Union[Observation, None]:
+        """Calculates the view point by doing a 2D Helmert transformation.
+
+        Args:
+            obs: Observation object. Needed for port and sensor information.
+
+        Returns:
+            New Observation object with view point coordinates.
+        """
         sum_local_x = sum_local_y = sum_local_z = 0     # [x], [y], [z].
         sum_global_x = sum_global_y = sum_global_z = 0  # [X], [Y], [Z].
         num_fixed_points = len(self._fixed_points)      # n.
@@ -439,8 +483,7 @@ class HelmertTransformer(Prototype):
 
             if None in [hz, v, dist]:
                 self.logger.warning('Hz, V, or distance is missing in '
-                                    'observation "{}" of target "{}"'
-                                    .format(obs.get('name'), obs.get('target')))
+                                    'fixed point "{}"'.format(name))
                 return
 
             # Calculate Cartesian coordinates out of polar coordinates.
@@ -624,6 +667,17 @@ class HelmertTransformer(Prototype):
                                   slope_dist: float) -> Tuple[float,
                                                               float,
                                                               float]:
+        """Returns Cartesian coordinates out of horizontal direction, vertical
+        angle, and slope distance.
+
+        Args:
+            hz: Horizontal direction in rad.
+            v: Vertical angle in rad.
+            slope_dist: Slope distance in metres.
+
+        Returns:
+            Coordinates x, y, z.
+        """
         hz_dist = slope_dist * math.sin(v)
 
         x = hz_dist * math.cos(hz)
