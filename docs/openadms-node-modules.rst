@@ -1733,16 +1733,17 @@ modules are based on Prototype. A minimal OpenADMS Node module is defined as:
 
 ::
 
-class MyModule(Prototype):
+    class MyModule(Prototype):
 
-    def __init__(self, module_name: str, module_type: str, manager: Manager):
-        super().__init__(module_name, module_type, manager)
+        def __init__(self, module_name: str, module_type: str, manager: Manager):
+            super().__init__(module_name, module_type, manager)
 
-    def process_observation(self, obs: Observation) -> Observation:
-        return obs
+        def process_observation(self, obs: Observation) -> Observation:
+            return obs
 
 The (changed) Observation object has always to be returned to the calling
-routine.
+routine. Please be aware that the function ``process_observation()`` runs
+already inside a Thread.
 
 Raspberry Pi
 -----
