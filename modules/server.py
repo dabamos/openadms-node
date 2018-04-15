@@ -3,7 +3,7 @@
 """Module for network services."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -85,8 +85,8 @@ class LocalControlServer(Prototype):
         """Stops the server."""
         super().stop()
 
+        # Close the HTTP server.
         if self._httpd:
-            # Close the HTTP server.
             self._httpd.server_close()
 
 

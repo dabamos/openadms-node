@@ -28,8 +28,9 @@ from modules.prototype import Prototype
 class CouchDriver(Prototype):
     """
     CouchDriver provides connectivity for Apache CouchDB. Observations send to
-    a CouchDriver instance will be saved in the database set in the
-    configuration. This module is for dumping observations only.
+    a CouchDriver instance will be cached and then stored in the database
+    defined the configuration. TinyDB is used for caching (either file-based
+    or in-memory).
 
     The JSON-based configuration for this module:
 
@@ -53,6 +54,7 @@ class CouchDriver(Prototype):
         self._couch = None      # CouchDB driver.
         self._db = None         # CouchDB database.
         self._thread = None     # Thread doing the caching.
+        self._timeout = 30.0    # Time to wait on connection error.
 
         # Initialise local cache database.
         cache_file = config.get('cacheFile')
@@ -67,18 +69,18 @@ class CouchDriver(Prototype):
                              .format(cache_file))
             self._cache_db = TinyDB(cache_file)
 
-        # HTTPS or HTTP.
+        # Use either HTTPS or HTTP.
         is_tls = config.get('tls', False)
         self._scheme = 'https' if is_tls else 'http'
 
-        # CouchDB server.
+        # Configuration of the CouchDB server.
         self._server = config.get('server')
         self._path = config.get('path', '')
         self._port = config.get('port', 5984)
         user = config.get('user')
         password = config.get('password')
 
-        # URI to CouchDB server, for example:
+        # Generate URI to CouchDB server, for example:
         # https://<user>:<password>@iot.example.com:443/couchdb/
         self._server_uri = '{}://{}:{}@{}:{}/{}'.format(self._scheme,
                                                         user,
@@ -86,7 +88,7 @@ class CouchDriver(Prototype):
                                                         self._server,
                                                         self._port,
                                                         self._path)
-        # Database to open.
+        # Set name of database to open.
         self._db_name = config.get('db')
 
     def _cache_observation_data(self, obs: Observation) -> str:
@@ -99,9 +101,14 @@ class CouchDriver(Prototype):
 
         return doc_id
 
-    def _connect(self) -> None:
-        """Connects to CouchDB database server."""
+    def _connect(self) -> bool:
+        """Connects to CouchDB database server.
+
+        Returns:
+            True on success, False on failure.
+        """
         try:
+            # Connect to CouchDB server.
             self.logger.info('Connecting to CouchDB server "{}://{}:{}/{}" ...'
                              .format(self._scheme,
                                      self._server,
@@ -109,17 +116,21 @@ class CouchDriver(Prototype):
                                      self._path))
             self._couch = couchdb.Server(self._server_uri)
 
+            # Open database.
             if self._db_name not in self._couch:
                 self.logger.error('Database "{}" not found on server "{}"'
                                   .format(self._db_name, self._server_uri))
-                return
+                return False
 
             self.logger.info('Opening CouchDB database "{}" ...'
                              .format(self._db_name))
             self._db = self._couch[self._db_name]
+            return True
         except Exception as e:
             self.logger.error('Failed to connect to CouchDB database: {}'
                               .format(e))
+
+        return False
 
     def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
         """"Returns a random observation data set from the local cache database.
@@ -171,8 +182,8 @@ class CouchDriver(Prototype):
             doc_id: The document id.
         """
         self._cache_db.remove(doc_ids=[doc_id])
-        self.logger.debug('Removed observation from cache database '
-                          '(doc id = {})'.format(doc_id))
+        self.logger.debug('Removed observation from cache (doc id = {})'
+                          .format(doc_id))
 
     def has_cached_observation_data(self) -> bool:
         """Returns whether or not a cached observation exists in the local
@@ -202,6 +213,7 @@ class CouchDriver(Prototype):
         """Inserts cached observations into CouchDB database."""
         while self.is_running:
             if not self.has_cached_observation_data():
+                # Poor men's event handling ...
                 time.sleep(1.0)
                 continue
 
@@ -225,6 +237,8 @@ class CouchDriver(Prototype):
                 # Remove the inserted observation data from local cache.
                 if self._insert_observation_data(obs_data):
                     self._remove_observation_data(obs_data.doc_id)
+                else:
+                    time.sleep(self._timeout)
 
     def start(self) -> None:
         """Starts the module."""
