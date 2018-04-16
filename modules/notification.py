@@ -738,7 +738,12 @@ class MastodonAgent(Prototype):
     def handle_mastodon(self,
                         header: Dict[str, Any],
                         payload: Dict[str, Any]) -> None:
-        """Uses the Mastodon API to send toots to the network."""
+        """Uses the Mastodon API to send toots to the network.
+
+        Args:
+            header: The message header.
+            payload: The message payload.
+        """
         if not Path(self._client_cred_file).exists():
             self._create_app()
 
@@ -796,7 +801,14 @@ class RssAgent(Prototype):
 
     def escape(self, html: str) -> str:
         """Returns the given HTML with ampersands, quotes, and carets
-        encoded."""
+        encoded.
+
+        Args:
+            html: String with HTML special characters.
+
+        Returns:
+            Escaped string.
+        """
         return html.replace('&', '&amp;')\
                    .replace('<', '&lt;')\
                    .replace('>', '&gt;')\

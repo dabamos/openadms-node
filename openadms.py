@@ -21,11 +21,11 @@ Example:
 
         $ python3 openadms.py -c config/my_config.json -m -d
 
-    The monitoring will begin automatically.
+    The monitoring will start automatically.
 """
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import argparse
@@ -51,9 +51,10 @@ from core.system import System
 # Get root logger.
 root = logging.getLogger()
 
-# Global Monitor.
+# Global Monitor object.
 monitor = None
 
+# Log file configuration.
 LOG_FILE_BACKUP_COUNT = 1     # 1 log file only.
 LOG_FILE_MAX_SIZE = 10485760  # 10 MiB.
 
@@ -64,7 +65,6 @@ def main(config_file_path: str) -> None:
     Args:
         config_file_path: The path to the configuration file.
     """
-    global monitor
     v = 'v.{}'.format(System.get_openadms_version())
 
     logger = logging.getLogger('openadms')
@@ -80,6 +80,7 @@ def main(config_file_path: str) -> None:
     logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
 
     # Start the monitoring.
+    global monitor
     monitor = Monitor(config_file_path)
     monitor.start()
 
@@ -121,14 +122,16 @@ def exception_hook(type: BaseException,
 
 
 def sighup_handler(signalnum: int, frame: Any) -> None:
+    """Catches signal HUP and restarts everything."""
     global monitor
     root.info('Caught SIGHUP')
 
     if monitor:
         monitor.restart()
 
+
 def sigint_handler(signalnum: int, frame: Any) -> None:
-    """Outputs a message before quitting the application."""
+    """Catches signal INT and quits gracefully."""
     global monitor
     root.info('Caught SIGINT')
 
@@ -212,8 +215,8 @@ def setup_logging(is_quiet: bool = False,
     fh.setFormatter(formatter)
     root.addHandler(fh)
 
+    # Silence logger output.
     if is_quiet:
-        # Silence logger output.
         console_level = 100
 
     # Colourised output of log messages.
@@ -247,7 +250,7 @@ if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
-    # Use signal handlers to quit gracefully and restart on SIGUP.
+    # Use signal handlers to quit gracefully and restart on SIGHUP.
     signal.signal(signal.SIGINT, sigint_handler)
     signal.signal(signal.SIGHUP, sighup_handler)
 
@@ -311,8 +314,8 @@ if __name__ == '__main__':
                                default='config/config.json',
                                required=True)
 
+    # Parse arguments.
     try:
-        # Parse arguments.
         args = parser.parse_args()
     except argparse.ArgumentTypeError as e:
         root.error(e)
@@ -321,8 +324,8 @@ if __name__ == '__main__':
     # Initialise the logger.
     setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)
 
+    # Use internal MQTT message broker (HBMQTT).
     if args.is_mqtt_broker:
-        # Use internal MQTT message broker (HBMQTT).
         start_mqtt_message_broker(args.host, args.port)
 
     # Start the monitoring.

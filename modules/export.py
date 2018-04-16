@@ -40,7 +40,7 @@ class CloudExporter(Prototype):
         user: User name for OpenADMS Server.
         password: Password for OpenADMS Server.
         authMethod: Authentication method (`basic` or `jwt`).
-        db: File name of the cache database (e.g.: ``cache.json``).
+        db: File name of the cache database (e.g.: `cache.json`).
         storage: Storage type (`file` or `memory`).
 
     Example:
@@ -272,7 +272,7 @@ class FileExporter(Prototype):
                                  obs.get('sensorName'),
                                  obs.get('portName'))
 
-            # Open a file for every path.
+            # Open a file for each path.
             with open(str(file_path), 'a') as fh:
                 # Add the header if necessary.
                 if header:
@@ -342,7 +342,7 @@ class RealTimePublisher(Prototype):
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
-            target = receiver + '/' + obs_copy.get('target')
+            target = '{}/{}'.format(receiver, obs_copy.get('target'))
 
             obs_copy.set('nextReceiver', 0)
             obs_copy.set('receivers', [target])

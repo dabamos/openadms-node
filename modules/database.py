@@ -36,7 +36,7 @@ class CouchDriver(Prototype):
 
     Parameters:
         server (str): FQDN or IP address of CouchDB server.
-        path (str): Additional URI path or blank.
+        path (str): Additional CouchDB instance path or blank.
         port (int): Port number of CouchDB server.
         user (str): User name.
         password (str): Password.
@@ -96,41 +96,35 @@ class CouchDriver(Prototype):
 
         Args:
             obs: Observation object.
-        """
-        doc_id = self._cache_db.insert(obs.data)
-
-        return doc_id
-
-    def _connect(self) -> bool:
-        """Connects to CouchDB database server.
 
         Returns:
-            True on success, False on failure.
+            Document id of cached data set.
         """
-        try:
-            # Connect to CouchDB server.
-            self.logger.info('Connecting to CouchDB server "{}://{}:{}/{}" ...'
-                             .format(self._scheme,
-                                     self._server,
-                                     self._port,
-                                     self._path))
-            self._couch = couchdb.Server(self._server_uri)
+        doc_id = self._cache_db.insert(obs.data)
+        return doc_id
 
-            # Open database.
-            if self._db_name not in self._couch:
-                self.logger.error('Database "{}" not found on server "{}"'
-                                  .format(self._db_name, self._server_uri))
-                return False
+    def _connect(self) -> None:
+        """Connects to CouchDB database server.
 
-            self.logger.info('Opening CouchDB database "{}" ...'
-                             .format(self._db_name))
-            self._db = self._couch[self._db_name]
-            return True
-        except Exception as e:
-            self.logger.error('Failed to connect to CouchDB database: {}'
-                              .format(e))
+        Raises:
+            Exception: On connection error.
+        """
+        # Connect to CouchDB server.
+        self.logger.info('Connecting to CouchDB server "{}://{}:{}/{}" ...'
+                         .format(self._scheme,
+                                 self._server,
+                                 self._port,
+                                 self._path))
+        self._couch = couchdb.Server(self._server_uri)
 
-        return False
+        # Open database.
+        if self._db_name not in self._couch:
+            self.logger.error('Database "{}" not found on server "{}"'
+                              .format(self._db_name, self._server_uri))
+
+        self.logger.info('Opening CouchDB database "{}" ...'
+                         .format(self._db_name))
+        self._db = self._couch[self._db_name]
 
     def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
         """"Returns a random observation data set from the local cache database.
@@ -169,8 +163,8 @@ class CouchDriver(Prototype):
                               .format(obs_data.get('name'),
                                       obs_data.get('target'),
                                       obs_data.get('portName'),
-                                      self._db_name),
-                                      e)
+                                      self._db_name,
+                                      e))
             return False
 
         return True
@@ -212,8 +206,8 @@ class CouchDriver(Prototype):
     def run(self) -> None:
         """Inserts cached observations into CouchDB database."""
         while self.is_running:
+            # Poor men's event handling ...
             if not self.has_cached_observation_data():
-                # Poor men's event handling ...
                 time.sleep(1.0)
                 continue
 

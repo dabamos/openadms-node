@@ -3,7 +3,7 @@
 """Main monitoring module. Everything starts here."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import time
@@ -20,7 +20,7 @@ class Monitor(object):
     def __init__(self, config_file_path: str):
         """
         Args:
-            config_file_path: The path to the configuration file.
+            config_file_path: The path to the OpenADMS Node configuration file.
         """
         self.logger = logging.getLogger('monitor')
         self._config_file_path = config_file_path
@@ -36,11 +36,12 @@ class Monitor(object):
             manager.sensor_manager = SensorManager(manager.config_manager)
             manager.module_manager = ModuleManager(manager)
         except ValueError as e:
-            self.logger.error(e)
+            self.logger.error('Fatal error: {}'.format(e))
 
         self._manager = manager
 
     def load_all(self) -> None:
+        """Calls managers to load and initialise everything."""
         self._manager.schema_manager.load_all()
         self._manager.config_manager.load_all()
         self._manager.project_manager.load_all()
@@ -71,7 +72,7 @@ class Monitor(object):
 
     def restart(self) -> None:
         """Clears and restarts everything."""
-        self.logger.notice('Restart everything ...')
+        self.logger.notice('Restarting everything ...')
 
         self.kill()
         time.sleep(3.0)

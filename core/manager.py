@@ -3,7 +3,7 @@
 """Collection of manager classes."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import json
@@ -175,9 +175,8 @@ class ConfigManager(object):
 
         # Check whether module's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
-            self.logger.error('Configuration of "{}" is invalid'
-                              .format(schema_name))
-            raise ValueError
+            raise ValueError('Configuration of "{}" is invalid'
+                             .format(schema_name))
 
         return config
 
@@ -300,10 +299,7 @@ class ModuleManager(object):
         Returns:
             True if module is found, False if not.
         """
-        if self._modules.get(name):
-            return True
-        else:
-            return False
+        return True if self._modules.get(name) else False
 
     def kill(self, name: str) -> None:
         """Kills a module (stops worker and messenger).
@@ -536,18 +532,16 @@ class ProjectManager(object):
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
         self._project = None
-
         self.load_all()
 
     def load_all(self) -> None:
-        """Loads the project configuration."""
-        # Configuration of the project.
+        """Loads the project configuration and meta information."""
         self._project = None
         self._schema_manager.add_schema('project', 'core/project.json')
         config = self._config_manager.get_valid_config('project',
                                                        'core',
                                                        'project')
-        # Project information.
+        # Project meta information.
         self._project = Project(config.get('name'),
                                 config.get('id'),
                                 config.get('description'))
@@ -571,21 +565,20 @@ class SchemaManager(object):
         self.logger = logging.getLogger('schemaManager')
         self._schemes = {}
         self._schemes_root_path = schemes_root_path
-
         self.load_all()
 
     def add_schema(self,
                    data_type: str,
                    path: str) -> bool:
-        """Reads a JSON schemes file from the given path and stores it in the
+        """Reads a JSON schema file from the given path and stores it in the
         internal dictionary.
 
         Args:
             data_type: The name of the data type (e.g., 'observation').
-            path: The path to the JSON schemes file.
+            path: The path to the JSON schema file.
 
         Returns:
-            True if schemes has been added, False if not.
+            True if schema has been added, False if not.
         """
         if self._schemes.get(data_type):
             return False
@@ -618,7 +611,7 @@ class SchemaManager(object):
 
     def get_schema_path(self, class_path: str) -> Path:
         """Uses the class path of a module to generate the path to the
-        configuration schemes file.
+        configuration schema file.
 
         For instance, the given class path `modules.schedule.Scheduler` will be
         converted to the file path `modules/schedule/scheduler.json`.
@@ -627,18 +620,18 @@ class SchemaManager(object):
             class_path: The class path of a module.
 
         Returns:
-            The path to the JSON schemes of the module's configuration.
+            The path to the JSON schema of the module's configuration.
         """
         return Path(class_path.replace('.', '/').lower() + '.json')
 
     def has_schema(self, name: str) -> bool:
-        """Returns whether or not a JSON schemes for the given name exists.
+        """Returns whether or not a JSON schema for the given name exists.
 
         Args:
-            name: Name of the schemes (e.g., 'observation').
+            name: Name of the schema (e.g., 'observation').
 
         Returns:
-            True if schemes exists, False if not.
+            True if schema exists, False if not.
         """
         if self._schemes.get(name):
             return True
@@ -646,11 +639,11 @@ class SchemaManager(object):
             return False
 
     def is_valid(self, data: Dict, schema_name: str) -> bool:
-        """Validates data with JSON schemes and returns result.
+        """Validates data with JSON schema and returns result.
 
         Args:
             data: The data.
-            schema_name: The name of the schemes used for validation.
+            schema_name: The name of the schema used for validation.
 
         Returns:
             True if data is valid, False if not.
@@ -692,7 +685,7 @@ class SchemaManager(object):
 
 class SensorManager(object):
     """
-    SensorManager stores and manages object of type `Sensor`.
+    SensorManager stores and manages objects of type `Sensor`.
     """
 
     def __init__(self, config_manager: ConfigManager):
