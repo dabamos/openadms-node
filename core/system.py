@@ -15,8 +15,7 @@ import arrow
 import uptime
 #import psutil
 
-
-from core.version import *
+from core.version import OPENADMS_VERSION, OPENADMS_VERSION_NAME
 
 
 class System(object):

@@ -10,7 +10,7 @@ __license__ = 'BSD-2-Clause'
 import json
 import logging
 
-from typing import *
+from typing import Any, Callable, Dict, List
 
 from core.observation import Observation
 

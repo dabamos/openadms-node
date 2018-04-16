@@ -6,13 +6,16 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
+import logging
+
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 from string import Template
 from threading import Thread
+from typing import Dict
 from urllib import parse
 
-from core.logging import *
+from core.logging import RingBufferLogHandler, RootFilter, StringFormatter
 from core.manager import Manager
 from core.system import System
 from modules.prototype import Prototype

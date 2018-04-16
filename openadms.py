@@ -38,7 +38,7 @@ import types
 
 from pathlib import Path
 from threading import Thread
-from typing import *
+from typing import Any
 
 import coloredlogs
 import verboselogs

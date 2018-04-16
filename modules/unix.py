@@ -14,7 +14,7 @@ import time
 import threading
 
 from enum import Enum
-from typing import *
+from typing import Any, Dict, Tuple, Union
 
 from core.manager import Manager
 from core.system import System

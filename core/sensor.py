@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 import codecs
 import logging
 
-from typing import *
+from typing import Any, Dict
 
 from core.observation import Observation
 
@@ -19,6 +19,8 @@ class Sensor(object):
     Sensor stores the configuration of a sensor, especially, all defined
     observations.
     """
+    _config = ...   # type: Dict[str, Any]
+    _name = ...     # type: str
 
     def __init__(self, name: str, config: Dict[str, Any]):
         """

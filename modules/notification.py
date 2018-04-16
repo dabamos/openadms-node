@@ -22,7 +22,7 @@ from email.mime.text import MIMEText
 from email.utils import formatdate
 from pathlib import Path
 from string import Template
-from typing import *
+from typing import Any, Dict, List
 
 # Third-party modules.
 import arrow

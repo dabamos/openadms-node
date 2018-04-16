@@ -10,13 +10,14 @@ __license__ = 'BSD-2-Clause'
 import math
 import time
 
-from typing import *
+from typing import Tuple, Union
 
 import arrow
 
 from core.observation import Observation
 from core.manager import Manager
 from core.sensor import SensorType
+from core.util import gon_to_rad, rad_to_gon
 from modules.prototype import Prototype
 
 
@@ -793,7 +794,7 @@ class PolarTransformer(Prototype):
             self.logger.error('Azimuth point "{}" does not exist'
                               .format(self._azimuth_point_name))
 
-        self._azimuth_angle = self.gon_to_rad(config.get('azimuthAngle', 0))
+        self._azimuth_angle = gon_to_rad(config.get('azimuthAngle', 0))
         self._is_adjustment_enabled = config.get('adjustmentEnabled')
 
     def _get_adjustment_value(self) -> float:
@@ -957,8 +958,8 @@ class PolarTransformer(Prototype):
         self.logger.debug('Starting polar transformation of target "{}" (Hz = '
                           '{:3.5f} gon, V = {:3.5f} gon, dist = {:4.5f} m)'
                           .format(obs.get('target'),
-                                  self.rad_to_gon(hz),
-                                  self.rad_to_gon(v),
+                                  rad_to_gon(hz),
+                                  rad_to_gon(v),
                                   dist_hz))
 
         if self._is_adjustment_enabled:
@@ -966,7 +967,7 @@ class PolarTransformer(Prototype):
             adj = self._get_adjustment_value()
             self.logger.info('Calculated adjustment value for polar '
                              'transformation ({:3.5f} gon)'
-                             .format(self.rad_to_gon(adj)))
+                             .format(rad_to_gon(adj)))
             hz += adj
 
         # Calculate the coordinates of the observation.
@@ -1048,28 +1049,6 @@ class PolarTransformer(Prototype):
         z = view_point_z + d_z
 
         return x, y, z
-
-    def gon_to_rad(self, a: float) -> float:
-        """Converts from gon (grad) to radiant.
-
-        Args:
-            a: Angle in gon.
-
-        Returns:
-            Converted angle in rad.
-        """
-        return a * math.pi / 200
-
-    def rad_to_gon(self, a: float) -> float:
-        """Converts from radiant to gon (grad).
-
-        Args:
-            a: Angle in rad.
-
-        Returns:
-            Converted angle in gon.
-        """
-        return a * 200 / math.pi
 
 
 class RefractionCorrector(Prototype):

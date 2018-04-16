@@ -13,7 +13,7 @@ import socket
 import time
 
 from threading import Thread
-from typing import *
+from typing import Union
 
 # Third-party modules.
 import arrow

@@ -12,10 +12,10 @@ import time
 
 from enum import Enum
 from pathlib import Path
-from typing import *
+from typing import Any, Dict, Union
 
 import arrow
-import requests
+#import requests
 
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage

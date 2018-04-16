@@ -5,7 +5,7 @@ import json
 import logging
 
 from threading import Thread
-from typing import *
+from typing import Any, Callable, Dict, List, Type
 
 import paho.mqtt.client as mqtt
 

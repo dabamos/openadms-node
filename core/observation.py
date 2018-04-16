@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 import json
 import logging
 
-from typing import *
+from typing import Any, Dict, List, TypeVar, Union
 from uuid import uuid4
 
 # Type definition for the value inside a response set of an observation.

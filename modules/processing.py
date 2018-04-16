@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 
 import re
 
-from typing import *
+from typing import Union
 
 from core.observation import Observation
 from core.manager import Manager
@@ -399,16 +399,12 @@ class ReturnCodeInspector(Prototype):
 
                 continue
 
-            # Get level and error message of the return code.
+            # Get error message of the return code.
             error_values = ReturnCodes.codes.get(return_code)
-
-            if (error_values):
-                lvl, retry, msg = error_values
-
             attempts = obs.get('attempts', 0)
 
             # Retry measurement.
-            if error_values and retry and attempts < self._retries:
+            if error_values and attempts < self._retries:
                 obs.set('attempts', attempts + 1)
                 obs.set('corrupted', False)
                 obs.set('nextReceiver', 0)
@@ -426,6 +422,8 @@ class ReturnCodeInspector(Prototype):
 
                 if error_values:
                     # Return code related log message.
+                    lvl, retry, msg = error_values
+
                     self.logger.log(lvl * 10,
                                     'Observation "{}" of target "{}": {} '
                                     '(code {} in response "{}")'

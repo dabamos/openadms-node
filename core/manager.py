@@ -11,9 +11,9 @@ import jsonschema
 import logging
 import re
 
-from importlib import *
+from importlib import import_module
 from pathlib import Path
-from typing import *
+from typing import Any, Dict, KeysView
 
 import arrow
 

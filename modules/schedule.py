@@ -11,7 +11,7 @@ import logging
 import threading
 import time
 
-from typing import *
+from typing import Any, Callable, Dict, List
 
 import arrow
 

@@ -6,9 +6,11 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
+import logging
 import time
 
-from core.manager import *
+from core.manager import (ConfigManager, Manager, ModuleManager, NodeManager,
+                          ProjectManager, SchemaManager, SensorManager)
 
 
 class Monitor(object):

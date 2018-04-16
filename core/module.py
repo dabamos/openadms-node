@@ -10,7 +10,7 @@ import logging
 import queue
 import threading
 
-from typing import *
+from typing import Dict, List
 
 from core.intercom import MQTTMessenger
 from modules.prototype import Prototype
@@ -115,4 +115,3 @@ class Module(threading.Thread):
     @worker.setter
     def worker(self, worker: Prototype) -> None:
         self._worker = worker
-

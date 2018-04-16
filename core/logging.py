@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 import logging
 
 from collections import deque
-from typing import *
+from typing import Any
 
 
 class RootFilter(logging.Filter):
