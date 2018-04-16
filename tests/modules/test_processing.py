@@ -8,9 +8,13 @@ __license__ = 'BSD-2-Clause'
 
 import pytest
 
+from typing import List
+
 from testfixtures import LogCapture
 
-from modules.processing import *
+from core.observation import Observation
+from modules.processing import (PreProcessor, ResponseValueInspector,
+                                ReturnCodeInspector, UnitConverter)
 
 
 @pytest.fixture(scope='module')

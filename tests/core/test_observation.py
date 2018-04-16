@@ -8,7 +8,7 @@ __license__ = 'BSD-2-Clause'
 
 import pytest
 
-from core.observation import *
+from core.observation import Observation
 
 
 @pytest.fixture(scope='module')

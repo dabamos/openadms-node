@@ -6,10 +6,14 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
+import json
+
+from typing import List
+
 import pytest
 
-from core.manager import *
-from core.observation import *
+from core.manager import ConfigManager, Manager, SchemaManager
+from core.observation import Observation
 
 
 @pytest.fixture(scope='module')
@@ -19,7 +23,7 @@ def observations() -> List[Observation]:
     Returns:
         List of examples observations.
     """
-    file_path = Path('tests/data/observations.json')
+    file_path = 'tests/data/observations.json'
 
     with open(file_path) as fh:
         data = json.loads(fh.read())
