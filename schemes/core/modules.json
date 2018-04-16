@@ -4,7 +4,7 @@
     "id": "schemes/core/modules.json",
     "minProperties": 1,
     "patternProperties": {
-        "^[a-zA-Z0-9]+$": {
+        "^[a-zA-Z0-9_-]+$": {
             "type": "string"
         }
     },
