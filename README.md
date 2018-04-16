@@ -76,7 +76,11 @@ You can start the unit tests with:
 ```
 $ python3 -m pytest
 ```
-These are work in progress.
+These are work in progress. You can run passive checks with
+[pyflakes](https://pypi.python.org/pypi/pyflakes):
+```
+$ python3 -m pyflakes *.py *.pyw core/*.py modules/*.py
+```
 
 ## Licence
 OpenADMS is licenced under BSD-2-Clause.
