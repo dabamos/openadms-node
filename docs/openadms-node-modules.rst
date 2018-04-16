@@ -2,8 +2,8 @@ OpenADMS Node Modules
 =====================
 
 The logic of the OpenADMS Node software is located in several modules, which are
-stored in the directory ``module/``. New features can be added to the
-monitoring system by writing additional modules.  Each module must be loaded
+stored in the directory ``modules/``. New features can be added to the
+monitoring system by writing additional modules. Each module must be loaded
 before it can be used.
 
 +-------------------------------------+--------------------------------------------------------+-----+
@@ -108,16 +108,20 @@ Node core configuration. In the example below, the modules :ref:`scheduler` and
           "fileExporter": "modules.export.FileExporter",
           "schedulerCom1": "modules.schedule.Scheduler"
         }
-      }
+      },
+      "modules": {}
     }
 
 The key ``fileExporter`` sets the name of the instance, the value
 ``modules.export.FileExporter`` the path to the module (class ``FileExporter``
-in ``modules/export.py``). The name of an instance can be chosen freely. For
-instance, instead of ``fileExporter`` the name ``myFileExporter`` is also valid,
-but the key of the FileExporter module configuration has to be renamed as well.
-Multiple instances of a module are possible, if they have different names (e.g.,
-``scheduler1``, ``scheduler2``, and so on). Each instance has its own
+in ``modules/export.py``). The configuration of each loaded module must be added
+to the ``modules`` section of the file.
+
+The name of an instance can be chosen freely. For instance, instead of
+``fileExporter`` the name ``myFileExporter`` is valid too, but the key of the
+FileExporter configuration in the ``modules`` section has to be renamed as well.
+Multiple instances of a module are possible, if they have different names
+(e.g., ``scheduler1``, ``scheduler2``, and so on). Each instance has its own
 configuration.
 
 Database
@@ -159,8 +163,9 @@ load the CouchDriver:
 
 Configuration
 ^^^^^^^^^^^^^
-An example CouchDB server ``https://alice:secret@db.example.com:443/couchdb/``
-may has the following configuration.
+An example CouchDB server on
+``https://alice:secret@db.example.com:443/couchdb/`` may has the following
+configuration.
 
 .. code:: javascript
 
@@ -1722,7 +1727,7 @@ The configuration below shows the definition of a unit conversion from ``mm`` to
 Prototype
 ---------
 
-All modules are a subclass of the module ``Prototype``.
+All OpenADMS Node modules are a subclass of the module ``Prototype``.
 
 .. _prototype:
 
@@ -1731,7 +1736,7 @@ Prototype
 The Prototype class is used for prototypal inheritance only. All OpenADMS Node
 modules are based on Prototype. A minimal OpenADMS Node module is defined as:
 
-::
+.. code:: python
 
     class MyModule(Prototype):
 

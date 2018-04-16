@@ -93,13 +93,13 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``enabled``       | Boolean   | Condition of the observation (enabled/disabled).                        |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``id``            | String    | ID of the observation (UUID4 hex).                                      |
+| ``id``            | String    | ID of the observation (UUID4 hex only).                                 |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``name``          | String    | Name of the observation.                                                |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``nextReceiver``  | Integer   | Index of the next receiver (0 … n).                                     |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``node``          | String    | ID of the sensor node (UUID4 hex).                                      |
+| ``node``          | String    | ID of the sensor node (UUID4 hex only).                                 |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``onetime``       | Boolean   | If true, observation will be send one time only.                        |
 +-------------------+-----------+-------------------------------------------------------------------------+
@@ -107,7 +107,7 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``portName``      | String    | Name of the serial port (will be added automatically).                  |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``project``       | String    | ID of the project (UUID4 hex).                                          |
+| ``project``       | String    | ID of the project (UUID4 hex only).                                     |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``receivers``     | List      | List of modules the observation will be send to sequentially.           |
 +-------------------+-----------+-------------------------------------------------------------------------+

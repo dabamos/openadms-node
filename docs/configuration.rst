@@ -6,14 +6,14 @@ in JavaScript Object Notation (JSON). The file is loaded once at the start of
 OpenADMS Node. The path to the configuration file is passed as a command-line
 argument. Example configuration files are located in directory
 ``config/examples/``. At the moment, configuration files have to be written
-manually. This will change in future, once a visual configuration tool will be
+manually. This will change in future, once a visual configuration tool is
 available.
 
 The configuration consists of several sections. The order of the sections is
 arbitrary, but it is recommended to start with the core settings (``core``),
 followed by the used sensors with their commands listed under ``sensors``. See
 directory ``sensors/`` for sensor configuration files. The configuration of
-the dynamically loaded modules must be under ``modules``.
+the dynamically loaded modules must be placed under ``modules``.
 
 .. code:: javascript
 
@@ -101,103 +101,105 @@ following JSON structure into it:
 .. code:: javascript
 
     {
-      "core":{
-        "modules":{ },
-        "project":{ },
-        "node":{ },
-        "intercom":{ }
+      "core": {
+        "modules": {},
+        "project": {},
+        "node": {},
+        "intercom": {}
       },
-      "sensors":{ },
-      "modules":{ }
+      "sensors": {},
+      "modules": {}
     }
 
-After that, fill the JSON objects and add further ones for the used modules.
+After that, fill the JSON objects with the actual configuration.
 
 Loading the Modules
 ~~~~~~~~~~~~~~~~~~~
 Modules used for the monitoring job have to be added to the modules object in
-the ``core`` section of the configuration file. For the control of a Leica
-Nivel210 at least four modules are necessary:
+the ``core`` section of the configuration file. The control of a Leica
+Nivel210 sensor requires at least four modules:
 
 - *Scheduler* for starting the observation,
 - *SerialPort* for sensor communication,
 - *PreProcessor* for sensor data extraction,
 - *FileExporter* to save the sensor data to a CSV file.
 
-The name of each module instance can be chosen freely. It is recommended to
-write the names in lower camel case. As a common practice, the scheduler and
-the serial port are named according to the used COM port (``COMx`` on Microsoft
-Windows and ``ttyx`` on Linux/Unix).
+The name of each module instance can be chosen freely (spaces and special
+characters are not allowed). It is recommended to write all names in lower camel
+case. As a sane practice, the scheduler and the serial port are named according
+to the used COM port (for example, ``COMx`` on Microsoft Windows and ``ttyx``
+on Linux/Unix). All modules listed in the modules object are loaded
+automatically at run-time:
 
 .. code:: javascript
 
     {
-      "core":{
-        "modules":{
-          "schedulerCom1":"module.schedule.Scheduler",
-          "com1":"module.port.SerialPort",
-          "preProcessor":"module.processing.PreProcessor",
-          "fileExporter":"module.export.FileExporter"
+      "core": {
+        "modules": {
+          "schedulerCom1": "module.schedule.Scheduler",
+          "com1": "module.port.SerialPort",
+          "preProcessor": "module.processing.PreProcessor",
+          "fileExporter": "module.export.FileExporter"
         }
       }
     }
 
-All modules listed in the modules object are loaded automatically at run-time.
+
 
 Project Details
 ~~~~~~~~~~~~~~~
-Some meta information about the monitoring project should be defined in the
-``project`` section of the configuration. For the project id, use a hex encoded
-UUID4.
+Some meta information about the monitoring project must be defined in the
+``project`` section of the core configuration. Use a hex-only UUID4 as the
+project id.
 
 .. code:: javascript
 
     {
-      "core":{
-        "project":{
-          "name":"Example Project",
-          "id":"19481e0791604b489a8a9c4a25e9dd80",
-          "description":"Project for testing the Leica Nivel210."
+      "core": {
+        "project": {
+          "name": "Example Project",
+          "id": "19481e0791604b489a8a9c4a25e9dd80",
+          "description": "Project for testing the Leica Nivel210."
         }
       }
     }
 
 Sensor Node Details
 ~~~~~~~~~~~~~~~~~~~
-Each project consists of one or more sensor nodes. It is required to set a
-node name, a node id, and a node description. The node id should be a hex
-encoded UUID4.
+Each monitoring project consists of one or more sensor nodes. It is required to
+set a node name, a node id, and a node description. Use a hex-only UUID4 as the
+node id.
 
 .. code:: javascript
 
     {
-      "core":{
-        "node":{
-          "name":"Sensor Node 1",
-          "id":"21bcf8c16a664b17bbc9cd4221fd8541",
-          "description":"The only sensor node in this project."
+      "core": {
+        "node": {
+          "name": "Sensor Node 1",
+          "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+          "description": "The only sensor node in this project."
         }
       }
     }
 
 Communication
 ~~~~~~~~~~~~~
-The communication between the single modules is based on the MQTT messaging
-protocol. An MQTT message broker must be installed and running before
-starting OpenADMS. The default configuration uses the IP address ``127.0.0.1``
-and the port ``1883``, but can be altered to the values set for the used MQTT
-message broker.
+The modules communicate by using the MQTT messaging protocol. For this reason,
+an MQTT message broker is required. Either run OpenADMS with the parameter
+``--with-mqtt-broker`` or start an external one. The default configuration uses
+the IP address ``127.0.0.1`` and the port ``1883``, but can be altered to the
+values set for the used MQTT message broker.
 
 .. code:: javascript
 
     {
-      "core":{
-        "intercom":{
-          "mqtt":{
-            "host":"127.0.0.1",
-            "port":1883,
-            "keepAlive":60,
-            "topic":"example"
+      "core": {
+        "intercom": {
+          "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "example"
           }
         }
       }
@@ -210,48 +212,48 @@ Add the sensor details and used commands to the configuration file:
 .. code:: javascript
 
     {
-      "sensors":{
-        "nivel210":{
-          "description":"Leica Nivel210",
-          "type":"inclinometer",
-          "observations":[
+      "sensors": {
+        "nivel210": {
+          "description": "Leica Nivel210",
+          "type": "inclinometer",
+          "observations": [
             {
-              "name":"getValues",
-              "description":"gets inclination and temperature",
-              "receivers":[
+              "name": "getValues",
+              "description": "gets inclination and temperature",
+              "receivers": [
                 "preProcessor",
                 "fileExporter"
               ],
               "nextReceiver":0,
-              "enabled":true,
-              "onetime":false,
-              "target":"nivel210",
-              "requestsOrder":[
+              "enabled": true,
+              "onetime": false,
+              "target": "nivel210",
+              "requestsOrder": [
                 "getXYTemp"
               ],
-              "requestSets":{
-                "getXYTemp":{
-                  "enabled":true,
-                  "request":"\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
-                  "response":"",
-                  "responseDelimiter":"\\x03",
-                  "responsePattern":"X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
+              "requestSets": {
+                "getXYTemp": {
+                  "enabled": true,
+                  "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
+                  "response": "",
+                  "responseDelimiter": "\\x03",
+                  "responsePattern": "X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
                   "sleepTime":0.0,
                   "timeout":1.0
                 }
               },
-              "responseSets":{
-                "temperature":{
-                  "type":"float",
-                  "unit":"C"
+              "responseSets": {
+                "temperature": {
+                  "type": "float",
+                  "unit": "C"
                 },
-                "x":{
-                  "type":"float",
-                  "unit":"mrad"
+                "x": {
+                  "type": "float",
+                  "unit": "mrad"
                 },
-                "y":{
-                  "type":"float",
-                  "unit":"mrad"
+                "y": {
+                  "type": "float",
+                  "unit": "mrad"
                 }
               },
               "sleepTime":0.30
@@ -272,19 +274,19 @@ likely ``9600``.
 .. code:: javascript
 
     {
-      "modules":{
-        "ports":{
-          "serial":{
-            "com1":{
-              "port":"COM1",
-              "baudRate":9600,
-              "byteSize":8,
-              "stopBits":1,
-              "parity":"none",
-              "timeout":2.0,
-              "softwareFlowControl":false,
-              "hardwareFlowControl":false,
-              "maxAttepts":1
+      "modules": {
+        "ports": {
+          "serial": {
+            "com1": {
+              "port": "COM1",
+              "baudRate": 9600,
+              "byteSize": 8,
+              "stopBits": 1,
+              "parity": "none",
+              "timeout": 2.0,
+              "softwareFlowControl": false,
+              "hardwareFlowControl": false,
+              "maxAttepts": 1
             }
           }
         }
@@ -298,18 +300,18 @@ Use a scheduler module to send commands to the sensor:
 .. code:: javascript
 
     {
-      "modules":{
-        "schedulers":{
-          "schedulerCom1":{
-            "port":"com1",
-            "sensor":"nivel210",
-            "schedules":[
+      "modules": {
+        "schedulers": {
+          "schedulerCom1": {
+            "port": "com1",
+            "sensor": "nivel210",
+            "schedules": [
               {
-                "enabled":true,
-                "startDate":"2017-01-01",
-                "endDate":"2020-12-31",
-                "weekdays":{ },
-                "observations":[
+                "enabled": true,
+                "startDate": "2017-01-01",
+                "endDate": "2020-12-31",
+                "weekdays": { },
+                "observations": [
                   "getValues"
                 ]
               }
@@ -328,22 +330,22 @@ extraction.
 
 File Exporter
 ~~~~~~~~~~~~~
-The name of the CSV file will be ``com1_nivel210_2017-05.csv`` or similar. The
-CSV file is stored in the directory ``data/``.
+The name of the CSV file will be ``com1_nivel210_2017-05.csv`` (or similar) and
+be stored in directory ``data/``.
 
 .. code:: javascript
 
     {
-      "modules":{
-        "fileExporter":{
-          "fileExtension":".csv",
-          "fileName":"{{port}}_{{id}}_{{date}}",
-          "fileRotation":"monthly",
-          "paths":[
+      "modules": {
+        "fileExporter": {
+          "fileExtension": ".csv",
+          "fileName": "{{port}}_{{id}}_{{date}}",
+          "fileRotation": "monthly",
+          "paths": [
             "./data"
           ],
-          "separator":",",
-          "dateTimeFormat":"YYYY-MM-DDTHH:mm:ss.SSSSS"
+          "separator": ",",
+          "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS"
         }
       }
     }
@@ -355,125 +357,125 @@ The complete configuration is listed below.
 .. code:: javascript
 
     {
-      "core":{
-        "modules":{
-          "schedulerCom1":"modules.schedule.Scheduler",
-          "com1":"modules.port.SerialPort",
-          "preProcessor":"modules.processing.PreProcessor",
-          "fileExporter":"modules.export.FileExporter"
+      "core": {
+        "modules": {
+          "schedulerCom1": "modules.schedule.Scheduler",
+          "com1": "modules.port.SerialPort",
+          "preProcessor": "modules.processing.PreProcessor",
+          "fileExporter": "modules.export.FileExporter"
         },
-        "project":{
-          "name":"Example Project",
-          "id":"19481e0791604b489a8a9c4a25e9dd80",
-          "description":"Project for testing the Leica Nivel210."
+        "project": {
+          "name": "Example Project",
+          "id": "19481e0791604b489a8a9c4a25e9dd80",
+          "description": "Project for testing the Leica Nivel210."
         },
-        "node":{
-          "name":"Sensor Node 1",
-          "id":"21bcf8c16a664b17bbc9cd4221fd8541",
-          "description":"The only sensor node in this project."
+        "node": {
+          "name": "Sensor Node 1",
+          "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+          "description": "The only sensor node in this project."
         },
-        "intercom":{
-          "mqtt":{
-            "host":"127.0.0.1",
-            "port":1883,
-            "keepAlive":60,
-            "topic":"example"
+        "intercom": {
+          "mqtt": {
+            "host": "127.0.0.1",
+            "port": 1883,
+            "keepAlive": 60,
+            "topic": "example"
           }
         }
       },
-      "sensors":{
-        "nivel210":{
-          "description":"Leica Nivel210",
-          "type":"inclinometer",
-          "observations":[
+      "sensors": {
+        "nivel210": {
+          "description": "Leica Nivel210",
+          "type": "inclinometer",
+          "observations": [
             {
-              "name":"getValues",
-              "description":"gets inclination and temperature",
-              "receivers":[
+              "name": "getValues",
+              "description": "gets inclination and temperature",
+              "receivers": [
                 "preProcessor",
                 "fileExporter"
               ],
-              "nextReceiver":0,
-              "enabled":true,
-              "onetime":false,
-              "target":"nivel210",
-              "requestsOrder":[
+              "nextReceiver": 0,
+              "enabled": true,
+              "onetime": false,
+              "target": "nivel210",
+              "requestsOrder": [
                 "getXYTemp"
               ],
-              "requestSets":{
-                "getXYTemp":{
-                  "enabled":true,
-                  "request":"\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
-                  "response":"",
-                  "responseDelimiter":"\\x03",
-                  "responsePattern":"X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
-                  "sleepTime":0.0,
-                  "timeout":1.0
+              "requestSets": {
+                "getXYTemp": {
+                  "enabled": true,
+                  "request": "\\x16\\x02N0C0 G A\\x03\\x0d\\x0a",
+                  "response": "",
+                  "responseDelimiter": "\\x03",
+                  "responsePattern": "X:(?P[-+]?[0-9]*\\.?[0-9]+) Y:(?P[-+]?[0-9]*\\.?[0-9]+) T:(?P[-+]?[0-9]*\\.?[0-9]+)",
+                  "sleepTime": 0.0,
+                  "timeout": 1.0
                 }
               },
-              "responseSets":{
-                "temperature":{
-                  "type":"float",
-                  "unit":"C"
+              "responseSets": {
+                "temperature": {
+                  "type": "float",
+                  "unit": "C"
                 },
-                "x":{
-                  "type":"float",
-                  "unit":"mrad"
+                "x": {
+                  "type": "float",
+                  "unit": "mrad"
                 },
-                "y":{
-                  "type":"float",
-                  "unit":"mrad"
+                "y": {
+                  "type": "float",
+                  "unit": "mrad"
                 }
               },
-              "sleepTime":0.30
+              "sleepTime": 0.30
             }
           ]
         }
       },
-      "modules":{
-        "ports":{
-          "serial":{
-            "com1":{
-              "port":"COM1",
-              "baudRate":9600,
-              "byteSize":8,
-              "stopBits":1,
-              "parity":"none",
-              "timeout":2.0,
-              "softwareFlowControl":false,
-              "hardwareFlowControl":false,
-              "maxAttepts":1
+      "modules": {
+        "ports": {
+          "serial": {
+            "com1": {
+              "port": "COM1",
+              "baudRate": 9600,
+              "byteSize": 8,
+              "stopBits": 1,
+              "parity": "none",
+              "timeout": 2.0,
+              "softwareFlowControl": false,
+              "hardwareFlowControl": false,
+              "maxAttepts": 1
             }
           }
         },
-        "schedulers":{
-          "schedulerCom1":{
-            "port":"com1",
-            "sensor":"nivel210",
-            "schedules":[
+        "schedulers": {
+          "schedulerCom1": {
+            "port": "com1",
+            "sensor": "nivel210",
+            "schedules": [
               {
-                "enabled":true,
-                "startDate":"2017-01-01",
-                "endDate":"2020-12-31",
-                "weekdays":{
+                "enabled": true,
+                "startDate": "2017-01-01",
+                "endDate": "2020-12-31",
+                "weekdays": {
 
                 },
-                "observations":[
+                "observations": [
                   "getValues"
                 ]
               }
             ]
           }
         },
-        "fileExporter":{
-          "fileExtension":".csv",
-          "fileName":"{{port}}_{{id}}_{{date}}",
-          "fileRotation":"monthly",
-          "paths":[
+        "fileExporter": {
+          "fileExtension": ".csv",
+          "fileName": "{{port}}_{{id}}_{{date}}",
+          "fileRotation": "monthly",
+          "paths": [
             "./data"
           ],
-          "separator":",",
-          "dateTimeFormat":"YYYY-MM-DDTHH:mm:ss.SSSSS"
+          "separator": ",",
+          "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS"
         }
       }
     }
@@ -487,4 +489,5 @@ following command from the command-line:
 
     $ python3 openadms.py --config config/nivel210.json --with-mqtt-broker --debug
 
-On Microsoft Windows, you may want to use the graphical launcher instead.
+On Microsoft Windows, you may want to use the graphical launcher
+``openadms-launcher.py`` instead.
