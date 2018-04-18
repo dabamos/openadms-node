@@ -8,6 +8,7 @@ __license__ = 'BSD-2-Clause'
 
 # Build-in modules.
 import copy
+import errno
 import re
 import socket
 import time
@@ -58,7 +59,8 @@ class BluetoothPort(Prototype):
         self._server_mac_address = valid_mac
 
         if System.is_windows():
-            raise EnvironmentError('Operating system not supported (no '
+            raise EnvironmentError(errno.ESOCKTNOSUPPORT,
+                                   'Operating system not supported (no '
                                    'socket.AF_BLUETOOTH on Microsoft Windows)')
 
     def __del__(self):
