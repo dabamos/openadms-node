@@ -95,7 +95,7 @@ class CouchDriver(Prototype):
         """Caches the given observation in local cache database.
 
         Args:
-            obs: Observation object.
+            obs: The observation object.
 
         Returns:
             Document id of cached data set.
@@ -204,7 +204,7 @@ class CouchDriver(Prototype):
         return obs
 
     def run(self) -> None:
-        """Inserts cached observations into CouchDB database."""
+        """Inserts cached observation data into CouchDB database."""
         while self.is_running:
             # Poor men's event handling ...
             if not self.has_cached_observation_data():

@@ -148,7 +148,7 @@ class Job(object):
         # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
-        self.logger.info('Starting job "{}" for port "{}"'
+        self.logger.info('Starting job "{}" for port "{}" ...'
                          .format(self._obs.get('name'),
                                  self._port_name))
 

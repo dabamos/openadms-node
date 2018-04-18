@@ -306,19 +306,19 @@ class FileExporter(Prototype):
                 # Write line to file.
                 fh.write(line + '\n')
 
-                self.logger.verbose('Saved observation "{}" of target "{}" '
-                                    'from port "{}" to file "{}"'
-                                    .format(obs.get('name'),
-                                            obs.get('target'),
-                                            obs.get('portName'),
-                                            str(file_path)))
+                self.logger.info('Saved observation "{}" of target "{}" from '
+                                 'port "{}" to file "{}"'
+                                 .format(obs.get('name'),
+                                         obs.get('target'),
+                                         obs.get('portName'),
+                                         str(file_path)))
 
         return obs
 
 
 class RealTimePublisher(Prototype):
     """
-    RealTimePublisher sends copies of `Observation` objects to a list of
+    RealTimePublisher forwards incoming `Observation` objects to a list of
     receivers.
 
     The JSON-based configuration for this module:
