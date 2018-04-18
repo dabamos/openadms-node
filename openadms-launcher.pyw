@@ -98,8 +98,8 @@ def mainw() -> None:
 
     setup_logging(args.is_debug, args.verbosity, args.log_file)
 
+    # Use internal MQTT message broker (HBMQTT).
     if args.is_mqtt_broker:
-        # Use internal MQTT message broker (HBMQTT).
         start_mqtt_message_broker(args.host, args.port)
 
     main(args.config_file_path)
@@ -108,6 +108,11 @@ def mainw() -> None:
 if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
+
+    # Use signal handlers to quit gracefully and restart on SIGHUP.
     signal.signal(signal.SIGINT, sigint_handler)
-    signal.signal(signal.SIGINT, sighup_handler)
+
+    if not System.is_windows():
+        signal.signal(signal.SIGINT, sighup_handler)
+
     mainw()
