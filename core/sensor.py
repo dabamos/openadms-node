@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 import codecs
 import logging
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from core.observation import Observation
 
@@ -19,8 +19,6 @@ class Sensor(object):
     Sensor stores the configuration of a sensor, especially, all defined
     observations.
     """
-    _config = ...   # type: Dict[str, Any]
-    _name = ...     # type: str
 
     def __init__(self, name: str, config: Dict[str, Any]):
         """
@@ -59,20 +57,20 @@ class Sensor(object):
         for set_name, request_set in data.get('requestSets').items():
             if request_set.get('request'):
                 request_set['request'] = codecs.decode(
-                        request_set.get('request'),
-                        'unicode_escape'
+                    request_set.get('request'),
+                    'unicode_escape'
                 )
 
             if request_set.get('responseDelimiter'):
                 request_set['responseDelimiter'] = codecs.decode(
-                        request_set.get('responseDelimiter'),
-                        'unicode_escape'
+                    request_set.get('responseDelimiter'),
+                    'unicode_escape'
                 )
 
             if request_set.get('responsePattern'):
                 request_set['responsePattern'] = codecs.decode(
-                        request_set.get('responsePattern'),
-                        'unicode_escape'
+                    request_set.get('responsePattern'),
+                    'unicode_escape'
                 )
 
         return Observation(data)

@@ -9,7 +9,6 @@ __license__ = 'BSD-2-Clause'
 import math
 
 
-@staticmethod
 def gon_to_rad(angle: float) -> float:
     """Converts from gon (grad) to radiant.
 
@@ -22,7 +21,6 @@ def gon_to_rad(angle: float) -> float:
     return angle * math.pi / 200
 
 
-@staticmethod
 def rad_to_gon(angle: float) -> float:
     """Converts from radiant to gon (grad).
 

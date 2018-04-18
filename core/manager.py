@@ -155,7 +155,7 @@ class ConfigManager(object):
         exception if the configuration is invalid.
 
         Args:
-            schema_name: Name of the JSON schemes.
+            schema_name: Name of the JSON schemas.
             *args: Key names to the module's configuration.
 
         Returns:
@@ -558,13 +558,13 @@ class ProjectManager(object):
 
 class SchemaManager(object):
     """
-    SchemaManager stores JSON schemes and validates given data with them.
+    SchemaManager stores JSON schemas and validates given data with them.
     """
 
-    def __init__(self, schemes_root_path: str = 'schemes'):
+    def __init__(self, schemas_root_path: str = 'schemas'):
         self.logger = logging.getLogger('schemaManager')
-        self._schemes = {}
-        self._schemes_root_path = schemes_root_path
+        self._schemas = {}
+        self._schemas_root_path = schemas_root_path
         self.load_all()
 
     def add_schema(self,
@@ -580,10 +580,10 @@ class SchemaManager(object):
         Returns:
             True if schema has been added, False if not.
         """
-        if self._schemes.get(data_type):
+        if self._schemas.get(data_type):
             return False
 
-        schema_path = Path(self._schemes_root_path, path)
+        schema_path = Path(self._schemas_root_path, path)
 
         if not schema_path.exists():
             self.logger.error('Schema file "{}" not found.'
@@ -595,7 +595,7 @@ class SchemaManager(object):
                 schema = json.loads(data_file.read())
                 jsonschema.Draft4Validator.check_schema(schema)
 
-                self._schemes[data_type] = schema
+                self._schemas[data_type] = schema
                 self.logger.debug('Loaded schema "{}"'
                                   .format(data_type))
             except json.JSONDecodeError:
@@ -633,7 +633,7 @@ class SchemaManager(object):
         Returns:
             True if schema exists, False if not.
         """
-        if self._schemes.get(name):
+        if self._schemas.get(name):
             return True
         else:
             return False
@@ -649,12 +649,12 @@ class SchemaManager(object):
             True if data is valid, False if not.
         """
         if not self.has_schema(schema_name):
-            self.logger.warning('JSON schemes "{}" not found'
+            self.logger.warning('JSON schema "{}" not found'
                                 .format(schema_name))
             return False
 
         try:
-            schema = self._schemes.get(schema_name)
+            schema = self._schemas.get(schema_name)
             jsonschema.validate(data, schema)
         except jsonschema.ValidationError:
             return False
@@ -662,8 +662,8 @@ class SchemaManager(object):
         return True
 
     def load_all(self) -> None:
-        """Initialises the schemes dictionary."""
-        self._schemes = {}
+        """Initialises the schemas dictionary."""
+        self._schemas = {}
         self.add_schema('observation', 'observation.json')
 
     def remove(self, name: str) -> None:
@@ -673,14 +673,14 @@ class SchemaManager(object):
             name: The name of the schema.
         """
         self.logger.info('Removing schema "{}" ...'.format(name))
-        self._schemes[name] = None
+        self._schemas[name] = None
 
     def remove_all(self) -> None:
-        """Removes all schemes."""
-        for schema_name in self._schemes.keys():
+        """Removes all schemas."""
+        for schema_name in self._schemas.keys():
             self.remove(schema_name)
 
-        self._schemes = {}
+        self._schemas = {}
 
 
 class SensorManager(object):

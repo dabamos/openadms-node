@@ -49,7 +49,7 @@ class MQTTMessageBroker(Thread):
 
         try:
             loop.run_until_complete(broker.start())
-            self.logger.info('Starting MQTT message broker')
+            self.logger.info('Starting MQTT message broker ...')
             loop.run_forever()
         except KeyboardInterrupt:
             loop.run_until_complete(broker.shutdown())
@@ -98,7 +98,7 @@ class MQTTMessenger(object):
             self.disconnect()
 
     def _get_config(self, *args):
-        """Returns the validated configuration of the module. If no JSON schemes
+        """Returns the validated configuration of the module. If no JSON schemas
         is available, the function just returns an unchecked configuration.
 
         Args:
@@ -107,7 +107,7 @@ class MQTTMessenger(object):
         Returns:
             A dictionary with the module's configuration.
         """
-        # Add the JSON schemes to the Schema Manager.
+        # Add the JSON schemas to the Schema Manager.
         schema_path = self._schema_manager.get_schema_path(self._type)
         self._schema_manager.add_schema(self._type, schema_path)
 
