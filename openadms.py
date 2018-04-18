@@ -60,24 +60,24 @@ LOG_FILE_MAX_SIZE = 10485760  # 10 MiB.
 
 
 def main(config_file_path: str) -> None:
-    """Main procedure.
+    """Main procedure. Instantiates the monitor class and then runs forever.
 
     Args:
         config_file_path: The path to the configuration file.
     """
-    v = 'v.{}'.format(System.get_openadms_version())
+    v = System.get_openadms_version()
 
     logger = logging.getLogger('openadms')
-    logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
-    logger.info(' _____             _____ ____  _____ _____')
-    logger.info('|     |___ ___ ___|  _  |    \|     |   __|')
-    logger.info('|  |  | . | -_|   |     |  |  | | | |__   |')
-    logger.info('|_____|  _|___|_|_|__|__|____/|_|_|_|_____|')
-    logger.info('      |_|                        Node {}'.format(v))
-    logger.info('')
-    logger.info('Copyright (c) Hochschule Neubrandenburg')
-    logger.info('Licenced under BSD-2-Clause')
-    logger.info('-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-')
+    logger.info('+---------------------------------------------+')
+    logger.info('|  _____             _____ ____  _____ _____  |')
+    logger.info('| |     |___ ___ ___|  _  |    \|     |   __| |')
+    logger.info('| |  |  | . | -_|   |     |  |  | | | |__   | |')
+    logger.info('| |_____|  _|___|_|_|__|__|____/|_|_|_|_____| |')
+    logger.info('|       |_|                        Node v.{} |'.format(v))
+    logger.info('|                                             |')
+    logger.info('| Copyright (c) Hochschule Neubrandenburg     |')
+    logger.info('| Licenced under BSD-2-Clause                 |')
+    logger.info('+---------------------------------------------+')
 
     # Start the monitoring.
     global monitor
@@ -151,7 +151,7 @@ def stay_alive() -> None:
 
 def valid_path(string: str) -> str:
     """Checks whether a given string is a valid file path. Used as a validator
-    for ``argparse.ArgumentParser``.
+    for ``argparse.ArgumentParser`` (that is why a string has to be returned).
 
     Args:
         string: The string.
@@ -252,7 +252,9 @@ if __name__ == '__main__':
 
     # Use signal handlers to quit gracefully and restart on SIGHUP.
     signal.signal(signal.SIGINT, sigint_handler)
-    signal.signal(signal.SIGHUP, sighup_handler)
+
+    if not System.is_windows():
+        signal.signal(signal.SIGHUP, sighup_handler)
 
     # Parse command-line options.
     parser = argparse.ArgumentParser(
