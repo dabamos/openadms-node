@@ -124,7 +124,7 @@ def exception_hook(type: BaseException,
 def sighup_handler(signalnum: int, frame: Any) -> None:
     """Catches signal HUP and restarts everything."""
     global monitor
-    root.info('Caught SIGHUP')
+    root.info('Received SIGHUP')
 
     if monitor:
         monitor.restart()
@@ -133,7 +133,7 @@ def sighup_handler(signalnum: int, frame: Any) -> None:
 def sigint_handler(signalnum: int, frame: Any) -> None:
     """Catches signal INT and quits gracefully."""
     global monitor
-    root.info('Caught SIGINT')
+    root.info('Received SIGINT')
 
     if monitor:
         monitor.kill()
@@ -316,7 +316,6 @@ if __name__ == '__main__':
                                default='config/config.json',
                                required=True)
 
-    # Parse arguments.
     try:
         args = parser.parse_args()
     except argparse.ArgumentTypeError as e:

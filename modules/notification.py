@@ -635,7 +635,7 @@ class MailAgent(Prototype):
             mail_from: The sender of the email.
             mail_to: The recipient of the email.
             mail_subject: The subject of the email.
-            mail_message: The body test of the email.
+            mail_message: The body text of the email.
         """
         msg = MIMEMultipart('alternative')
         msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
@@ -651,8 +651,8 @@ class MailAgent(Prototype):
 
         done = False
 
+        # Repeat in case of error.
         while not done:
-            # Repeat in case of error.
             try:
                 if self._is_tls and not self._is_start_tls:
                     # Use TLS encryption.
