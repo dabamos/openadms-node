@@ -38,6 +38,7 @@ logger = logging.getLogger()
        monospace_display=True,
        image_dir='./extra')
 def mainw() -> None:
+    """Wrapper routine to run OpenADMS Node windowed."""
     parser = GooeyParser(
         description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
                     'System'.format(System.get_openadms_version()))
@@ -115,4 +116,5 @@ if __name__ == '__main__':
     if not System.is_windows():
         signal.signal(signal.SIGINT, sighup_handler)
 
+    # Run wrapper.
     mainw()
