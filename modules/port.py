@@ -132,8 +132,8 @@ class BluetoothPort(Prototype):
 
             # Data of the request set.
             request = request_set.get('request')
-            sleep_time = request_set.get('sleepTime')
-            timeout = request_set.get('timeout')
+            sleep_time = request_set.get('sleepTime') or 1.0
+            timeout = request_set.get('timeout') or 1.0
 
             # Send the request of the observation to the attached sensor.
             self.logger.verbose('Sending request "{}" of observation "{}" to '
