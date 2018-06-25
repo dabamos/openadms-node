@@ -1294,7 +1294,56 @@ passive
 An observation can demand passive mode by setting its key ``passiveMode`` to
 ``true``. The passive mode can be left by a further observation with
 ``passiveMode`` set to ``false``. In passive mode, the serial port module
-creates new observations as fast as incoming data from a sensor is received.
+creates new observations as fast as incoming data from a sensor is received. As
+a prerequisite it is required that the one and only request set of the
+observation is named ``draft``, for instance:
+
+.. code:: javascript
+
+    {
+      "sensors": {
+        "thermometer": {
+          "description": "example of a thermometer in passive mode",
+          "type": "thermometer",
+          "observations": [
+            {
+              "name": "getTemperature",
+              "description": "get temperature",
+              "id": "9dd4ac4d872547028bc287c66f64b8b0",
+              "target": "temp",
+              "receivers": [
+                "com1",
+                "preProcessor"
+              ],
+              "nextReceiver": 0,
+              "enabled": true,
+              "onetime": true,
+              "passiveMode": true,
+              "requestsOrder": [
+                "draft"
+              ],
+              "requestSets": {
+                "draft": {
+                  "enabled": true,
+                  "request": "",
+                  "responseDelimiter": "\r\n",
+                  "responsePattern": "(?P<temp>[+-]?\\d+\\.\\d+)",
+                  "sleepTime": 0.0,
+                  "timeout": 1.0
+                }
+              },
+              "responseSets": {
+                "temp": {
+                  "type": "float",
+                  "unit": "degC"
+                }
+              },
+              "sleepTime": 0.0
+            }
+          ]
+        }
+      }
+    }
 
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
@@ -1440,6 +1489,7 @@ The observation data object is then forwarded to the next receiver.
               "nextReceiver": 1,
               "enabled": true,
               "onetime": false,
+              "passiveMode": false,
               "requestsOrder": [
                 "getValue"
               ],
@@ -1751,7 +1801,7 @@ routine. Please be aware that the function ``process_observation()`` runs
 already inside a Thread.
 
 Raspberry Pi
------
+------------
 
 Modules in this package are compatible with the Raspberry Pi single-board
 computer running Linux only.
