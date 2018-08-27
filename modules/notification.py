@@ -567,6 +567,7 @@ class MailAgent(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
+        retryDelay (float): Time to wait before resending after failure.
         charset (str): Character set of the email.
         defaultSubject (str): Default subject if no subject is given.
         host (str): FQDN or IP address of the SMTP server.
@@ -582,7 +583,7 @@ class MailAgent(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
-        self._timeout = 30.0
+        self._retry_delay = config.get('retryDelay') or 600.0
         self._charset = config.get('charset')
         self._default_subject = config.get('defaultSubject',
                                            '[OpenADMS] Notification')
@@ -679,15 +680,15 @@ class MailAgent(Prototype):
             except smtplib.SMTPException:
                 self.logger.warning('E-mail could not be sent to "{}" '
                                     '(SMTP error)'.format(mail_to))
-                time.sleep(self._timeout)
+                time.sleep(self._retry_delay)
             except socket.gaierror:
                 self.logger.warning('E-mail could not be sent to "{}"'
                                     '(connection error)'.format(mail_to))
-                time.sleep(self._timeout)
+                time.sleep(self._retry_delay)
             except TimeoutError:
                 self.logger.warning('E-mail could not be sent to "{}" '
                                     '(timeout)'.format(mail_to))
-                time.sleep(self._timeout)
+                time.sleep(self._retry_delay)
 
 
 class MastodonAgent(Prototype):
