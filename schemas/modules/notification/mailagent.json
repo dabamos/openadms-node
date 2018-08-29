@@ -18,6 +18,10 @@
             "id": "/properties/port",
             "type": "integer"
         },
+        "retryDelay": {
+            "id": "/properties/retryDelay",
+            "type": "number"
+        },
         "startTls": {
             "id": "/properties/startTls",
             "type": "boolean"
@@ -40,15 +44,16 @@
         }
     },
     "required": [
-        "userName",
-        "tls",
-        "defaultSubject",
-        "startTls",
-        "userPassword",
         "charset",
-        "userMail",
+        "defaultSubject",
         "host",
-        "port"
+        "port",
+        "retryDelay",
+        "startTls",
+        "tls",
+        "userMail",
+        "userName",
+        "userPassword"
     ],
     "type": "object"
 }

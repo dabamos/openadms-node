@@ -62,7 +62,7 @@ Linux and Unix
     compile it from source.
 
 macOS
-    The latest version of Python is also available for download on the Python
+    The latest version of Python is also available for download on the official
     website.
 
 .. _python-path:
@@ -225,7 +225,7 @@ necessary directories:
 
 ::
 
-    $ sh ./freebsd_install.sh
+    # sh ./freebsd_install.sh
 
 Then, add the following line to your ``/etc/rc.conf``:
 

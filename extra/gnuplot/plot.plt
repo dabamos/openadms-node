@@ -18,6 +18,6 @@ set nokey
 set grid
 set title 'Plot'
 # plot "< tail -n 25 ../data/data.csv | awk -f filter.awk" using 1:2 with lines
-plot "< cat ../../data/data.csv | awk -f filter.awk" using 1:2 with lines
+plot "< cat ../../data/com1_uwe_2018-06.csv | awk -f filter.awk" using 1:2 with lines
 pause 1
 reread

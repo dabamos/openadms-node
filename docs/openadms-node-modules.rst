@@ -840,7 +840,8 @@ Configuration
         "host": "smtp.example.com",
         "port": 465,
         "tls": true,
-        "startTls": false
+        "startTls": false,
+        "retryDelay": 600.0
       }
     }
 
@@ -864,6 +865,9 @@ Configuration
 | ``tls``            | Boolean     | If ``true``, use TLS encryption.                     |
 +--------------------+-------------+------------------------------------------------------+
 | ``startTls``       | Boolean     | If ``true``, use TLS encryption with StartTLS.       |
++--------------------+-------------+------------------------------------------------------+
+| ``retryDelay``     | Float       | Time in seconds to wait before trying to re-send     |
+|                    |             | after failure.                                       |
 +--------------------+-------------+------------------------------------------------------+
 
 .. _mastodon-agent:

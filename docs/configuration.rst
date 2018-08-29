@@ -89,14 +89,14 @@ Geodetic inclinometers are not only used in industrial surveying but also in
 deformation monitoring. This tutorial explains how the OpenADMS monitoring
 system has to be configured in order to be used with a Leica Nivel210
 inclinometer. More sensors can be added easily. This setup works on all
-operating systems (Microsoft Windows, Linux, Unix).
+operating systems.
 
 The example requires a Leica Nivel210 inclinometer with data cable and
 power supply unit, as well as a computer with an RS-232 port or USB serial
 adapter.
 
 Create an empty configuration file under ``config/nivel210.json`` and copy the
-following JSON structure into it:
+following (empty) JSON structure into it:
 
 .. code:: javascript
 
@@ -119,17 +119,17 @@ Modules used for the monitoring job have to be added to the modules object in
 the ``core`` section of the configuration file. The control of a Leica
 Nivel210 sensor requires at least four modules:
 
-- *Scheduler* for starting the observation,
-- *SerialPort* for sensor communication,
-- *PreProcessor* for sensor data extraction,
+- *Scheduler* for starting the observation;
+- *SerialPort* for sensor communication;
+- *PreProcessor* for sensor data extraction;
 - *FileExporter* to save the sensor data to a CSV file.
 
 The name of each module instance can be chosen freely (spaces and special
-characters are not allowed). It is recommended to write all names in lower camel
-case. As a sane practice, the scheduler and the serial port are named according
-to the used COM port (for example, ``COMx`` on Microsoft Windows and ``ttyx``
-on Linux/Unix). All modules listed in the modules object are loaded
-automatically at run-time:
+characters are not permitted). It is recommended to write all names in lower
+camel case. As a sane practice, the scheduler and the serial port are named
+according to the used COM port (for example, ``COMx`` on Microsoft Windows and
+``ttyx`` on Linux/Unix). All modules listed in the core/modules object are
+loaded automatically at run-time:
 
 .. code:: javascript
 
@@ -207,7 +207,8 @@ values set for the used MQTT message broker.
 
 Sensor
 ~~~~~~
-Add the sensor details and used commands to the configuration file:
+Add the sensor details and used commands of the Nivel210 to the configuration
+file:
 
 .. code:: javascript
 
@@ -265,11 +266,11 @@ Add the sensor details and used commands to the configuration file:
 
 Serial Port
 ~~~~~~~~~~~
-The configuration of serial port modules is stored under ``ports`` → ``serial``
-→ *module name*. On Microsoft Windows, the port is ``COMx``, on Linux and Unix
-``/dev/ttyx`` or ``/dev/ttyUx``, whereas ``x`` is the number of the port. The
-baud rate has to be set to the value the Nivel210 is configured to, most
-likely ``9600``.
+The configuration of serial port modules must be stored under ``ports`` →
+``serial`` → *module name*. On Microsoft Windows, the port is ``COMx``, on Linux
+and Unix ``/dev/ttyx`` or ``/dev/ttyUx``, whereas ``x`` is the number of the
+port. The baud rate has to be set to the value the Nivel210 is configured to,
+most likely ``9600``.
 
 .. code:: javascript
 

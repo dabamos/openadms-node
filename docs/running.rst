@@ -25,7 +25,7 @@ Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
 
 ::
 
-    > python openadms.py --config config\myconfig.json --with-mqtt-broker
+    > python openadms.py --config config\config.json --with-mqtt-broker
 
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
@@ -37,7 +37,7 @@ OpenADMS can be started with an installed Python 3.6 interpreter
 
 ::
 
-    $ python openadms.py --config config/myconfig.json --with-mqtt-broker
+    $ python openadms.py --config config/config.json --with-mqtt-broker
 
 Depending on the used operating system, the name of the Python binary may be
 ``python36`` or ``python3.6``. On Unix-like operating systems, ``openadms.py``
@@ -46,7 +46,7 @@ can be executed directly once the proper permissions are set:
 ::
 
     $ chmod ug+x openadms.py
-    $ ./openadms.py --config config/my_config.json --with-mqtt-broker
+    $ ./openadms.py --config config/config.json --with-mqtt-broker
 
 A running instance of OpenADMS can be restarted by sending a HUP signal:
 
