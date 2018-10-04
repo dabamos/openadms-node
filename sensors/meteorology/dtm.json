@@ -1,0 +1,71 @@
+{
+    "name": "STS DTM",
+    "type": "meteo",
+    "description": "Pressure and temperature sensor.",
+    "observations": {
+        "initialize": {
+            "description": "Initializes the sensor.",
+            "requestSets": {
+                "powerOn": {
+                    "request": "A\r",
+                    "responsePattern": "(?P<powerOn>#)",
+                    "responseDelimiter": "\r",
+                    "timeout": 1.0
+                },
+                "setCommandSet": {
+                    "request": "CMDT 1\r",
+                    "responsePattern": "(?P<setCmd>\\*)",
+                    "responseDelimiter": "\r",
+                    "timeout": 1.0
+                },
+                "save": {
+                    "request": "SAVE\r",
+                    "responsePattern": "(?P<save>\\*)",
+                    "responseDelimiter": "\r",
+                    "timeout": 1.0
+                }
+            },
+            "responseSets": {
+                "powerOn": {
+                    "type": "string",
+                    "unit": "none"
+                },
+                "setCmd": {
+                    "type": "string",
+                    "unit": "none"
+                },
+                "save": {
+                    "type": "string",
+                    "unit": "none"
+                }
+            }
+        },
+        "getValues": {
+            "description": "Gets temperature and pressure.",
+            "requestSets": {
+                "getTemperature": {
+                    "request": "TEMP ?\r",
+                    "responseDelimiter": "\r",
+                    "responsePattern": "(?P<temperature>[+-]?\\d+\\.+\\d)",
+                    "timeout": 1.0
+                },
+                "getPressure": {
+                    "request": "PRES ?\r",
+                    "responseDelimiter": "\r",
+                    "responsePattern": "(?P<pressure>[+-]?\\d+\\.+\\d)",
+                    "timeout": 1.0
+                }
+            },
+            "responseSets": {
+                "temperature": {
+                    "type": "float",
+                    "unit": "C"
+                },
+                "pressure": {
+                    "type": "float",
+                    "unit": "mbar"
+                }
+            }
+        }
+    }
+}
