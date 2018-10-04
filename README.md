@@ -26,7 +26,7 @@ The software is written in Python 3.6 and has been tested on:
 OpenADMS Node can either be used with [CPython 3.6+](https://www.python.org/) or
 [PyPy3.5](https://pypy.org/).
 
-The current development version of OpenADMS Node is 0.7 (code name “Geneva”).
+The current development version of OpenADMS Node is 0.8 (code name “Hanoi”).
 For more information, see https://www.dabamos.de/.
 
 ## Installation
