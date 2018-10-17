@@ -233,7 +233,7 @@ class FileExporter(Prototype):
             # No file rotation, i.e., all data is stored in a single file.
             FileRotation.NONE: None,
             # Every day a new file is created.
-            FileRotation.DAILY: ts.format.format()('YYYY-MM-DD'),
+            FileRotation.DAILY: ts.format('YYYY-MM-DD'),
             # Every month a new file is created.
             FileRotation.MONTHLY: ts.format('YYYY-MM'),
             # Every year a new file is created.
@@ -260,10 +260,9 @@ class FileExporter(Prototype):
             header = None
 
             if not Path(file_path).is_file():
-                header = '# Target "{}" of "{}" on "{}"\n' \
-                         .format(obs.get("target"),
-                                 obs.get("sensorName"),
-                                 obs.get("portName"))
+                header = (f'# Target "{obs.get("target")}" of '
+                          f'"{obs.get("sensorName")}" on '
+                          f'"{obs.get("portName")}"\n')
 
             # Open a file for each path.
             with open(str(file_path), 'a') as fh:

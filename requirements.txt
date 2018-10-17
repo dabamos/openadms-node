@@ -1,7 +1,7 @@
 arrow>=0.10.0
 coloredlogs>=7.3
 CouchDB>=1.1
-hbmqtt>=0.9
+hbmqtt>=0.9.4
 jsonschema>=2.6.0
 Mastodon.py>=1.1.1
 paho-mqtt>=1.2

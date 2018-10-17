@@ -7,7 +7,7 @@ import logging
 from threading import Thread
 from typing import Any, Callable, Dict, List, Type
 
-import paho.mqtt.client as mqtt
+import paho.mqtt.client as paho
 
 try:
     from hbmqtt.broker import Broker
@@ -20,7 +20,7 @@ class MQTTMessageBroker(Thread):
     Wrapper class for the HBMQTT message broker.
     """
 
-    def __init__(self, host: str, port: int):
+    def __init__(self, host: str = '127.0.0.1', port: int = 1883):
         """
         Args:
             host: The host name (IP or FQDN).
@@ -33,11 +33,18 @@ class MQTTMessageBroker(Thread):
         self._config = {
             'listeners': {
                 'default': {
-                    'max-connections': 5000,        # Set '0' for no limit.
-                    'type': 'tcp',                  # Set 'ws' for WebSockets.
-                    'bind': f'{host}:{port}'        # IP or FQDN : port.
-                }
-            }
+                    'max-connections': 50000,
+                    'bind': f'{host}:{port}',
+                    'type': 'tcp',
+                },
+            },
+            'auth': {
+                'allow-anonymous': True
+            },
+            'plugins': ['auth_anonymous'],
+            'topic-check': {
+                'enabled': False
+            },
         }
 
     def run(self) -> None:
@@ -82,12 +89,21 @@ class MQTTMessenger(object):
         self._port = config.get('port')
         self._keep_alive = config.get('keepAlive')
         self._topic = config.get('topic')
+        self._user = config.get('user') or ''
+        self._password = config.get('password') or ''
 
         # Function to send received messages to.
         self._downlink = None
 
         # MQTT client configuration.
-        self._client = mqtt.Client(self._client_id)
+        self._client = paho.Client(client_id=self._client_id,
+                                   clean_session=True,
+                                   userdata=None,
+                                   protocol=paho.MQTTv311)
+
+        if len(self._user) > 0 and len(self._password) > 0:
+            self._client.username_pw_set(self._user, self._password)
+
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
         self._client.on_message = self._on_message
@@ -114,7 +130,7 @@ class MQTTMessenger(object):
         return self._config_manager.get_valid_config(self._type, 'core', *args)
 
     def _on_connect(self,
-                    client: Type[mqtt.Client],
+                    client: Type[paho.Client],
                     userdata: Any,
                     flags: Dict[str, int],
                     rc: int) -> None:
@@ -123,7 +139,7 @@ class MQTTMessenger(object):
         self._client.subscribe(self._topic)
 
     def _on_disconnect(self,
-                       client: Type[mqtt.Client],
+                       client: Type[paho.Client],
                        userdata: Any,
                        rc: int) -> None:
         """Callback method is called after disconnection."""
@@ -134,9 +150,9 @@ class MQTTMessenger(object):
             self.connect()
 
     def _on_message(self,
-                    client: Type[mqtt.Client],
+                    client: Type[paho.Client],
                     userdata: Any,
-                    msg: Type[mqtt.MQTTMessage]) -> None:
+                    msg: Type[paho.MQTTMessage]) -> None:
         """Callback method for incoming messages. Converts the JSON-based
         message to its real data type and then forwards it to the downlink
         function."""
@@ -150,9 +166,10 @@ class MQTTMessenger(object):
     def connect(self) -> None:
         """Connect to the message broker."""
         if self._client:
-            self._client.connect_async(self._host,
-                                       self._port,
-                                       self._keep_alive)
+            self._client.connect_async(host=self._host,
+                                       port=self._port,
+                                       keepalive=self._keep_alive,
+                                       bind_address='')
             self._client.loop_start()
         else:
             self.logger.error('Can\'t connect to MQTT message broker')
@@ -173,7 +190,7 @@ class MQTTMessenger(object):
         self._topic = topic
 
     @property
-    def client(self) -> mqtt.Client:
+    def client(self) -> paho.Client:
         return self._client
 
     @property

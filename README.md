@@ -83,4 +83,4 @@ $ python3 -m pyflakes *.py *.pyw core/*.py modules/*.py
 ```
 
 ## Licence
-OpenADMS is licenced under BSD-2-Clause.
+OpenADMS is licenced under BSD (2-Clause).

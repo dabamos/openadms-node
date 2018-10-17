@@ -320,6 +320,9 @@ class ModuleManager(object):
                                                        'core',
                                                        'modules')
 
+        if len(config.items()) == 0:
+            self.logger.info('No modules defined')
+
         for module_name, class_path in config.items():
             try:
                 self.add(module_name, class_path)

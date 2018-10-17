@@ -11,7 +11,6 @@ import json
 import logging
 
 from typing import Any, Callable, Dict, List
-
 from core.observation import Observation
 
 
@@ -89,10 +88,10 @@ class Prototype(object):
 
                 {
                     {
-                        "type": "service"
+                        "type": "service",
+                        "from": "foo"
                     },
                     {
-                        "from": "foo",
                         "action": "stop"
                     }
                 }
@@ -133,10 +132,11 @@ class Prototype(object):
         payload_type = header.get('type')
 
         if not payload_type:
-            self.logger.error('No payload type defined')
+            self.logger.error('Undefined payload type')
             return
 
-        self.logger.debug(f'Received message of type "{payload_type}"')
+        self.logger.debug(f'Received message of type "{payload_type}" from '
+                          f'"{header.get("from")}"')
 
         # Validate payload.
         if not self.is_valid(payload, payload_type):
@@ -147,7 +147,7 @@ class Prototype(object):
         handler_func = self._handlers.get(payload_type)
 
         if not handler_func:
-            self.logger.error(f'No handler found for payload type '
+            self.logger.error(f'Undefined handler for payload type '
                               f'"{payload_type}"')
             return
 
@@ -221,15 +221,15 @@ class Prototype(object):
             payload: Payload of the message.
         """
         if not self._uplink:
-            self.logger.error(f'No uplink defined for module "{self._name}"')
+            self.logger.error(f'Undefined uplink for module "{self._name}"')
             return
 
         try:
             message = json.dumps([header, payload])
             self._uplink(target, message)
         except TypeError as e:
-            self.logger.error(f'Message could not be published (header or '
-                              f'payload invalid): {e}')
+            self.logger.error(f'Message could not be published (invalid header '
+                              f'or payload): {e}')
 
         self.logger.debug(f'Published message of type "{header.get("type")}" '
                           f'to "{target}"')

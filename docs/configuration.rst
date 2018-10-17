@@ -37,7 +37,9 @@ the dynamically loaded modules must be placed under ``modules``.
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "openadms"
+            "topic": "openadms",
+            "user": "client1".
+            "password": "secret"
           }
         }
       },
@@ -144,8 +146,6 @@ automatically at run-time:
       }
     }
 
-
-
 Project Details
 ~~~~~~~~~~~~~~~
 Some meta information about the monitoring project must be defined in the
@@ -199,11 +199,15 @@ values set for the used MQTT message broker.
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "example"
+            "topic": "example",
+            "user": "client1",
+            "password": "secret"
           }
         }
       }
     }
+
+User and password are optional and not required for anonymous sessions.
 
 Sensor
 ~~~~~~
