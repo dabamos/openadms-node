@@ -136,6 +136,8 @@ class Prototype(object):
             self.logger.error('No payload type defined')
             return
 
+        self.logger.debug(f'Received message of type "{payload_type}"')
+
         # Validate payload.
         if not self.is_valid(payload, payload_type):
             self.logger.error(f'Payload of type "{payload_type}" is invalid')
@@ -228,6 +230,9 @@ class Prototype(object):
         except TypeError as e:
             self.logger.error(f'Message could not be published (header or '
                               f'payload invalid): {e}')
+
+        self.logger.debug(f'Published message of type "{header.get("type")}" '
+                          f'to "{target}"')
 
     def publish_observation(self, obs: Observation) -> None:
         """Prepares the observation for publishing and forwards it to the
