@@ -253,22 +253,6 @@ class ModuleManager(object):
         """
         return self._modules.keys()
 
-    def get_uptime_string(self) -> str:
-        """Returns the software uptime as a formatted string (days, hours,
-        minutes, seconds).
-
-        Returns:
-            String with the software uptime.
-        """
-        u = '{:d}d {:d}h {:d}m {:d}s'
-
-        t = int((arrow.now() - self._start_time).total_seconds())
-        m, s = divmod(t, 60)
-        h, m = divmod(m, 60)
-        d, h = divmod(h, 24)
-
-        return u.format(d, h, m, s)
-
     def get_worker(self, module_name: str, class_path: str) -> Prototype:
         """Loads a Python class from a given path and returns the instance.
 

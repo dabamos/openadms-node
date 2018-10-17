@@ -26,7 +26,6 @@ class Monitor(object):
         """
         self.logger = logging.getLogger('monitor')
         self._config_file_path = config_file_path
-
         manager = Manager()
 
         try:

@@ -195,7 +195,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         )
 
     def absolute_path(self, path: str) -> Path:
-        return Path(self._root_dir, path)
+        return Path(self._root_dir + '/' + path)
 
     def get_file_contents(self, path: Path) -> str:
         """Opens a file and returns the contents.
@@ -239,8 +239,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             'root_dir': System.get_root_dir(),
             'sensors_table': self.get_sensors_table(),
             'system': System.get_system_string(),
-            'system_uptime': System.get_uptime_string(),
-            'software_uptime': self._module_manager.get_uptime_string(),
+            'system_uptime': System.get_system_uptime_string(),
+            'software_uptime': System.get_software_uptime_string(),
             'year': System.get_current_year()
         }
 

@@ -24,6 +24,8 @@ class System(object):
     system resources.
     """
 
+    start_time = arrow.now()
+
 #    @staticmethod
 #    def get_cpu_load():
 #        """Returns the current CPU load in percent. Please note, that calling
@@ -145,16 +147,7 @@ class System(object):
                 f'({System.get_machine()})')
 
     @staticmethod
-    def get_uptime() -> float:
-        """Returns the system uptime in seconds.
-
-        Returns:
-            Uptime in seconds.
-        """
-        return uptime.uptime()
-
-    @staticmethod
-    def get_uptime_string() -> str:
+    def get_system_uptime_string() -> str:
         """Returns the system uptime as a formatted string (days, hours,
         minutes, seconds).
 
@@ -173,6 +166,32 @@ class System(object):
         d, h = divmod(h, 24)
 
         return u.format(d, h, m, s)
+
+    @staticmethod
+    def get_software_uptime_string() -> str:
+        """Returns the software uptime as a formatted string (days, hours,
+        minutes, seconds).
+
+        Returns:
+            String with the software uptime.
+        """
+        u = '{:d}d {:d}h {:d}m {:d}s'
+
+        t = int((arrow.now() - System.start_time).total_seconds())
+        m, s = divmod(t, 60)
+        h, m = divmod(m, 60)
+        d, h = divmod(h, 24)
+
+        return u.format(d, h, m, s)
+
+    @staticmethod
+    def get_uptime() -> float:
+        """Returns the system uptime in seconds.
+
+        Returns:
+            Uptime in seconds.
+        """
+        return uptime.uptime()
 
 #    @staticmethod
 #    def get_used_memory():
