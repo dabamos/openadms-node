@@ -1,4 +1,4 @@
-OpenADMS Node 0.7
+OpenADMS Node 0.8
 =================
 
 The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
