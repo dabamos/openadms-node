@@ -1,0 +1,26 @@
+{
+    "core": {
+        "modules": {
+        },
+        "project": {
+            "name": "Empty Project",
+            "id": "19481e0791604b489a8a9c4a25e9dd80",
+            "description": "An emptry monitoring project."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+            "description": "The first sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms"
+            }
+        }
+    },
+    "sensors": {},
+    "modules": {}
+}
