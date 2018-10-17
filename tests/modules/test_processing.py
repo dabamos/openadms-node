@@ -138,7 +138,7 @@ class TestResponseValueInspector(object):
         gt_max_val = 200.0
 
         with LogCapture() as log_capture:
-            # Test 1 (observation not defined).
+            # Test 1 (observation undefined).
             obs.data['name'] = 'test'
             rv_inspector.process_observation(obs)
 
@@ -163,37 +163,26 @@ class TestResponseValueInspector(object):
             log_capture.check(
                 (rv_inspector.name,
                  'WARNING',
-                 'Observation "{}" with target "{}" is '
-                 'not defined'.format('test',
-                                      obs_target)),
+                 f'Observation "test" with target "{obs_target}" is undefined'),
                 (rv_inspector.name,
                  'WARNING',
-                 'Response value "{}" of observation "{}" with target "{}" is '
-                 'not a number'.format(response_name,
-                                       obs_name,
-                                       obs_target)),
+                 f'Response value "{response_name}" of observation '
+                 f'"{obs_name}" with target "{obs_target}" is not a number'),
                 (rv_inspector.name,
                  'DEBUG',
-                 'Response value "{}" of observation "{}" with target "{}" is '
-                 'within the limits'.format(response_name,
-                                            obs_name,
-                                            obs_target)),
+                 f'Response value "{response_name}" of observation '
+                 f'"{obs_name}" with target "{obs_target}" is within the '
+                 f'limits'),
                 (rv_inspector.name,
                  'CRITICAL',
-                 'Response value "{}" of observation "{}" with target "{}" is '
-                 'less than minimum ({} < {})'.format(response_name,
-                                                      obs_name,
-                                                      obs_target,
-                                                      lt_min_val,
-                                                      min_val)),
+                 f'Response value "{response_name}" of observation '
+                 f'"{obs_name}" with target "{obs_target}" is less than '
+                 f'minimum ({lt_min_val} < {min_val})'),
                 (rv_inspector.name,
                  'CRITICAL',
-                 'Response value "{}" of observation "{}" with target "{}" is '
-                 'greater than maximum ({} > {})'.format(response_name,
-                                                         obs_name,
-                                                         obs_target,
-                                                         gt_max_val,
-                                                         max_val))
+                 f'Response value "{response_name}" of observation '
+                 f'"{obs_name}" with target "{obs_target}" is greater than '
+                 f'maximum ({gt_max_val} > {max_val})')
             )
 
     def test_is_number(self,

@@ -121,17 +121,15 @@ class ConfigManager(object):
             True if file has been loaded, False if not.
         """
         if not Path(config_path).exists():
-            self.logger.error('Configuration file "{}" not found.'
-                              .format(config_path))
+            self.logger.error(f'Configuration file "{config_path}" not found.')
             return False
 
         with open(config_path) as config_file:
             try:
                 self._config = json.loads(config_file.read())
-                self.logger.info('Loaded configuration file "{}"'
-                                 .format(config_path))
+                self.logger.info(f'Loaded configuration file "{config_path}"')
             except ValueError as e:
-                self.logger.error('Invalid JSON file "{}"'.format(e))
+                self.logger.error(f'Invalid JSON file "{e}"')
                 return False
 
         return True
@@ -175,8 +173,7 @@ class ConfigManager(object):
 
         # Check whether module's configuration is valid.
         if not self._schema_manager.is_valid(config, schema_name):
-            raise ValueError('Configuration of "{}" is invalid'
-                             .format(schema_name))
+            raise ValueError(f'Configuration of "{schema_name}" is invalid')
 
         return config
 
@@ -232,13 +229,13 @@ class ModuleManager(object):
             ValueError: If module file not exists.
         """
         if not self.module_exists(class_path):
-            raise ValueError('Module "{}" not found'.format(class_path))
+            raise ValueError(f'Module "{class_path}" not found')
 
         messenger = MQTTMessenger(self._manager, name)
         worker = self.get_worker(name, class_path)
 
         self._modules[name] = Module(messenger, worker)
-        self.logger.debug('Loaded module "{}"'.format(name))
+        self.logger.debug(f'Loaded module "{name}"')
 
     def get(self, name: str) -> Module:
         """Returns a specific module.
@@ -327,8 +324,8 @@ class ModuleManager(object):
             try:
                 self.add(module_name, class_path)
             except Exception as e:
-                self.logger.error('Module "{}" not loaded{}'
-                                  .format(module_name, ': ' + str(e)))
+                self.logger.error(f'Module "{module_name}" '
+                                  'not loaded: {str(e)}')
                 continue
 
         # Start-time of the monitoring software.
@@ -361,7 +358,7 @@ class ModuleManager(object):
         self._modules[name].stop_worker()
         self._modules[name].stop()
 
-        self.logger.info('Removing module "{}" ...'.format(name))
+        self.logger.info(f'Removing module "{name}" ...')
         self._modules[name] = None
 
     def remove_all(self) -> None:
@@ -377,7 +374,7 @@ class ModuleManager(object):
         Args:
             name: The name of the module.
         """
-        self.logger.debug('Starting module "{}" ...'.format(name))
+        self.logger.debug(f'Starting module "{name}" ...')
         self._modules.get(name).start()
         self._modules.get(name).start_worker()
 
@@ -473,7 +470,7 @@ class NodeManager(object):
 
     def remove_all(self) -> None:
         """Clears everything."""
-        self.logger.info('Removing node "{}" ...'.format(self._node.name))
+        self.logger.info(f'Removing node "{self._node.name}" ...')
         self._node = None
 
     @property
@@ -548,7 +545,7 @@ class ProjectManager(object):
 
     def remove_all(self) -> None:
         """Clears everything."""
-        self.logger.info('Removing project "{}" ...'.format(self._project.name))
+        self.logger.info(f'Removing project "{self._project.name)}" ...')
         self._project = None
 
     @property
@@ -586,8 +583,7 @@ class SchemaManager(object):
         schema_path = Path(self._schemas_root_path, path)
 
         if not schema_path.exists():
-            self.logger.error('Schema file "{}" not found.'
-                              .format(schema_path))
+            self.logger.error(f'Schema file "{schema_path}" not found.')
             return False
 
         with open(str(schema_path), encoding='utf-8') as data_file:
@@ -596,15 +592,12 @@ class SchemaManager(object):
                 jsonschema.Draft4Validator.check_schema(schema)
 
                 self._schemas[data_type] = schema
-                self.logger.debug('Loaded schema "{}"'
-                                  .format(data_type))
+                self.logger.debug(f'Loaded schema "{data_type}"')
             except json.JSONDecodeError:
-                self.logger.error('Invalid JSON file "{}"'
-                                  .format(schema_path))
+                self.logger.error(f'Invalid JSON file "{data_type}"')
                 return False
             except jsonschema.SchemaError:
-                self.logger.error('Invalid JSON schema "{}"'
-                                  .format(schema_path))
+                self.logger.error(f'Invalid JSON schema "{data_type}"')
                 return False
 
         return True
@@ -649,8 +642,7 @@ class SchemaManager(object):
             True if data is valid, False if not.
         """
         if not self.has_schema(schema_name):
-            self.logger.warning('JSON schema "{}" not found'
-                                .format(schema_name))
+            self.logger.warning(f'JSON schema "{schema_name}" not found')
             return False
 
         try:
@@ -672,7 +664,7 @@ class SchemaManager(object):
         Args:
             name: The name of the schema.
         """
-        self.logger.info('Removing schema "{}" ...'.format(name))
+        self.logger.info(f'Removing schema "{name}" ...')
         self._schemas[name] = None
 
     def remove_all(self) -> None:
@@ -710,7 +702,7 @@ class SensorManager(object):
         for sensor_name, sensor_config in self._sensors_config.items():
             sensor_obj = Sensor(sensor_name, sensor_config)
             self.add_sensor(sensor_name, sensor_obj)
-            self.logger.info('Loaded sensor "{}"'.format(sensor_name))
+            self.logger.info(f'Loaded sensor "{sensor_name}"')
 
     def add_sensor(self, name: str, sensor: Sensor) -> None:
         """Adds a sensor to the sensors dictionary.
@@ -723,7 +715,7 @@ class SensorManager(object):
 
     def remove(self, name: str) -> None:
         """Removes a sensor from the sensors dictionary."""
-        self.logger.info('Removing sensor "{}" ...'.format(name))
+        self.logger.info(f'Removing sensor "{name}" ...')
         self._sensors[name] = None
 
     def remove_all(self) -> None:

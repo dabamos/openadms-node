@@ -38,7 +38,7 @@ class Monitor(object):
             manager.sensor_manager = SensorManager(manager.config_manager)
             manager.module_manager = ModuleManager(manager)
         except ValueError as e:
-            self.logger.error('Fatal error: {}'.format(e))
+            self.logger.error(f'Fatal error: {e}')
 
         self._manager = manager
 

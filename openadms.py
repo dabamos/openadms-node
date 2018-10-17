@@ -68,16 +68,16 @@ def main(config_file_path: str) -> None:
     v = System.get_openadms_version()
 
     logger = logging.getLogger('openadms')
-    logger.info('+---------------------------------------------+')
-    logger.info('|  _____             _____ ____  _____ _____  |')
-    logger.info('| |     |___ ___ ___|  _  |    \|     |   __| |')
-    logger.info('| |  |  | . | -_|   |     |  |  | | | |__   | |')
-    logger.info('| |_____|  _|___|_|_|__|__|____/|_|_|_|_____| |')
-    logger.info('|       |_|                        Node v.{} |'.format(v))
-    logger.info('|                                             |')
-    logger.info('| Copyright (c) Hochschule Neubrandenburg     |')
-    logger.info('| Licenced under BSD-2-Clause                 |')
-    logger.info('+---------------------------------------------+')
+    logger.info(f'+---------------------------------------------+')
+    logger.info(f'|  _____             _____ ____  _____ _____  |')
+    logger.info(f'| |     |___ ___ ___|  _  |    \|     |   __| |')
+    logger.info(f'| |  |  | . | -_|   |     |  |  | | | |__   | |')
+    logger.info(f'| |_____|  _|___|_|_|__|__|____/|_|_|_|_____| |')
+    logger.info(f'|       |_|                        Node v.{v} |')
+    logger.info(f'|                                             |')
+    logger.info(f'| Copyright (c) Hochschule Neubrandenburg     |')
+    logger.info(f'| Licenced under BSD-2-Clause                 |')
+    logger.info(f'+---------------------------------------------+')
 
     # Start the monitoring.
     global monitor
@@ -117,8 +117,7 @@ def exception_hook(type: BaseException,
     fmt_exception = ''.join(traceback.format_exception(type,
                                                        value,
                                                        tb)).replace('\n', '')
-    root.critical('Unhandled exception: {}'
-                  .format(' '.join(fmt_exception.split())))
+    root.critical(f'Unhandled exception: {" ".join(fmt_exception.split())}')
 
 
 def sighup_handler(signalnum: int, frame: Any) -> None:
@@ -149,7 +148,7 @@ def stay_alive() -> None:
         time.sleep(1)
 
 
-def valid_path(string: str) -> str:
+def valid_path(path_str: str) -> str:
     """Checks whether a given string is a valid file path. Used as a validator
     for ``argparse.ArgumentParser`` (that is why a string has to be returned).
 
@@ -162,13 +161,13 @@ def valid_path(string: str) -> str:
     Raises:
         argparse.ArgumentTypeError: If string is not a valid file path.
     """
-    path = Path(string)
+    path = Path(path_str)
 
     if not path.exists() or not path.is_file():
-        msg = '"{}" is not a valid configuration file'.format(string)
+        msg = f'"{path_str}" is not a valid configuration file'
         raise argparse.ArgumentTypeError(msg)
 
-    return string
+    return path_str
 
 
 def setup_logging(is_quiet: bool = False,
@@ -250,17 +249,18 @@ if __name__ == '__main__':
     setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
-    # Use signal handlers to quit gracefully and restart on SIGHUP.
+    # Use signal handlers to quit gracefully on SIGINT and to restart on SIGHUP.
     signal.signal(signal.SIGINT, sigint_handler)
 
+    # SIGHUP is not supported on Windows.
     if not System.is_windows():
         signal.signal(signal.SIGHUP, sighup_handler)
 
     # Parse command-line options.
     parser = argparse.ArgumentParser(
         usage='%(prog)s [options]',
-        description='OpenADMS Node {} - Open Automatic Deformation Monitoring '
-                    'System'.format(System.get_openadms_version()),
+        description=f'OpenADMS Node {System.get_openadms_version()} - '
+                    f'Open Automatic Deformation Monitoring System',
         epilog='OpenADMS Node has been developed at the Neubrandenburg '
                'University of Applied Sciences (Germany). Licenced under '
                'BSD-2-Clause. For further information, visit '
@@ -320,7 +320,7 @@ if __name__ == '__main__':
         args = parser.parse_args()
     except argparse.ArgumentTypeError as e:
         root.error(e)
-        sys.exit(0)
+        sys.exit(1)
 
     # Initialise the logger.
     setup_logging(args.is_quiet, args.is_debug, args.verbosity, args.log_file)

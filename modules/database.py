@@ -65,8 +65,7 @@ class CouchDriver(Prototype):
             self._cache_db = TinyDB(storage=MemoryStorage)
         else:
             # Create file-based cache database.
-            self.logger.info('Opening local cache database "{}" ...'
-                             .format(cache_file))
+            self.logger.info(f'Opening local cache database "{cache_file}" ...')
             self._cache_db = TinyDB(cache_file)
 
         # Use either HTTPS or HTTP.
@@ -82,12 +81,8 @@ class CouchDriver(Prototype):
 
         # Generate URI to CouchDB server, for example:
         # https://<user>:<password>@iot.example.com:443/couchdb/
-        self._server_uri = '{}://{}:{}@{}:{}/{}'.format(self._scheme,
-                                                        user,
-                                                        password,
-                                                        self._server,
-                                                        self._port,
-                                                        self._path)
+        self._server_uri = (f'{self._scheme}://{user}:{password}@{self._server}'
+                            f':{self._port}/{self._path}')
         # Set name of database to open.
         self._db_name = config.get('db')
 
@@ -110,20 +105,16 @@ class CouchDriver(Prototype):
             Exception: On connection error.
         """
         # Connect to CouchDB server.
-        self.logger.info('Connecting to CouchDB server "{}://{}:{}/{}" ...'
-                         .format(self._scheme,
-                                 self._server,
-                                 self._port,
-                                 self._path))
+        self.logger.info(f'Connecting to CouchDB server "{self._scheme}://'
+                         f'{self._server}:{self._port}/{self._path)}" ...')
         self._couch = couchdb.Server(self._server_uri)
 
         # Open database.
         if self._db_name not in self._couch:
-            self.logger.error('Database "{}" not found on server "{}"'
-                              .format(self._db_name, self._server_uri))
+            self.logger.error(f'Database "{self._db_name}" not found on server '
+                              f'"{self._server_uri)}"')
 
-        self.logger.info('Opening CouchDB database "{}" ...'
-                         .format(self._db_name))
+        self.logger.info(f'Opening CouchDB database "{self._db_name}" ...')
         self._db = self._couch[self._db_name]
 
     def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
@@ -151,20 +142,16 @@ class CouchDriver(Prototype):
                 self._connect()
 
             self._db[obs_data.get('id')] = obs_data
-            self.logger.info('Saved observation "{}" of target "{}" from '
-                             'port "{}" to CouchDB database "{}"'
-                             .format(obs_data.get('name'),
-                                     obs_data.get('target'),
-                                     obs_data.get('portName'),
-                                     self._db_name))
+            self.logger.info(f'Saved observation "{obs_data.get("name")}" of '
+                             f'target "{obs_data.get("target")}" from '
+                             f'port "{obs_data.get("portName")}" to CouchDB '
+                             f'database "{self._db_name)}"')
         except Exception as e:
-            self.logger.error('Observation "{}" of target "{}" from port "{}" '
-                              'could not be saved in CouchDB database "{}": {}'
-                              .format(obs_data.get('name'),
-                                      obs_data.get('target'),
-                                      obs_data.get('portName'),
-                                      self._db_name,
-                                      e))
+            self.logger.error(f'Observation "{obs_data.get("name")}" of target '
+                              f'"{obs_data.get("target")}" from port '
+                              f'"{obs_data.get("portName")}" could not be '
+                              f'saved in CouchDB database "{self._db_name}": '
+                              f'{e}')
             return False
 
         return True
@@ -176,8 +163,7 @@ class CouchDriver(Prototype):
             doc_id: The document id.
         """
         self._cache_db.remove(doc_ids=[doc_id])
-        self.logger.debug('Removed observation from cache (doc id = {})'
-                          .format(doc_id))
+        self.logger.debug(f'Removed observation from cache (doc id = {doc_id})')
 
     def has_cached_observation_data(self) -> bool:
         """Returns whether or not a cached observation exists in the local
@@ -192,14 +178,12 @@ class CouchDriver(Prototype):
         doc_id = self._cache_observation_data(obs)
 
         if doc_id:
-            self.logger.debug('Cached observation "{}" with target "{}" '
-                              '(doc id = {})'.format(obs.get('name'),
-                                                     obs.get('target'),
-                                                     doc_id))
+            self.logger.debug(f'Cached observation "{obs.get("name")}" with '
+                              f'target "{obs.get("target")}" (doc id = '
+                              f'{doc_id})')
         else:
-            self.logger.error('Caching of observation "{}" with target "{}" '
-                              'failed'.format(obs.get('name'),
-                                              obs.get('target')))
+            self.logger.error(f'Caching of observation "{obs.get("name")}" '
+                              f'with target "{obs.get("target")}" failed')
 
         return obs
 
@@ -220,13 +204,11 @@ class CouchDriver(Prototype):
             obs_data = self._get_cached_observation_data()
 
             if obs_data:
-                self.logger.debug('Trying to insert observation "{}" with '
-                                  'target "{}" (doc id = {}) into CouchDB '
-                                  'database "{}" ...'
-                                  .format(obs_data.get('name'),
-                                          obs_data.get('target'),
-                                          obs_data.doc_id,
-                                          self._db_name))
+                self.logger.debug(f'Trying to insert observation '
+                                  f'"{obs_data.get("name")}" with target '
+                                  f'"{obs_data.get("target")}" '
+                                  f'(doc id = {obs_data.doc_id}) into CouchDB '
+                                  f'database "{self._db_name}" ...')
 
                 # Remove the inserted observation data from local cache.
                 if self._insert_observation_data(obs_data):

@@ -48,18 +48,16 @@ class ErrorGenerator(Prototype):
             time.sleep(self._interval)
 
             if self._is_warning_enabled:
-                self.logger.warning('WARNING #{}'
-                                    .format(self._warning_count))
+                self.logger.warning(f'GENERATED WARNING #{self._warning_count}')
                 self._warning_count += 1
 
             if self._is_error_enabled:
-                self.logger.error('ERROR #{}'
-                                  .format(self._error_count))
+                self.logger.error(f'GENERATED ERROR #{self._error_count}')
                 self._error_count += 1
 
             if self._is_critical_enabled:
-                self.logger.critical('CRITICAL ERROR #{}'
-                                     .format(self._critical_count))
+                self.logger.critical(f'GENERATED CRITICAL ERROR '
+                                     f'#{self._critical_count}')
                 self._critical_count += 1
 
     def start(self) -> None:

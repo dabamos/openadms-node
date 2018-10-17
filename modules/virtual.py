@@ -36,11 +36,9 @@ class VirtualSensor(Prototype):
             sleep_time = request_set.get('sleepTime')
             response = ''
 
-            self.logger.verbose('Sending request "{}" to sensor "{}" on '
-                                'virtual port "{}"'
-                                .format(set_name,
-                                        obs.get('sensorName'),
-                                        self.name))
+            self.logger.verbose(f'Sending request "{set_name}" to sensor '
+                                f'"{obs.get("sensorName")}" on virtual port '
+                                f'"{self.name}"')
 
             for pattern in self.patterns:
                 reg_exp = re.compile(pattern)
@@ -51,11 +49,10 @@ class VirtualSensor(Prototype):
 
                 response = self.patterns[pattern](request)
 
-                self.logger.verbose('Received response "{}" from sensor "{}" '
-                                    'on virtual port "{}"'
-                                    .format(self.sanitize(response),
-                                            obs.get('sensorName'),
-                                            self.name))
+                self.logger.verbose(f'Received response '
+                                    f'"{self.sanitize(response)}" from sensor '
+                                    f'"{obs.get("sensorName")}" on virtual '
+                                    f'port "{self.name}"')
                 break
 
             request_set['response'] = response
@@ -120,17 +117,8 @@ class VirtualTotalStationTM30(VirtualSensor):
         slope_dist = '{:0.15f}'.format(random.uniform(1, 2000))
         dist_time = '{:8.0f}'.format(random.uniform(4, 5) * 10e8)
 
-        response = '%R1P,0,0:{},{},{},{},{},{},{},{},{}\r\n' \
-                   .format(return_code,
-                           hz,
-                           v,
-                           acc_angle,
-                           c,
-                           l,
-                           acc_incl,
-                           slope_dist,
-                           dist_time)
-
+        response = (f'%R1P,0,0:{return_code},{hz},{v},{acc_angle},{c},{l},'
+                    f'{acc_incl},{slope_dist},{dist_time}\r\n')
         return response
 
     def get_sensor_id(self, request: str) -> str:
@@ -143,8 +131,7 @@ class VirtualTotalStationTM30(VirtualSensor):
             GeoCOM string with encapsulated sensor id.
         """
         return_code = '0'
-        response = '%R1P,0,0:{},999999\r\n'.format(return_code)
-
+        response = f'%R1P,0,0:{return_code},999999\r\n'
         return response
 
     def get_sensor_name(self, request: str) -> str:
@@ -157,8 +144,7 @@ class VirtualTotalStationTM30(VirtualSensor):
             GeoCOM string with encapsulated sensor name.
         """
         return_code = '0'
-        response = '%R1P,0,0:{},"TM30 0.5"\r\n'.format(return_code)
-
+        response = f'%R1P,0,0:{return_code},"TM30 0.5"\r\n'
         return response
 
     def measure_distance(self, request: str) -> str:
@@ -172,7 +158,6 @@ class VirtualTotalStationTM30(VirtualSensor):
         """
         return_code = '0'
         response = '%R1P,0,0:{}\r\n'.format(return_code)
-
         return response
 
     def set_direction(self, request: str) -> str:
@@ -185,8 +170,7 @@ class VirtualTotalStationTM30(VirtualSensor):
             GeoCOM string with return code.
         """
         return_code = '0'
-        response = '%R1P,0,0:{}\r\n'.format(return_code)
-
+        response = f'%R1P,0,0:{return_code}\r\n'
         return response
 
 

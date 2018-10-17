@@ -77,8 +77,7 @@ class System(object):
         Returns:
             Complete OpenADMS Node version string.
         """
-        return 'OpenADMS Node {} ({})'.format(OPENADMS_VERSION,
-                                              OPENADMS_VERSION_NAME)
+        return f'OpenADMS Node {OPENADMS_VERSION} ({OPENADMS_VERSION_NAME})'
 
     @staticmethod
     def get_openadms_version() -> float:
@@ -123,8 +122,7 @@ class System(object):
         Returns:
             String with name and version number.
         """
-        return '{} {}'.format(platform.python_implementation(),
-                              platform.python_version())
+        return f'{platform.python_implementation()} {platform.python_version()}'
 
     @staticmethod
     def get_root_dir() -> Path:
@@ -143,10 +141,8 @@ class System(object):
         Returns:
             String with OS name and architecture.
         """
-        s = '{} {} ({})'.format(System.get_os_name(),
-                                System.get_os_version(),
-                                System.get_machine())
-        return s
+        return (f'{System.get_os_name()} {System.get_os_version()} '
+                f'({System.get_machine()})')
 
     @staticmethod
     def get_uptime() -> float:

@@ -80,11 +80,10 @@ class CloudExporter(Prototype):
         if self._storage == 'file':
             try:
                 self._cache_db = TinyDB(self._db_file)
-                self.logger.info('Opened cache database "{}"'
-                                 .format(self._db_file))
+                self.logger.info(f'Opened cache database "{self._db_file}"')
             except Exception:
-                raise ValueError('Cache database "{}" could not be opened'
-                                 .format(self._db_file))
+                raise ValueError(f'Cache database "{self._db_file}" could not '
+                                 f'be opened')
 
     def _cache_observation(self, obs: Observation) -> str:
         """Caches the given observation in the local cache database.
@@ -93,10 +92,8 @@ class CloudExporter(Prototype):
             obs: Observation object.
         """
         doc_id = self._cache_db.insert(obs.data)
-        self.logger.debug('Cached observation "{}" with target "{}" '
-                          '(document id = {})'.format(obs.get('name'),
-                                                      obs.get('target'),
-                                                      doc_id))
+        self.logger.debug(f'Cached observation "{obs.get("name")}" with target '
+                          f'"{obs.get("target")}" (doc id = {doc_id})')
         return doc_id
 
     def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
@@ -122,9 +119,8 @@ class CloudExporter(Prototype):
 
     def _transfer_observation_data(self, obs_data: Dict[str, Any]) -> bool:
         # TODO this method is a mock
-        self.logger.info('Transferred observation "{}" with target "{}"'
-                         .format(obs_data.get('name'),
-                                 obs_data.get('target')))
+        self.logger.info(f'Transferred observation "{obs_data.get("name")}" '
+                         f'with target "{obs_data.get("target")}"')
         return True
 
     def has_cached_observation(self) -> bool:
@@ -155,8 +151,7 @@ class CloudExporter(Prototype):
                 continue
 
             if len(self._cache_db) > 500:
-                self.logger.warning('Cache is running full '
-                                    '(> 500 observations)')
+                self.logger.warning('Cache stores > 500 observations')
 
             # Send cached observation data to OpenADMS Server.
             obs_data = self._get_cached_observation_data()
@@ -238,39 +233,37 @@ class FileExporter(Prototype):
             # No file rotation, i.e., all data is stored in a single file.
             FileRotation.NONE: None,
             # Every day a new file is created.
-            FileRotation.DAILY: ts.format('YYYY-MM-DD'),
+            FileRotation.DAILY: ts.format.format()('YYYY-MM-DD'),
             # Every month a new file is created.
             FileRotation.MONTHLY: ts.format('YYYY-MM'),
             # Every year a new file is created.
             FileRotation.YEARLY: ts.format('YYYY')
         }[self._file_rotation]
 
-        file_name = self._file_name
-        file_name = file_name.replace('{{port}}', obs.get('portName'))
-        file_name = file_name.replace('{{date}}', '{}'.format(file_date)
-                                      if file_date else '')
-        file_name = file_name.replace('{{target}}', '{}'
-                                      .format(obs.get('target'))
-                                      if obs.get('target') is not None else '')
-        file_name = file_name.replace('{{name}}', '{}'.format(obs.get('name'))
-                                      if obs.get('name') is not None else '')
-        file_name += self._file_extension
+        fn = self._file_name
+        fn = fn.replace('{{port}}', obs.get("portName"))
+        fn = fn.replace('{{date}}', f'{file_date}' if file_date else '')
+        fn = fn.replace('{{target}}', f'{obs.get("target")}' if obs.get('target')
+            is not None else '')
+        fn = fn.replace('{{name}}', f'{obs.get("name")}' if obs.get('name')
+            is not None else '')
+        fn += self._file_extension
 
         for path in self._paths:
             if not Path(path).exists():
-                self.logger.error('Path "{}" does not exist'.format(path))
+                self.logger.error(f'Path "{path}" does not exist')
                 continue
 
-            file_path = Path(path, file_name)
+            file_path = Path(path, fn)
 
             # Create a header if a new file has to be touched.
             header = None
 
             if not Path(file_path).is_file():
                 header = '# Target "{}" of "{}" on "{}"\n' \
-                         .format(obs.get('target'),
-                                 obs.get('sensorName'),
-                                 obs.get('portName'))
+                         .format(obs.get("target"),
+                                 obs.get("sensorName"),
+                                 obs.get("portName"))
 
             # Open a file for each path.
             with open(str(file_path), 'a') as fh:
@@ -306,12 +299,10 @@ class FileExporter(Prototype):
                 # Write line to file.
                 fh.write(line + '\n')
 
-                self.logger.info('Saved observation "{}" of target "{}" from '
-                                 'port "{}" to file "{}"'
-                                 .format(obs.get('name'),
-                                         obs.get('target'),
-                                         obs.get('portName'),
-                                         str(file_path)))
+                self.logger.info(f'Saved observation "{obs.get("name")}" of '
+                                 f'target "{obs.get("target")}" from port '
+                                 f'"{obs.get("portName")}" to file '
+                                 f'"{str(file_path))}"')
 
         return obs
 
@@ -342,15 +333,14 @@ class RealTimePublisher(Prototype):
         for receiver in self._receivers:
             obs_copy = copy.deepcopy(obs)
 
-            target = '{}/{}'.format(receiver, obs_copy.get('target'))
+            target = f'{receiver}/{obs_copy.get("target")}'
 
             obs_copy.set('nextReceiver', 0)
             obs_copy.set('receivers', [target])
 
-            self.logger.debug('Publishing observation "{}" of target "{}" '
-                              'to "{}"'.format(obs_copy.get('name'),
-                                               obs_copy.get('target'),
-                                               target))
+            self.logger.debug(f'Publishing observation '
+                              f'"{obs_copy.get("name")}" of target '
+                              f'"{obs_copy.get("target")}" to "{target}"')
 
             header = Observation.get_header()
             payload = obs_copy.data

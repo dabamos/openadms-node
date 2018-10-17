@@ -50,33 +50,33 @@ class PreProcessor(Prototype):
             response_pattern = request_set.get('responsePattern')
 
             if response is None or len(response) == 0:
-                self.logger.warning('No response "{}" in observation "{}" of '
-                                    'target "{}"'.format(set_name,
-                                                         obs.get('name'),
-                                                         obs.get('target')))
+                self.logger.warning(f'No response "{set_name}" in observation '
+                                    f'"{obs.get("name")}" of target '
+                                    f'"{obs.get("target")}" from sensor '
+                                    f'"{obs.get("sensorName")}" on port '
+                                    f'"{obs.get("portName")}"')
                 continue
 
             try:
                 pattern = re.compile(response_pattern)
                 match = pattern.search(response)
             except Exception:
-                self.logger.error('Invalid regular expression for response '
-                                  '"{}" in observation "{}" of target "{}"'
-                                  .format(set_name,
-                                          obs.get('name'),
-                                          obs.get('target')))
+                self.logger.error(f'Invalid regular expression for response '
+                                  f'"{set_name}" in observation '
+                                  f'"{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}" from sensor '
+                                  f'"{obs.get("sensorName")}" on port '
+                                  f'"{obs.get("portName")}"')
                 return obs
 
             if not match:
-                self.logger.error('Response "{}" of request "{}" of '
-                                  'observation "{}" of target "{}" from sensor '
-                                  '"{}" on port "{}" does not match extraction '
-                                  'pattern'.format(self.sanitize(response),
-                                                   set_name,
-                                                   obs.get('name'),
-                                                   obs.get('target'),
-                                                   obs.get('sensorName'),
-                                                   obs.get('portName')))
+                self.logger.error(f'Response "{self.sanitize(response)}" of '
+                                  f'request "{set_name}" in observation '
+                                  f'"{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}" from sensor '
+                                  f'"{obs.get("sensorName")}" on port '
+                                  f'"{obs.get("portName")}" does not match '
+                                  f'extraction pattern')
                 return obs
 
             # The regular expression pattern needs at least one named group
@@ -85,9 +85,9 @@ class PreProcessor(Prototype):
             # Right: "(?P<id>.*)"
             # Wrong: ".*"
             if pattern.groups == 0:
-                self.logger.error('No group(s) defined in regular expression '
-                                  'pattern of observation "{}" of target "{}"'
-                                  .format(obs.get('name'), obs.get('target')))
+                self.logger.error(f'No group(s) defined in regular expression '
+                                  f'pattern of observation "{obs.get("name")}" '
+                                  f'of target "{obs.get("target")}"')
                 return obs
 
             # Convert the type of the parsed raw values from string to the
@@ -96,21 +96,18 @@ class PreProcessor(Prototype):
 
             for group_name, raw_value in match.groupdict("").items():
                 if raw_value is None or len(raw_value) == 0:
-                    self.logger.error('No raw value found in response set "{}" '
-                                      'of observation "{}" of target "{}"'
-                                      .format(group_name,
-                                              obs.get('name'),
-                                              obs.get('target')))
+                    self.logger.error(f'Undefined raw value in response set '
+                                      f'"{group_name}" in observation '
+                                      f'"{obs.get("name")}" of target '
+                                      f'"{ obs.get("target")}"')
                     continue
 
                 response_set = response_sets.get(group_name)
 
                 if not response_set:
-                    self.logger.error('Response set "{}" of observation "{}" '
-                                      'of target "{}" not defined'
-                                      .format(group_name,
-                                              obs.get('name'),
-                                              obs.get('target')))
+                    self.logger.error(f'Undefined response set "{group_name}" '
+                                      f'in observation "{obs.get("name")}" '
+                                      f'of target "{obs.get("target")}"')
                     continue
 
                 response_type = response_set.get('type').lower()
@@ -125,12 +122,10 @@ class PreProcessor(Prototype):
                     response_value = raw_value
 
                 if response_value is not None:
-                    self.logger.debug('Extracted "{}" from raw response "{}" '
-                                      'of observation "{}" of target "{}"'
-                                      .format(response_value,
-                                              group_name,
-                                              obs.get('name'),
-                                              obs.get('target')))
+                    self.logger.debug(f'Extracted "{response_value}" from raw '
+                                      f'response "{group_name}" in observation '
+                                      f'"{ obs.get("name")}" of target '
+                                      f'"{obs.get("target")}"')
                     response_set['value'] = response_value
 
         return obs
@@ -193,8 +188,8 @@ class PreProcessor(Prototype):
             response_value = float(dot_value)
             return response_value
         else:
-            self.logger.warning('Value "{}" could not be converted '
-                                '(not float)'.format(raw_value))
+            self.logger.warning(f'Value "{raw_value}" could not be converted '
+                                f'(invalid float)')
             return None
 
     def to_int(self, raw_value: str) -> Union[int, None]:
@@ -210,8 +205,8 @@ class PreProcessor(Prototype):
             response_value = int(raw_value)
             return response_value
         else:
-            self.logger.warning('Value "{}" could not be converted '
-                                '(not integer)'.format(raw_value))
+            self.logger.warning(f'Value "{raw_value}" could not be converted '
+                                f'(invalid integer)')
             return None
 
 
@@ -255,9 +250,8 @@ class ResponseValueInspector(Prototype):
             The untouched observation object.
         """
         if not obs.get('name') in self._observations:
-            self.logger.warning('Observation "{}" with target "{}" is not '
-                                'defined'.format(obs.get('name'),
-                                                 obs.get('target')))
+            self.logger.warning(f'Undefined observation "{obs.get("name")}" '
+                                f'with target "{obs.get("target")}"')
             return obs
 
         response_sets = self._observations.get(obs.get('name'))
@@ -266,38 +260,32 @@ class ResponseValueInspector(Prototype):
             response_value = obs.get_response_value(response_name)
 
             if response_value is None or not self.is_number(response_value):
-                self.logger.warning('Response value "{}" of observation "{}" '
-                                    'with target "{}" is not a number'
-                                    .format(response_name,
-                                            obs.get('name'),
-                                            obs.get('target')))
+                self.logger.warning(f'Response value "{response_name}" in '
+                                    f'observation "{obs.get("name")}" '
+                                    f'of target "{obs.get("target")}" is '
+                                    f'not a number')
                 continue
 
             min_value = limits.get('min')
             max_value = limits.get('max')
 
             if min_value <= response_value <= max_value:
-                self.logger.debug('Response value "{}" of observation "{}" '
-                                  'with target "{}" is within the limits'
-                                  .format(response_name,
-                                          obs.get('name'),
-                                          obs.get('target')))
+                self.logger.debug(f'Response value "{response_name}" in '
+                                  f'observation "{obs.get("name")}" with '
+                                  f'target "{obs.get("target")}" is within '
+                                  f'set limits')
             elif response_value < min_value:
-                self.logger.critical('Response value "{}" of observation "{}" '
-                                     'with target "{}" is less than minimum '
-                                     '({} < {})'.format(response_name,
-                                                        obs.get('name'),
-                                                        obs.get('target'),
-                                                        response_value,
-                                                        min_value))
+                self.logger.critical(f'Response value "{response_name}" of '
+                                     f'observation "{obs.get("name")}" with '
+                                     f'target "{obs.get("target")}" is less '
+                                     f'than minimum ({response_value} < '
+                                     f'{min_value})')
             elif response_value > max_value:
-                self.logger.critical('Response value "{}" of observation "{}" '
-                                     'with target "{}" is greater than maximum '
-                                     '({} > {})'.format(response_name,
-                                                        obs.get('name'),
-                                                        obs.get('target'),
-                                                        response_value,
-                                                        max_value))
+                self.logger.critical(f'Response value "{response_name}" of '
+                                     f'observation "{obs.get("name")}" with '
+                                     f'target "{obs.get("target")}" is greater '
+                                     f'than maximum ({response_value} > '
+                                     f'{max_value})')
 
         return obs
 
@@ -409,14 +397,11 @@ class ReturnCodeInspector(Prototype):
                 obs.set('corrupted', False)
                 obs.set('nextReceiver', 0)
 
-                self.logger.info('Retrying observation "{}" of target "{}" due '
-                                 'to return code {} of response "{}" '
-                                 '(attempt {} of {})'.format(obs.get('name'),
-                                                             obs.get('target'),
-                                                             return_code,
-                                                             response_set,
-                                                             attempts + 1,
-                                                             self._retries))
+                self.logger.info(f'Retrying observation "{obs.get("name")}" of '
+                                 f'target "{obs.get("target")}" due to return '
+                                 f'code {return_code} of response '
+                                 f'"{response_set}" (attempt {attempts + 1,} '
+                                 f'of {self._retries})')
             else:
                 obs.set('corrupted', True)
 
@@ -425,21 +410,17 @@ class ReturnCodeInspector(Prototype):
                     lvl, retry, msg = error_values
 
                     self.logger.log(lvl * 10,
-                                    'Observation "{}" of target "{}": {} '
-                                    '(code {} in response "{}")'
-                                    .format(obs.get('name'),
-                                            obs.get('target'),
-                                            msg,
-                                            return_code,
-                                            response_set))
+                                    f'Observation "{obs.get("name")}" of '
+                                    f'target "{obs.get("target")}": {msg} '
+                                    f'(code {return_code} in response '
+                                    f'"{response_set}")')
 
                 else:
                     # Generic log message.
-                    self.logger.error('Error occurred on observation "{}" '
-                                      '(code {} in response "{}")'
-                                      .format(obs.get('name'),
-                                              return_code,
-                                              response_set))
+                    self.logger.error(f'Error occurred on observation '
+                                      f'"{obs.get("name")}" (unknown code '
+                                      f'{return_code} in response '
+                                      f'"{response_set}")')
             return obs
 
         return obs
@@ -487,13 +468,11 @@ class UnitConverter(Prototype):
                 continue
 
             if source_unit != properties.get('sourceUnit'):
-                self.logger.warning('Unit "{}" of response "{}" of observation '
-                                    '"{}" of target "{}" does not match "{}"'
-                                    .format(source_unit,
-                                            name,
-                                            obs.get('name'),
-                                            obs.get('target'),
-                                            properties.get('sourceUnit')))
+                self.logger.warning(f'Unit "{source_unit}" of response '
+                                    f'"{name}" of observation '
+                                    f'"{obs.get("name")}" of target '
+                                    f'"{obs.get("target")}" does not match '
+                                    f'"{properties.get("sourceUnit")}"')
                 continue
 
             if properties.get('conversionType') == 'scale':
@@ -504,8 +483,8 @@ class UnitConverter(Prototype):
                 self.logger.info('Converted response "{}" of observation "{}" '
                                  'of target "{}" from {:.4f} {} to {:.4f} {}'
                                  .format(name,
-                                         obs.get('name'),
-                                         obs.get('target'),
+                                         obs.get("name"),
+                                         obs.get("target"),
                                          source_value,
                                          source_unit,
                                          target_value,
@@ -514,8 +493,7 @@ class UnitConverter(Prototype):
                 response_set = Observation.create_response_set(
                     'float',
                     target_unit,
-                    round(target_value, 5)
-                )
+                    round(target_value, 5))
 
                 obs.data['responseSets'][name] = response_set
 

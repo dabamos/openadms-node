@@ -77,8 +77,8 @@ class InterruptCounter(Prototype):
 
         try:
             self._counter += 1
-            self.logger.debug('Counted interrupt {} on GPIO pin {}'
-                              .format(self._counter, self._pin))
+            self.logger.debug(f'Counted interrupt {self._counter} on GPIO '
+                              f'pin {self._pin}')
         finally:
             self._lock.release()
 
@@ -123,7 +123,7 @@ class InterruptCounter(Prototype):
         obs.set('nextReceiver', 0)
         obs.set('node', self._node_manager.node.id)
         obs.set('onetime', False)
-        obs.set('portName', 'GPIO{}'.format(self._pin))
+        obs.set('portName', f'GPIO{self._pin}')
         obs.set('project', self._project_manager.project.id)
         obs.set('receivers', [self._receiver])
         obs.set('responseSets', response_sets)

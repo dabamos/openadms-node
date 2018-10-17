@@ -104,12 +104,12 @@ class Prototype(object):
 
         if action is 'stop':
             self._is_running = False
-            self.logger.debug('Stopped module "{}" by call from "{}"'
-                              .format(self._name, sender))
+            self.logger.debug(f'Stopped module "{self._name}" by call from '
+                              f'"{sender}"')
         elif action is 'start':
             self._is_running = True
-            self.logger.debug('Started module "{}" by call from "{}"'
-                              .format(self._name, sender))
+            self.logger.debug(f'Started module "{self._name}" by call from '
+                              f'"{sender}"')
 
     def handle(self, message: List[Dict]) -> None:
         """Processes messages by calling callback functions for data
@@ -138,16 +138,15 @@ class Prototype(object):
 
         # Validate payload.
         if not self.is_valid(payload, payload_type):
-            self.logger.error('Payload of type "{}" is invalid'
-                              .format(payload_type))
+            self.logger.error(f'Payload of type "{payload_type}" is invalid')
             return
 
         # Send payload to specific handler.
         handler_func = self._handlers.get(payload_type)
 
         if not handler_func:
-            self.logger.warning('No handler found for payload type "{}"'
-                                .format(payload_type))
+            self.logger.error(f'No handler found for payload type '
+                              f'"{payload_type}"')
             return
 
         handler_func(header, payload)
@@ -220,16 +219,15 @@ class Prototype(object):
             payload: Payload of the message.
         """
         if not self._uplink:
-            self.logger.error('No uplink defined for module "{}"'
-                              .format(self._name))
+            self.logger.error(f'No uplink defined for module "{self._name}"')
             return
 
         try:
             message = json.dumps([header, payload])
             self._uplink(target, message)
         except TypeError as e:
-            self.logger.error('Message could not be published '
-                              '(header or payload invalid): {}'.format(e))
+            self.logger.error(f'Message could not be published (header or '
+                              f'payload invalid): {e}')
 
     def publish_observation(self, obs: Observation) -> None:
         """Prepares the observation for publishing and forwards it to the
@@ -243,23 +241,22 @@ class Prototype(object):
 
         # No receivers defined.
         if len(receivers) == 0:
-            logging.debug('No receivers defined in observation "{}" '
-                          'of target "{}"'.format(obs.get('name'),
-                                                  obs.get('target')))
+            logging.debug(f'No receivers defined in observation '
+                          f'"{obs.get("name")}" of target '
+                          f'"{obs.get("target")}"')
             return
 
         # No index defined.
         if (index is None) or (index < 0):
-            self.logger.warning('Next receiver of observation "{}" with target '
-                                '"{}" not defined'.format(obs.get('name'),
-                                                          obs.get('target')))
+            self.logger.warning(f'Next receiver of observation '
+                                f'"{obs.get("name")}" with target '
+                                f'"{obs.get("target")}" undefined')
             return
 
         # Receivers list has been processed and observation is finished.
         if index >= len(receivers):
-            self.logger.info('Observation "{}" of target "{}" has been '
-                             'finished'.format(obs.get('name'),
-                                               obs.get('target')))
+            self.logger.info(f'Observation "{obs.get("name")}" of target '
+                             f'"{obs.get("target")}" has been finished')
             return
 
         # Name of the sending module.
@@ -285,7 +282,7 @@ class Prototype(object):
         if self._is_running:
             return
 
-        self.logger.debug('Starting worker "{}"'.format(self._name))
+        self.logger.debug(f'Starting worker "{self._name}" ...')
         self._is_running = True
 
     def stop(self) -> None:
@@ -293,7 +290,7 @@ class Prototype(object):
         if not self._is_running:
             return
 
-        self.logger.debug('Stopping worker "{}"'.format(self._name))
+        self.logger.debug(f'Stopping worker "{self._name}" ...')
         self._is_running = False
 
     @property

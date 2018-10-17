@@ -53,8 +53,8 @@ class BluetoothPort(Prototype):
         valid_mac = self.get_mac_address(config.get('serverMacAddress'))
 
         if not valid_mac:
-            raise ValueError('Invalid MAC address "{}"'
-                             .format(config.get('serverMacAddress')))
+            raise ValueError(f'Invalid MAC address '
+                             f'"{config.get("serverMacAddress")}"')
 
         self._server_mac_address = valid_mac
 
@@ -69,7 +69,7 @@ class BluetoothPort(Prototype):
     def close(self) -> None:
         """Closes the socket connection."""
         if self._sock:
-            self.logger.info('Closing port "{}" ...'.format(self._port))
+            self.logger.info(f'Closing port "{self._port}" ...')
             self._sock.close()
 
     def get_mac_address(self, s: str) -> Union[str, None]:
@@ -110,20 +110,18 @@ class BluetoothPort(Prototype):
         request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
-            self.logger.notice('No requests order defined in observation "{}" '
-                               'of target "{}"'.format(obs.get('name'),
-                                                       obs.get('target')))
+            self.logger.notice(f'No requests order defined in observation '
+                               f'"{obs.get("name")}" of target '
+                               f'"{obs.get("target")}"')
 
         # Send requests sequentially to the sensor.
         for request_name in requests_order:
             request_set = request_sets.get(request_name)
 
             if not request_set:
-                self.logger.error('Request set "{}" not found in observation '
-                                  '"{}" of target "{}"'
-                                  .format(request_name,
-                                          obs.get('name'),
-                                          obs.get('target')))
+                self.logger.error(f'Request set "{request_name}" not found in '
+                                  f'observation "{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}"')
                 return
 
             # The response of the sensor.
@@ -136,22 +134,20 @@ class BluetoothPort(Prototype):
             timeout = request_set.get('timeout') or 1.0
 
             # Send the request of the observation to the attached sensor.
-            self.logger.verbose('Sending request "{}" of observation "{}" to '
-                                'sensor "{}" ...'.format(request_name,
-                                                         obs.get('name'),
-                                                         obs.get('sensorName')))
+            self.logger.verbose(f'Sending request "{request_name}" of '
+                                f'observation "{obs.get("name")}" to sensor '
+                                f'"{obs.get("sensorName")}" ...')
             # Write to Bluetooth port.
             self._send(request)
 
             # Get the response of the sensor.
             response = self._receive(response_delimiter, timeout)
 
-            self.logger.verbose('Received response "{}" for request "{}" '
-                                'of observation "{}" from sensor "{}"'
-                                .format(self.sanitize(response),
-                                        request_name,
-                                        obs.get('name'),
-                                        obs.get('sensorName')))
+            self.logger.verbose(f'Received response '
+                                f'"{self.sanitize(response)}" for request '
+                                f'"{request_name}" of observation '
+                                f'"{obs.get("name")}" from sensor '
+                                f'"{obs.get("sensorName")}"')
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
 
@@ -199,9 +195,8 @@ class BluetoothPort(Prototype):
                 break
 
             if time.time() - start_time > timeout:
-                self.logger.warning('Timeout on port "{}" after {} s'
-                                    .format(self._port,
-                                            timeout))
+                self.logger.warning(f'Timeout on port "{self._port}" after '
+                                    f'{timeout} s')
                 break
 
         return response
@@ -355,8 +350,8 @@ class SerialPort(Prototype):
 
     def close(self) -> None:
         if self._serial:
-            self.logger.verbose('Closing port "{}" ...'
-                                .format(self._serial_port_config.port))
+            self.logger.verbose(f'Closing port '
+                                f'"{self._serial_port_config.port}" ...')
             self._serial.close()
 
     def _create(self) -> None:
@@ -364,8 +359,8 @@ class SerialPort(Prototype):
         if not self._serial_port_config:
             self._serial_port_config = self._get_port_config()
 
-        self.logger.verbose('Opening port "{}" ...'
-                            .format(self._serial_port_config.port))
+        self.logger.verbose(f'Opening port "{self._serial_port_config.port}" '
+                            f'...')
 
         try:
             self._serial = serial.Serial(
@@ -378,8 +373,8 @@ class SerialPort(Prototype):
                 xonxoff=self._serial_port_config.xonxoff,
                 rtscts=self._serial_port_config.rtscts)
         except serial.serialutil.SerialException:
-            self.logger.error('Permission denied for port "{}"'
-                              .format(self._serial_port_config.port))
+            self.logger.error(f'Permission denied for port '
+                              f'"{self._serial_port_config.port}"')
 
     def process_observation(self, obs: Observation) -> Union[Observation, None]:
         """Processes an observation object. Sends request to sensor and stores
@@ -402,29 +397,27 @@ class SerialPort(Prototype):
             self._passive_listener = Thread(target=self.listen, args=(obs,))
             self._passive_listener.daemon = True
             self._passive_listener.start()
-            self.logger.debug('Started passive listener of port "{}"'
-                              .format(self.name))
+            self.logger.debug(f'Started passive listener of port "{self.name}"')
             return
 
         # Turn off passive mode.
         if self._is_passive and not obs.get('passiveMode'):
             self._is_passive = False
             self._passive_listener.join()
-            self.logger.debug('Stopped passive listener of port "{}"'
-                              .format(self.name))
+            self.logger.debug(f'Stopped passive listener of port "{self.name}"')
 
         # Create new serial connection.
         if not self._serial:
             self._create()
 
         if self._serial is None:
-            self.logger.error('Could not access port "{}"'
-                              .format(self._serial_port_config.port))
+            self.logger.error(f'Could not access port '
+                              f'"{self._serial_port_config.port}"')
             return
 
         if not self._serial.is_open:
-            self.logger.verbose('Re-opening port "{}" ...'
-                                .format(self._serial_port_config.port))
+            self.logger.verbose(f'Re-opening port '
+                                f'"{self._serial_port_config.port}" ...')
             self._serial.open()
             self._serial.reset_output_buffer()
             self._serial.reset_input_buffer()
@@ -436,20 +429,18 @@ class SerialPort(Prototype):
         request_sets = obs.get('requestSets')
 
         if len(requests_order) == 0:
-            self.logger.notice('No requests order defined in observation "{}" '
-                               'of target "{}"'.format(obs.get('name'),
-                                                       obs.get('target')))
+            self.logger.notice(f'No requests order defined in observation '
+                               f'"{obs.get("name")}" of target '
+                               f'"{obs.get("target")}"')
 
         # Send requests sequentially to the sensor.
         for request_name in requests_order:
             request_set = request_sets.get(request_name)
 
             if not request_set:
-                self.logger.error('Request set "{}" not found in observation '
-                                  '"{}" of target "{}"'
-                                  .format(request_name,
-                                          obs.get('name'),
-                                          obs.get('target')))
+                self.logger.error(f'Request set "{request_name}" not found in '
+                                  f'observation "{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}"')
                 return
 
             # The response of the sensor.
@@ -458,19 +449,18 @@ class SerialPort(Prototype):
 
             # Data of the request set.
             request = request_set.get('request')
-            sleep_time = request_set.get('sleepTime')
-            timeout = request_set.get('timeout')
+            sleep_time = request_set.get('sleepTime') or 0.0
+            timeout = request_set.get('timeout') or 0.0
 
             # Send the request of the observation to the attached sensor.
-            self.logger.verbose('Sending request "{}" of observation "{}" to '
-                                'sensor "{}" ...'.format(request_name,
-                                                         obs.get('name'),
-                                                         obs.get('sensorName')))
+            self.logger.verbose(f'Sending request "{request_name}" of '
+                                f'observation "{obs.get("name")}" to sensor '
+                                f'"{obs.get("sensorName")}" ...')
 
             for attempt in range(self._max_attempts):
                 if attempt > 0:
-                    self.logger.info('Attempt {} of {}'
-                                     .format(attempt + 1, self._max_attempts))
+                    self.logger.info(f'Request attempt {attempt + 1} of '
+                                     f'{self._max_attempts}')
                     time.sleep(1)
 
                 # Write to the serial port.
@@ -485,20 +475,18 @@ class SerialPort(Prototype):
                 self._serial.reset_input_buffer()
 
                 if len(response) > 0:
-                    self.logger.verbose('Received response "{}" for request '
-                                        '"{}" of observation "{}" from sensor '
-                                        '"{}"'.format(self.sanitize(response),
-                                                      request_name,
-                                                      obs.get('name'),
-                                                      obs.get('sensorName')))
+                    self.logger.verbose(f'Received response '
+                                        f'"{self.sanitize(response)}" for '
+                                        f'request "{request_name}" of '
+                                        f'observation "{obs.get("name")}" from '
+                                        f'sensor "{obs.get("sensorName")}"')
                     break
 
                 # Try next attempt if response is empty.
-                self.logger.warning('No response from sensor "{}" for '
-                                    'observation "{}" of target "{}"'
-                                    .format(obs.get('sensorName'),
-                                            obs.get('name'),
-                                            obs.get('target')))
+                self.logger.warning(f'No response from sensor '
+                                    f'"{obs.get("sensorName")}" for '
+                                    f'observation "{obs.get("name")}" of '
+                                    f'target "{obs.get("target")}"')
 
             # Add the raw response of the sensor to the observation set.
             request_set['response'] = response
@@ -511,8 +499,7 @@ class SerialPort(Prototype):
 
     def _get_port_config(self) -> SerialPortConfiguration:
         if not self._config:
-            self.logger.debug('No port "{}" defined in configuration'
-                              .format(self.name))
+            self.logger.debug(f'Port "{self.name}" is undefined')
 
         return SerialPortConfiguration(
             port=self._config.get('port'),
@@ -535,21 +522,24 @@ class SerialPort(Prototype):
         """
         while self._is_running and self._is_passive:
             if not obs_draft:
-                self.logger.warning('No observation set for passive listener of'
-                                    'port "{}"'.format(self.name))
+                self.logger.warning(f'No draft observation set for passive '
+                                    f'listener on port "{self.name}"')
                 break
 
             if not self._serial:
                 self._create()
 
             if self._serial is None:
-                self.logger.error('Could not access port "{}"'
-                                  .format(self._serial_port_config.port))
+                self.logger.error(f'Can\'t access port '
+                                  f'"{self._serial_port_config.port}" for '
+                                  f'passive listening')
+
                 return
 
             if not self._serial.is_open:
-                self.logger.info('Re-opening port "{}" ...'
-                                 .format(self._serial_port_config.port))
+                self.logger.info(f'Re-opening port '
+                                 f'"{self._serial_port_config.port}" for '
+                                 f'passive listening ...')
                 self._serial.open()
                 self._serial.reset_input_buffer()
 
@@ -572,10 +562,9 @@ class SerialPort(Prototype):
                                   timeout=timeout)
 
             if len(response) > 0:
-                self.logger.verbose('Received "{}" from sensor "{}" on port '
-                                    '"{}"'.format(self.sanitize(response),
-                                                  obs.get('sensorName'),
-                                                  self._name))
+                self.logger.verbose(f'Received "{self.sanitize(response)}" '
+                                    f'from sensor "{obs.get("sensorName")}" on '
+                                    f'port "{self._name}"')
                 draft['response'] = response
                 obs.set('timestamp', str(arrow.utcnow()))
                 self.publish_observation(obs)
@@ -609,14 +598,14 @@ class SerialPort(Prototype):
                     if len(response) >= len(eol) and response[-i:] == eol:
                         break
             except UnicodeDecodeError:
-                self.logger.error('No sensor on port "{}"'
-                                  .format(self._serial_port_config.port))
+                self.logger.error(f'No sensor on port '
+                                  f'"{self._serial_port_config.port}"')
                 break
 
             if time.time() - start_time > timeout:
-                self.logger.warning('Timeout on port "{}" after {} s'
-                                    .format(self._serial_port_config.port,
-                                            timeout))
+                self.logger.warning(f'Timeout on port '
+                                    f'"{self._serial_port_config.port}" after '
+                                    f'{timeout} s')
                 break
 
         return response

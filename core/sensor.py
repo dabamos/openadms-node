@@ -37,10 +37,10 @@ class Sensor(object):
 
         for data in self._config.get('observations'):
             obs = self.create_observation(data)
-            self._observations[obs.get('name')] = obs
+            self._observations[obs.get("name")] = obs
 
-            self.logger.debug('Loaded observation "{}" of sensor "{}"'
-                              .format(obs.get('name'), self._name))
+            self.logger.debug(f'Loaded observation "{obs.get("name")}" of '
+                              f'sensor "{self._name}"')
 
     def create_observation(self, data: Dict[str, Any]) -> Observation:
         """Creates an observation object.

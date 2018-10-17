@@ -72,7 +72,7 @@ class Job(object):
         now = arrow.now()
 
         if now > self._end_date:
-            self.logger.debug('Job "{}" has expired'.format(self._name))
+            self.logger.debug(f'Job "{self._name}" has expired')
             return True
 
         return False
@@ -148,9 +148,8 @@ class Job(object):
         # Set the next receiver to the module following the port.
         obs_copy.set('nextReceiver', 1)
 
-        self.logger.info('Starting job "{}" for port "{}" ...'
-                         .format(self._obs.get('name'),
-                                 self._port_name))
+        self.logger.info(f'Starting job "{self._obs.get("name")}" for port '
+                         f'"{self._port_name)}" ...')
 
         # Get the sleep time of the whole observation.
         sleep_time = obs_copy.get('sleepTime', 0)
@@ -164,7 +163,7 @@ class Job(object):
         self._uplink(target, header, payload)
 
         # Sleep until the next observation.
-        self.logger.debug('Next observation in {} s'.format(sleep_time))
+        self.logger.debug(f'Next observation in {sleep_time} s')
         time.sleep(sleep_time)
 
     @property
@@ -209,8 +208,7 @@ class Scheduler(Prototype):
             job: Job to add.
         """
         self._jobs.append(job)
-        self.logger.debug('Added job "{}" to scheduler "{}"'
-                          .format(job.name, self._name))
+        self.logger.debug(f'Added job "{job.name}" to scheduler "{self._name}"')
 
     def load_jobs(self) -> None:
         """Loads all observation sets from the configurations and creates jobs
@@ -225,8 +223,7 @@ class Scheduler(Prototype):
                                           .get_observation(obs_name)
 
                 if not obs:
-                    self.logger.error('Observation "{}" not found'
-                                      .format(obs_name))
+                    self.logger.error(f'Observation "{obs_name}" not found')
                     continue
 
                 # Add sensor name to the observation.
@@ -277,8 +274,7 @@ class Scheduler(Prototype):
             # Remove expired jobs from the jobs list.
             while zombies:
                 zombie = zombies.pop()
-                self.logger.debug('Deleting expired job "{}"'
-                                  .format(zombie.name))
+                self.logger.debug(f'Deleting expired job "{zombie.name}"')
                 self._jobs.remove(zombie)
 
             t2 = time.time()

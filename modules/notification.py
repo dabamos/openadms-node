@@ -77,15 +77,15 @@ class Alerter(Prototype):
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
-                self.logger.notice('Skipped module "{}" (not enabled)'
-                                   .format(module_name))
+                self.logger.notice(f'Skipping module "{module_name}" '
+                                   f'(not enabled)')
                 continue
 
             receivers = module.get('receivers').get(record.levelname.lower())
 
             if not receivers or len(receivers) == 0:
-                self.logger.debug('No receivers defined for log level "{}"'
-                                  .format(record.levelname.lower()))
+                self.logger.debug(f'No receivers defined for log level '
+                                  f'"{record.levelname.lower()}"')
                 continue
 
             # Publish a single message for each receiver.
@@ -239,8 +239,8 @@ class AlertMessageFormatter(Prototype):
         payload['message'] = complete_msg
 
         # Fire and forget.
-        self.logger.debug('Sending formatted alert message to "{}"'
-                          .format(self._receiver))
+        self.logger.debug(f'Sending formatted alert message to '
+                          f'"{self._receiver}"')
         self.publish(self._receiver, header, payload)
 
     def run(self) -> None:
@@ -275,8 +275,7 @@ class AlertMessageFormatter(Prototype):
                         self.process_alert_messages(receiver, messages)
 
                 # Sleep some time.
-                self.logger.debug('Waiting {} s to collect new alert messages'
-                                  .format(self._msg_collection_time))
+                self.logger.debug(f'Waiting {self._msg_collection_time} s')
                 time.sleep(self._msg_collection_time)
 
                 # Clear the messages cache.
@@ -324,9 +323,8 @@ class Heartbeat(Prototype):
     def process_heartbeat(self,
                           header: Dict[str, Any],
                           payload: Dict[str, Any]) -> None:
-        self.logger.info('Received heartbeat at "{}" UTC for project "{}"'
-                         .format(payload.get('dt'),
-                                 payload.get('project')))
+        self.logger.info(f'Received heartbeat at "{payload.get("dt")}" UTC '
+                         f'for project "{payload.get("project")}"')
 
     def run(self) -> None:
         project_id = self._project_manager.project.id
@@ -402,7 +400,7 @@ class IrcAgent(Prototype):
         self._channel = config.get('channel')
 
         if not self._channel.startswith('#'):
-            self.logger.warning('Channel name is missing "#"')
+            self.logger.warning('Channel name is missing "#" character')
             self._channel = '#' + self._channel
 
         self.add_handler('irc', self.handle_irc)
@@ -429,25 +427,22 @@ class IrcAgent(Prototype):
         else:
             self._conn = sock
 
-        self.logger.info('Connecting to "{}:{}"'.format(self._host,
-                                                        self._port))
+        self.logger.info(f'Connecting to "{self._host}:{self._port}"')
+
         try:
             # Connect to IRC server.
             self._conn.connect((self._host, self._port))
             self._conn.setblocking(0)
             self._conn.settimeout(1)
         except ConnectionRefusedError:
-            self.logger.error('Could not connect to "{}:{}" '
-                              '(connection refused)'
-                              .format(self._host, self._port))
+            self.logger.error(f'Could not connect to "{self._host}:'
+                              f'{self._port}" (connection refused)')
         except TimeoutError:
-            self.logger.error('Could not connect to "{}:{}" '
-                              '(timeout)'
-                              .format(self._host, self._port))
+            self.logger.error(f'Could not connect to "{self._host}:'
+                              f'{self._port}" (timeout)')
         except ssl.SSLError:
-            self.logger.error('Could not connect to "{}:{}" '
-                              '(SSL error)'
-                              .format(self._host, self._port))
+            self.logger.error(f'Could not connect to "{self._host}:'
+                              f'{self._port}" (SSL error)')
 
     def _disconnect(self) -> None:
         """Disconnects from IRC server and closes socket connection."""
@@ -473,20 +468,16 @@ class IrcAgent(Prototype):
         self._receive()
 
         if self._password and len(self._password) > 0:
-            self._send('PASS {}\r\n'.format(self._password))
+            self._send(f'PASS {self._password}\r\n')
 
-        self._send('NICK {}\r\n'.format(self._nickname))
-        self._send('USER {} {} {} :{}\r\n'.format(self._nickname,
-                                                  self._nickname,
-                                                  self._nickname,
-                                                  'OpenADMS Node IRC Client'))
+        self._send(f'NICK {self._nickname}\r\n')
+        self._send(f'USER {self._nickname} {self._nickname} {self._nickname} '
+                   f':OpenADMS Node IRC Client\r\n')
 
         if self._channel and len(self._channel) > 0:
-            self.logger.info('Joining channel "{}" on "{}:{}"'
-                             .format(self._channel,
-                                     self._host,
-                                     self._port))
-            self._send('JOIN {}\r\n'.format(self._channel))
+            self.logger.info(f'Joining channel "{self._channel}" on '
+                             f'"{self._host}:{self._port}"')
+            self._send(f'JOIN {self._channel}\r\n')
 
     def _priv_msg(self, target: str, message: str) -> None:
         """Sends message to channel or user.
@@ -495,7 +486,7 @@ class IrcAgent(Prototype):
             target: The channel or user name.
             message: The message to send.
         """
-        self._send('PRIVMSG {} :{}\r\n'.format(target, message))
+        self._send(f'PRIVMSG {target} :{message}\r\n')
 
     def _receive(self, buffer_size: int = 4096) -> str:
         """Receives message from server.
@@ -526,7 +517,7 @@ class IrcAgent(Prototype):
             data = self._receive()
 
             if data.startswith('PING'):
-                self._send('PONG ' + data.split()[1] + '\r\n')
+                self._send(f'PONG {data.split()[1]}\r\n')
 
             if not self._queue.empty():
                 item = self._queue.get()
@@ -534,10 +525,8 @@ class IrcAgent(Prototype):
                 message = item.get('message', '')
 
                 self._priv_msg(target, message)
-                self.logger.debug('Sent alert message to target "{}" on '
-                                  'network "{}:{}"'.format(target,
-                                                           self._host,
-                                                           self._port))
+                self.logger.debug(f'Sent alert message to target "{target}" on '
+                                  f'network "{self._host}:{self._port}"')
 
         self._disconnect()
 
@@ -595,8 +584,7 @@ class MailAgent(Prototype):
         self._user_mail = config.get('userMail')
         self._user_name = config.get('userName')
         self._user_password = config.get('userPassword')
-        self._x_mailer = 'OpenADMS Node {} Mail Agent'\
-                         .format(System.get_openadms_version())
+        self._x_mailer = f'OpenADMS Node {System.get_openadms_version()}'
 
         if self._is_tls and self._is_start_tls:
             raise ValueError('Invalid SSL configuration '
@@ -639,7 +627,7 @@ class MailAgent(Prototype):
             mail_message: The body text of the email.
         """
         msg = MIMEMultipart('alternative')
-        msg['From'] = '{} <{}>'.format(mail_from, self._user_mail)
+        msg['From'] = f'{mail_from} <{self._user_mail}>'
         msg['To'] = mail_to
         msg['Date'] = formatdate(localtime=True)
         msg['X-Mailer'] = self._x_mailer
@@ -675,19 +663,19 @@ class MailAgent(Prototype):
                 smtp.quit()
 
                 done = True
-                self.logger.info('E-mail has been send successfully to "{}"'
-                                 .format(mail_to))
+                self.logger.info(f'E-mail has been send successfully to '
+                                 f'"{mail_to}"')
             except smtplib.SMTPException:
-                self.logger.warning('E-mail could not be sent to "{}" '
-                                    '(SMTP error)'.format(mail_to))
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
+                                    f'(SMTP error)')
                 time.sleep(self._retry_delay)
             except socket.gaierror:
-                self.logger.warning('E-mail could not be sent to "{}"'
-                                    '(connection error)'.format(mail_to))
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}"'
+                                    f'(connection error)')
                 time.sleep(self._retry_delay)
             except TimeoutError:
-                self.logger.warning('E-mail could not be sent to "{}" '
-                                    '(timeout)'.format(mail_to))
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
+                                    f'(timeout)')
                 time.sleep(self._retry_delay)
 
 
@@ -731,10 +719,9 @@ class MastodonAgent(Prototype):
             self._mastodon.log_in(self._email,
                                   self._password,
                                   to_file=self._user_cred_file)
-            self.logger.debug('Login on {} successful'
-                              .format(self._api_base_url))
+            self.logger.debug(f'Login on "{self._api_base_url}" was successful')
         except Exception:
-            self.logger.error('Cannot login on {}'.format(self._api_base_url))
+            self.logger.error(f'Can\'t login on "{self._api_base_url}"')
 
     def handle_mastodon(self,
                         header: Dict[str, Any],
@@ -758,9 +745,9 @@ class MastodonAgent(Prototype):
             try:
                 self._login()
                 self._mastodon.toot(message)
-                self.logger.info('Tooted to {}'.format(self._api_base_url))
+                self.logger.info(f'Tooted to "{self._api_base_url}"')
             except Exception:
-                self.logger.error('Accessing Mastodon instance failed')
+                self.logger.error(f'Can\'t access "{self._api_base_url}"')
 
 
 class RssAgent(Prototype):
@@ -837,7 +824,7 @@ class RssAgent(Prototype):
             payload['description'] = ''
 
         if not payload.get('guid'):
-            payload['guid'] = 'urn:uuid:{}'.format(uuid.uuid4())
+            payload['guid'] = f'urn:uuid:{uuid.uuid4()}'
 
         if not payload.get('title'):
             payload['title'] = self._default_title
@@ -941,8 +928,7 @@ class RssAgent(Prototype):
 
         with open(str(file_path), 'w') as fh:
             fh.write(contents)
-            self.logger.info('Saved RSS feed to file "{}"'
-                             .format(str(file_path)))
+            self.logger.info(f'Saved RSS feed to file "{str(file_path)}"')
 
 
 class ShortMessageAgent(Prototype):
@@ -998,20 +984,18 @@ class ShortMessageAgent(Prototype):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             try:
                 sock.connect((self._host, self._port))
-                self.logger.debug('Established connection to "{}:{}"'
-                                  .format(self._host, self._port))
+                self.logger.debug(f'Connection to "{self._host}:{self._port}" '
+                                  f'has been established')
             except ConnectionRefusedError:
-                self.logger.error('Could not connect to "{}:{}" '
-                                  '(connection refused)'.format(self._host,
-                                                                self._port))
+                self.logger.error(f'Could not connect to "{self._host}:'
+                                  f'{self._port}" (connection refused)')
                 return
             except TimeoutError:
-                self.logger.error('Could not connect to "{}:{}" (timeout)'
-                                  .format(self._host, self._port))
+                self.logger.error(f'Could not connect to "{self._host}:'
+                                  f'{self._port}" (timeout)')
                 return
 
-            self.logger.info('Sending SMS to "{}"'.format(number))
+            self.logger.info(f'Sending SMS to "{number}" ...')
             sock.send(message.encode())
-
-            self.logger.debug('Closed connection to "{}:{}"'
-                              .format(self._host, self._port))
+            self.logger.debug(f'Closed connection to "{self._host}:'
+                              f'{self._port}"')

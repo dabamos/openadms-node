@@ -111,7 +111,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         self._log_handler = log_handler
         self._root_dir = 'modules/server'
 
-        index_file = self.get_complete_path('/index.html')
+        index_file = self.absolute_path('/index.html')
         self._template = self.get_file_contents(index_file)
 
         super().__init__(*args)
@@ -119,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         """Creates the response to a GET request."""
         parsed_path = parse.urlparse(self.path)
-        file_path = self.get_complete_path(parsed_path.path)
+        file_path = self.absolute_path(parsed_path.path)
 
         status = 200
         mime = 'text/html'
@@ -194,8 +194,8 @@ class RequestHandler(BaseHTTPRequestHandler):
                 .format(openadms_version=System.get_openadms_string())
         )
 
-    def get_complete_path(self, path: str) -> Path:
-        return Path('{}/{}'.format(self._root_dir, path))
+    def absolute_path(self, path: str) -> Path:
+        return Path(self._root_dir, path)
 
     def get_file_contents(self, path: Path) -> str:
         """Opens a file and returns the contents.

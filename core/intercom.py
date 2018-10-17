@@ -35,8 +35,7 @@ class MQTTMessageBroker(Thread):
                 'default': {
                     'max-connections': 5000,        # Set '0' for no limit.
                     'type': 'tcp',                  # Set 'ws' for WebSockets.
-                    'bind': '{}:{}'.format(host,
-                                           port)
+                    'bind': f'{host}:{port}'        # IP or FQDN : port.
                 }
             }
         }
@@ -129,10 +128,9 @@ class MQTTMessenger(object):
                        rc: int) -> None:
         """Callback method is called after disconnection."""
         if rc != 0:
-            self.logger.error('Unexpected disconnection from {}:{}'
-                              .format(self._host, self._port))
-            self.logger.info('Reconnecting to {}:{} ...'
-                             .format(self._host, self._port))
+            self.logger.error(f'Unexpected disconnection from '
+                              f'{self._host}:{self._port}')
+            self.logger.info(f'Reconnecting to {self._host}:{self._port} ...')
             self.connect()
 
     def _on_message(self,
@@ -146,8 +144,8 @@ class MQTTMessenger(object):
             data = json.loads(str(msg.payload, encoding='UTF-8'))
             self._downlink(data)
         except json.JSONDecodeError:
-            self.logger.error('Message from client "{}" is corrupted '
-                              '(invalid JSON)'.format(client))
+            self.logger.error(f'Message from client "{client}" is corrupted '
+                              f'(invalid JSON)')
 
     def connect(self) -> None:
         """Connect to the message broker."""
