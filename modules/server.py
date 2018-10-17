@@ -18,7 +18,7 @@ from urllib import parse
 from core.logging import RingBufferLogHandler, RootFilter, StringFormatter
 from core.manager import Manager
 from core.system import System
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class LocalControlServer(Prototype):

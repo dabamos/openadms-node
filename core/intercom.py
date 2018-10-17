@@ -48,7 +48,7 @@ class MQTTMessageBroker(Thread):
 
         try:
             loop.run_until_complete(broker.start())
-            self.logger.info('Starting MQTT message broker ...')
+            self.logger.info('Starting local MQTT message broker ...')
             loop.run_forever()
         except KeyboardInterrupt:
             loop.run_until_complete(broker.shutdown())
@@ -155,7 +155,7 @@ class MQTTMessenger(object):
                                        self._keep_alive)
             self._client.loop_start()
         else:
-            self.logger.error('Can\'t create connection to MQTT message broker')
+            self.logger.error('Can\'t connect to MQTT message broker')
 
     def disconnect(self) -> None:
         """Disconnect from the message broker."""

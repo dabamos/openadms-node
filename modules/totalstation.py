@@ -18,7 +18,7 @@ from core.observation import Observation as Obs
 from core.manager import Manager
 from core.sensor import SensorType
 from core.util import gon_to_rad, rad_to_gon
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class DistanceCorrector(Prototype):

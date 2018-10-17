@@ -22,7 +22,7 @@ from tinydb.storages import MemoryStorage
 
 from core.manager import Manager
 from core.observation import Observation
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class CloudExporter(Prototype):
@@ -302,7 +302,7 @@ class FileExporter(Prototype):
                 self.logger.info(f'Saved observation "{obs.get("name")}" of '
                                  f'target "{obs.get("target")}" from port '
                                  f'"{obs.get("portName")}" to file '
-                                 f'"{str(file_path))}"')
+                                 f'"{str(file_path)}"')
 
         return obs
 

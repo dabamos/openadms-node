@@ -22,7 +22,7 @@ from tinydb.storages import MemoryStorage
 
 from core.manager import Manager
 from core.observation import Observation
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class CouchDriver(Prototype):

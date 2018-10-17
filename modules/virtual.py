@@ -15,7 +15,7 @@ import arrow
 
 from core.manager import Manager
 from core.observation import Observation
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class VirtualSensor(Prototype):

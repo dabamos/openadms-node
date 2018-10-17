@@ -13,7 +13,7 @@ from typing import Union
 
 from core.observation import Observation
 from core.manager import Manager
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class PreProcessor(Prototype):

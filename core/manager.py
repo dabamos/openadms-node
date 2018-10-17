@@ -20,7 +20,7 @@ import arrow
 from core.intercom import MQTTMessenger
 from core.module import Module
 from core.sensor import Sensor
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class Manager(object):
@@ -324,8 +324,8 @@ class ModuleManager(object):
             try:
                 self.add(module_name, class_path)
             except Exception as e:
-                self.logger.error(f'Module "{module_name}" '
-                                  'not loaded: {str(e)}')
+                self.logger.error(f'Loading module "{module_name}" failed: '
+                                  f'{str(e)}')
                 continue
 
         # Start-time of the monitoring software.
@@ -545,7 +545,7 @@ class ProjectManager(object):
 
     def remove_all(self) -> None:
         """Clears everything."""
-        self.logger.info(f'Removing project "{self._project.name)}" ...')
+        self.logger.info(f'Removing project "{self._project.name}" ...')
         self._project = None
 
     @property
@@ -594,10 +594,10 @@ class SchemaManager(object):
                 self._schemas[data_type] = schema
                 self.logger.debug(f'Loaded schema "{data_type}"')
             except json.JSONDecodeError:
-                self.logger.error(f'Invalid JSON file "{data_type}"')
+                self.logger.error(f'Invalid JSON file "{schema_path}"')
                 return False
             except jsonschema.SchemaError:
-                self.logger.error(f'Invalid JSON schema "{data_type}"')
+                self.logger.error(f'Invalid JSON schema "{schema_path}"')
                 return False
 
         return True

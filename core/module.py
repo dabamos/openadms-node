@@ -13,7 +13,7 @@ import threading
 from typing import Dict, List
 
 from core.intercom import MQTTMessenger
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class Module(threading.Thread):
@@ -73,7 +73,7 @@ class Module(threading.Thread):
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
         self.logger.verbose(f'Connecting module "{self._worker.name}" to '
-                            f'{self._messenger.host}:{self._messenger.port)}')
+                            f'{self._messenger.host}:{self._messenger.port}')
         self._messenger.connect()
 
         while self._is_running:

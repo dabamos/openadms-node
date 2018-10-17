@@ -33,7 +33,7 @@ from mastodon import Mastodon
 from core.logging import RingBuffer, RootFilter
 from core.manager import Manager
 from core.system import System
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class Alerter(Prototype):
@@ -400,7 +400,7 @@ class IrcAgent(Prototype):
         self._channel = config.get('channel')
 
         if not self._channel.startswith('#'):
-            self.logger.warning('Channel name is missing "#" character')
+            self.logger.warning('Channel name doesn\'t start with "#"')
             self._channel = '#' + self._channel
 
         self.add_handler('irc', self.handle_irc)

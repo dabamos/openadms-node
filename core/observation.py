@@ -114,9 +114,9 @@ class Observation(object):
         try:
             t = self._data.get('responseSets').get(name).get('type')
         except AttributeError:
-            logger.warning(f'Type of response set "{name}" is missing in '
+            logger.warning(f'Missing type of response set "{name}" in '
                            f'observation "{self.get("name")}" of target '
-                           f'"{self.get("target"))}"')
+                           f'"{self.get("target")}"')
 
         return t
 
@@ -134,7 +134,7 @@ class Observation(object):
         try:
             u = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
-            logger.warning(f'Unit of response set "{name}" is missing in '
+            logger.warning(f'Missing unit of response set "{name}" in '
                            f'observation "{self.get("name")}" of target "'
                            f'"{self.get("target")}"')
 
@@ -154,7 +154,7 @@ class Observation(object):
         try:
             v = self._data.get('responseSets').get(name).get('value')
         except AttributeError:
-            logger.warning(f'Value of response set "{name}" is missing in '
+            logger.warning(f'Missing value of response set "{name}" in '
                            f'observation "{self.get("name")}" of '
                            f'target "{self.get("target")}"')
 

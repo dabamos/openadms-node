@@ -17,7 +17,7 @@ import arrow
 
 from core.manager import Manager
 from core.observation import Observation
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class Job(object):
@@ -149,7 +149,7 @@ class Job(object):
         obs_copy.set('nextReceiver', 1)
 
         self.logger.info(f'Starting job "{self._obs.get("name")}" for port '
-                         f'"{self._port_name)}" ...')
+                         f'"{self._port_name}" ...')
 
         # Get the sleep time of the whole observation.
         sleep_time = obs_copy.get('sleepTime', 0)

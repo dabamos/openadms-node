@@ -18,7 +18,7 @@ from typing import Any, Dict, Tuple, Union
 
 from core.manager import Manager
 from core.system import System
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class Unix(Enum):

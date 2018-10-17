@@ -10,7 +10,7 @@ import threading
 import time
 
 from core.manager import Manager
-from modules.prototype import Prototype
+from core.prototype import Prototype
 
 
 class ErrorGenerator(Prototype):
