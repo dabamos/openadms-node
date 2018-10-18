@@ -9,12 +9,12 @@
                 "getDistance": {
                     "request": "?\r",
                     "responseDelimiter": "\r",
-                    "responsePattern": "(?P<length>\\d{3}.\\d{3})",
+                    "responsePattern": "(?P<range>\\d{3}.\\d{3})",
                     "timeout": 1
                 }
             },
             "responseSets": {
-                "length": {
+                "range": {
                     "type": "float",
                     "unit": "mm"
                 }
