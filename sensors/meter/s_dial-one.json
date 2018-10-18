@@ -4,17 +4,17 @@
     "description": "Digital indicator with RS-232 interface.",
     "observations": {
         "getValue": {
-            "description": "Returns the current length.",
+            "description": "Returns the current distance.",
             "requestSets": {
                 "getDistance": {
                     "request": "?\r",
                     "responseDelimiter": "\r",
-                    "responsePattern": "(?P<range>\\d{3}.\\d{3})",
+                    "responsePattern": "(?P<distance>\\d{3}.\\d{3})",
                     "timeout": 1
                 }
             },
             "responseSets": {
-                "range": {
+                "distance": {
                     "type": "float",
                     "unit": "mm"
                 }
