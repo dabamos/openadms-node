@@ -106,13 +106,13 @@ class CouchDriver(Prototype):
         """
         # Connect to CouchDB server.
         self.logger.info(f'Connecting to CouchDB server "{self._scheme}://'
-                         f'{self._server}:{self._port}/{self._path)}" ...')
+                         f'{self._server}:{self._port}/{self._path}" ...')
         self._couch = couchdb.Server(self._server_uri)
 
         # Open database.
         if self._db_name not in self._couch:
             self.logger.error(f'Database "{self._db_name}" not found on server '
-                              f'"{self._server_uri)}"')
+                              f'"{self._server_uri}"')
 
         self.logger.info(f'Opening CouchDB database "{self._db_name}" ...')
         self._db = self._couch[self._db_name]
@@ -145,7 +145,7 @@ class CouchDriver(Prototype):
             self.logger.info(f'Saved observation "{obs_data.get("name")}" of '
                              f'target "{obs_data.get("target")}" from '
                              f'port "{obs_data.get("portName")}" to CouchDB '
-                             f'database "{self._db_name)}"')
+                             f'database "{self._db_name}"')
         except Exception as e:
             self.logger.error(f'Observation "{obs_data.get("name")}" of target '
                               f'"{obs_data.get("target")}" from port '
