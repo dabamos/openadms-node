@@ -43,9 +43,7 @@ class BluetoothPort(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get('ports')\
-                                     .get('bluetooth')\
-                                     .get(self._name)
+        config = self.get_module_config('ports', 'bluetooth', self._name)
         self._port = config.get('port')
         self._server_mac_address = None
         self._sock = None
@@ -329,9 +327,7 @@ class SerialPort(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        self._config = self.get_module_config('ports',
-                                              'serial',
-                                              self.name)
+        self._config = self.get_module_config('ports', 'serial', self.name)
         self._max_attempts = self._config.get('maxAttempts')
 
         # Serial port.

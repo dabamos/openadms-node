@@ -17,6 +17,14 @@
         "topic": {
             "id": "/properties/topic",
             "type": "string"
+        },
+        "user": {
+            "id": "/properties/user",
+            "type": "string"
+        },
+        "password": {
+            "id": "/properties/password",
+            "type": "string"
         }
     },
     "required": [

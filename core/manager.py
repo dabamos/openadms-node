@@ -153,7 +153,7 @@ class ConfigManager(object):
         exception if the configuration is invalid.
 
         Args:
-            schema_name: Name of the JSON schemas.
+            schema_name: Name of the JSON schema.
             *args: Key names to the module's configuration.
 
         Returns:

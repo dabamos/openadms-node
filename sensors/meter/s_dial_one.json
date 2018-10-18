@@ -1,0 +1,24 @@
+{
+    "name": "Sylvac S_Dial ONE",
+    "type": "indicator",
+    "description": "Digital indicator with RS-232 interface.",
+    "observations": {
+        "getValue": {
+            "description": "Returns the current length.",
+            "requestSets": {
+                "getDistance": {
+                    "request": "?\r",
+                    "responseDelimiter": "\r",
+                    "responsePattern": "(?P<length>\\d{3}.\\d{3})",
+                    "timeout": 1
+                }
+            },
+            "responseSets": {
+                "length": {
+                    "type": "float",
+                    "unit": "mm"
+                }
+            }
+        }
+    }
+}

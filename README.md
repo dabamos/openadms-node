@@ -41,7 +41,7 @@ $ python3 -m pip install --user -U -r requirements.txt
 ## Run
 Run OpenADMS Node from the command line:
 ```
-$ python3 openadms.py --config ./config/my_config.json --with-mqtt-broker --debug
+$ python3 openadms.py --config ./config/config.json --with-mqtt-broker --debug
 ```
 OpenADMS Node also features a graphical launcher. At first, run `install.bat` on
 Microsoft Windows or install the dependencies manually:
@@ -61,7 +61,7 @@ OpenADMS Node must be configured by a JSON-based text file. Please define
 modules, serial ports, sensors, etc. in there. The file name of your custom
 configuration is taken as an argument. For instance, run:
 ```
-$ python3 openadms.py --config ./config/myconfig.json
+$ python3 openadms.py --config ./config/config.json
 ```
 
 ## Documentation and Supported Sensors

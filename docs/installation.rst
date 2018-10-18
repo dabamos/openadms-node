@@ -27,7 +27,7 @@ You can run OpenADMS Node by following these steps:
 4. Write a configuration file for OpenADMS Node (see directory
    ``config/examples/`` for examples).
 
-5. Run ``python3 openadms.py --config config/my_config.json --with-mqtt-broker
+5. Run ``python3 openadms.py --config config/config.json --with-mqtt-broker
    --debug`` or start the graphical launcher ``openadms-launcher.pyw``.
 
 Source Code
