@@ -1,3 +1,7 @@
+![license](https://img.shields.io/github/license/dabamos/openadms.svg)
+![release](https://img.shields.io/github/release/dabamos/openadms-node.svg)
+![ci](https://img.shields.io/travis/dabamos/openadms-node.svg)
+
 ![OpenADMS Node](https://www.dabamos.de/github/openadms.png)
 
 The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
