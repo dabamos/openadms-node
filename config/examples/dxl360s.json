@@ -117,13 +117,13 @@
             "conversionTable": {
                 "x": {
                     "sourceUnit": "mdeg",
-                    "designatedUnit": "deg",
+                    "targetUnit": "deg",
                     "conversionType": "scale",
                     "scalingValue": 0.01
                 },
                 "y": {
                     "sourceUnit": "mdeg",
-                    "designatedUnit": "deg",
+                    "targetUnit": "deg",
                     "conversionType": "scale",
                     "scalingValue": 0.01
                 }

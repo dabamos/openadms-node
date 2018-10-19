@@ -403,7 +403,7 @@
                 "conversionType": "scale",
                 "sourceUnit": "um",
                 "scalingValue": 0.0001,
-                "designatedUnit": "m"
+                "targetUnit": "m"
             }
         },
         "fileExporter": {
