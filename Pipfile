@@ -20,6 +20,7 @@ CouchDB = "*"
 
 [dev-packages]
 Sphinx = "*"
+pyflakes = "*"
 pytest = "*"
 sphinx_numfig = "*"
 sphinx_rtd_theme = "*"

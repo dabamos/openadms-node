@@ -91,7 +91,6 @@ $ pipenv run pytest
 These are work in progress. You can run passive checks with
 [pyflakes](https://pypi.python.org/pypi/pyflakes):
 ```
-$ pipenv install --dev pyflakes
 $ pipenv run pyflakes *.py *.pyw core/*.py modules/*.py
 ```
 
