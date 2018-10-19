@@ -1,0 +1,9 @@
+language: python
+python:
+  - "3.6"
+  - "3.7"
+  - "pypy3.5"
+install:
+  - pipenv install --deploy
+script:
+  - python -m pytest
