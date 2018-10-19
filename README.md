@@ -6,7 +6,7 @@
 
 The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
 open-source software for sensor control, observation data processing, and
-spatial , and sensor data exchangedata storage in the Internet of Things (IoT).
+spatial data storage in the Internet of Things (IoT).
 
 The **OpenADMS Node** software runs on single sensor node instances in a sensor
 network to obtain the measured data of total stations, digital levels,
