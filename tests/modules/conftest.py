@@ -12,7 +12,7 @@ from typing import List
 
 import pytest
 
-from core.manager import ConfigManager, Manager, SchemaManager
+from core.manager import (ConfigManager, Manager, SchemaManager)
 from core.observation import Observation
 
 

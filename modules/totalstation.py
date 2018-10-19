@@ -85,7 +85,7 @@ class DistanceCorrector(Prototype):
 
         if dist is None:
             self.logger.error(f'No distance set in observation '
-                              f'"{obs.get("name")}" with target '
+                              f'"{obs.get("name")}" of target '
                               f'"{obs.get("target")}"')
             return obs
 
@@ -1056,7 +1056,7 @@ class RefractionCorrector(Prototype):
         k_r = k * k_e               # Correction of refraction.
         r = k_e - k_r
 
-        self.logger.info('Updated height of observation "{}" of target "{}" '
+        self.logger.info('Updated height in observation "{}" of target "{}" '
                          'from {:3.4f} m to {:3.4f} m (refraction value: '
                          '{:3.5f} m)'.format(obs.get("name"),
                                              obs.get("target"),

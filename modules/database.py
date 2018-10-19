@@ -147,8 +147,8 @@ class CouchDriver(Prototype):
                              f'port "{obs_data.get("portName")}" to CouchDB '
                              f'database "{self._db_name}"')
         except Exception as e:
-            self.logger.error(f'Observation "{obs_data.get("name")}" of target '
-                              f'"{obs_data.get("target")}" from port '
+            self.logger.error(f'Observation "{obs_data.get("name")}" with '
+                              f'target "{obs_data.get("target")}" from port '
                               f'"{obs_data.get("portName")}" could not be '
                               f'saved in CouchDB database "{self._db_name}": '
                               f'{e}')
@@ -178,12 +178,12 @@ class CouchDriver(Prototype):
         doc_id = self._cache_observation_data(obs)
 
         if doc_id:
-            self.logger.debug(f'Cached observation "{obs.get("name")}" with '
+            self.logger.debug(f'Cached observation "{obs.get("name")}" of '
                               f'target "{obs.get("target")}" (doc id = '
                               f'{doc_id})')
         else:
-            self.logger.error(f'Caching of observation "{obs.get("name")}" '
-                              f'with target "{obs.get("target")}" failed')
+            self.logger.error(f'Caching of observation "{obs.get("name")}" of '
+                              f'target "{obs.get("target")}" failed')
 
         return obs
 
@@ -205,7 +205,7 @@ class CouchDriver(Prototype):
 
             if obs_data:
                 self.logger.debug(f'Trying to insert observation '
-                                  f'"{obs_data.get("name")}" with target '
+                                  f'"{obs_data.get("name")}" of target '
                                   f'"{obs_data.get("target")}" '
                                   f'(doc id = {obs_data.doc_id}) into CouchDB '
                                   f'database "{self._db_name}" ...')

@@ -86,7 +86,7 @@ class PreProcessor(Prototype):
             # Wrong: ".*"
             if pattern.groups == 0:
                 self.logger.error(f'No group(s) defined in regular expression '
-                                  f'pattern of observation "{obs.get("name")}" '
+                                  f'pattern in observation "{obs.get("name")}" '
                                   f'of target "{obs.get("target")}"')
                 return obs
 
@@ -212,7 +212,7 @@ class PreProcessor(Prototype):
 
 class ResponseValueInspector(Prototype):
     """
-    ResponseValueInspector checks if response values of observations are within
+    ResponseValueInspector checks if response values in observations are within
     defined thresholds and creates critical log messages if not.
 
     The JSON-based configuration for this module:
@@ -251,7 +251,7 @@ class ResponseValueInspector(Prototype):
         """
         if not obs.get('name') in self._observations:
             self.logger.warning(f'Undefined observation "{obs.get("name")}" '
-                                f'with target "{obs.get("target")}"')
+                                f'of target "{obs.get("target")}"')
             return obs
 
         response_sets = self._observations.get(obs.get('name'))
@@ -261,9 +261,9 @@ class ResponseValueInspector(Prototype):
 
             if response_value is None or not self.is_number(response_value):
                 self.logger.warning(f'Response value "{response_name}" in '
-                                    f'observation "{obs.get("name")}" '
-                                    f'of target "{obs.get("target")}" is '
-                                    f'not a number')
+                                    f'observation "{obs.get("name")}" of '
+                                    f'target "{obs.get("target")}" is not a '
+                                    f'number')
                 continue
 
             min_value = limits.get('min')
@@ -271,18 +271,17 @@ class ResponseValueInspector(Prototype):
 
             if min_value <= response_value <= max_value:
                 self.logger.debug(f'Response value "{response_name}" in '
-                                  f'observation "{obs.get("name")}" with '
-                                  f'target "{obs.get("target")}" is within '
-                                  f'set limits')
+                                  f'observation "{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}" is within limits')
             elif response_value < min_value:
-                self.logger.critical(f'Response value "{response_name}" of '
-                                     f'observation "{obs.get("name")}" with '
+                self.logger.critical(f'Response value "{response_name}" in '
+                                     f'observation "{obs.get("name")}" of '
                                      f'target "{obs.get("target")}" is less '
                                      f'than minimum ({response_value} < '
                                      f'{min_value})')
             elif response_value > max_value:
-                self.logger.critical(f'Response value "{response_name}" of '
-                                     f'observation "{obs.get("name")}" with '
+                self.logger.critical(f'Response value "{response_name}" in '
+                                     f'observation "{obs.get("name")}" of '
                                      f'target "{obs.get("target")}" is greater '
                                      f'than maximum ({response_value} > '
                                      f'{max_value})')
@@ -469,7 +468,7 @@ class UnitConverter(Prototype):
 
             if source_unit != properties.get('sourceUnit'):
                 self.logger.warning(f'Unit "{source_unit}" of response '
-                                    f'"{name}" of observation '
+                                    f'"{name}" in observation '
                                     f'"{obs.get("name")}" of target '
                                     f'"{obs.get("target")}" does not match '
                                     f'"{properties.get("sourceUnit")}"')
@@ -480,7 +479,7 @@ class UnitConverter(Prototype):
                                           properties.get('scalingValue'))
                 target_unit = properties.get('targetUnit')
 
-                self.logger.info('Converted response "{}" of observation "{}" '
+                self.logger.info('Converted response "{}" in observation "{}" '
                                  'of target "{}" from {:.4f} {} to {:.4f} {}'
                                  .format(name,
                                          obs.get("name"),

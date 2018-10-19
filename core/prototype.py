@@ -253,9 +253,9 @@ class Prototype(object):
 
         # No index defined.
         if (index is None) or (index < 0):
-            self.logger.warning(f'Next receiver of observation '
-                                f'"{obs.get("name")}" with target '
-                                f'"{obs.get("target")}" undefined')
+            self.logger.warning(f'Undefined receiver in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
             return
 
         # Receivers list has been processed and observation is finished.

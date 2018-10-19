@@ -6,7 +6,7 @@ Installation of OpenADMS Node
 The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
--  `CPython 3.6`_ or `PyPy3.5`_,
+-  `CPython 3.6+`_ or `PyPy3.5`_,
 -  the Python packaging tool `pipenv`,
 -  *optional:* an MQTT message broker,
 -  *optional:* the `Git`_ version control system.
@@ -48,8 +48,8 @@ Python
 ------
 
 OpenADMS Node is written in Python. A recent Python 3 interpreter is required to
-run the software. `CPython 3.6`_ and `PyPy3.5`_ are supported. Interpreters are
-available for all modern operating systems.
+run the software. `CPython 3.6`_ or higher and `PyPy3.5`_ are supported.
+Interpreters are available for all modern operating systems.
 
 Microsoft Windows Vista/7/8/10
     Download the latest release from the Python website and execute the
@@ -58,8 +58,8 @@ Microsoft Windows Vista/7/8/10
     variable of the system (see :numref:`python-path`).
 
 Linux and Unix
-    Install Python 3.6 by using your favourite package managing system or
-    compile it from source.
+    Install Python 3.6 or higher by using your favourite package managing system
+    or compile it from source.
 
 macOS
     The latest version of Python is also available for download on the Python
@@ -72,29 +72,17 @@ macOS
 
    Add Python to the ``PATH`` variable of Microsoft Windows
 
-Additional Modules
+Packages
 ~~~~~~~~~~~~~~~~~~
 
-OpenADMS Node depends on the following Python modules:
+The dependencies can be installed with the Python package manager `pipenv`.  If
+not installed already, run:
 
--  `arrow`_ (Apache 2.0 Licence),
--  `coloredlogs`_ (MIT Licence),
--  `CouchDB`_ (BSD Licence),
--  `HBMQTT`_ (MIT Licence),
--  `jsonschema`_ (MIT Licence)
--  `Mastodon.py`_ (MIT Licence)
--  `paho-mqtt`_ (Eclipse Public Licence),
--  `pyserial`_ (Python Software Foundation Licence).
--  `requests`_ (Apache 2.0 Licence),
--  `tinydb`_ (MIT Licence),
--  `uptime`_ (BSD-2-Clause Licence).
--  `verboselogs`_ (MIT Licence).
+::
+    $ pip3 install --user pipenv
 
-The (optional) graphical launcher requires `Gooey`_ (MIT Licence).
-
-All modules can be installed with the Python package manager `pipenv`. Open the
-OpenADMS Node directory in your terminal (or ``cmd.exe`` with administrator
-privileges on Microsoft Windows) and then run:
+Create a virtual environment with all required Python packages by running
+`pipenv` inside the directory `openadms-node/`:
 
 ::
 
@@ -455,7 +443,7 @@ The compilation may take some time.
 
 .. _Creative Commons Attribution-ShareAlike 3.0 Germany: https://creativecommons.org/licenses/by-sa/3.0/de/
 .. _project website: https://www.dabamos.de/
-.. _CPython 3.6: https://www.python.org/
+.. _CPython 3.6+: https://www.python.org/
 .. _PyPy3.5: https://pypy.org/
 .. _Git: https://git-scm.com/
 .. _Python 3.6: https://www.python.org/

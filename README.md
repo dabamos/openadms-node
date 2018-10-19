@@ -86,7 +86,9 @@ $ pipenv install --dev
 Execute the unit tests with:
 
 ```
-$ pipenv run pytest
+$ pipenv shell
+$ python3 -m pytest
+$ exit
 ```
 These are work in progress. You can run passive checks with
 [pyflakes](https://pypi.python.org/pypi/pyflakes):

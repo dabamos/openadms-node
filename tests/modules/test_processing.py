@@ -163,25 +163,24 @@ class TestResponseValueInspector(object):
             log_capture.check(
                 (rv_inspector.name,
                  'WARNING',
-                 f'Observation "test" with target "{obs_target}" is undefined'),
+                 f'Undefined observation "test" of target "{obs_target}"'),
                 (rv_inspector.name,
                  'WARNING',
-                 f'Response value "{response_name}" of observation '
-                 f'"{obs_name}" with target "{obs_target}" is not a number'),
+                 f'Response value "{response_name}" in observation '
+                 f'"{obs_name}" of target "{obs_target}" is not a number'),
                 (rv_inspector.name,
                  'DEBUG',
-                 f'Response value "{response_name}" of observation '
-                 f'"{obs_name}" with target "{obs_target}" is within the '
-                 f'limits'),
+                 f'Response value "{response_name}" in observation '
+                 f'"{obs_name}" of target "{obs_target}" is within limits'),
                 (rv_inspector.name,
                  'CRITICAL',
-                 f'Response value "{response_name}" of observation '
-                 f'"{obs_name}" with target "{obs_target}" is less than '
+                 f'Response value "{response_name}" in observation '
+                 f'"{obs_name}" of target "{obs_target}" is less than '
                  f'minimum ({lt_min_val} < {min_val})'),
                 (rv_inspector.name,
                  'CRITICAL',
-                 f'Response value "{response_name}" of observation '
-                 f'"{obs_name}" with target "{obs_target}" is greater than '
+                 f'Response value "{response_name}" in observation '
+                 f'"{obs_name}" of target "{obs_target}" is greater than '
                  f'maximum ({gt_max_val} > {max_val})')
             )
 

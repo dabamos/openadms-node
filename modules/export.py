@@ -92,7 +92,7 @@ class CloudExporter(Prototype):
             obs: Observation object.
         """
         doc_id = self._cache_db.insert(obs.data)
-        self.logger.debug(f'Cached observation "{obs.get("name")}" with target '
+        self.logger.debug(f'Cached observation "{obs.get("name")}" of target '
                           f'"{obs.get("target")}" (doc id = {doc_id})')
         return doc_id
 
@@ -120,7 +120,7 @@ class CloudExporter(Prototype):
     def _transfer_observation_data(self, obs_data: Dict[str, Any]) -> bool:
         # TODO this method is a mock
         self.logger.info(f'Transferred observation "{obs_data.get("name")}" '
-                         f'with target "{obs_data.get("target")}"')
+                         f'of target "{obs_data.get("target")}"')
         return True
 
     def has_cached_observation(self) -> bool:
