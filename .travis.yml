@@ -4,6 +4,7 @@ python:
   - "3.7"
   - "pypy3.5"
 install:
-  - pipenv install --deploy
+  - "pip install pipenv"
+  - "pipenv sync"
 script:
-  - python -m pytest
+  - "python -m pytest"
