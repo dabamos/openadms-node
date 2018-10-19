@@ -83,6 +83,10 @@
         "timestamp": {
             "id": "/properties/timestamp",
             "type": "string"
+        },
+        "type": {
+            "id": "/properties/type",
+            "type": "string"
         }
     },
     "required": [
@@ -95,7 +99,8 @@
         "sensorName",
         "sensorType",
         "sleepTime",
-        "target"
+        "target",
+        "type"
     ],
     "type": "object"
 }

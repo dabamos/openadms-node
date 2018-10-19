@@ -3,7 +3,7 @@
 """Structures to store observation data from sensors."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (C) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (C) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import json
@@ -42,7 +42,8 @@ class Observation(object):
                 'responseSets': {},
                 'sleepTime': 0,
                 'target': 'default',
-                'timestamp': None
+                'timestamp': None,
+                'type': 'observation'
             }
         else:
             self._data = data
