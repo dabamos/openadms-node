@@ -140,9 +140,10 @@ Linux
 ~~~~~
 
 In case you are running a Linux distribution with the systemd init system, you
-can use the provided unit file to start OpenADMS as a daemon. Copy the file
-``openadms.service`` to ``/etc/systemd/system/``.  OpenADMS must be installed in
-``/usr/local/sbin/openadms/``. The config will be loaded from
+can use the provided unit file to start OpenADMS as a daemon. Copy and rename
+the file ``services/openadms.systemd`` to
+``/etc/systemd/system/openadms.service``. OpenADMS must be installed in
+``/usr/local/sbin/openadms/``. The configuration will be loaded from
 ``/usr/local/etc/openadms/config.json``. You can alter these values in the
 service file.
 
@@ -184,15 +185,15 @@ For more information regarding systemd, see the `Arch Linux Wiki`_.
 
 FreeBSD
 ~~~~~~~
-An rc.d script (``freebsd.rc``) is provided for FreeBSD to start OpenADMS Node
-automatically at boot time. The script has to be moved and renamed to
-``/usr/local/etc/rc.d/openadms``. It is recommended to run the install script
-``freebsd_install.sh``, as it also creates the user ``openadms`` and all
-necessary directories:
+The rc.d script ``services/openadms.freebsd``) is provided for FreeBSD to start
+OpenADMS Node automatically at boot time. The script has to be copied and
+renamed to ``/usr/local/etc/rc.d/openadms``. OpenADMS starts with the privileges
+of user ``openadms``. You can add the user with:
 
 ::
 
-    $ sh ./freebsd_install.sh
+    $ useradd -m -G dialer openadms
+    $ passwd openadms
 
 Then, add the following line to your ``/etc/rc.conf``:
 
@@ -253,12 +254,12 @@ the internal broker by adding the appropriate command-line argument to
 
 NetBSD
 ~~~~~~
-For NetBSD, the rc.d script ``netbsd.rc`` can be used to start OpenADMS Node as
-a service. The script has to be moved and renamed to ``/etc/rc.d/openadms``.
-OpenADMS must be installed to ``/usr/sbin/openadms/``. The configuration is
-expected to be in ``/usr/etc/openadms/openadms.json`` and the log file will be
-located at ``/var/log/openadms.log``. OpenADMS starts with the privileges of
-user ``openadms``. You can add the user with:
+For NetBSD, the rc.d script ``services/openadms.netbsd`` can be used to start
+OpenADMS Node as a service. The script has to be copied and renamed to
+``/etc/rc.d/openadms``. OpenADMS must be installed to ``/usr/sbin/openadms/``.
+The configuration is expected to be in ``/usr/etc/openadms/openadms.json`` and
+the log file will be located at ``/var/log/openadms.log``. OpenADMS starts with
+the privileges of user ``openadms``. You can add the user with:
 
 ::
 

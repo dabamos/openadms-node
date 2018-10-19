@@ -29,18 +29,16 @@ copy_files() {
   chown -R $OPENADMS_USER $OPENADMS_CONFIG_PATH
 }
 
-install_pip() {
-  if pip3 --version | grep -qv "python 3.6" ; then
-    python3.6 -m ensurepip
-  fi
+install_pipenv() {
+  pkg install devel/py-pipenv
 }
 
 install_modules() {
-  pip3 -q install -U -r $OPENADMS_PATH/requirements.txt
+  pipenv sync
 }
 
 copy_rc() {
-  cp freebsd.rc /usr/local/etc/rc.d/openadms
+  cp services/openadms.freebsd /usr/local/etc/rc.d/openadms
 }
 
 install() {
@@ -54,10 +52,10 @@ install() {
   echo "Copying files ..."
   copy_files
 
-  echo "Installing pip for Python 3.6 ..."
-  install_pip
+  echo "Installing pipenv ..."
+  install_pipenv
 
-  echo "Installing Python dependencies ..."
+  echo "Syncing dependencies ..."
   install_modules
 
   echo "Installing rc.d script ..."
