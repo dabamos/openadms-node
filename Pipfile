@@ -17,7 +17,6 @@ verboselogs = "*"
 CouchDB = "*"
 "Mastodon.py" = "*"
 
-
 [dev-packages]
 Sphinx = "*"
 pyflakes = "*"
@@ -26,6 +25,7 @@ sphinx_numfig = "*"
 sphinx_rtd_theme = "*"
 sphinxcontrib-napoleon = "*"
 testfixtures = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "*"
