@@ -1,8 +1,8 @@
 ![OpenADMS Node](https://www.dabamos.de/github/openadms.png)
 
 The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
-open-source software for sensor control, observation data processing, data
-storage, and data exchange in the Internet of Things (IoT).
+open-source software for sensor control, observation data processing, and
+spatial , and sensor data exchangedata storage in the Internet of Things (IoT).
 
 The **OpenADMS Node** software runs on single sensor node instances in a sensor
 network to obtain the measured data of total stations, digital levels,
@@ -30,25 +30,32 @@ The current development version of OpenADMS Node is 0.8 (code name “Hanoi”).
 For more information, see https://www.dabamos.de/.
 
 ## Installation
-The latest source version of OpenADMS Node can be downloaded by cloning the
-master branch and installing the required dependencies with `pip`:
+Either CPython 3.6+ or PyPy3.5 has to be installed. OpenADMS Node uses `pipenv`
+for dependency management and virtual environments. Make sure that `pipenv` is
+installed or run:
+```
+$ pip3 install --user pipenv
+```
+Download the [Zip archive](https://github.com/dabamos/openadms-node/archive/master.zip)
+with the latest version of OpenADMS Node or clone the master branch with Git.
+Then, create a virtual environment with `pipenv`:
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
-$ cd openadms-node
-$ python3 -m pip install --user -U -r requirements.txt
+$ cd openadms-node/
+$ pipenv install
 ```
 
 ## Run
 Run OpenADMS Node from the command line:
 ```
-$ python3 openadms.py --config ./config/config.json --with-mqtt-broker --debug
+$ pipenv run ./openadms.py --config ./config/config.json --with-mqtt-broker --debug
 ```
 OpenADMS Node also features a graphical launcher. At first, run `install.bat` on
 Microsoft Windows or install the dependencies manually:
 ```
-$ python3 -m pip install Gooey
+$ pipenv install Gooey
 ```
-Execute `openadms-launcher.pyw` to start the graphical launcher.
+Execute `pipenv run ./openadms-launcher.pyw` to start the graphical launcher.
 
 ## Message Broker
 The MQTT protocol is used for the message exchange in OpenADMS Node. You can
@@ -61,7 +68,7 @@ OpenADMS Node must be configured by a JSON-based text file. Please define
 modules, serial ports, sensors, etc. in there. The file name of your custom
 configuration is taken as an argument. For instance, run:
 ```
-$ python3 openadms.py --config ./config/config.json
+$ pipenv run ./openadms.py --config ./config/example.json
 ```
 
 ## Documentation and Supported Sensors
@@ -72,14 +79,20 @@ See `./docs` for how to build the documentation from source.
 For a list of tested sensors, see https://dabamos.de/sensors/.
 
 ## Running Tests
-You can start the unit tests with:
+Development dependencies must be installed to run test:
 ```
-$ python3 -m pytest
+$ pipenv install --dev
+```
+Execute the unit tests with:
+
+```
+$ pipenv run pytest
 ```
 These are work in progress. You can run passive checks with
 [pyflakes](https://pypi.python.org/pypi/pyflakes):
 ```
-$ python3 -m pyflakes *.py *.pyw core/*.py modules/*.py
+$ pipenv install --dev pyflakes
+$ pipenv run pyflakes *.py *.pyw core/*.py modules/*.py
 ```
 
 ## Licence

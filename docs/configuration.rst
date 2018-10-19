@@ -491,7 +491,4 @@ following command from the command-line:
 
 ::
 
-    $ python3 openadms.py --config config/nivel210.json --with-mqtt-broker --debug
-
-On Microsoft Windows, you may want to use the graphical launcher
-``openadms-launcher.py`` instead.
+    $ pipenv run ./openadms.py --config config/nivel210.json --with-mqtt-broker --debug

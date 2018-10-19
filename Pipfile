@@ -1,0 +1,30 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+arrow = "*"
+coloredlogs = "*"
+hbmqtt = "*"
+jsonschema = "*"
+paho-mqtt = "*"
+pyserial = "*"
+requests = "*"
+uptime = "*"
+tinydb = "*"
+verboselogs = "*"
+CouchDB = "*"
+"Mastodon.py" = "*"
+
+
+[dev-packages]
+Sphinx = "*"
+pytest = "*"
+sphinx_numfig = "*"
+sphinx_rtd_theme = "*"
+sphinxcontrib-napoleon = "*"
+testfixtures = "*"
+
+[requires]
+python_version = "*"

@@ -5,7 +5,7 @@
 This Python script starts OpenADMS Node by using a graphical launcher. You have
 to install the Python modules `wxPython` and `Gooey` with pip at first::
 
-    $ python -m pip install gooey
+    $ pipenv install Gooey
 
 For more information, please visit https://www.dabamos.de/.
 """

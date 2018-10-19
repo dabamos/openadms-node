@@ -9,7 +9,7 @@ __license__ = 'BSD-2-Clause'
 import codecs
 import logging
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from core.observation import Observation
 

@@ -1777,14 +1777,15 @@ The configuration below shows the definition of a unit conversion from ``mm`` to
 Prototype
 ---------
 
-All OpenADMS Node modules are a subclass of the module ``Prototype``.
+All OpenADMS Node modules are a subclass of the module ``core.Prototype``.
 
 .. _prototype:
 
 Prototype
 ~~~~~~~~~
 The Prototype class is used for prototypal inheritance only. All OpenADMS Node
-modules are based on Prototype. A minimal OpenADMS Node module is defined as:
+modules are based on Prototype. A minimal OpenADMS Node module can be
+implemented as:
 
 .. code:: python
 
@@ -1796,7 +1797,7 @@ modules are based on Prototype. A minimal OpenADMS Node module is defined as:
         def process_observation(self, obs: Observation) -> Observation:
             return obs
 
-The (changed) Observation object has always to be returned to the calling
+The (processed) Observation object has always to be returned to the calling
 routine. Please be aware that the function ``process_observation()`` runs
 already inside a Thread.
 

@@ -1,4 +1,0 @@
-sphinx-numfig>=0.1.1
-sphinx>=1.6.3
-sphinx_rtd_theme>=0.2.4
-sphinxcontrib-napoleon>=0.6.1

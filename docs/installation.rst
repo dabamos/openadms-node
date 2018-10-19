@@ -7,7 +7,7 @@ The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
 -  `CPython 3.6`_ or `PyPy3.5`_,
--  some additional Python modules (as described below),
+-  the Python packaging tool `pipenv`,
 -  *optional:* an MQTT message broker,
 -  *optional:* the `Git`_ version control system.
 
@@ -20,15 +20,15 @@ You can run OpenADMS Node by following these steps:
 
 2. Download and unpack `OpenADMS`_.
 
-3. In the OpenADMS Node directory, run ``python -m pip install -U -r
-   requirements.txt`` or execute ``install.bat`` as an administrator on
-   Microsoft Windows.
+3. In the OpenADMS Node directory, run ``pipenv install`` or execute
+   ``install.bat`` as an administrator on Microsoft Windows.
 
 4. Write a configuration file for OpenADMS Node (see directory
    ``config/examples/`` for examples).
 
-5. Run ``python3 openadms.py --config config/config.json --with-mqtt-broker
-   --debug`` or start the graphical launcher ``openadms-launcher.pyw``.
+5. Run ``pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
+   --debug`` or start the graphical launcher ``pipenv run
+   ./openadms-launcher.pyw``.
 
 Source Code
 -----------
@@ -85,7 +85,6 @@ OpenADMS Node depends on the following Python modules:
 -  `Mastodon.py`_ (MIT Licence)
 -  `paho-mqtt`_ (Eclipse Public Licence),
 -  `pyserial`_ (Python Software Foundation Licence).
--  `pytest`_ (MIT Licence)
 -  `requests`_ (Apache 2.0 Licence),
 -  `tinydb`_ (MIT Licence),
 -  `uptime`_ (BSD-2-Clause Licence).
@@ -93,41 +92,13 @@ OpenADMS Node depends on the following Python modules:
 
 The (optional) graphical launcher requires `Gooey`_ (MIT Licence).
 
-All modules can be installed with the Python package management system
-(``pip``). Open the OpenADMS Node directory in your terminal (or ``cmd.exe``
-with administrator privileges on Microsoft Windows) and then run:
+All modules can be installed with the Python package manager `pipenv`. Open the
+OpenADMS Node directory in your terminal (or ``cmd.exe`` with administrator
+privileges on Microsoft Windows) and then run:
 
 ::
 
-    $ python3 -m pip install -U -r requirements.txt
-
-Or, if you prefer PyPy3.5:
-
-::
-
-    $ pypy3 -m pip install -U -r requirements.txt
-
-.. note::
-
-    On Microsoft Windows, the script ``install.bat`` will download
-    and install all necessary dependencies on CPython. Run the script
-    with administrator rights.
-
-Virtual Environment
-~~~~~~~~~~~~~~~~~~~
-
-The tool ``venv`` creates an independent Python environment. Further information
-is given in the `Python online manual`_. On Linux/Unix with ``csh``/``tcsh``,
-run:
-
-::
-
-    $ python -m venv virtual-environment
-    $ source virtual-environment/bin/activate.csh
-    $ git clone https://github.com/dabamos/openadms-node
-    $ cd openadms-node/
-    $ python -m pip install -U -r requirements.txt
-    $ python openadms.py --config config/my_config.json --with-mqtt-broker --debug
+    $ pipenv install
 
 Message Broker
 --------------
@@ -348,7 +319,7 @@ at first. PyInstaller can be obtained with ``pip``:
 
 ::
 
-    > python -m pip install PyInstaller
+    > pipenv install --dev PyInstaller
 
 
 Build OpenADMS Node by running:
@@ -378,7 +349,7 @@ Python scripts. Install it with ``pip`` at first:
 
 ::
 
-    > python -m pip install cx_Freeze appdirs packaging
+    > pipenv install --dev cx_Freeze appdirs packaging
 
 Create a file ``setup.py`` with the following contents:
 
@@ -500,7 +471,6 @@ The compilation may take some time.
 .. _Mastodon.py: https://pypi.python.org/pypi/Mastodon.py
 .. _paho-mqtt: https://pypi.python.org/pypi/paho-mqtt
 .. _pyserial: https://pypi.python.org/pypi/pyserial
-.. _pytest: https://pypi.python.org/pypi/pytest
 .. _requests: https://pypi.python.org/pypi/requests
 .. _tinydb: https://pypi.python.org/pypi/tinydb
 .. _uptime: https://pypi.python.org/pypi/uptime

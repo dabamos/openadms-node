@@ -17,7 +17,7 @@ load_rc_config ${name}
 : ${openadms_log="/var/log/openadms.log"}
 
 pidfile="/var/run/${name}.pid"
-command="./openadms.py"
+command="pipenv run ./openadms.py"
 command_args="-c ${openadms_config} -l ${openadms_log} -m"
 
 start_cmd="${name}_start"

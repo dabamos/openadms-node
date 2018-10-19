@@ -16,37 +16,23 @@ as well as additional options have to be set by using command-line arguments.
 Microsoft Windows
 -----------------
 
-The easiest way to run OpenADMS on Microsoft Windows is to use the graphical
-launcher ``openadms-launcher.pyw`` (see :numref:`openadms-launcher-screenshot`).
-Please make sure that all dependencies are installed (execute ``install.bat``
-with administrator privileges).
-
 Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
 
 ::
 
-    > python openadms.py --config config\config.json --with-mqtt-broker
+    > pipenv run ./openadms.py --config config\config.json --with-mqtt-broker
 
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
 Linux, Unix, and macOS
 ----------------------
 
-OpenADMS can be started with an installed Python 3.6 interpreter
-(:numref:`openadms-freebsd`):
+Run OpenADMS Node from your terminal:
 
 ::
 
-    $ python openadms.py --config config/config.json --with-mqtt-broker
+    $ pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
 
-Depending on the used operating system, the name of the Python binary may be
-``python36`` or ``python3.6``. On Unix-like operating systems, ``openadms.py``
-can be executed directly once the proper permissions are set:
-
-::
-
-    $ chmod ug+x openadms.py
-    $ ./openadms.py --config config/config.json --with-mqtt-broker
 
 A running instance of OpenADMS can be restarted by sending a HUP signal:
 
@@ -66,19 +52,13 @@ Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
    Running OpenADMS on FreeBSD
 
-Additional Parameters
----------------------
+Command-Line Arguments
+----------------------
 
-OpenADMS Node can be started with parameters, for instance:
-
-::
-
-    $ python3 openadms.py -c config/config.json -m -d
-
-The following parameters will be accepted:
+OpenADMS Node can be started with command-line arguments. The following ones will be accepted:
 
 +------------------------+------------+--------------------------+---------------------------+
-| Parameter              | Short form | Default value            | Description               |
+| Argument               | Short form | Default value            | Description               |
 +========================+============+==========================+===========================+
 | ``--config``           | ``-c``     | ``config/config.json``   | Path to the configuration |
 |                        |            |                          | file.                     |

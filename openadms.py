@@ -19,7 +19,7 @@ Example:
 
     To start OpenADMS Node with the internal broker, run::
 
-        $ python3 openadms.py -c config/my_config.json -m -d
+        $ pipenv run ./openadms.py -c config/my_config.json -m -d
 
     The monitoring will start automatically.
 """

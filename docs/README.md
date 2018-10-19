@@ -1,15 +1,17 @@
 # OpenADMS Documenation
 
-You can generate the documentation with [Sphinx](http://www.sphinx-doc.org/). At
-first, install Sphinx with `pip`:
+Make sure that all development packages are install:
 ```
-$ python3 -m pip install -U -r requirements.txt
+$ pipenv install --dev
 ```
-Then, build the HTML files:
+You can then generate the documentation with
+[Sphinx](http://www.sphinx-doc.org/):
 ```
+$ pipenv shell
 $ gmake clean
 $ sphinx-apidoc -f -e -T -o docs/source ../
 $ gmake html
+$ exit
 ```
 If you are using PyPy3, run:
 ```
