@@ -1,12 +1,9 @@
 language: python
 python:
   - "3.6"
-  - "3.7"
   - "pypy3.5"
 install:
   - "pip install pipenv"
   - "pipenv sync"
 script:
-  - "pipenv shell"
-  - "python -m pytest"
-  - "exit"
+  - "pipenv run python -m pytest"
