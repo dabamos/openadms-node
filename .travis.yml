@@ -7,4 +7,6 @@ install:
   - "pip install pipenv"
   - "pipenv sync"
 script:
+  - "pipenv shell"
   - "python -m pytest"
+  - "exit"
