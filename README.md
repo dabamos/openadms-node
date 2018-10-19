@@ -46,7 +46,7 @@ Then, create a virtual environment with `pipenv`:
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node/
-$ pipenv install
+$ pipenv sync
 ```
 
 ## Run

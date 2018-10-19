@@ -20,7 +20,7 @@ Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
 
 ::
 
-    > pipenv run ./openadms.py --config config\config.json --with-mqtt-broker
+    > pipenv run openadms.py --config config\config.json --with-mqtt-broker
 
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
