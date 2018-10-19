@@ -80,7 +80,8 @@ OpenADMS Node can be started with command-line arguments. The following ones wil
 | ``--port``             | ``-p``     | ``1883``                 | Port of internal MQTT     |
 |                        |            |                          | message broker.           |
 +------------------------+------------+--------------------------+---------------------------+
-| ``--quiet``            | ``-q``     | off                      | Disable logging.          |
+| ``--quiet``            | ``-q``     | off                      | Disable logging to        |
+|                        |            |                          | console.                  |
 +------------------------+------------+--------------------------+---------------------------+
 
 Available verbosity levels for the ``--verbosity`` parameter:

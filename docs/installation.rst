@@ -7,7 +7,7 @@ The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
 -  `CPython 3.6+`_ or `PyPy3.5`_,
--  the Python packaging tool `pipenv`,
+-  the Python packaging tool ``pipenv``,
 -  *optional:* an MQTT message broker,
 -  *optional:* the `Git`_ version control system.
 
@@ -50,8 +50,8 @@ Python
 ------
 
 OpenADMS Node is written in Python. A recent Python 3 interpreter is required to
-run the software. `CPython 3.6`_ or higher and `PyPy3.5`_ are supported.
-Interpreters are available for all modern operating systems.
+run the software. CPython 3.6 or higher and PyPy3.5 are supported.  Interpreters
+are available for all modern operating systems.
 
 Microsoft Windows Vista/7/8/10
     Download the latest release from the Python website and execute the
@@ -81,6 +81,7 @@ The dependencies can be installed with the Python package manager `pipenv`.  If
 not installed already, run:
 
 ::
+
     $ pip3 install --user pipenv
 
 Create a virtual environment with all required Python packages by running

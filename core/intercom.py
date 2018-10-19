@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.6
 
+__author__ = 'Philipp Engel'
+__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__license__ = 'BSD-2-Clause'
+
 import asyncio
 import json
 import logging

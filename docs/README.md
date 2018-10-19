@@ -1,6 +1,6 @@
 # OpenADMS Documenation
 
-Make sure that all development packages are install:
+Make sure that all development packages are installed:
 ```
 $ pipenv install --dev
 ```
