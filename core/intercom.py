@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, List, Type
 import paho.mqtt.client as paho
 
 try:
-    from hbmqtt.broker import Broker
+    from hbmqtt.broker import (Broker, BrokerException)
 except ImportError:
     logging.getLogger().critical('Importing Python module "HBMQTT" failed')
 
@@ -61,6 +61,8 @@ class MQTTMessageBroker(Thread):
             loop.run_until_complete(broker.start())
             self.logger.info('Starting local MQTT message broker ...')
             loop.run_forever()
+        except BrokerException as e:
+            self.logger.critical(e)
         except KeyboardInterrupt:
             loop.run_until_complete(broker.shutdown())
         finally:
@@ -105,7 +107,7 @@ class MQTTMessenger(object):
                                    userdata=None,
                                    protocol=paho.MQTTv311)
 
-        if len(self._user) > 0 and len(self._password) > 0:
+        if len(self._user) > 0:
             self._client.username_pw_set(self._user, self._password)
 
         self._client.on_connect = self._on_connect

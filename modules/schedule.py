@@ -163,7 +163,7 @@ class Job(object):
         self._uplink(target, header, payload)
 
         # Sleep until the next observation.
-        self.logger.debug(f'Next observation in {sleep_time} s')
+        self.logger.debug(f'Next observation starts in {sleep_time} s')
         time.sleep(sleep_time)
 
     @property
