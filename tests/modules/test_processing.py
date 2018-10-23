@@ -209,7 +209,7 @@ class TestReturnCodeInspector(object):
         assert obs.data['nextReceiver'] == 0
 
 
-class TestReturnCodeInspector(object):
+class TestUnitConverter(object):
 
     def test_process_observation(self,
                                  unit_converter: UnitConverter,
