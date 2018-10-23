@@ -305,7 +305,7 @@ class ModuleManager(object):
                                                        'modules')
 
         if len(config.items()) == 0:
-            self.logger.info('No modules defined')
+            self.logger.warning('No modules defined')
 
         for module_name, class_path in config.items():
             try:
@@ -683,7 +683,7 @@ class SensorManager(object):
         self._sensors = {}
 
         if not self._sensors_config:
-            self.logger.info('No sensors defined')
+            self.logger.warning('No sensors defined')
             return
 
         for sensor_name, sensor_config in self._sensors_config.items():

@@ -43,6 +43,7 @@
             "observations": [
                 {
                     "description": "initialize the sensor.",
+                    "type": "observation",
                     "enabled": true,
                     "target": "init",
                     "name": "initialize",
@@ -104,6 +105,7 @@
                 {
                     "name": "getValues",
                     "description": "gets temperature and pressure",
+                    "type": "observation",
                     "receivers": [
                         "preProcessor",
                         "distanceCorrector",
@@ -158,6 +160,7 @@
                 {
                     "name": "beep",
                     "description": "beeps 1 second",
+                    "type": "observation",
                     "receivers": [],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -196,6 +199,7 @@
                 {
                     "name": "initialize",
                     "description": "initialize sensor.",
+                    "type": "observation",
                     "receivers": [
                         "preProcessor",
                         "returnCodeInspector",
@@ -325,6 +329,7 @@
                 },
                 {
                     "description": "complete measurement of P1",
+                    "type": "observation",
                     "enabled": true,
                     "target": "p1",
                     "name": "getP1",
@@ -528,6 +533,7 @@
                 },
                 {
                     "description": "complete measurement of P2",
+                    "type": "observation",
                     "enabled": true,
                     "target": "p2",
                     "name": "getP2",
@@ -730,6 +736,7 @@
                 },
                 {
                     "description": "complete measurement of P3",
+                    "type": "observation",
                     "enabled": true,
                     "target": "p3",
                     "name": "getP3",
@@ -932,6 +939,7 @@
                 },
                 {
                     "description": "complete measurement of P4",
+                    "type": "observation",
                     "enabled": true,
                     "target": "p4",
                     "name": "getP4",
@@ -1134,6 +1142,7 @@
                 },
                 {
                     "description": "complete measurement of P5",
+                    "type": "observation",
                     "enabled": true,
                     "target": "p5",
                     "name": "getP5",
@@ -1336,6 +1345,7 @@
                 {
                     "name": "wait10",
                     "description": "waits 10 seconds",
+                    "type": "observation",
                     "receivers": [],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -1349,6 +1359,7 @@
                 {
                     "name": "wait60",
                     "description": "waits 1 minute",
+                    "type": "observation",
                     "receivers": [],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -1362,6 +1373,7 @@
                 {
                     "name": "wait600",
                     "description": "waits 10 minutes",
+                    "type": "observation",
                     "receivers": [],
                     "nextReceiver": 0,
                     "enabled": true,

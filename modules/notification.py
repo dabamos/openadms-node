@@ -59,7 +59,8 @@ class Alerter(Prototype):
         # Add logging handler to the root logger.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.addFilter(RootFilter())
-        qh.setLevel(logging.WARNING)    # Only get WARNING, ERROR, and CRITICAL.
+        # Capture only WARNING, ERROR, and CRITICAL.
+        qh.setLevel(logging.WARNING)
         root = logging.getLogger()
         root.addHandler(qh)
 
@@ -230,9 +231,7 @@ class AlertMessageFormatter(Prototype):
             msg_body += line
 
         # Concatenate the message parts.
-        complete_msg = ''.join([msg_header,
-                                msg_body,
-                                msg_footer])
+        complete_msg = ''.join([msg_header, msg_body, msg_footer])
 
         # Create the payload of the message.
         payload = properties
@@ -665,6 +664,10 @@ class MailAgent(Prototype):
                 done = True
                 self.logger.info(f'E-mail has been send successfully to '
                                  f'"{mail_to}"')
+            except smtplib.ConnectionResetError:
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
+                                    f'(connection reset by peer)')
+                time.sleep(self._retry_delay)
             except smtplib.SMTPException:
                 self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
                                     f'(SMTP error)')
@@ -831,26 +834,11 @@ class RssAgent(Prototype):
 
         # Convert UTC date to RFC 822 format.
         dt = payload.get('dt', str(arrow.utcnow()))
-        payload['dt'] = self.get_rfc_822(dt)
+        payload['dt'] = self.rfc_822(dt)
 
         self._ring_buffer.append(payload)
         rss = self.get_rss_feed(self._vars, self._ring_buffer.get().reverse())
         self.write(self._file_path, rss)
-
-    def get_rfc_822(self, date: str = None) -> str:
-        """Returns a date string formatted as RFC 822. If no date is given, the
-        current date is used.
-
-        Args:
-            date: A string with date and time in UTC.
-
-        Returns:
-            A string with the date and time as RFC 822.
-        """
-        if not date or date == '':
-            date = str(arrow.utcnow())
-
-        return str(arrow.get(date).format('ddd, DD MMM YYYY HH:mm:ss Z'))
 
     def get_rss_feed(self,
                      vars: Dict[str, str],
@@ -881,7 +869,7 @@ class RssAgent(Prototype):
             rss_items += self.parse(item_tpl, **item)
 
         # Create the RSS feed.
-        vars['date'] = self.get_rfc_822()
+        vars['date'] = self.rfc_822()
         vars['items'] = rss_items
 
         rss_tpl = ('<?xml version="1.0" encoding="utf-8" ?>\n'
@@ -916,6 +904,21 @@ class RssAgent(Prototype):
         """
         return str(Template(template).safe_substitute(**kwargs))
 
+    def rfc_822(self, date: str = None) -> str:
+        """Returns a date string formatted as RFC 822. If no date is given, the
+        current date is used.
+
+        Args:
+            date: A string with date and time in UTC.
+
+        Returns:
+            A string with of date and time as RFC 822.
+        """
+        if not date or date == '':
+            date = str(arrow.utcnow())
+
+        return str(arrow.get(date).format('ddd, DD MMM YYYY HH:mm:ss Z'))
+
     def write(self, file_path: Path, contents: str) -> None:
         """Writes string to file."""
         if not file_path:
@@ -949,7 +952,7 @@ class ShortMessageAgent(Prototype):
         self._host = config.get('host')
         self._port = config.get('port')
 
-        # Capture messages of type 'sms'.
+        # Capture messages of type `sms`.
         self.add_handler('sms', self.handle_short_message)
 
     def handle_short_message(self,

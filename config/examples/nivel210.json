@@ -33,6 +33,7 @@
                 {
                     "name": "getValues",
                     "description": "gets inclination and temperature",
+                    "type": "observation",
                     "receivers": [
                         "preProcessor",
                         "fileExporter"

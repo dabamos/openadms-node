@@ -45,6 +45,7 @@
                     "enabled": true,
                     "onetime": true,
                     "target": "disto",
+                    "type": "observation",
                     "passiveMode": false,
                     "requestsOrder": [
                         "getDistance"
@@ -85,6 +86,7 @@
                     "onetime": true,
                     "passiveMode": true,
                     "target": "disto",
+                    "type": "observation",
                     "requestsOrder": [
                         "draft"
                     ],
@@ -120,6 +122,7 @@
                     "enabled": true,
                     "onetime": true,
                     "target": "status",
+                    "type": "observation",
                     "requestsOrder": [
                         "getSoftwareVersion",
                         "getHardwareVersion",
@@ -207,6 +210,7 @@
                     "enabled": true,
                     "onetime": true,
                     "target": "init",
+                    "type": "observation",
                     "requestsOrder": [
                         "turnOn",
                         "stop",
@@ -320,6 +324,7 @@
                     "enabled": true,
                     "onetime": true,
                     "target": "shutdown",
+                    "type": "observation",
                     "requestsOrder": [
                         "stop",
                         "disableOnlineMode",

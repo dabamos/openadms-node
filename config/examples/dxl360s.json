@@ -44,6 +44,7 @@
                     "enabled": true,
                     "onetime": true,
                     "target": "dxl360s",
+                    "type": "observation",
                     "requestsOrder": [
                         "draft"
                     ],
