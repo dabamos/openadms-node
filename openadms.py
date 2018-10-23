@@ -314,7 +314,7 @@ if __name__ == '__main__':
                                action='store',
                                type=valid_path,
                                default='config/config.json',
-                               required=True)
+                               required=False)
 
     try:
         args = parser.parse_args()

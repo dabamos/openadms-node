@@ -40,9 +40,9 @@ installed or run:
 ```
 $ pip3 install --user pipenv
 ```
-Download the [Zip archive](https://github.com/dabamos/openadms-node/archive/master.zip)
-with the latest version of OpenADMS Node or clone the master branch with Git.
-Then, create a virtual environment with `pipenv`:
+Download the [latest release](https://github.com/dabamos/openadms-node/releases)
+or clone the master branch with Git. Then, create a virtual environment with
+`pipenv`:
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node/
@@ -59,7 +59,7 @@ Microsoft Windows or install the dependencies manually:
 ```
 $ pipenv install Gooey
 ```
-Execute `pipenv run ./openadms-launcher.pyw` to start the graphical launcher.
+Execute `pipenv run ./openadms-launcher.pyw` to start the launcher.
 
 ## Message Broker
 The MQTT protocol is used for the message exchange in OpenADMS Node. You can
@@ -90,9 +90,7 @@ $ pipenv install --dev
 Execute the unit tests with:
 
 ```
-$ pipenv shell
-$ python3 -m pytest
-$ exit
+$ pipenv run python3 -m pytest
 ```
 These are work in progress. You can run passive checks with
 [pyflakes](https://pypi.python.org/pypi/pyflakes):
