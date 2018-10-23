@@ -46,6 +46,7 @@ or clone the master branch with Git. Then, create a virtual environment with
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node/
+$ pipenv lock
 $ pipenv sync
 ```
 

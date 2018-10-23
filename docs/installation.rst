@@ -22,8 +22,7 @@ You can run OpenADMS Node by following these steps:
 
 3. Install ``pipenv`` with ``pip3 install --user pipenv``.
 
-4. In the OpenADMS Node directory, run ``pipenv sync`` or execute
-   ``install.bat`` on Microsoft Windows.
+4. In the OpenADMS Node directory, run ``pipenv lock`` and then ``pipenv sync``.
 
 5. Write a configuration file for OpenADMS Node (see directory
    ``config/examples/`` for examples).
@@ -89,6 +88,7 @@ Create a virtual environment with all required Python packages by running
 
 ::
 
+    $ pipenv lock
     $ pipenv sync
 
 Development packages can be installed additionally with:
