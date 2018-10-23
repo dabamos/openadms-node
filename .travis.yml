@@ -6,4 +6,5 @@ install:
   - "pipenv lock"
   - "pipenv sync --dev"
 script:
+  - "pipenv run pyflakes *.py core/*.py modules/*.py"
   - "pipenv run python -m pytest"
