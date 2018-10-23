@@ -202,11 +202,10 @@ class TestReturnCodeInspector(object):
         obs = rc_inspector.process_observation(observations[1])
         assert obs.data['corrupted'] is True
 
-        obs.data['responseSets']['returnCode']['value'] = 13
+        obs.data['responseSets']['returnCode']['value'] = 0
         obs = rc_inspector.process_observation(obs)
-        assert obs.data['attempts'] == 1
         assert obs.data['corrupted'] is False
-        assert obs.data['nextReceiver'] == 0
+        assert obs.data['nextReceiver'] == 1
 
 
 class TestUnitConverter(object):

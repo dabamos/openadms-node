@@ -37,7 +37,7 @@
             }
         },
         "returnCodeInspector": {
-            "retries": 1,
+            "retries": 0,
             "responseSets": [
                 "returnCode"
             ]
