@@ -3,6 +3,7 @@ python:
   - "3.6"
 install:
   - "pip install pipenv"
+  - "pipenv lock"
   - "pipenv sync --dev"
 script:
   - "pipenv run python -m pytest"
