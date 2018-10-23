@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, List
 from core.observation import Observation
 
 
-class Prototype(object):
+class Prototype():
     """
     Prototype is used as a blueprint for OpenADMS workers.
     """
@@ -245,7 +245,7 @@ class Prototype(object):
         index = obs.get('nextReceiver')
 
         # No receivers defined.
-        if len(receivers) == 0:
+        if not receivers:
             logging.debug(f'No receivers defined in observation '
                           f'"{obs.get("name")}" of target '
                           f'"{obs.get("target")}"')

@@ -26,11 +26,11 @@ class RootFilter(logging.Filter):
                                    'urllib3',
                                    'transitions')):
             return False
-        else:
-            return True
+
+        return True
 
 
-class RingBuffer(object):
+class RingBuffer():
     """
     RingBuffer stores elements in a deque. It is a FIFO list with fixed size to
     cache a number of elements, like log messages. The oldest elements get
@@ -54,6 +54,9 @@ class RingBuffer(object):
             x: Element to append.
         """
         self._deque.append(x)
+
+    def list(self) -> Any:
+        return list(self.deque)
 
     def pop(self) -> Any:
         """Pops an element.
@@ -113,7 +116,7 @@ class RingBufferLogHandler(logging.Handler):
     RingBufferLogHandler stores a number of log messages in a `RingBuffer`.
     """
 
-    def __init__(self,  level: int, size: int):
+    def __init__(self, level: int, size: int):
         """
         Args:
             level: The log level.

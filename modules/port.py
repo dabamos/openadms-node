@@ -81,11 +81,10 @@ class BluetoothPort(Prototype):
         """
         if re.match(r'^[a-fA-F0-9]{2}(?::[a-fA-F0-9]{2}){5}$', s):
             return s
-        elif re.match(r'^[a-fA-F0-9]{12}$', s):
+
+        if re.match(r'^[a-fA-F0-9]{12}$', s):
             f = re.findall('..', s)
             return '{}:{}:{}:{}:{}:{}'.format(*f)
-        else:
-            return
 
     def process_observation(self, obs: Observation) -> Union[Observation, None]:
         """Sends a request to the attached sensor and forwards the response.
@@ -107,7 +106,7 @@ class BluetoothPort(Prototype):
         requests_order = obs.get('requestsOrder', [])
         request_sets = obs.get('requestSets')
 
-        if len(requests_order) == 0:
+        if not requests_order:
             self.logger.notice(f'No requests order defined in observation '
                                f'"{obs.get("name")}" of target '
                                f'"{obs.get("target")}"')
@@ -222,7 +221,7 @@ class BluetoothPort(Prototype):
         self._sock.send(bytes(data, 'UTF-8'))
 
 
-class SerialPortConfiguration(object):
+class SerialPortConfiguration():
     """
     SerialPortConfiguration saves a serial port configuration.
 
@@ -424,7 +423,7 @@ class SerialPort(Prototype):
         requests_order = obs.get('requestsOrder', [])
         request_sets = obs.get('requestSets')
 
-        if len(requests_order) == 0:
+        if not requests_order:
             self.logger.notice(f'No requests order defined in observation '
                                f'"{obs.get("name")}" of target '
                                f'"{obs.get("target")}"')
@@ -470,7 +469,7 @@ class SerialPort(Prototype):
                 self._serial.reset_output_buffer()
                 self._serial.reset_input_buffer()
 
-                if len(response) > 0:
+                if response:
                     self.logger.verbose(f'Received response '
                                         f'"{self.sanitize(response)}" for '
                                         f'request "{request_name}" of '
@@ -550,14 +549,14 @@ class SerialPort(Prototype):
             length = draft.get('responseLength', 0)
             request = draft.get('request')
 
-            if request and len(request) > 0:
+            if request:
                 self._write(request)
 
             response = self._read(eol=response_delimiter,
                                   length=length,
                                   timeout=timeout)
 
-            if len(response) > 0:
+            if response:
                 self.logger.verbose(f'Received "{self.sanitize(response)}" '
                                     f'from sensor "{obs.get("sensorName")}" on '
                                     f'port "{self._name}"')
@@ -587,7 +586,7 @@ class SerialPort(Prototype):
                     if c == length:
                         break
 
-                if eol and len(eol) > 0:
+                if eol:
                     # Did we get an end of line (e.g., '\r' or '\n')?
                     i = len(eol)
 

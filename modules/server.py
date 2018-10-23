@@ -191,8 +191,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 '<h1>Zonk! <small>File not found</small></h1>\n'
                 '<p>The file you are looking for cannot be found.</p>\n<hr>\n'
                 '<p><small>{openadms_version}</small></p>\n</body></html>'
-                .format(openadms_version=System.get_openadms_string())
-        )
+                .format(openadms_version=System.get_openadms_string()))
 
     def absolute_path(self, path: str) -> Path:
         return Path(self._root_dir + '/' + path)
@@ -326,9 +325,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         Returns:
             True if argument exists, else false.
         """
-        if len(query) > 0:
-            if query.get(name) and len(query.get(name)) > 0:
-                return True
+        if query and query.get(name) and len(query.get(name)) > 0:
+            return True
 
         return False
 

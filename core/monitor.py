@@ -13,7 +13,7 @@ from core.manager import (ConfigManager, Manager, ModuleManager, NodeManager,
                           ProjectManager, SchemaManager, SensorManager)
 
 
-class Monitor(object):
+class Monitor():
     """
     Monitor is used to manage the monitoring process by creating a schema
     manager, configuration manager, a sensor manager, and a module manager.

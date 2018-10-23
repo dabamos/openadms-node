@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, Union
 
 import arrow
-#import requests
+# import requests
 
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
@@ -242,11 +242,12 @@ class FileExporter(Prototype):
 
         fn = self._file_name
         fn = fn.replace('{{port}}', obs.get("portName"))
-        fn = fn.replace('{{date}}', f'{file_date}' if file_date else '')
-        fn = fn.replace('{{target}}', f'{obs.get("target")}' if obs.get('target')
-            is not None else '')
-        fn = fn.replace('{{name}}', f'{obs.get("name")}' if obs.get('name')
-            is not None else '')
+        fn = fn.replace('{{date}}', f'{file_date}'
+                        if file_date else '')
+        fn = fn.replace('{{target}}', f'{obs.get("target")}'
+                        if obs.get('target') is not None else '')
+        fn = fn.replace('{{name}}', f'{obs.get("name")}'
+                        if obs.get('name') is not None else '')
         fn += self._file_extension
 
         for path in self._paths:

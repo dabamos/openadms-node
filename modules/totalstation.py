@@ -532,15 +532,15 @@ class HelmertTransformer(Prototype):
 
             # o = [ x_i * Y_i - y_i * X_i ] * [ x_i^2 + y_i^2 ]^-1
             o_1 += (r_local_centroid_x * r_global_centroid_y) -\
-                   (r_local_centroid_y * r_global_centroid_x)
+                (r_local_centroid_y * r_global_centroid_x)
             o_2 += math.pow(r_local_centroid_x, 2) +\
-                   math.pow(r_local_centroid_y, 2)
+                math.pow(r_local_centroid_y, 2)
 
             # a = [ x_i * X_i + y_i * Y_i ] * [ x_i^2 + y_i^2 ]^-1
             a_1 += (r_local_centroid_x * r_global_centroid_x) +\
-                   (r_local_centroid_y * r_global_centroid_y)
+                (r_local_centroid_y * r_global_centroid_y)
             a_2 += math.pow(r_local_centroid_x, 2) +\
-                   math.pow(r_local_centroid_y, 2)
+                math.pow(r_local_centroid_y, 2)
 
         self._o = o_1 / o_2 if o_2 != 0 else 0   # Parameter o.
         self._a = a_1 / a_2 if a_2 != 0 else 0   # Parameter a.
@@ -550,11 +550,9 @@ class HelmertTransformer(Prototype):
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
         self._view_point['x'] = global_centroid_x -\
-                                (self._a * local_centroid_x) +\
-                                (self._o * local_centroid_y)
+            (self._a * local_centroid_x) + (self._o * local_centroid_y)
         self._view_point['y'] = global_centroid_y -\
-                                (self._a * local_centroid_y) -\
-                                (self._o * local_centroid_x)
+            (self._a * local_centroid_y) - (self._o * local_centroid_x)
         self._view_point['z'] = (sum_global_z - sum_local_z) / num_fixed_points
 
         self.logger.info('Calculated coordinates of view point "{}" '
@@ -757,7 +755,7 @@ class PolarTransformer(Prototype):
 
     Parameters:
         adjustmentEnabled (bool): If True, improve horizontal directions.
-        azimuthAngle (float): Between local azimuth and global azimuth (in gon).
+        azimuthAngle (float): Between local and global azimuth (in gon).
         azimuthPointName (str): Name of azimuth.
         fixedPoints (Dict[Dict]): Coordinates of fixed points (X, Y, Z).
         viewPoint (Dict): Coordinates of view point (X, Y, Z).

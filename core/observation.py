@@ -20,7 +20,7 @@ ValueType = TypeVar('ValueType', float, int, str, List, Dict)
 logger = logging.getLogger('observation')
 
 
-class Observation(object):
+class Observation():
     """
     Observation stores all information regarding a request to and a response by
     a sensor in a dictionary. Filled with initial information from the

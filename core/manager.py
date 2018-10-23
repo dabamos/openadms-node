@@ -7,7 +7,6 @@ __copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import json
-import jsonschema
 import logging
 import re
 
@@ -16,6 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, KeysView
 
 import arrow
+import jsonschema
 
 from core.intercom import MQTTMessenger
 from core.module import Module
@@ -23,7 +23,7 @@ from core.sensor import Sensor
 from core.prototype import Prototype
 
 
-class Manager(object):
+class Manager():
     """
     Manager is a container class for all the managers.
     """
@@ -85,7 +85,7 @@ class Manager(object):
         self._sensor_manager = sensor_manager
 
 
-class ConfigManager(object):
+class ConfigManager():
     """
     ConfigManager loads and stores the OpenADMS Node configuration.
     """
@@ -194,7 +194,7 @@ class ConfigManager(object):
         self._config = config
 
 
-class ModuleManager(object):
+class ModuleManager():
     """
     ModuleManager loads and manages OpenADMS Node modules.
     """
@@ -293,7 +293,7 @@ class ModuleManager(object):
 
     def kill_all(self) -> None:
         """Kills all modules (stops all workers and messengers)."""
-        for module_name in self._modules.keys():
+        for module_name in self._modules:
             self.kill(module_name)
 
     def load_all(self) -> None:
@@ -350,7 +350,7 @@ class ModuleManager(object):
 
     def remove_all(self) -> None:
         """Removes all modules."""
-        for module_name in self._modules.keys():
+        for module_name in self._modules:
             self.remove(module_name)
 
         self._modules = {}
@@ -367,7 +367,7 @@ class ModuleManager(object):
 
     def start_all(self) -> None:
         """Starts all modules."""
-        for name in self._modules.keys():
+        for name in self._modules:
             self.start(name)
 
     def stop(self, name: str) -> None:
@@ -380,7 +380,7 @@ class ModuleManager(object):
 
     def stop_all(self) -> None:
         """Stops all modules."""
-        for module_name in self._modules.keys():
+        for module_name in self._modules:
             self.stop(module_name)
 
     @property
@@ -388,7 +388,7 @@ class ModuleManager(object):
         return self._modules
 
 
-class Node(object):
+class Node():
     """
     Node stores name, description, and ID of the sensor node.
     """
@@ -424,7 +424,7 @@ class Node(object):
         self._name = name
 
 
-class NodeManager(object):
+class NodeManager():
     """
     NodeManager loads and stores the node configuration.
     """
@@ -465,7 +465,7 @@ class NodeManager(object):
         return self._node
 
 
-class Project(object):
+class Project():
     """
     Project stores name, description, and ID of the monitoring project.
     """
@@ -501,7 +501,7 @@ class Project(object):
         self._name = name
 
 
-class ProjectManager(object):
+class ProjectManager():
     """
     ProjectManager loads and stores the project configuration.
     """
@@ -540,7 +540,7 @@ class ProjectManager(object):
         return self._project
 
 
-class SchemaManager(object):
+class SchemaManager():
     """
     SchemaManager stores JSON schemas and validates given data with them.
     """
@@ -656,13 +656,13 @@ class SchemaManager(object):
 
     def remove_all(self) -> None:
         """Removes all schemas."""
-        for schema_name in self._schemas.keys():
+        for schema_name in self._schemas:
             self.remove(schema_name)
 
         self._schemas = {}
 
 
-class SensorManager(object):
+class SensorManager():
     """
     SensorManager stores and manages objects of type `Sensor`.
     """
@@ -707,7 +707,7 @@ class SensorManager(object):
 
     def remove_all(self) -> None:
         """Removes all sensors."""
-        for sensor_name in self._sensors.keys():
+        for sensor_name in self._sensors:
             self.remove(sensor_name)
 
         self._sensors = {}

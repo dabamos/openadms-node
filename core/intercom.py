@@ -69,7 +69,7 @@ class MQTTMessageBroker(Thread):
             loop.close()
 
 
-class MQTTMessenger(object):
+class MQTTMessenger():
     """
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
     """
@@ -107,7 +107,7 @@ class MQTTMessenger(object):
                                    userdata=None,
                                    protocol=paho.MQTTv311)
 
-        if len(self._user) > 0:
+        if self._user:
             self._client.username_pw_set(self._user, self._password)
 
         self._client.on_connect = self._on_connect

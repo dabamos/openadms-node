@@ -6,9 +6,9 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
-import pytest
-
 from typing import List
+
+import pytest
 
 from testfixtures import LogCapture
 
@@ -77,7 +77,7 @@ def unit_converter(manager) -> UnitConverter:
                          manager)
 
 
-class TestPreProcessor(object):
+class TestPreProcessor():
     """
     Test for the ``module.processing.PreProcessor`` class.
     """
@@ -115,7 +115,7 @@ class TestPreProcessor(object):
         assert pre_processor.to_int('foo') is None
 
 
-class TestResponseValueInspector(object):
+class TestResponseValueInspector():
     """
     Test for the ``module.processing.ResponseValueInspector`` class.
     """
@@ -191,7 +191,7 @@ class TestResponseValueInspector(object):
         assert rv_inspector.is_number('foo') is False
 
 
-class TestReturnCodeInspector(object):
+class TestReturnCodeInspector():
     """
     Test for the ``module.processing.ReturnCodeInspector`` class.
     """
@@ -208,7 +208,7 @@ class TestReturnCodeInspector(object):
         assert obs.data['nextReceiver'] == 1
 
 
-class TestUnitConverter(object):
+class TestUnitConverter():
 
     def test_process_observation(self,
                                  unit_converter: UnitConverter,

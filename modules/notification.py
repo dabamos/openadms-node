@@ -837,7 +837,7 @@ class RssAgent(Prototype):
         payload['dt'] = self.rfc_822(dt)
 
         self._ring_buffer.append(payload)
-        rss = self.get_rss_feed(self._vars, self._ring_buffer.get().reverse())
+        rss = self.get_rss_feed(self._vars, self._ring_buffer.list())
         self.write(self._file_path, rss)
 
     def get_rss_feed(self,
