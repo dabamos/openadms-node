@@ -304,7 +304,7 @@ class ResponseValueInspector(Prototype):
             return False
 
 
-class ReturnCodes():
+class ReturnCodes:
     """
     ReturnCodes stores a dictionary of return codes of sensors of Leica
     Geosystems. The dictionary is static and has the following structure::

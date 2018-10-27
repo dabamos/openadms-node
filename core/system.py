@@ -18,7 +18,7 @@ import uptime
 from core.version import OPENADMS_VERSION, OPENADMS_VERSION_NAME
 
 
-class System():
+class System:
     """
     System is a helper class to retrieve information about the used platform and
     system resources.

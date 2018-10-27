@@ -7,7 +7,7 @@ The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
 -  `CPython 3.6+`_ or `PyPy3.5`_,
--  the Python packaging tool ``pipenv``,
+-  the Python packaging tool `pipenv`_,
 -  *optional:* an MQTT message broker,
 -  *optional:* the `Git`_ version control system.
 
@@ -76,15 +76,16 @@ macOS
 Packages
 ~~~~~~~~~~~~~~~~~~
 
-The dependencies can be installed with the Python package manager `pipenv`.  If
+The dependencies can be installed with the Python package manager `pipenv`_.  If
 not installed already, run:
 
 ::
 
     $ pip3 install --user pipenv
 
+
 Create a virtual environment with all required Python packages by running
-`pipenv` inside the directory `openadms-node/`:
+``pipenv`` inside the directory ``openadms-node/``:
 
 ::
 
@@ -96,6 +97,9 @@ Development packages can be installed additionally with:
 ::
 
     $ pipenv sync --dev
+
+On Microsoft Windows, the batch file ``install.bat`` can be executed to install
+all dependencies.
 
 Message Broker
 --------------
@@ -455,6 +459,7 @@ The compilation may take some time.
 .. _project website: https://www.dabamos.de/
 .. _CPython 3.6+: https://www.python.org/
 .. _PyPy3.5: https://pypy.org/
+.. _pipenv: https://pypi.org/project/pipenv/
 .. _Git: https://git-scm.com/
 .. _Python 3.6: https://www.python.org/
 .. _OpenADMS: https://github.com/dabamos/openadms-node/releases

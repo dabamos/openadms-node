@@ -221,7 +221,7 @@ class BluetoothPort(Prototype):
         self._sock.send(bytes(data, 'UTF-8'))
 
 
-class SerialPortConfiguration():
+class SerialPortConfiguration:
     """
     SerialPortConfiguration saves a serial port configuration.
 

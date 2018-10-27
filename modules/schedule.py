@@ -20,7 +20,7 @@ from core.observation import Observation
 from core.prototype import Prototype
 
 
-class Job():
+class Job:
     """
     Job stores an observation object and sends it to a callback function if the
     current date and time are within the set schedule.

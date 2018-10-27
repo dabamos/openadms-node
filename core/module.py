@@ -9,6 +9,7 @@ __license__ = 'BSD-2-Clause'
 import logging
 import queue
 import threading
+import time
 
 from typing import Dict, List
 
@@ -75,6 +76,9 @@ class Module(threading.Thread):
         self.logger.verbose(f'Connecting module "{self._worker.name}" to '
                             f'{self._messenger.host}:{self._messenger.port}')
         self._messenger.connect()
+
+        while not self._messenger.is_connected:
+            time.sleep(1.0)
 
         while self._is_running:
             message = self._inbox.get()   # Blocking I/O.

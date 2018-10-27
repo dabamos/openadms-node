@@ -23,7 +23,7 @@ from core.sensor import Sensor
 from core.prototype import Prototype
 
 
-class Manager():
+class Manager:
     """
     Manager is a container class for all the managers.
     """
@@ -85,7 +85,7 @@ class Manager():
         self._sensor_manager = sensor_manager
 
 
-class ConfigManager():
+class ConfigManager:
     """
     ConfigManager loads and stores the OpenADMS Node configuration.
     """
@@ -194,7 +194,7 @@ class ConfigManager():
         self._config = config
 
 
-class ModuleManager():
+class ModuleManager:
     """
     ModuleManager loads and manages OpenADMS Node modules.
     """
@@ -304,7 +304,7 @@ class ModuleManager():
                                                        'core',
                                                        'modules')
 
-        if len(config.items()) == 0:
+        if not config:
             self.logger.warning('No modules defined')
 
         for module_name, class_path in config.items():
@@ -388,7 +388,7 @@ class ModuleManager():
         return self._modules
 
 
-class Node():
+class Node:
     """
     Node stores name, description, and ID of the sensor node.
     """
@@ -424,7 +424,7 @@ class Node():
         self._name = name
 
 
-class NodeManager():
+class NodeManager:
     """
     NodeManager loads and stores the node configuration.
     """
@@ -465,7 +465,7 @@ class NodeManager():
         return self._node
 
 
-class Project():
+class Project:
     """
     Project stores name, description, and ID of the monitoring project.
     """
@@ -501,7 +501,7 @@ class Project():
         self._name = name
 
 
-class ProjectManager():
+class ProjectManager:
     """
     ProjectManager loads and stores the project configuration.
     """
@@ -540,7 +540,7 @@ class ProjectManager():
         return self._project
 
 
-class SchemaManager():
+class SchemaManager:
     """
     SchemaManager stores JSON schemas and validates given data with them.
     """
@@ -662,7 +662,7 @@ class SchemaManager():
         self._schemas = {}
 
 
-class SensorManager():
+class SensorManager:
     """
     SensorManager stores and manages objects of type `Sensor`.
     """

@@ -77,7 +77,7 @@ def unit_converter(manager) -> UnitConverter:
                          manager)
 
 
-class TestPreProcessor():
+class TestPreProcessor:
     """
     Test for the ``module.processing.PreProcessor`` class.
     """
@@ -115,7 +115,7 @@ class TestPreProcessor():
         assert pre_processor.to_int('foo') is None
 
 
-class TestResponseValueInspector():
+class TestResponseValueInspector:
     """
     Test for the ``module.processing.ResponseValueInspector`` class.
     """
@@ -191,7 +191,7 @@ class TestResponseValueInspector():
         assert rv_inspector.is_number('foo') is False
 
 
-class TestReturnCodeInspector():
+class TestReturnCodeInspector:
     """
     Test for the ``module.processing.ReturnCodeInspector`` class.
     """
@@ -208,7 +208,7 @@ class TestReturnCodeInspector():
         assert obs.data['nextReceiver'] == 1
 
 
-class TestUnitConverter():
+class TestUnitConverter:
 
     def test_process_observation(self,
                                  unit_converter: UnitConverter,

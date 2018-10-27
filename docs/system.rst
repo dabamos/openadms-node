@@ -8,28 +8,29 @@ System Description
 Observation Entity
 ------------------
 
-All information regarding a single measurement of a sensor is stored in a
-JSON-based observation entity. This means, every time a request to a sensor
-should be made, the request has to be embedded in an observation entity together
-with all necessary meta data, like name and target of the observation, name of
-the serial port, regular expression pattern of the sensor’s raw response, and so
-on.
+Information regarding a single measurement of a sensor is stored in a JSON-based
+observation entity. Whenever a request is made to a sensor, it must be embedded
+into an observation entity along with meta information like name and target of
+the observation, name of the serial port, regular expression pattern of the
+sensor’s raw response, and so on.
 
-These settings are stored in a configuration file in JSON format. OpenADMS Node
-reads the configuration file and processes the observations according to their
-definition.
+All observations that will be send to a sensor are stored prior in a
+configuration file in JSON format. OpenADMS Node reads the configuration file
+and processes the observations according to their properties.
 
-Observation entities can be extended by simply adding new key-value pairs.
-Please be aware that most elements in an observation entity are mandatory. The
-following basic observation describes a temperature measurement with an STS DTM
-meteorological sensor.
+Observation entities can be enhanced by adding optional key-value pairs. But
+most elements in an observation entity are mandatory. The following basic
+object stores the finished observation ``getValues`` with two requests
+``getTemperature`` and ``getPressure`` of the STS DTM meteorological sensor. The
+observation was send to the modules ``com1``, ``preProcessor``, and
+``fileExporter``.
 
 .. code:: javascript
 
     {
       "name": "getValues",
-      "description": "get sensor values (temperature, pressure)",
       "type": "observation",
+      "description": "get sensor values (temperature, pressure)",
       "timestamp": "2017-04-05T21:48:00.805527",
       "target": "TempPress",
       "id": "6dc84c06018043ba84ac90636ed0f677",
@@ -40,7 +41,6 @@ meteorological sensor.
       "receivers": [
         "com1",
         "preProcessor",
-        "distanceCorrector",
         "fileExporter"
       ],
       "nextReceiver": 4,
@@ -128,5 +128,5 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``timestamp``     | String    | Time stamp of the observation (UTC in ISO 8601).                        |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``type``          | String    | Data type (``observation``).                                            |
+| ``type``          | String    | Name of data type (always ``observation``).                             |
 +-------------------+-----------+-------------------------------------------------------------------------+

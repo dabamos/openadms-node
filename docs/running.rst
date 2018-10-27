@@ -34,7 +34,8 @@ Run OpenADMS Node from your terminal:
     $ pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
 
 
-A running instance of OpenADMS can be restarted by sending a HUP signal:
+Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node. A running instance of
+OpenADMS can be restarted by sending a HUP signal:
 
 ::
 
@@ -42,8 +43,6 @@ A running instance of OpenADMS can be restarted by sending a HUP signal:
 
 ``$PID`` is the process ID of the Python interpreter running OpenADMS Node.
 The configuration will be re-read from file.
-
-Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
 .. _openadms-freebsd:
 .. figure:: _static/openadms_urxvt.png
@@ -57,32 +56,32 @@ Command-Line Arguments
 
 OpenADMS Node can be started with command-line arguments. The following ones will be accepted:
 
-+------------------------+------------+--------------------------+---------------------------+
-| Argument               | Short form | Default value            | Description               |
-+========================+============+==========================+===========================+
-| ``--config``           | ``-c``     | ``config/config.json``   | Path to the configuration |
-|                        |            |                          | file.                     |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--debug``            | ``-d``     | off                      | Print debug messages.     |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--verbosity``        | ``-v``     | ``6`` (info)             | Log more diagnostic       |
-|                        |            |                          | messages (level 1 to 9).  |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--log-file``         | ``-l``     | ``openadms.log``         | Path to the log file.     |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--with-mqtt-broker`` | ``-m``     | off                      | Start internal MQTT       |
-|                        |            |                          | message broker.           |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--bind``             | ``-b``     | ``127.0.0.1``            | IP address or FQDN of     |
-|                        |            |                          | internal MQTT message     |
-|                        |            |                          | broker.                   |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--port``             | ``-p``     | ``1883``                 | Port of internal MQTT     |
-|                        |            |                          | message broker.           |
-+------------------------+------------+--------------------------+---------------------------+
-| ``--quiet``            | ``-q``     | off                      | Disable logging to        |
-|                        |            |                          | console.                  |
-+------------------------+------------+--------------------------+---------------------------+
++------------------------+------------+------------------------+---------------------------+
+| Argument               | Short form | Default value          | Description               |
++========================+============+========================+===========================+
+| ``--config``           | ``-c``     | ``config/config.json`` | Path to the configuration |
+|                        |            |                        | file.                     |
++------------------------+------------+------------------------+---------------------------+
+| ``--debug``            | ``-d``     | off                    | Print debug messages.     |
++------------------------+------------+------------------------+---------------------------+
+| ``--verbosity``        | ``-v``     | ``6`` (info)           | Log more diagnostic       |
+|                        |            |                        | messages (level 1 to 9).  |
++------------------------+------------+------------------------+---------------------------+
+| ``--log-file``         | ``-l``     | ``openadms.log``       | Path to the log file.     |
++------------------------+------------+------------------------+---------------------------+
+| ``--with-mqtt-broker`` | ``-m``     | off                    | Start internal MQTT       |
+|                        |            |                        | message broker.           |
++------------------------+------------+------------------------+---------------------------+
+| ``--bind``             | ``-b``     | ``127.0.0.1``          | IP address or FQDN of     |
+|                        |            |                        | internal MQTT message     |
+|                        |            |                        | broker.                   |
++------------------------+------------+------------------------+---------------------------+
+| ``--port``             | ``-p``     | ``1883``               | Port of internal MQTT     |
+|                        |            |                        | message broker.           |
++------------------------+------------+------------------------+---------------------------+
+| ``--quiet``            | ``-q``     | off                    | Disable logging to        |
+|                        |            |                        | console.                  |
++------------------------+------------+------------------------+---------------------------+
 
 Available verbosity levels for the ``--verbosity`` parameter:
 
@@ -107,3 +106,5 @@ Available verbosity levels for the ``--verbosity`` parameter:
 +-------+----------+
 | 9     | spam     |
 +-------+----------+
+
+The higher the level, the more log messages will be outputted.

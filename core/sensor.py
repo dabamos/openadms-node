@@ -14,7 +14,7 @@ from typing import Any, Dict
 from core.observation import Observation
 
 
-class Sensor():
+class Sensor:
     """
     Sensor stores the configuration of a sensor, especially, all defined
     observations.
@@ -104,7 +104,7 @@ class Sensor():
         return self._type
 
 
-class SensorType():
+class SensorType:
     """
     SensorType is a static class used to determine the type of a sensor.
     """

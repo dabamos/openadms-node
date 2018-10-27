@@ -16,7 +16,7 @@ def observation() -> Observation:
     return Observation()
 
 
-class TestObservation():
+class TestObservation:
 
     def test_create_response_test(self, observation: Observation) -> None:
         response_set = observation.create_response_set('test', 'none', 0.0)

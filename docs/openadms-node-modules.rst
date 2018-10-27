@@ -1,10 +1,9 @@
 OpenADMS Node Modules
 =====================
 
-The logic of the OpenADMS Node software is located in several modules, which are
-stored in the directory ``modules/``. New features can be added to the
-monitoring system by writing additional modules. Each module must be loaded
-before it can be used.
+The logic of the OpenADMS Node application is outsourced to several modules in
+the directory ``modules/``. New features can be added to the monitoring system
+by writing additional modules. Each module must be loaded before it can be used.
 
 +-------------------------------------+--------------------------------------------------------+-----+
 | **Database**                        |                                                        |     |
@@ -114,14 +113,14 @@ Node core configuration. In the example below, the modules :ref:`scheduler` and
 
 The key ``fileExporter`` sets the name of the instance, the value
 ``modules.export.FileExporter`` the path to the module (class ``FileExporter``
-in ``modules/export.py``). The configuration of each loaded module must be added
-to the ``modules`` section of the file.
+in file ``modules/export.py``). The configuration of each loaded module must be
+added to the ``modules`` section of the file.
 
 The name of an instance can be chosen freely. For instance, instead of
 ``fileExporter`` the name ``myFileExporter`` is valid too, but the key of the
 FileExporter configuration in the ``modules`` section has to be renamed as well.
-Multiple instances of a module are possible, if they have different names
-(e.g., ``scheduler1``, ``scheduler2``, and so on). Each instance has its own
+Multiple instances of a module are possible, if they have distinct names (e.g.,
+``scheduler1``, ``scheduler2``, and so on). Each instance has its own
 configuration.
 
 Database
@@ -134,12 +133,13 @@ Drivers for various database management systems are provided in this package.
 CouchDriver
 ~~~~~~~~~~~
 
-CouchDriver is a connectivity module for `Apache CouchDB`_ (see
-:numref:`couchdb`). It is used to store observation data sets inside a CouchDB
-database defined in the module’s configuration. Observations are cached before
-inserting them into the database. On server error, the cached observations are
-send again. If a file-based cache database is used, observation stay persistent
-between restarts of OpenADMS Node.
+CouchDriver is a connectivity module for `Apache CouchDB`_ 1/2 (see
+:numref:`couchdb`). It is used to store observation data sets (timeseries) in a
+CouchDB database defined in the module’s configuration. Observations are cached
+before inserting them into the database. On connection error, the cached
+observations will be send until the server has stored them successfully. If a
+file-based cache database is used, observation are persistent between restarts
+of OpenADMS Node.
 
 .. _couchdb:
 .. figure:: _static/couchdb.png
@@ -182,27 +182,27 @@ configuration.
       }
     }
 
-+--------------+-------------+---------------------------------------------------------+
-| Name         | Data Type   | Description                                             |
-+==============+=============+=========================================================+
-| ``server``   | String      | IP address or FQDN of the CouchDB server.               |
-+--------------+-------------+---------------------------------------------------------+
-| ``path``     | String      | URI path (if available).                                |
-+--------------+-------------+---------------------------------------------------------+
-| ``port``     | String      | Port number (CouchDB default is ``5984``).              |
-+--------------+-------------+---------------------------------------------------------+
-| ``tls``      | Boolean     | If true, uses encrypted HTTPS instead of HTTP (depends  |
-|              |             | on server).                                             |
-+--------------+-------------+---------------------------------------------------------+
-| ``user``     | String      | Name of the CouchDB user.                               |
-+--------------+-------------+---------------------------------------------------------+
-| ``password`` | String      | Password of the CouchDB user.                           |
-+--------------+-------------+---------------------------------------------------------+
-| ``db``       | String      | Name of the CouchDB database.                           |
-+--------------+-------------+---------------------------------------------------------+
-| ``cacheFile``| String      | File name of the local cache database. If not set, an   |
-|              |             | in-memory database is used instead.                     |
-+--------------+-------------+---------------------------------------------------------+
++---------------+-------------+---------------------------------------------------------+
+| Name          | Data Type   | Description                                             |
++===============+=============+=========================================================+
+| ``server``    | String      | IP address or FQDN of the CouchDB server.               |
++---------------+-------------+---------------------------------------------------------+
+| ``path``      | String      | URI path (if available).                                |
++---------------+-------------+---------------------------------------------------------+
+| ``port``      | String      | Port number (CouchDB default is ``5984``).              |
++---------------+-------------+---------------------------------------------------------+
+| ``tls``       | Boolean     | If true, uses encrypted HTTPS instead of HTTP (depends  |
+|               |             | on server).                                             |
++---------------+-------------+---------------------------------------------------------+
+| ``user``      | String      | Name of the CouchDB user.                               |
++---------------+-------------+---------------------------------------------------------+
+| ``password``  | String      | Password of the CouchDB user.                           |
++---------------+-------------+---------------------------------------------------------+
+| ``db``        | String      | Name of the CouchDB database.                           |
++---------------+-------------+---------------------------------------------------------+
+| ``cacheFile`` | String      | File name of the local cache database. If not set, an   |
+|               |             | in-memory database is used instead.                     |
++---------------+-------------+---------------------------------------------------------+
 
 Export
 ------
@@ -215,15 +215,16 @@ external receivers.
 FileExporter
 ~~~~~~~~~~~~
 
-The FileExporter module is used to export observations to comma-separated flat
-files. Every file starts with a header, introduced by the character ``#``.
-Observations are stored line by line in the file, with new ones appended at the
-end.
+The FileExporter module is used to export observations as comma-separated values
+to flat files. Each file starts with a header, introduced by the character
+``#``.  Observations are stored line by line in the file, with new lines
+appended to the end.
 
-Each line starts with date and time of the observation, followed by the ID,
-target name and all response sets in alphabetical order. The format of date and
-time can be modified in the configuration. A response set consists of response
-name, response value, and response unit.
+Each line starts with date and time of the observation, followed by ID, target
+name and all response sets in alphabetical order. The format of date and time
+can be modified in the configuration. A response set consists of response name,
+response value, and response unit (for example: ``distance``, ``27.412``,
+``m``).
 
 Example
 ^^^^^^^
@@ -233,25 +234,23 @@ A single observation in a CSV file, with a header line at the beginning:
 .. code:: text
 
     # Target "EXT" of "Extensometer" on "USB0"
-    2016-10-09T15:29:38,6dc84c06018043ba84ac90636ed0f677,EXT,Distance,19.212,mm
+    2016-10-09T15:29:38,6dc84c06018043ba84ac90636ed0f677,EXT,distance,19.212,mm
 
-+----------+--------------------------------------+------------------------------------------+
-| No.      | Value                                | Description                              |
-+==========+======================================+==========================================+
-| 1        | ``2016-10-09T15:29:38``              | Date and time (ISO 8601).                |
-+----------+--------------------------------------+------------------------------------------+
-| 2        | ``6dc84c06018043ba84ac90636ed0f677`` | ID of the observation.                   |
-+----------+--------------------------------------+------------------------------------------+
-| 2        | ``EXT``                              | Target name of the observation.          |
-+----------+--------------------------------------+------------------------------------------+
-| 3        | ``Distance``                         | Name of the response set.                |
-+----------+--------------------------------------+------------------------------------------+
-| 4        | ``19.212``                           | Value of the response set.               |
-+----------+--------------------------------------+------------------------------------------+
-| 5        | ``mm``                               | Unit of the response set.                |
-+----------+--------------------------------------+------------------------------------------+
-
-Additional response sets will be appended at the end of the line.
++----------+--------------------------------------+---------------------------------+
+| No.      | Value                                | Description                     |
++==========+======================================+=================================+
+| 1        | ``2016-10-09T15:29:38``              | Date and time (ISO 8601).       |
++----------+--------------------------------------+---------------------------------+
+| 2        | ``6dc84c06018043ba84ac90636ed0f677`` | ID of the observation.          |
++----------+--------------------------------------+---------------------------------+
+| 2        | ``EXT``                              | Target name of the observation. |
++----------+--------------------------------------+---------------------------------+
+| 3        | ``distance``                         | Name of the response set.       |
++----------+--------------------------------------+---------------------------------+
+| 4        | ``19.212``                           | Value of the response set.      |
++----------+--------------------------------------+---------------------------------+
+| 5        | ``mm``                               | Unit of the response set.       |
++----------+--------------------------------------+---------------------------------+
 
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
@@ -298,7 +297,7 @@ Configuration
 | ``fileRotation``      | String      | File rotation (``none``, ``daily``,             |
 |                       |             | ``monthly``, or ``yearly``).                    |
 +-----------------------+-------------+-------------------------------------------------+
-| ``paths``             | Array       | Paths to save files to (multiple paths          |
+| ``paths``             | List        | Paths to save files to (multiple paths          |
 |                       |             | possible).                                      |
 +-----------------------+-------------+-------------------------------------------------+
 | ``separator``         | String      | Separator between values within the CSV file.   |
@@ -314,12 +313,12 @@ RealTimePublisher
 ~~~~~~~~~~~~~~~~~
 
 The RealTimePublisher module pushes an observation to a list of receivers. The
-receivers can be any third party application.
+receivers can be any third party application connected to the MQTT server.
 
 For each receiver defined in the configuration an MQTT topic will be created.
-The observations are then published under their target names. For example, an
-observation with the target name “target1” and a receiver “onlineViewer” will be
-published under the MQTT topic ``onlineViewer/target1``.
+The topic name is set to the target name of an observation.  For example, an
+observation with target name “bridge1” and a receiver “onlineViewer” will be
+published to the MQTT topic ``onlineViewer/bridge1``.
 
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
@@ -358,8 +357,9 @@ Alerter
 
 The Alerter module captures warning and error messages. The messages are drained
 off from the OpenADMS logger and then send to an arbitrary number of
-AlertMessageFormatter module. These will format the messages and forward them to
-MailAgent, ShortMessageAgent, RssAgent, IrcAgent, or MastodonAgent modules.
+AlertMessageFormatter modules. These will format the messages and forward them
+to MailAgent, ShortMessageAgent, RssAgent, IrcAgent, or MastodonAgent modules,
+where they are send to their defined receivers.
 
 The sequences could be:
 

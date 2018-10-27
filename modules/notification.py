@@ -56,10 +56,10 @@ class Alerter(Prototype):
         self._thread = None
         self._queue = queue.Queue(1000)
 
-        # Add logging handler to the root logger.
+        # Add logging handler to the root logger. Only capture WARNING, ERROR,
+        # and CRITICAL.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.addFilter(RootFilter())
-        # Capture only WARNING, ERROR, and CRITICAL.
         qh.setLevel(logging.WARNING)
         root = logging.getLogger()
         root.addHandler(qh)
@@ -313,9 +313,7 @@ class Heartbeat(Prototype):
         self._interval = config.get('interval')
 
         self._thread = None
-        self._header = {
-            'type': 'heartbeat'
-        }
+        self._header = { 'type': 'heartbeat' }
 
         self.add_handler('heartbeat', self.process_heartbeat)
 
@@ -447,7 +445,6 @@ class IrcAgent(Prototype):
         """Disconnects from IRC server and closes socket connection."""
         if self._conn:
             self._send('QUIT\r\n')
-            self._conn.shutdown()
             self._conn.close()
             self._conn = None
 

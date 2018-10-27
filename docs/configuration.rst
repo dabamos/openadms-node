@@ -35,11 +35,13 @@ the dynamically loaded modules must be placed under ``modules``.
         "intercom": {
           "mqtt": {
             "host": "127.0.0.1",
-            "port": 1883,
+            "port": 8883,
             "keepAlive": 60,
             "topic": "openadms",
             "user": "client1".
-            "password": "secret"
+            "password": "secret",
+            "tls": false,
+            "caCerts": "mqtt_ca.crt"
           }
         }
       },
@@ -85,6 +87,22 @@ the dynamically loaded modules must be placed under ``modules``.
       }
     }
 
++-------------+------+----------------------------------------------------+
+| **core**    | Dict | Core configuration.                                |
++-------------+------+----------------------------------------------------+
+| modules     | Dict | List of OpenADMS Node modules to load.             |
++-------------+------+----------------------------------------------------+
+| project     | Dict | Project information.                               |
++-------------+------+----------------------------------------------------+
+| node        | Dict | Sensor node information.                           |
++-------------+------+----------------------------------------------------+
+| intercom    | Dict | MQTT configuration for inter-module communication. |
++-------------+------+----------------------------------------------------+
+| **sensors** | Dict | Sensors and their commands.                        |
++-------------+------+----------------------------------------------------+
+| **modules** | Dict | Configuration of loaded modules.                   |
++-------------+------+----------------------------------------------------+
+
 Example
 -------
 Geodetic inclinometers are not only used in industrial surveying but also in
@@ -129,7 +147,7 @@ Nivel210 sensor requires at least four modules:
 The name of each module instance can be chosen freely (spaces and special
 characters are not allowed). It is recommended to write all names in lower camel
 case. As a sane practice, the scheduler and the serial port are named according
-to the used COM port (for example, ``COMx`` on Microsoft Windows and ``ttyx``
+to the used COM port (for example, ``COM1`` on Microsoft Windows and ``ttyU0``
 on Linux/Unix). All modules listed in the modules object are loaded
 automatically at run-time:
 
@@ -197,17 +215,22 @@ values set for the used MQTT message broker.
         "intercom": {
           "mqtt": {
             "host": "127.0.0.1",
-            "port": 1883,
+            "port": 8883,
             "keepAlive": 60,
             "topic": "example",
             "user": "client1",
-            "password": "secret"
+            "password": "secret",
+            "tls": false,
+            "caCerts": "mqtt_ca.crt"
           }
         }
       }
     }
 
-User and password are optional and not required for anonymous sessions.
+User and password are optional and not required for anonymous sessions. If TLS
+encryption is enabled by setting ``tls`` to ``true``, a CA certificate has to be
+provided most likely.  ``caCerts`` is the path to the CA certificate of the MQTT
+server.
 
 Sensor
 ~~~~~~
@@ -272,8 +295,8 @@ Serial Port
 The configuration of serial port modules is stored under ``ports`` → ``serial``
 → *module name*. On Microsoft Windows, the port is ``COMx``, on Linux and Unix
 ``/dev/ttyx`` or ``/dev/ttyUx``, whereas ``x`` is the number of the port. The
-baud rate has to be set to the value the Nivel210 is configured to, most
-likely ``9600``.
+baud rate has to be set to the value the Nivel210 is configured to, most likely
+``9600``.
 
 .. code:: javascript
 
@@ -314,7 +337,7 @@ Use a scheduler module to send commands to the sensor:
                 "enabled": true,
                 "startDate": "2017-01-01",
                 "endDate": "2020-12-31",
-                "weekdays": { },
+                "weekdays": {},
                 "observations": [
                   "getValues"
                 ]
@@ -325,6 +348,11 @@ Use a scheduler module to send commands to the sensor:
       }
     }
 
+Set ``port`` to the name of the serial port configuration name and ``sensor`` to
+the name of the sensor configuration. Multiple schedules can be defined.
+Commands to send to the sensor must be listed in ``observations`` in their
+correct order. Only listed observations will be performed.
+
 Pre-Processor
 ~~~~~~~~~~~~~
 The PreProcessor is called right after the SerialPort module and extracts the
@@ -334,8 +362,8 @@ extraction.
 
 File Exporter
 ~~~~~~~~~~~~~
-The name of the CSV file will be ``com1_nivel210_2017-05.csv`` (or similar) and
-be stored in directory ``data/``.
+The name of the CSV file may be ``com1_nivel210_2019-05.csv`` or similar and be
+stored in directory ``data/``.
 
 .. code:: javascript
 
@@ -383,7 +411,11 @@ The complete configuration is listed below.
             "host": "127.0.0.1",
             "port": 1883,
             "keepAlive": 60,
-            "topic": "example"
+            "topic": "example",
+            "user": "client1".
+            "password": "secret",
+            "tls": false,
+            "caCerts": "mqtt_ca.crt"
           }
         }
       },

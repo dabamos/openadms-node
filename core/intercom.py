@@ -7,6 +7,7 @@ __license__ = 'BSD-2-Clause'
 import asyncio
 import json
 import logging
+import ssl
 
 from threading import Thread
 from typing import Any, Callable, Dict, List, Type
@@ -14,7 +15,7 @@ from typing import Any, Callable, Dict, List, Type
 import paho.mqtt.client as paho
 
 try:
-    from hbmqtt.broker import (Broker, BrokerException)
+    from hbmqtt.broker import Broker, BrokerException
 except ImportError:
     logging.getLogger().critical('Importing Python module "HBMQTT" failed')
 
@@ -69,7 +70,7 @@ class MQTTMessageBroker(Thread):
             loop.close()
 
 
-class MQTTMessenger():
+class MQTTMessenger:
     """
     MQTTMessenger connects to an MQTT message broker and exchanges messages.
     """
@@ -84,6 +85,7 @@ class MQTTMessenger():
 
         self._type = 'core.intercom.MQTTMessenger'
         self._client = None
+        self._is_connected = False
 
         self._config_manager = manager.config_manager
         self._schema_manager = manager.schema_manager
@@ -97,6 +99,8 @@ class MQTTMessenger():
         self._topic = config.get('topic')
         self._user = config.get('user') or ''
         self._password = config.get('password') or ''
+        self._tls = config.get('tls') or False
+        self._ca_certs = config.get('caCerts')
 
         # Function to send received messages to.
         self._downlink = None
@@ -109,6 +113,12 @@ class MQTTMessenger():
 
         if self._user:
             self._client.username_pw_set(self._user, self._password)
+
+        if self._tls:
+            self._client.tls_set(ca_certs=self._ca_certs, certfile=None,
+                                 keyfile=None, cert_reqs=ssl.CERT_REQUIRED,
+                                 tls_version=ssl.PROTOCOL_TLS, ciphers=None)
+            self._client.tls_insecure_set(False)
 
         self._client.on_connect = self._on_connect
         self._client.on_disconnect = self._on_disconnect
@@ -142,6 +152,9 @@ class MQTTMessenger():
                     rc: int) -> None:
         """Callback method is called after a connection has been
         established."""
+        self.logger.debug(f'Connected "{self._client_id}" to '
+                          f'{self._host}:{self._port}')
+        self._is_connected = True
         self._client.subscribe(self._topic)
 
     def _on_disconnect(self,
@@ -183,6 +196,7 @@ class MQTTMessenger():
     def disconnect(self) -> None:
         """Disconnect from the message broker."""
         if self._client:
+            self._is_connected = False
             self._client.loop_stop()
             self._client.disconnect()
 
@@ -206,6 +220,10 @@ class MQTTMessenger():
     @property
     def host(self) -> str:
         return self._host
+
+    @property
+    def is_connected(self) -> bool:
+        return self._is_connected
 
     @property
     def port(self) -> int:

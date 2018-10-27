@@ -2,6 +2,10 @@
     "$schema": "http://json-schema.org/draft-06/schema#",
     "id": "schemes/core/intercom/mqttmessenger.json",
     "properties": {
+        "caCerts": {
+            "id": "/properties/caCerts",
+            "type": "string"
+        },
         "host": {
             "id": "/properties/host",
             "type": "string"
@@ -10,9 +14,17 @@
             "id": "/properties/keepAlive",
             "type": "integer"
         },
+        "password": {
+            "id": "/properties/password",
+            "type": "string"
+        },
         "port": {
             "id": "/properties/port",
             "type": "integer"
+        },
+        "tls": {
+            "id": "/properties/tls",
+            "type": "boolean"
         },
         "topic": {
             "id": "/properties/topic",
@@ -21,17 +33,14 @@
         "user": {
             "id": "/properties/user",
             "type": "string"
-        },
-        "password": {
-            "id": "/properties/password",
-            "type": "string"
         }
     },
     "required": [
         "topic",
         "host",
         "port",
-        "keepAlive"
+        "keepAlive",
+        "tls"
     ],
     "type": "object"
 }

@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, List
 from core.observation import Observation
 
 
-class Prototype():
+class Prototype:
     """
     Prototype is used as a blueprint for OpenADMS workers.
     """

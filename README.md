@@ -36,9 +36,9 @@ For more information, see https://www.dabamos.de/.
 ## Installation
 Either CPython 3.6+ or PyPy3.5 has to be installed. OpenADMS Node uses `pipenv`
 for dependency management and virtual environments. Make sure that `pipenv` is
-installed or run:
+installed:
 ```
-$ pip3 install --user pipenv
+$ pip3 install -U pipenv
 ```
 Download the [latest release](https://github.com/dabamos/openadms-node/releases)
 or clone the master branch with Git. Then, create a virtual environment with

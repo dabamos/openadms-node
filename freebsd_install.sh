@@ -34,6 +34,7 @@ install_pipenv() {
 }
 
 install_modules() {
+  pipenv lock
   pipenv sync
 }
 
