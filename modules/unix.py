@@ -67,7 +67,7 @@ class GpioController(Prototype):
         self._thread = None
 
         self.add_handler('gpio', self.handle_gpio)
-        manager.schema_manager.add_schema('gpio', 'gpio.json')
+        manager.schema.add_schema('gpio', 'gpio.json')
 
     def _communicate(self, cmd: str) -> Tuple[str, str]:
         """Communicates with the operating system using `subprocess`.

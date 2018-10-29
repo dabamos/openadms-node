@@ -157,6 +157,7 @@ class Job:
         # Create target, header, and payload in order to send the observation.
         target = self._port_name
         header = Observation.get_header()
+        header['from'] = self._name
         payload = obs_copy.data
 
         # Fire and forget the observation.

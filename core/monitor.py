@@ -29,53 +29,53 @@ class Monitor:
         manager = Manager()
 
         try:
-            manager.schema_manager = SchemaManager()
-            manager.config_manager = ConfigManager(self._config_file_path,
-                                                   manager.schema_manager)
-            manager.project_manager = ProjectManager(manager)
-            manager.node_manager = NodeManager(manager)
-            manager.sensor_manager = SensorManager(manager.config_manager)
-            manager.module_manager = ModuleManager(manager)
+            manager.schema = SchemaManager()
+            manager.config = ConfigManager(self._config_file_path,
+                                           manager.schema)
+            manager.project = ProjectManager(manager)
+            manager.node = NodeManager(manager)
+            manager.sensor = SensorManager(manager.config)
+            manager.module = ModuleManager(manager)
         except ValueError as e:
             self.logger.error(f'Fatal error: {e}')
 
         self._manager = manager
 
+    def kill_all(self) -> None:
+        """Kills all modules"""
+        self._manager.module.kill_all()
+
     def load_all(self) -> None:
         """Calls managers to load and initialise everything."""
-        self._manager.schema_manager.load_all()
-        self._manager.config_manager.load_all()
-        self._manager.project_manager.load_all()
-        self._manager.node_manager.load_all()
-        self._manager.sensor_manager.load_all()
-        self._manager.module_manager.load_all()
+        self._manager.schema.load_all()
+        self._manager.config.load_all()
+        self._manager.project.load_all()
+        self._manager.node.load_all()
+        self._manager.sensor.load_all()
+        self._manager.module.load_all()
 
     def start(self) -> None:
         """Starts all modules."""
-        if self._manager.module_manager:
-            self._manager.module_manager.start_all()
+        if self._manager.module:
+            self._manager.module.start_all()
 
     def stop(self) -> None:
         """Stops all modules."""
-        self._manager.module_manager.stop_all()
-
-    def kill(self) -> None:
-        """Kills all modules"""
-        self._manager.module_manager.kill_all()
+        self._manager.module.stop_all()
 
     def remove_all(self) -> None:
         """Clears all managers."""
-        self._manager.sensor_manager.remove_all()
-        self._manager.node_manager.remove_all()
-        self._manager.project_manager.remove_all()
-        self._manager.config_manager.remove_all()
-        self._manager.schema_manager.remove_all()
+        self._manager.sensor.remove_all()
+        self._manager.node.remove_all()
+        self._manager.project.remove_all()
+        self._manager.config.remove_all()
+        self._manager.schema.remove_all()
 
     def restart(self) -> None:
         """Clears and restarts everything."""
         self.logger.notice('Restarting everything ...')
 
-        self.kill()
+        self.kill_all()
         time.sleep(3.0)
 
         self.remove_all()

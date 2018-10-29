@@ -48,18 +48,25 @@ class Module(threading.Thread):
         self._worker.uplink = self.publish          # Call to publish message.
 
         # Subscribe to topic of worker's name.
-        self._messenger.subscribe(self._topic + '/' + worker.name)
+        self._messenger.subscribe(f'{self._topic}/{worker.name}')
 
-    def publish(self, target: str, message: str) -> None:
+    def publish(self, target: str, message: str, qos: int = 0,
+                retain: bool = False) -> None:
         """Sends an `Observation` object to the next receiver by using the
         messenger.
 
         Args:
             target: Name of the topic.
             message: Message in JSON format.
+            qos: Quality of Service (0, 1, or 2).
+            retain: Retained message or not.
         """
         target_path = f'{self._topic}/{target}'
-        self._messenger.publish(target_path, message)
+        self._messenger.publish(target_path, message, qos, retain)
+        retained = 'retained ' if retain else ''
+
+        self.logger.debug(f'Published {retained}message with QoS {qos} to '
+                          f'"{target_path}"')
 
     def retrieve(self, message: List[Dict]) -> None:
         """Callback function for the messenger. New data from the message broker
@@ -74,7 +81,8 @@ class Module(threading.Thread):
         """Checks the inbox for new messages and calls the `handle()` method of
         the worker for further processing. Runs within a thread."""
         self.logger.verbose(f'Connecting module "{self._worker.name}" to '
-                            f'{self._messenger.host}:{self._messenger.port}')
+                            f'{self._messenger.host}:{self._messenger.port} '
+                            f'...')
         self._messenger.connect()
 
         while not self._messenger.is_connected:

@@ -87,8 +87,8 @@ class MQTTMessenger:
         self._client = None
         self._is_connected = False
 
-        self._config_manager = manager.config_manager
-        self._schema_manager = manager.schema_manager
+        self._config_manager = manager.config
+        self._schema_manager = manager.schema
 
         config = self._get_config('intercom', 'mqtt')
 
@@ -200,9 +200,17 @@ class MQTTMessenger:
             self._client.loop_stop()
             self._client.disconnect()
 
-    def publish(self, topic: str, message: str) -> None:
-        """Send message to the message broker."""
-        self._client.publish(topic, message)
+    def publish(self, topic: str, message: str, qos: int = 0,
+                retain: bool = False) -> None:
+        """Send message to the message broker.
+
+        Args:
+            topic: Topic to publish to.
+            message: Message to publish.
+            qos: Quality of Service (0, 1, or 2).
+            retain: Retained message or not.
+        """
+        self._client.publish(topic, message, qos, retain)
 
     def subscribe(self, topic) -> None:
         """Set the topic the client should subscribe from the message

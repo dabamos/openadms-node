@@ -28,15 +28,15 @@ class Prototype:
         """
         self.logger = logging.getLogger(module_name)
 
-        self._name = module_name  # Name, e.g., 'com5'.
-        self._type = module_type  # Type, e.g., 'modules.port.SerialPort'.
+        self._name = module_name  # Name, e.g., `com5`.
+        self._type = module_type  # Type, e.g., `modules.port.SerialPort`.
 
-        self._config_manager = manager.config_manager
-        self._module_manager = manager.module_manager
-        self._node_manager = manager.node_manager
-        self._project_manager = manager.project_manager
-        self._sensor_manager = manager.sensor_manager
-        self._schema_manager = manager.schema_manager
+        self._config_manager = manager.config
+        self._module_manager = manager.module
+        self._node_manager = manager.node
+        self._project_manager = manager.project
+        self._sensor_manager = manager.sensor
+        self._schema_manager = manager.schema
 
         self._uplink = None
         self._is_running = False
@@ -121,22 +121,23 @@ class Prototype:
             self.logger.warning('Received message is invalid')
             return
 
-        header = message[0]
-        payload = message[1]
+        header = message.get('header')
+        payload = message.get('payload')
 
         if not header or not payload:
             self.logger.warning('Received data is corrupted')
             return
 
-        # Get payload type.
+        # Get payload type and sender.
         payload_type = header.get('type')
+        sender = header.get('from', '?')
 
         if not payload_type:
             self.logger.error('Undefined payload type')
             return
 
         self.logger.debug(f'Received message of type "{payload_type}" from '
-                          f'"{header.get("from")}"')
+                          f'"{sender}"')
 
         # Validate payload.
         if not self.is_valid(payload, payload_type):
@@ -208,31 +209,39 @@ class Prototype:
         """
         return obs
 
-    def publish(self, target: str, header: Dict, payload: Dict) -> None:
+    def publish(self, target: str, header: Dict, payload: Dict, qos: int = 0,
+                retain: bool = False) -> None:
         """Appends header and payload to a list, converts the list to a JSON
         string and sends it to the designated target by using the callback
         function `_uplink()`. The JSON string has the format::
 
-            [ { <header> }, { <payload> } ].
+            {
+              "header": <header>,
+              "payload": <payload>
+            }
 
         Args:
             target: Name of the target.
             header: Header of the message.
             payload: Payload of the message.
+            qos: Quality of Service (0, 1, or 2).
+            retain: Retained message or not.
         """
         if not self._uplink:
             self.logger.error(f'Undefined uplink for module "{self._name}"')
             return
 
         try:
-            message = json.dumps([header, payload])
-            self._uplink(target, message)
+            message = json.dumps({
+                'header': header,
+                'payload': payload
+            })
+            self._uplink(target, message, qos, retain)
+            # self.logger.debug(f'Published message of type'
+            #                   f'"{header.get("type")}" to "{target}"')
         except TypeError as e:
             self.logger.error(f'Message could not be published (invalid header '
                               f'or payload): {e}')
-
-        self.logger.debug(f'Published message of type "{header.get("type")}" '
-                          f'to "{target}"')
 
     def publish_observation(self, obs: Observation) -> None:
         """Prepares the observation for publishing and forwards it to the

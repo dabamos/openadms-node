@@ -56,7 +56,7 @@ class LocalControlServer(Prototype):
         log_handler.addFilter(RootFilter())
         log_handler.setFormatter(log_formatter)
 
-        # Add log handler to root handler.
+        # Add local log handler to root handler.
         root = logging.getLogger()
         root.addHandler(log_handler)
 
@@ -102,11 +102,11 @@ class RequestHandler(BaseHTTPRequestHandler):
                  manager: Manager,
                  log_handler: RingBufferLogHandler,
                  *args):
-        self._config_manager = manager.config_manager
-        self._module_manager = manager.module_manager
-        self._sensor_manager = manager.sensor_manager
-        self._project_manager = manager.project_manager
-        self._node_manager = manager.node_manager
+        self._config_manager = manager.config
+        self._module_manager = manager.module
+        self._sensor_manager = manager.sensor
+        self._project_manager = manager.project
+        self._node_manager = manager.node
 
         self._log_handler = log_handler
         self._root_dir = 'modules/server'

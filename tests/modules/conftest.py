@@ -39,7 +39,7 @@ def manager() -> Manager:
         An instance of class ``core.Manager``.
     """
     manager = Manager()
-    manager.schema_manager = SchemaManager()
-    manager.config_manager = ConfigManager('tests/config/config.json',
-                                           manager.schema_manager)
+    manager.schema = SchemaManager()
+    manager.config = ConfigManager('tests/config/config.json',
+                                   manager.schema)
     return manager

@@ -135,7 +135,7 @@ def sigint_handler(signalnum: int, frame: Any) -> None:
     root.info('Received SIGINT')
 
     if monitor:
-        monitor.kill()
+        monitor.kill_all()
         time.sleep(3.0)
 
     root.info('Exiting ...')

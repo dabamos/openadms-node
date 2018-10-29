@@ -29,60 +29,60 @@ class Manager:
     """
 
     def __init__(self):
-        self._config_manager = None
-        self._module_manager = None
-        self._node_manager = None
-        self._project_manager = None
-        self._schema_manager = None
-        self._sensor_manager = None
+        self._config = None
+        self._module = None
+        self._node = None
+        self._project = None
+        self._schema = None
+        self._sensor = None
 
     @property
-    def config_manager(self) -> Any:
-        return self._config_manager
+    def config(self) -> Any:
+        return self._config
 
     @property
-    def module_manager(self) -> Any:
-        return self._module_manager
+    def module(self) -> Any:
+        return self._module
 
     @property
-    def node_manager(self) -> Any:
-        return self._node_manager
+    def node(self) -> Any:
+        return self._node
 
     @property
-    def project_manager(self) -> Any:
-        return self._project_manager
+    def project(self) -> Any:
+        return self._project
 
     @property
-    def schema_manager(self) -> Any:
-        return self._schema_manager
+    def schema(self) -> Any:
+        return self._schema
 
     @property
-    def sensor_manager(self) -> Any:
-        return self._sensor_manager
+    def sensor(self) -> Any:
+        return self._sensor
 
-    @config_manager.setter
-    def config_manager(self, config_manager):
-        self._config_manager = config_manager
+    @config.setter
+    def config(self, config_manager):
+        self._config = config_manager
 
-    @module_manager.setter
-    def module_manager(self, module_manager):
-        self._module_manager = module_manager
+    @module.setter
+    def module(self, module_manager):
+        self._module = module_manager
 
-    @node_manager.setter
-    def node_manager(self, node_manager):
-        self._node_manager = node_manager
+    @node.setter
+    def node(self, node_manager):
+        self._node = node_manager
 
-    @project_manager.setter
-    def project_manager(self, project_manager):
-        self._project_manager = project_manager
+    @project.setter
+    def project(self, project_manager):
+        self._project = project_manager
 
-    @schema_manager.setter
-    def schema_manager(self, schema_manager):
-        self._schema_manager = schema_manager
+    @schema.setter
+    def schema(self, schema_manager):
+        self._schema = schema_manager
 
-    @sensor_manager.setter
-    def sensor_manager(self, sensor_manager):
-        self._sensor_manager = sensor_manager
+    @sensor.setter
+    def sensor(self, sensor_manager):
+        self._sensor = sensor_manager
 
 
 class ConfigManager:
@@ -206,8 +206,8 @@ class ModuleManager:
         """
         self.logger = logging.getLogger('moduleManager')
         self._manager = manager
-        self._config_manager = manager.config_manager
-        self._schema_manager = manager.schema_manager
+        # Quirky work-around:
+        self._manager.module = self
 
         self._start_time = None
         self._modules = {}
@@ -232,7 +232,7 @@ class ModuleManager:
             raise ValueError(f'Module "{class_path}" not found')
 
         messenger = MQTTMessenger(self._manager, name)
-        worker = self.get_worker(name, class_path)
+        worker = self.get_worker_instance(name, class_path)
 
         self._modules[name] = Module(messenger, worker)
         self.logger.debug(f'Loaded module "{name}"')
@@ -253,7 +253,8 @@ class ModuleManager:
         """
         return self._modules.keys()
 
-    def get_worker(self, module_name: str, class_path: str) -> Prototype:
+    def get_worker_instance(self, module_name: str,
+                            class_path: str) -> Prototype:
         """Loads a Python class from a given path and returns the instance.
 
         Args:
@@ -288,8 +289,9 @@ class ModuleManager:
         Args:
             name: The name of the module.
         """
-        self._modules.get(name).stop_worker()
-        self._modules.get(name).stop()
+        if self.has_module(name):
+            self._modules.get(name).stop_worker()
+            self._modules.get(name).stop()
 
     def kill_all(self) -> None:
         """Kills all modules (stops all workers and messengers)."""
@@ -299,8 +301,8 @@ class ModuleManager:
     def load_all(self) -> None:
         """Loads all modules."""
         self._modules = {}
-        self._schema_manager.add_schema('modules', 'core/modules.json')
-        config = self._config_manager.get_valid_config('modules',
+        self._manager.schema.add_schema('modules', 'core/modules.json')
+        config = self._manager.config.get_valid_config('modules',
                                                        'core',
                                                        'modules')
 
@@ -342,11 +344,11 @@ class ModuleManager:
         Args:
             name: The name of the module.
         """
-        self._modules[name].stop_worker()
-        self._modules[name].stop()
-
-        self.logger.info(f'Removing module "{name}" ...')
-        self._modules[name] = None
+        if self.has_module(name):
+            self.logger.info(f'Removing module "{name}" ...')
+            self._modules[name].stop_worker()
+            self._modules[name].stop()
+            self._modules[name] = None
 
     def remove_all(self) -> None:
         """Removes all modules."""
@@ -436,8 +438,6 @@ class NodeManager:
         """
         self.logger = logging.getLogger('nodeManager')
         self._manager = manager
-        self._config_manager = manager.config_manager
-        self._schema_manager = manager.schema_manager
         self._node = None
 
         self.load_all()
@@ -447,8 +447,8 @@ class NodeManager:
         self._node = None
 
         # Configuration of the node.
-        self._schema_manager.add_schema('node', 'core/node.json')
-        config = self._config_manager.get_valid_config('node', 'core', 'node')
+        self._manager.schema.add_schema('node', 'core/node.json')
+        config = self._manager.config.get_valid_config('node', 'core', 'node')
 
         # Node information.
         self._node = Node(config.get('name'),
@@ -513,16 +513,14 @@ class ProjectManager:
         """
         self.logger = logging.getLogger('projectManager')
         self._manager = manager
-        self._config_manager = manager.config_manager
-        self._schema_manager = manager.schema_manager
         self._project = None
         self.load_all()
 
     def load_all(self) -> None:
         """Loads the project configuration and meta information."""
         self._project = None
-        self._schema_manager.add_schema('project', 'core/project.json')
-        config = self._config_manager.get_valid_config('project',
+        self._manager.schema.add_schema('project', 'core/project.json')
+        config = self._manager.config.get_valid_config('project',
                                                        'core',
                                                        'project')
         # Project meta information.
