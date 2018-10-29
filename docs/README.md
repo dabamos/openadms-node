@@ -8,8 +8,9 @@ You can then generate the documentation with
 [Sphinx](http://www.sphinx-doc.org/):
 ```
 $ pipenv shell
+$ cd docs/
 $ gmake clean
-$ sphinx-apidoc -f -e -T -o docs/source ../
+$ sphinx-apidoc -f -e -T -o source ../
 $ gmake html
 $ exit
 ```
@@ -17,7 +18,7 @@ If you are using PyPy3, run:
 ```
 $ gmake html "SPHINXBUILD=pypy3 -msphinx"
 ```
-You will find the compiled documentation in `./_build/html/`.
+You will find the compiled documentation in `./build/html/`.
 
 ## Licence
 The documentation is licenced under the [Creative Commons Attribution
