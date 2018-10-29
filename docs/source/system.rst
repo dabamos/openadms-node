@@ -1,10 +1,6 @@
 System Description
 ==================
 
-.. note::
-
-    This section is still under construction.
-
 Observation Entity
 ------------------
 
@@ -110,17 +106,17 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``project``       | String    | ID of the project (UUID4 hex only).                                     |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``receivers``     | List      | List of modules the observation will be send to sequentially.           |
+| ``receivers``     | Array     | Array of modules the observation will be send to sequentially.          |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``requestSets``   | Dict      | Requests to the sensor, response patterns, etc.                         |
+| ``requestSets``   | Object    | Requests to the sensor, response patterns, etc.                         |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``requestsOrder`` | List      | Defines the order of the requests.                                      |
+| ``requestsOrder`` | Array     | Defines the order of the requests.                                      |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``responseSets``  | Dict      | Response units, types, and values.                                      |
+| ``responseSets``  | Object    | Response units, types, and values.                                      |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``sensorName``    | String    | Name of the sensor (will be added by the scheduler).                    |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``sensorType``    | String    | Type of sensor (e.g., total station, inclinometer, …).                  |
+| ``sensorType``    | String    | Type of sensor (e.g., total station, GNSS receiver, …).                 |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``sleepTime``     | Float     | Time in seconds to wait before the next observation.                    |
 +-------------------+-----------+-------------------------------------------------------------------------+

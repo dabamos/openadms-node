@@ -297,7 +297,7 @@ Configuration
 | ``fileRotation``      | String      | File rotation (``none``, ``daily``,             |
 |                       |             | ``monthly``, or ``yearly``).                    |
 +-----------------------+-------------+-------------------------------------------------+
-| ``paths``             | List        | Paths to save files to (multiple paths          |
+| ``paths``             | Array       | Paths to save files to (multiple paths          |
 |                       |             | possible).                                      |
 +-----------------------+-------------+-------------------------------------------------+
 | ``separator``         | String      | Separator between values within the CSV file.   |
@@ -461,11 +461,11 @@ Configuration
 +---------------+-------------+---------------------------------------------------------+
 | Name          | Data Type   | Description                                             |
 +===============+=============+=========================================================+
-| ``module``    | Dict        | Modules to process alert messages.                      |
+| ``module``    | Object      | Modules to process alert messages.                      |
 +---------------+-------------+---------------------------------------------------------+
 | ``enabled``   | Boolean     | Turns forwarding to module on/off.                      |
 +---------------+-------------+---------------------------------------------------------+
-| ``receivers`` | Dict        | Alert levels and their respective receivers (depend on  |
+| ``receivers`` | Object      | Alert levels and their respective receivers (depend on  |
 |               |             | module).                                                |
 +---------------+-------------+---------------------------------------------------------+
 
@@ -569,10 +569,10 @@ They are used to format e-mails and short messages.
 | ``type``                     | String      | Type of the message (e.g., ``email`` or      |
 |                              |             | ``sms``).                                    |
 +------------------------------+-------------+----------------------------------------------+
-| ``templates``                | Dict        | Message templates with ``header``, ``body``, |
+| ``templates``                | Object      | Message templates with ``header``, ``body``, |
 |                              |             | and ``footer``.                              |
 +------------------------------+-------------+----------------------------------------------+
-| ``properties``               | Dict        | Additional properties expected by the        |
+| ``properties``               | Object      | Additional properties expected by the        |
 |                              |             | receiver.                                    |
 +------------------------------+-------------+----------------------------------------------+
 
@@ -633,7 +633,7 @@ Configuration
 +------------------+-------------+------------------------------------------------------+
 | Name             | Data Type   | Description                                          |
 +==================+=============+======================================================+
-| ``receivers``    | List        | List of receivers (topics).                          |
+| ``receivers``    | Array       | List of receivers (topics).                          |
 +------------------+-------------+------------------------------------------------------+
 | ``interval``     | Integer     | Message sending interval in seconds.                 |
 +------------------+-------------+------------------------------------------------------+
@@ -1608,7 +1608,7 @@ Configuration
 +------------------+-------------+------------------------------------------------------+
 | Name             | Data Type   | Description                                          |
 +==================+=============+======================================================+
-| ``observations`` | Dict        | Observations with response names and there minimum   |
+| ``observations`` | Object      | Observations with response names and there minimum   |
 |                  |             | and maximum values.                                  |
 +------------------+-------------+------------------------------------------------------+
 | ``min``          | Float       | Minimum value of the response.                       |
@@ -1715,7 +1715,7 @@ Configuration
 +==================+=============+=======================================================+
 | ``retries``      | Integer     | Number of retries after a failed observation.         |
 +------------------+-------------+-------------------------------------------------------+
-| ``responseSets`` | List        | List of return code response set names to search for. |
+| ``responseSets`` | Array       | List of return code response set names to search for. |
 +------------------+-------------+-------------------------------------------------------+
 
 .. _unit-converter:
@@ -1968,7 +1968,7 @@ configuration, defined by the name of the respective module instance (e.g.,
 +------------------+-------------+------------------------------------------------------+
 | ``sensor``       | String      | Name of the sensor as defined in ``sensors``.        |
 +------------------+-------------+------------------------------------------------------+
-| ``schedules``    | List        | List of schedules.                                   |
+| ``schedules``    | Array       | List of schedules.                                   |
 +------------------+-------------+------------------------------------------------------+
 
 Server
@@ -2231,9 +2231,9 @@ Configuration
 +===========================================+=============+======================================================+
 | ``residualMismatchTransformationEnabled`` | Boolean     | Prorate residuals between the target points.         |
 +-------------------------------------------+-------------+------------------------------------------------------+
-| ``viewPoint``                             | Dict        | Target names and receivers of the view point.        |
+| ``viewPoint``                             | Object      | Target names and receivers of the view point.        |
 +-------------------------------------------+-------------+------------------------------------------------------+
-| ``fixedPoints``                           | Dict        | Target names and coordinates of the fixed points.    |
+| ``fixedPoints``                           | Object      | Target names and coordinates of the fixed points.    |
 +-------------------------------------------+-------------+------------------------------------------------------+
 
 .. _polar-transformer:
@@ -2298,18 +2298,18 @@ Configuration
 +-----------------------+-------------+-------------------------------------------------+
 | Name                  | Data Type   | Description                                     |
 +=======================+=============+=================================================+
-| ``viewPoint``         | Dict        | Coordinates of the sensor position (``x``,      |
+| ``viewPoint``         | Object      | Coordinates of the sensor position (``x``,      |
 |                       |             | ``y``, ``z``).                                  |
 +-----------------------+-------------+-------------------------------------------------+
-| ``fixedPoints``       | Dict        | Coordinates of the fixed points (``x``, ``y``,  |
+| ``fixedPoints``       | Object      | Coordinates of the fixed points (``x``, ``y``,  |
 |                       |             | ``z``).                                         |
 +-----------------------+-------------+-------------------------------------------------+
-| ``azimuthPointName``  | Dict        | Name of the fixed point that sets the azimuth.  |
+| ``azimuthPointName``  | Object      | Name of the fixed point that sets the azimuth.  |
 +-----------------------+-------------+-------------------------------------------------+
-| ``azimuthAngle``      | Dict        | Global azimuth in gon. Set to ``0`` if no       |
+| ``azimuthAngle``      | Object      | Global azimuth in gon. Set to ``0`` if no       |
 |                       |             | global coordinate system is used.               |
 +-----------------------+-------------+-------------------------------------------------+
-| ``adjustmentEnabled`` | Dict        | Turns the adjustment of the orientation using   |
+| ``adjustmentEnabled`` | Object      | Turns the adjustment of the orientation using   |
 |                       |             | more than one fixed point on or off (in German: |
 |                       |             | *Abriss*).                                      |
 +-----------------------+-------------+-------------------------------------------------+
