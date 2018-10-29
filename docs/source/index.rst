@@ -22,6 +22,12 @@ platforms, like x86, x86-64, ARM, and MIPS. The software is compatible to
 desktop, industrial, embedded, and single-board computers with Microsoft Windows
 Vista/7/8/10, Linux, BSD Unix, or macOS.
 
+.. _openadms_sensor_network:
+.. figure:: _static/openadms_sensor_network.png
+   :alt: OpenADMS sensor network
+
+   Schematic illustration of a sensor network based on OpenADMS Node
+
 More information is provided on the official `project website`_.
 
 Licence
@@ -29,9 +35,6 @@ Licence
 
 This work is licenced under the `Creative Commons Attribution 3.0 Germany`_
 (CC BY 3.0 DE).
-
-Table of Contents
-=================
 
 .. toctree::
    :maxdepth: 3
@@ -41,12 +44,14 @@ Table of Contents
    configuration
    system
    openadms-node-modules
+   database
 
-Indices and Tables
+
+Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
 
 .. _project website: https://www.dabamos.de/
-.. _Creative Commons Attribution 3.0 Germany: https://creativecommons.org/licenses/by/3.0/de/
+.. _Creative Commons Attribution 3.0 Germany: https://creativecommons.org/licenses/by/3.0/de/  
