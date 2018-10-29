@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/modules/totalstation/helmerttransformer.json",
+    "id": "schemas/modules/totalstation/helmerttransformer.json",
     "properties": {
         "residualMismatchTransformationEnabled": {
             "id": "/properties/residualMismatchTransformationEnabled",

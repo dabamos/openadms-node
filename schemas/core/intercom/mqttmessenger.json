@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/core/intercom/mqttmessenger.json",
+    "id": "schemas/core/intercom/mqttmessenger.json",
     "properties": {
         "caCerts": {
             "id": "/properties/caCerts",

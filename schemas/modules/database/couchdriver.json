@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/modules/export/couchdriver.json",
+    "id": "schemas/modules/export/couchdriver.json",
     "properties": {
         "cacheFile": {
             "id": "/properties/cacheFile",

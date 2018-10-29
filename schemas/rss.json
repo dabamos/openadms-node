@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/rss.json",
+    "id": "schemas/rss.json",
     "properties": {
         "author": {
             "id": "/properties/author",

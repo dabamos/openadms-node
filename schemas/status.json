@@ -1,0 +1,219 @@
+{
+  "definitions": {},
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "schemas/status.json",
+  "type": "object",
+  "title": "Status",
+  "required": [
+    "modules",
+    "node",
+    "project",
+    "sensors",
+    "statistics",
+    "system",
+    "timestamp",
+    "type"
+  ],
+  "properties": {
+    "modules": {
+      "$id": "#/properties/modules",
+      "type": "array",
+      "title": "Modules Schema",
+      "items": {
+        "$id": "#/properties/modules/items",
+        "type": "object",
+        "title": "Items Schema",
+        "required": [
+          "name",
+          "type",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "$id": "#/properties/modules/items/properties/name",
+            "type": "string",
+            "title": "Name Schema"
+          },
+          "type": {
+            "$id": "#/properties/modules/items/properties/type",
+            "type": "string",
+            "title": "Type Schema"
+          },
+          "status": {
+            "$id": "#/properties/modules/items/properties/status",
+            "type": "string",
+            "title": "Status Schema"
+          }
+        }
+      }
+    },
+    "node": {
+      "$id": "#/properties/node",
+      "type": "object",
+      "title": "Node Schema",
+      "required": [
+        "description",
+        "id",
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "$id": "#/properties/node/properties/description",
+          "type": "string",
+          "title": "Description Schema"
+        },
+        "id": {
+          "$id": "#/properties/node/properties/id",
+          "type": "string",
+          "title": "Id Schema"
+        },
+        "name": {
+          "$id": "#/properties/node/properties/name",
+          "type": "string",
+          "title": "Name Schema"
+        }
+      }
+    },
+    "project": {
+      "$id": "#/properties/project",
+      "type": "object",
+      "title": "Project Schema",
+      "required": [
+        "description",
+        "id",
+        "name"
+      ],
+      "properties": {
+        "description": {
+          "$id": "#/properties/project/properties/description",
+          "type": "string",
+          "title": "Description Schema"
+        },
+        "id": {
+          "$id": "#/properties/project/properties/id",
+          "type": "string",
+          "title": "Id Schema"
+        },
+        "name": {
+          "$id": "#/properties/project/properties/name",
+          "type": "string",
+          "title": "Name Schema"
+        }
+      }
+    },
+    "sensors": {
+      "$id": "#/properties/sensors",
+      "type": "array",
+      "title": "Sensors Schema",
+      "items": {
+        "$id": "#/properties/sensors/items",
+        "type": "object",
+        "title": "Items Schema",
+        "required": [
+          "name",
+          "type",
+          "description"
+        ],
+        "properties": {
+          "name": {
+            "$id": "#/properties/sensors/items/properties/name",
+            "type": "string",
+            "title": "Name Schema"
+          },
+          "type": {
+            "$id": "#/properties/sensors/items/properties/type",
+            "type": "string",
+            "title": "Type Schema"
+          },
+          "description": {
+            "$id": "#/properties/sensors/items/properties/description",
+            "type": "string",
+            "title": "Description Schema"
+          }
+        }
+      }
+    },
+    "statistics": {
+      "$id": "#/properties/statistics",
+      "type": "object",
+      "title": "Statistics Schema",
+      "required": [
+        "softwareUptime",
+        "systemUptime"
+      ],
+      "properties": {
+        "softwareUptime": {
+          "$id": "#/properties/statistics/properties/softwareUptime",
+          "type": "string",
+          "title": "Software Uptime Schema"
+        },
+        "systemUptime": {
+          "$id": "#/properties/statistics/properties/systemUptime",
+          "type": "string",
+          "title": "System Uptime Schema"
+        }
+      }
+    },
+    "system": {
+      "$id": "#/properties/system",
+      "type": "object",
+      "title": "System Name Schema",
+      "required": [
+        "configFile",
+        "datetime",
+        "host",
+        "interpreter",
+        "os",
+        "rootDirectory",
+        "version"
+      ],
+      "properties": {
+        "configFile": {
+          "$id": "#/properties/system/properties/configFile",
+          "type": "string",
+          "title": "Configuration File Schema"
+        },
+        "datetime": {
+          "$id": "#/properties/system/properties/datetime",
+          "type": "string",
+          "title": "Datetime Schema"
+        },
+        "host": {
+          "$id": "#/properties/system/properties/host",
+          "type": "string",
+          "title": "Hostname Schema"
+        },
+        "interpreter": {
+          "$id": "#/properties/system/properties/interpreter",
+          "type": "string",
+          "title": "Python Interpreter Schema"
+        },
+        "os": {
+          "$id": "#/properties/system/properties/os",
+          "type": "string",
+          "title": "OS Schema"
+        },
+        "rootDirectory": {
+          "$id": "#/properties/system/properties/rootDirectory",
+          "type": "string",
+          "title": "Root Directory Schema"
+        },
+        "version": {
+          "$id": "#/properties/system/properties/version",
+          "type": "string",
+          "title": "Version Schema"
+        }
+      }
+    },
+    "timestamp": {
+      "$id": "#/properties/timestamp",
+      "type": "string",
+      "title": "Timestamp Schema"
+    },
+    "type": {
+      "$id": "#/properties/type",
+      "type": "string",
+      "title": "Type Schema"
+    }
+  }
+}

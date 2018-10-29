@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/modules/testing/errorgenerator.json",
+    "id": "schemas/modules/testing/errorgenerator.json",
     "properties": {
         "critical": {
             "id": "/properties/critical",

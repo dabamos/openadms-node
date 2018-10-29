@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/irc.json",
+    "id": "schemas/irc.json",
     "properties": {
         "message": {
             "id": "/properties/message",

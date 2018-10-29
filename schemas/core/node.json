@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/core/node.json",
+    "id": "schemas/core/node.json",
     "properties": {
         "description": {
             "id": "/properties/description",

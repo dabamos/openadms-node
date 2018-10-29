@@ -64,7 +64,7 @@ class Alerter(Prototype):
         root = logging.getLogger()
         root.addHandler(qh)
 
-        manager.schema_manager.add_schema('alert', 'alert.json')
+        manager.schema.add_schema('alert', 'alert.json')
 
         if not self._is_enabled:
             self.logger.notice('Alerting is disabled')
@@ -348,20 +348,6 @@ class Heartbeat(Prototype):
         self._thread.start()
 
 
-class HeartbeatMonitor(Prototype):
-
-    def __init__(self, module_name: str, module_type: str, manager: Manager):
-        super().__init__(module_name, module_type, manager)
-
-        # Capture messages of type 'heartbeat'.
-        self.add_handler('heartbeat', self.handle_heartbeat)
-
-    def handle_heartbeat(self,
-                         header: Dict[str, Any],
-                         payload: Dict[str, Any]) -> None:
-        pass
-
-
 class IrcAgent(Prototype):
     """
     IrcAgent sends alert messages to the Internet Relay Chat. This module acts
@@ -401,7 +387,7 @@ class IrcAgent(Prototype):
             self._channel = '#' + self._channel
 
         self.add_handler('irc', self.handle_irc)
-        manager.schema_manager.add_schema('irc', 'irc.json')
+        manager.schema.add_schema('irc', 'irc.json')
 
     def __del__(self):
         self._disconnect()
@@ -424,7 +410,7 @@ class IrcAgent(Prototype):
         else:
             self._conn = sock
 
-        self.logger.info(f'Connecting to "{self._host}:{self._port}"')
+        self.logger.info(f'Connecting to "{self._host}:{self._port}" ...')
 
         try:
             # Connect to IRC server.
@@ -472,7 +458,7 @@ class IrcAgent(Prototype):
 
         if self._channel and len(self._channel) > 0:
             self.logger.info(f'Joining channel "{self._channel}" on '
-                             f'"{self._host}:{self._port}"')
+                             f'"{self._host}:{self._port}" ...')
             self._send(f'JOIN {self._channel}\r\n')
 
     def _priv_msg(self, target: str, message: str) -> None:
@@ -587,7 +573,7 @@ class MailAgent(Prototype):
                              '(select either TLS or StartTLS)')
 
         self.add_handler('email', self.handle_mail)
-        manager.schema_manager.add_schema('email', 'email.json')
+        manager.schema.add_schema('email', 'email.json')
 
     def handle_mail(self,
                     header: Dict[str, Any],
@@ -697,7 +683,7 @@ class MastodonAgent(Prototype):
         config = self.get_module_config(self._name)
 
         self.add_handler('mastodon', self.handle_mastodon)
-        manager.schema_manager.add_schema('mastodon', 'mastodon.json')
+        manager.schema.add_schema('mastodon', 'mastodon.json')
 
         self._email = config.get('email')
         self._password = config.get('password')
@@ -785,7 +771,7 @@ class RssAgent(Prototype):
         }
 
         self.add_handler('rss', self.handle_rss)
-        manager.schema_manager.add_schema('rss', 'rss.json')
+        manager.schema.add_schema('rss', 'rss.json')
 
     def escape(self, html: str) -> str:
         """Returns the given HTML with ampersands, quotes, and carets
@@ -999,3 +985,90 @@ class ShortMessageAgent(Prototype):
             sock.send(message.encode())
             self.logger.debug(f'Closed connection to "{self._host}:'
                               f'{self._port}"')
+
+
+class StatusPublisher(Prototype):
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+
+        self._thread = None
+        self._header = {'type': 'status'}
+
+        config = self.get_module_config(self._name)
+        self._topic = config.get('topic')
+        self._interval = config.get('interval')
+
+        manager.schema.add_schema('status', 'status.json')
+
+    def _get_modules(self) -> List[Dict]:
+        modules = []
+
+        for module_name, module in self._module_manager.modules.items():
+            modules.append({
+                'name': module_name,
+                'type': module.worker.type,
+                'status': 'running' if module.worker.is_running else
+                          'stopped'
+            })
+
+        return modules
+
+    def _get_sensors(self) -> List[Dict]:
+        sensors = []
+
+        for sensor_name, sensor in self._sensor_manager.sensors.items():
+            sensors.append({
+                'name': sensor.name,
+                'type': sensor.type,
+                'description': sensor.description
+            })
+
+        return sensors
+
+    def run(self) -> None:
+        while self._is_running:
+            payload = {
+                'modules': self._get_modules(),
+                'node': {
+                    'description': self._node_manager.node.description,
+                    'id': self._node_manager.node.id,
+                    'name': self._node_manager.node.name
+                },
+                'project': {
+                    'description': self._project_manager.project.description,
+                    'id': self._project_manager.project.id,
+                    'name': self._project_manager.project.name
+                },
+                'sensors': self._get_sensors(),
+                'statistics': {
+                    'softwareUptime': System.get_software_uptime_string(),
+                    'systemUptime': System.get_system_uptime_string()
+                },
+                'system': {
+                    'configFile': self._config_manager.path,
+                    'datetime': System.get_date_time(),
+                    'host': System.get_host_name(),
+                    'interpreter': System.get_python_version(),
+                    'os': System.get_system_string(),
+                    'rootDirectory': str(System.get_root_dir()),
+                    'version': System.get_openadms_string(),
+                },
+                'timestamp': str(arrow.utcnow()),
+                'type': 'status'
+            }
+
+            self.logger.debug(f'Sending status message to topic '
+                              f'"{self._topic}" ...')
+            self.publish(self._topic, self._header, payload, retain=True)
+            time.sleep(self._interval)
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()

@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "id": "schemas/modules/notification/statuspublisher.json",
+    "properties": {
+        "interval": {
+            "id": "/properties/interval",
+            "type": "number"
+        },
+        "topic": {
+            "id": "/properties/topic",
+            "type": "string"
+        }
+    },
+    "required": [
+        "interval",
+        "topic"
+    ],
+    "type": "object"
+}

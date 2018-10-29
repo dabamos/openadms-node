@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-06/schema#",
-    "id": "schemes/modules/notification/alertmessageformatter.json",
+    "id": "schemas/modules/notification/alertmessageformatter.json",
     "properties": {
         "messageCollectionEnabled": {
             "id": "/properties/messageCollectionEnabled",

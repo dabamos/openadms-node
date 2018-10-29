@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-06/schema#",
-  "id": "schemes/modules/processing/returncodeinspector.json",
+  "id": "schemas/modules/processing/returncodeinspector.json",
   "properties": {
     "responseSets": {
       "id": "/properties/responseSets",
