@@ -30,8 +30,8 @@ observation was send to the modules ``com1``, ``preProcessor``, and
       "timestamp": "2017-04-05T21:48:00.805527",
       "target": "TempPress",
       "id": "6dc84c06018043ba84ac90636ed0f677",
-      "project": "6600055d61ce4d8698f77596e436785f",
-      "node": "21bcf8c16a664b17bbc9cd4221fd8541",
+      "pid": "6600055d61ce4d8698f77596e436785f",
+      "nid": "21bcf8c16a664b17bbc9cd4221fd8541",
       "enabled": true,
       "onetime": false,
       "receivers": [
@@ -96,7 +96,7 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``nextReceiver``  | Integer   | Index of the next receiver (0 … n).                                     |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``node``          | String    | ID of the sensor node (UUID4 hex only).                                 |
+| ``nid``           | String    | Sensor node ID (UUID4 hex).                                             |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``onetime``       | Boolean   | If true, observation will be send one time only.                        |
 +-------------------+-----------+-------------------------------------------------------------------------+
@@ -104,7 +104,7 @@ The single elements of this observation entity are explained below.
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``portName``      | String    | Name of the serial port (will be added automatically).                  |
 +-------------------+-----------+-------------------------------------------------------------------------+
-| ``project``       | String    | ID of the project (UUID4 hex only).                                     |
+| ``pid``           | String    | Project ID (UUID4 hex).                                                 |
 +-------------------+-----------+-------------------------------------------------------------------------+
 | ``receivers``     | Array     | Array of modules the observation will be send to sequentially.          |
 +-------------------+-----------+-------------------------------------------------------------------------+

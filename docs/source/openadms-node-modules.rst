@@ -2366,7 +2366,7 @@ Example
 ^^^^^^^
 
 The example shows a measurement with the Leica TM30 total station in two faces.
-Both measurements, in face 1 and face 2, are done in one observation, with
+Both measurements, in face 0 and face 1, are done in one observation, with
 response sets for each face.
 
 .. code:: javascript

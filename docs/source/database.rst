@@ -92,19 +92,20 @@ CouchDB:
 .. code::
 
     $ curl -X GET --user <username>:<password> \
-      -G 'https://couchdb.example.com/timeseries/_design/by_date/_view/observations'
+      -G 'https://couchdb.example.com/timeseries/_design/by_date/_view/observations' | jq
 
-Add ``startkey`` and ``endkey`` to the request to select specific observations:
+The output can be colorised with ``jq``. Add ``startkey`` and ``endkey`` to the
+request to select specific observations:
 
 .. code::
 
     $ curl -X GET --user <username>:<password> \
       -G 'https://couchdb.example.com/timeseries/_design/by_date/_view/observations' \
-      -d startkey='["project1","node1","p99","2017"]' \
-      -d endkey='["project1","node1","p99","2019"]'
+      -d startkey='["project1","node1","p99","2016"]' \
+      -d endkey='["project1","node1","p99","2018"]' | jq
 
 This will limit the result to observations with given project ID ``project1``,
-sensor node ID ``node1``, target name ``p99``, and timestamp between ``2017``
+sensor node ID ``node1``, target name ``p99``, and timestamp between ``2016``
 and ``2018``. Month, day, and time can be added to the timestamp (for example,
 ``2018-10-27T12:26:21.592259+00:00``).
 

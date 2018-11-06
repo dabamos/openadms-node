@@ -2,7 +2,7 @@ Running OpenADMS Node
 =====================
 
 OpenADMS can either be started from the command-line or by executing the
-graphical launcher ``openadms-launcher.pyw``. The path to the configuration file
+graphical launcher ``openadms-node-launcher.pyw``. The path to the configuration file
 as well as additional options have to be set by using command-line arguments.
 
 .. _openadms-launcher-screenshot:
@@ -20,7 +20,7 @@ Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
 
 ::
 
-    > pipenv run openadms.py --config config\config.json --with-mqtt-broker
+    > pipenv run openadms-node.py --config config\config.json --with-mqtt-broker
 
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
 
@@ -31,7 +31,7 @@ Run OpenADMS Node from your terminal:
 
 ::
 
-    $ pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
+    $ pipenv run ./openadms-node.py --config config/config.json --with-mqtt-broker
 
 
 Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node. A running instance of
