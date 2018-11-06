@@ -27,9 +27,9 @@ You can run OpenADMS Node by following these steps:
 5. Write a configuration file for OpenADMS Node (see directory
    ``config/examples/`` for examples).
 
-6. Run ``pipenv run ./openadms-node.py --config config/config.json --with-mqtt-broker
+6. Run ``pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
    --debug`` or start the graphical launcher ``pipenv run
-   ./openadms-node-launcher.pyw``.
+   ./openadms-launcher.pyw``.
 
 Source Code
 -----------
@@ -213,7 +213,7 @@ lines to ``/etc/rc.conf``:
 
     openadms_user="openadms" ➊
     openadms_config="/usr/local/etc/openadms/openadms.json" ➋
-    openadms_path="/usr/local/sbin/openadms/openadms-node.py" ➌
+    openadms_path="/usr/local/sbin/openadms/openadms.py" ➌
     openadms_log="/var/log/openadms.log" ➍
     openadms_args="" ➎
 
@@ -328,19 +328,19 @@ Build OpenADMS Node by running:
 
 ::
 
-    > pipenv run pyinstaller --clean --noconfirm --icon="extra\dabamos.ico" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms-node.py
+    > pipenv run pyinstaller --clean --noconfirm --icon="extra\dabamos.ico" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms.py
 
 Build the graphical launcher with:
 
 ::
 
-    > pipenv run pyinstaller --clean --windowed --noconfirm --icon="extra\dabamos.ico" --hidden-import "gooey" --hidden-import "openadms" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms-node-launcher.pyw
+    > pipenv run pyinstaller --clean --windowed --noconfirm --icon="extra\dabamos.ico" --hidden-import "gooey" --hidden-import "openadms" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms-launcher.pyw
 
 
 The binaries will be located in the sub-folder ``dist``. Copy the folders
 ``data``, ``config``, ``core``, ``modules``, ``schemes``, and ``sensors`` into
 ``dist``. Furthermore, copy folder ``C:\Python36\Lib\site-packages\gooey`` to
-``dist\openadms-node-launcher\``. Execute ``openadms-node-launcher.exe`` to
+``dist\openadms-launcher\``. Execute ``openadms-launcher.exe`` to
 start the OpenADMS graphical launcher.
 
 cx\_Freeze
@@ -409,8 +409,8 @@ Create a file ``setup.py`` with the following contents:
         base = 'Win32GUI'
 
     executables = [
-        Executable('openadms-node.py', base=base),
-        Executable('openadms-node-launcher.pyw', base=base)
+        Executable('openadms.py', base=base),
+        Executable('openadms-launcher.pyw', base=base)
     ]
 
     setup(name='OpenADMS Node',
@@ -428,7 +428,7 @@ Build OpenADMS Node by running:
     > pipenv run ./setup.py build
 
 
-You can then start the graphical launcher ``openadms-node-launcher.exe`` in
+You can then start the graphical launcher ``openadms-launcher.exe`` in
 directory ``dist/``.
 
 Nuitka
@@ -450,8 +450,8 @@ Build OpenADMS Node with:
 
 ::
 
-    > nuitka3 --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.rpi --recurse-not-to=modules.unix --show-progress --windows-icon=extra/dabamos.ico openadms-node.py
-    > nuitka3 --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.rpi --recurse-not-to=modules.unix --show-progress --windows-disable-console --windows-icon=extra/dabamos.ico openadms-node-launcher.pyw
+    > nuitka3 --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.rpi --recurse-not-to=modules.unix --show-progress --windows-icon=extra/dabamos.ico openadms.py
+    > nuitka3 --standalone --python-version=3.6 --recurse-all --recurse-plugins=core --recurse-plugins=modules --recurse-not-to=modules.tests --recurse-not-to=modules.rpi --recurse-not-to=modules.unix --show-progress --windows-disable-console --windows-icon=extra/dabamos.ico openadms-launcher.pyw
 
 The compilation may take some time.
 

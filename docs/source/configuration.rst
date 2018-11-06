@@ -523,4 +523,4 @@ following command from the command-line:
 
 ::
 
-    $ pipenv run ./openadms-node.py --config config/nivel210.json --with-mqtt-broker --debug
+    $ pipenv run ./openadms.py --config config/nivel210.json --with-mqtt-broker --debug

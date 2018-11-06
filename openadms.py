@@ -288,7 +288,7 @@ if __name__ == '__main__':
                         help='path to log file',
                         dest='log_file',
                         action='store',
-                        default='openadms-node.log')
+                        default='openadms.log')
     parser.add_argument('-m', '--with-mqtt-broker',
                         help='use internal MQTT message broker',
                         dest='is_mqtt_broker',

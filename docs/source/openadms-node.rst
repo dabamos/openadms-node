@@ -14,7 +14,7 @@ Submodules
 
 .. toctree::
 
-   openadms-node.openadms-node
+   openadms-node.openadms
 
 Module contents
 ---------------
