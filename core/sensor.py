@@ -58,20 +58,17 @@ class Sensor:
             if request_set.get('request'):
                 request_set['request'] = codecs.decode(
                     request_set.get('request'),
-                    'unicode_escape'
-                )
+                    'unicode_escape')
 
             if request_set.get('responseDelimiter'):
                 request_set['responseDelimiter'] = codecs.decode(
                     request_set.get('responseDelimiter'),
-                    'unicode_escape'
-                )
+                    'unicode_escape')
 
             if request_set.get('responsePattern'):
                 request_set['responsePattern'] = codecs.decode(
                     request_set.get('responsePattern'),
-                    'unicode_escape'
-                )
+                    'unicode_escape')
 
         return Observation(data)
 

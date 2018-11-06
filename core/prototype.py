@@ -136,8 +136,8 @@ class Prototype:
             self.logger.error('Undefined payload type')
             return
 
-        self.logger.debug(f'Received message of type "{payload_type}" from '
-                          f'"{sender}"')
+        self.logger.spam(f'Received message of type "{payload_type}" from '
+                         f'"{sender}"')
 
         # Validate payload.
         if not self.is_valid(payload, payload_type):
@@ -237,8 +237,8 @@ class Prototype:
                 'payload': payload
             })
             self._uplink(target, message, qos, retain)
-            # self.logger.debug(f'Published message of type'
-            #                   f'"{header.get("type")}" to "{target}"')
+            # self.logger.spam(f'Published message of type'
+            #                  f'"{header.get("type")}" to "{target}"')
         except TypeError as e:
             self.logger.error(f'Message could not be published (invalid header '
                               f'or payload): {e}')

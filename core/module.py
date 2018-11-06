@@ -65,8 +65,8 @@ class Module(threading.Thread):
         self._messenger.publish(target_path, message, qos, retain)
         retained = 'retained ' if retain else ''
 
-        self.logger.debug(f'Published {retained}message with QoS {qos} to '
-                          f'"{target_path}"')
+        self.logger.spam(f'Published {retained}message with QoS {qos} to '
+                         f'"{target_path}"')
 
     def retrieve(self, message: List[Dict]) -> None:
         """Callback function for the messenger. New data from the message broker

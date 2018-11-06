@@ -721,3 +721,4 @@ class SensorManager:
     @property
     def sensors(self) -> Dict[str, Sensor]:
         return self._sensors
+

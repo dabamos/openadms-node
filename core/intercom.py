@@ -145,21 +145,15 @@ class MQTTMessenger:
         # Return a valid configuration for the module or raise an exception.
         return self._config_manager.get_valid_config(self._type, 'core', *args)
 
-    def _on_connect(self,
-                    client: Type[paho.Client],
-                    userdata: Any,
-                    flags: Dict[str, int],
-                    rc: int) -> None:
-        """Callback method is called after a connection has been
-        established."""
+    def _on_connect(self, client: Type[paho.Client], userdata: Any,
+                    flags: Dict[str, int], rc: int) -> None:
+        """Callback method is called after a connection has been established."""
         self.logger.debug(f'Connected "{self._client_id}" to '
                           f'{self._host}:{self._port}')
         self._is_connected = True
         self._client.subscribe(self._topic)
 
-    def _on_disconnect(self,
-                       client: Type[paho.Client],
-                       userdata: Any,
+    def _on_disconnect(self, client: Type[paho.Client], userdata: Any,
                        rc: int) -> None:
         """Callback method is called after disconnection."""
         if rc != 0:
@@ -168,9 +162,7 @@ class MQTTMessenger:
             self.logger.info(f'Reconnecting to {self._host}:{self._port} ...')
             self.connect()
 
-    def _on_message(self,
-                    client: Type[paho.Client],
-                    userdata: Any,
+    def _on_message(self, client: Type[paho.Client], userdata: Any,
                     msg: Type[paho.MQTTMessage]) -> None:
         """Callback method for incoming messages. Converts the JSON-based
         message to its real data type and then forwards it to the downlink
