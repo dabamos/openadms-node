@@ -136,8 +136,8 @@ class Job:
 
         # Set IDs.
         obs_copy.set('id', Observation.get_new_id())
-        obs_copy.set('project', self._project_id)
-        obs_copy.set('node', self._node_id)
+        obs_copy.set('pid', self._project_id)
+        obs_copy.set('nid', self._node_id)
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
@@ -157,7 +157,7 @@ class Job:
         # Create target, header, and payload in order to send the observation.
         target = self._port_name
         header = Observation.get_header()
-        header['from'] = self._name
+        header['from'] = 'job'
         payload = obs_copy.data
 
         # Fire and forget the observation.
@@ -231,8 +231,8 @@ class Scheduler(Prototype):
                 obs.set('sensorName', self._sensor_name)
 
                 # Add project and node id.
-                obs.set('project', self._project_manager.project.id)
-                obs.set('node', self._node_manager.node.id)
+                obs.set('pid', self._project_manager.project.id)
+                obs.set('nid', self._node_manager.node.id)
 
                 # Create a new job.
                 job = Job(obs_name,

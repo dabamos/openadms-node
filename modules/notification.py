@@ -26,7 +26,6 @@ from typing import Any, Dict, List
 
 # Third-party modules.
 import arrow
-
 from mastodon import Mastodon
 
 # OpenADMS Node modules.
@@ -329,7 +328,7 @@ class Heartbeat(Prototype):
         while True:
             payload = {
                 'dt': arrow.utcnow(),
-                'project': project_id
+                'pid': project_id
             }
 
             for target in self._receivers:
@@ -988,6 +987,17 @@ class ShortMessageAgent(Prototype):
 
 
 class StatusPublisher(Prototype):
+    """
+    StatusPublisher sends retained messages to a given topic of the MQTT server.
+    The messages include project, node, and system information, current uptime,
+    loaded modules and sensors, and current timestamp.
+
+    The JSON-based configuration for this module:
+
+    Parameters:
+        topic (str): MQTT topic to publish to.
+        interval (int): Interval of status messages.
+    """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)

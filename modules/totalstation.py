@@ -177,8 +177,8 @@ class DistanceCorrector(Prototype):
             self.pressure = p
 
         # Update humidity.
-        if obs.has_response_value('humidity') and\
-           obs.has_response_type('humidity'):
+        if (obs.has_response_value('humidity') and
+            obs.has_response_type('humidity')):
             h = obs.get_response_value('humidity')
             u = obs.get_response_unit('humidity')
 
@@ -549,10 +549,10 @@ class HelmertTransformer(Prototype):
         # Y_0 = Y_s - a * y_s - o * x_s
         # X_0 = X_s - a * x_s + o * y_s
         # Z_0 = ([Z] - [z]) / n
-        self._view_point['x'] = global_centroid_x -\
-            (self._a * local_centroid_x) + (self._o * local_centroid_y)
-        self._view_point['y'] = global_centroid_y -\
-            (self._a * local_centroid_y) - (self._o * local_centroid_x)
+        self._view_point['x'] = (global_centroid_x -
+            (self._a * local_centroid_x) + (self._o * local_centroid_y))
+        self._view_point['y'] = (global_centroid_y -
+            (self._a * local_centroid_y) - (self._o * local_centroid_x))
         self._view_point['z'] = (sum_global_z - sum_local_z) / num_fixed_points
 
         self.logger.info('Calculated coordinates of view point "{}" '
@@ -579,10 +579,10 @@ class HelmertTransformer(Prototype):
             view_point_y = self._view_point.get('y')
             view_point_z = self._view_point.get('z')
 
-            wx_i = (-1 * view_point_x) - (self._a * local_x) +\
-                   (self._o * local_y) + global_x
-            wy_i = (-1 * view_point_y) - (self._a * local_y) -\
-                   (self._o * local_x) + global_y
+            wx_i = ((-1 * view_point_x) - (self._a * local_x) +
+                    (self._o * local_y) + global_x)
+            wy_i = ((-1 * view_point_y) - (self._a * local_y) -
+                    (self._o * local_x) + global_y)
 
             sum_wx += wx_i
             sum_wy += wy_i
@@ -630,9 +630,9 @@ class HelmertTransformer(Prototype):
         view_point = Obs()
         view_point.set('name', 'getViewPoint')
         view_point.set('nextReceiver', 0)
-        view_point.set('node', self._node_manager.node.id)
+        view_point.set('nid', self._node_manager.node.id)
         view_point.set('portName', obs.get('portName'))
-        view_point.set('project', self._project_manager.project.id)
+        view_point.set('pid', self._project_manager.project.id)
         view_point.set('receivers', self._view_point.get('receivers'))
         view_point.set('responseSets', response_sets)
         view_point.set('sensorName', obs.get('sensorName'))
@@ -704,6 +704,7 @@ class HelmertTransformer(Prototype):
         fixed_point = self._fixed_points.get(obs.get('target'))
 
         if self._is_ready():
+            # Calculate fixed point coordinates.
             x, y, z = self.calculate_point_coordinates(
                 hz,
                 v,
@@ -973,8 +974,7 @@ class PolarTransformer(Prototype):
             response_sets['hzAdjusted'] = Obs.create_response_set(
                 'float',
                 'rad',
-                round(hz, 16)
-            )
+                round(hz, 16))
 
         return obs
 
@@ -1123,3 +1123,4 @@ class SerialMeasurementProcessor(Prototype):
                           f'observation "{obs.get("name")}" of target '
                           f'"{obs.get("target")}"')
         return obs
+

@@ -75,12 +75,13 @@ class CloudExporter(Prototype):
 
         if self._storage == 'memory':
             self._cache_db = TinyDB(storage=MemoryStorage)
-            self.logger.info('Created in-memory cache database')
+            self.logger.verbose('Created in-memory cache database')
 
         if self._storage == 'file':
             try:
+                self.logger.verbose(f'Opening local cache database '
+                                    f'"{self._db_file}" ...')
                 self._cache_db = TinyDB(self._db_file)
-                self.logger.info(f'Opened cache database "{self._db_file}"')
             except Exception:
                 raise ValueError(f'Cache database "{self._db_file}" could not '
                                  f'be opened')
@@ -212,7 +213,8 @@ class FileExporter(Prototype):
             'none': FileRotation.NONE,
             'daily': FileRotation.DAILY,
             'monthly': FileRotation.MONTHLY,
-            'yearly': FileRotation.YEARLY}.get(config.get('fileRotation'))
+            'yearly': FileRotation.YEARLY
+        }.get(config.get('fileRotation'))
         self._date_time_format = config.get('dateTimeFormat')
         self._separator = config.get('separator')
         self._paths = config.get('paths')
@@ -252,7 +254,7 @@ class FileExporter(Prototype):
 
         for path in self._paths:
             if not Path(path).exists():
-                self.logger.error(f'Path "{path}" does not exist')
+                self.logger.critical(f'Path "{path}" does not exist')
                 continue
 
             file_path = Path(path, fn)

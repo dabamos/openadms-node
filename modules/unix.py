@@ -134,7 +134,8 @@ class GpioController(Prototype):
     def run(self) -> None:
         """Waits for new messages and sets GPIO pin to high or low."""
         while self.is_running:
-            message = self._queue.get()      # Blocking I/O.
+            # Blocking I/O.
+            message = self._queue.get()
             value = message.get('value', self._default_state)
 
             if value in [0, 1, "0", "1"]:
@@ -152,3 +153,4 @@ class GpioController(Prototype):
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
+
