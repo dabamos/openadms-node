@@ -56,17 +56,22 @@ class CouchDriver(Prototype):
         self._thread = None     # Thread doing the caching.
         self._timeout = 30.0    # Time to wait on connection error.
 
-        # Initialise local cache database.
         cache_file = config.get('cacheFile')
 
+        # Initialise local cache database.
         if not cache_file or cache_file.strip() == "":
             # Create in-memory cache database.
-            self.logger.info('Creating in-memory cache database ...')
+            self.logger.verbose('Creating in-memory cache database ...')
             self._cache_db = TinyDB(storage=MemoryStorage)
         else:
             # Create file-based cache database.
-            self.logger.info(f'Opening local cache database "{cache_file}" ...')
-            self._cache_db = TinyDB(cache_file)
+            try:
+                self.logger.verbose(f'Opening local cache database '
+                                    f'"{cache_file}" ...')
+                self._cache_db = TinyDB(cache_file)
+            except Exception:
+                raise ValueError(f'Cache database "{self._db_file}" could '
+                                 f'not be opened')
 
         # Use either HTTPS or HTTP.
         is_tls = config.get('tls', False)
@@ -118,7 +123,8 @@ class CouchDriver(Prototype):
         self._db = self._couch[self._db_name]
 
     def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
-        """"Returns a random observation data set from the local cache database.
+        """"Returns a random JSON-serialised observation data set from the
+        local cache database.
 
         Returns:
             Observation data or None if cache is empty.
@@ -203,18 +209,20 @@ class CouchDriver(Prototype):
             # Insert cached observation data into CouchDB database.
             obs_data = self._get_cached_observation_data()
 
-            if obs_data:
-                self.logger.debug(f'Trying to insert observation '
-                                  f'"{obs_data.get("name")}" of target '
-                                  f'"{obs_data.get("target")}" '
-                                  f'(doc id = {obs_data.doc_id}) into CouchDB '
-                                  f'database "{self._db_name}" ...')
+            if not obs_data:
+                continue
 
-                # Remove the inserted observation data from local cache.
-                if self._insert_observation_data(obs_data):
-                    self._remove_observation_data(obs_data.doc_id)
-                else:
-                    time.sleep(self._timeout)
+            self.logger.debug(f'Trying to insert observation '
+                              f'"{obs_data.get("name")}" of target '
+                              f'"{obs_data.get("target")}" '
+                              f'(doc id = {obs_data.doc_id}) into CouchDB '
+                              f'database "{self._db_name}" ...')
+
+            # Remove the inserted observation data from local cache.
+            if self._insert_observation_data(obs_data):
+                self._remove_observation_data(obs_data.doc_id)
+            else:
+                time.sleep(self._timeout)
 
     def start(self) -> None:
         """Starts the module."""
@@ -226,3 +234,40 @@ class CouchDriver(Prototype):
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
+
+
+class TinyDriver(Prototype):
+    """
+    TinyDriver stores observations in a TinyDB document store.
+
+    The JSON-based configuration for this module:
+
+    Parameters:
+        path (str): Path to the database file.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self.get_module_config(self._name)
+
+        self._path = config.get('path')
+
+    def process_observation(self, obs: Observation) -> Observation:
+        try:
+            self.logger.debug(f'Opening TinyDB document store '
+                              f'"{self._path}" ...')
+            db = TinyDB(self._path)
+
+            doc_id = db.insert(obs.data)
+            self.logger.verbose(f'Saved observation "{obs.get("name")}" of '
+                                f'target "{obs.get("target")}" in document '
+                                f'store "{self._path}" (doc id = {doc_id})')
+
+            db.close()
+            self.logger.debug(f'Closed TinyDB document store'
+                              f'"{self._path}" ...')
+        except Exception as e:
+            self.logger.critical(f'Could not access document store '
+                                 f'"{self._path}": {str(e)}')
+
+        return obs
