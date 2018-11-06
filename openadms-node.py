@@ -68,16 +68,16 @@ def main(config_file_path: str) -> None:
     v = System.get_openadms_version()
 
     logger = logging.getLogger('openadms')
-    logger.info(f'+---------------------------------------------+')
-    logger.info(f'|  _____             _____ ____  _____ _____  |')
-    logger.info(f'| |     |___ ___ ___|  _  |    \|     |   __| |')
-    logger.info(f'| |  |  | . | -_|   |     |  |  | | | |__   | |')
-    logger.info(f'| |_____|  _|___|_|_|__|__|____/|_|_|_|_____| |')
-    logger.info(f'|       |_|                        Node v.{v} |')
-    logger.info(f'|                                             |')
-    logger.info(f'| Copyright (c) Hochschule Neubrandenburg     |')
-    logger.info(f'| Licenced under BSD-2-Clause                 |')
-    logger.info(f'+---------------------------------------------+')
+    logger.debug(f'+-----------------------------------------------+')
+    logger.debug(f'|   _____             _____ ____  _____ _____   |')
+    logger.debug(f'|  |     |___ ___ ___|  _  |    \|     |   __|  |')
+    logger.debug(f'|  |  |  | . | -_|   |     |  |  | | | |__   |  |')
+    logger.debug(f'|  |_____|  _|___|_|_|__|__|____/|_|_|_|_____|  |')
+    logger.debug(f'|        |_|                        Node v.{v}  |')
+    logger.debug(f'|                                               |')
+    logger.debug(f'| Copyright (c) 2018, Hochschule Neubrandenburg |')
+    logger.debug(f'| Distributed under the BSD-2-Clause licence.   |')
+    logger.debug(f'+-----------------------------------------------+')
 
     # Start the monitoring.
     global monitor
@@ -186,7 +186,7 @@ def setup_logging(is_quiet: bool = False,
     verboselogs.install()
 
     # Basic logging configuration.
-    console_level = logging.DEBUG if is_debug else logging.INFO
+    console_level = logging.SPAM if is_debug else logging.INFO
     root.setLevel(console_level)
 
     fmt = '%(asctime)s - %(levelname)8s - %(name)26s - %(message)s'
