@@ -38,7 +38,7 @@ def main(t_file, c_file, o_file):
     with open(c_file) as f:
         commands = json.loads(f.read())
 
-    logger.debug('Opened commands file {}'.format(t_file))
+    logger.debug('Opened commands file {}'.format(c_file))
 
     result = { 'observations': [] }
 
