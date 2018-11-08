@@ -9,7 +9,6 @@ __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
-import coloredlogs
 import copy
 import json
 import logging.handlers
@@ -128,13 +127,9 @@ if __name__ == '__main__':
     date_fmt = '%Y-%m-%dT%H:%M:%S'
 
     formatter = logging.Formatter(fmt)
-    # Logging console handler.
-    ch = logging.StreamHandler(sys.stdout)
+    ch = logging.StreamHandler()
     ch.setLevel(level)
     ch.setFormatter(formatter)
-
-    coloredlogs.install(level=level,
-                        fmt=fmt,
-                        datefmt=date_fmt)
+    logger.addHandler(ch)
 
     main(options.t_file, options.c_file, options.o_file)
