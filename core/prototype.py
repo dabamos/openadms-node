@@ -101,11 +101,11 @@ class Prototype:
         sender = header.get('from', '?')
         action = payload.get('action')
 
-        if action is 'stop':
+        if action == 'stop':
             self._is_running = False
             self.logger.debug(f'Stopped module "{self._name}" by call from '
                               f'"{sender}"')
-        elif action is 'start':
+        elif action == 'start':
             self._is_running = True
             self.logger.debug(f'Started module "{self._name}" by call from '
                               f'"{sender}"')

@@ -1088,30 +1088,32 @@ class SerialMeasurementProcessor(Prototype):
 
     def process_observation(self, obs: Obs) -> Obs:
         # Calculate the serial measurement of an observation in two faces.
-        hz_0 = obs.get_response_value('hz0')
-        hz_1 = obs.get_response_value('hz1')
+        hz0 = obs.get_response_value('hz0')
+        hz1 = obs.get_response_value('hz1')
 
-        v_0 = obs.get_response_value('v0')
-        v_1 = obs.get_response_value('v1')
+        v0 = obs.get_response_value('v0')
+        v1 = obs.get_response_value('v1')
 
-        dist_0 = obs.get_response_value('slopeDist0')
-        dist_1 = obs.get_response_value('slopeDist1')
+        dist0 = obs.get_response_value('slopeDist0')
+        dist1 = obs.get_response_value('slopeDist1')
 
-        if None in [hz_0, hz_1, v_0, v_1, dist_0, dist_1]:
+        if None in [hz0, hz1, v0, v1, dist0, dist1]:
             return obs
 
         # Calculate new Hz, V, and slope distance.
-        hz = hz_0 + hz_1
+        hz = hz0 + hz1
 
-        if hz_0 > hz_1:
+        if hz0 > hz1:
             hz += math.pi
         else:
             hz -= math.pi
 
         hz /= 2
+        v = ((2 * math.pi) + (v0 - v1)) / 2
+        dist = 0
 
-        v = ((2 * math.pi) + (v_0 - v_1)) / 2
-        dist = (dist_0 + dist_1) / 2
+        if (dist0 != 0 and dist1 != 0):
+            dist = (dist0 + dist1) / 2
 
         # Save the calculated values.
         response_sets = obs.get('responseSets')

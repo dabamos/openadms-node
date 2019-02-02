@@ -7,11 +7,14 @@ __copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 # Build-in modules.
+import base64
 import logging
 import queue
+import shlex
 import smtplib
 import socket
 import ssl
+import subprocess
 import threading
 import time
 import uuid
@@ -290,6 +293,68 @@ class AlertMessageFormatter(Prototype):
             self._thread = threading.Thread(target=self.run)
             self._thread.daemon = True
             self._thread.start()
+
+
+class Camcorder(Prototype):
+    """
+    Camcorder captures pictures with an attached digital camera and forwards
+    them to a given MQTT topic.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        config = self._config_manager.get(self._name)
+
+        self._command = config.get('command')
+        self._interval = config.get('interval')
+        self._path = config.get('path')
+        self._topic = config.get('topic')
+
+        self._thread = None
+        self._header = { 'type': 'image' }
+
+    def _load_image(path):
+        with open(path, 'rb') as image_file:
+            encoded = base64.b64encode(image_file.read())
+            return encoded
+
+    def run(self) -> None:
+        while True:
+            process = subprocess.Popen(shlex.split(self._command),
+                                       stdout=subprocess.PIPE)
+            rc = process.poll()
+
+            if (rc != 0):
+                self.logger.error('Could not take camera image')
+                time.sleep(self._interval)
+                continue
+
+            image = self._load_image(self._path)
+
+            if (image is None):
+                self.logger.error(f'Image "{self._path}" not found')
+                time.sleep(self._interval)
+                continue
+
+            payload = {
+                'dt': arrow.utcnow(),
+                'mime': 'image/jpeg',
+                'interval': self._interval,
+                'base64': image
+            }
+
+            self.publish(self._topic, self._header, payload)
+            time.sleep(self._interval)
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
 
 class Heartbeat(Prototype):
