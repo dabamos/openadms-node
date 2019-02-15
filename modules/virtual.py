@@ -92,8 +92,8 @@ class VirtualTotalStationTM30(VirtualSensor):
             '%R1Q,5004:\\r\\n': self.get_sensor_name,
             '%R1Q,9027:(-?[0-9]*\.?[0-9]+),(-?[0-9]*\.?[0-9]+),2,1,0\\r\\n':
                 self.set_direction,
-            '%R1Q,2008: 1,1\\r\\n': self.measure_distance,
-            '%R1Q,2167: 5000,1\\r\\n': self.do_complete_measurement
+            '%R1Q,2008:1,1\\r\\n': self.measure_distance,
+            '%R1Q,2167:5000,1\\r\\n': self.do_complete_measurement
         }
 
     def do_complete_measurement(self, request: str) -> str:
