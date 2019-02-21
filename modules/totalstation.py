@@ -4,7 +4,7 @@
 systems (pre-processing, atmospheric corrections, transformations)."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import math
@@ -1119,7 +1119,7 @@ class SerialMeasurementProcessor(Prototype):
         response_sets = obs.get('responseSets')
         response_sets['hz'] = Obs.create_response_set('float', 'rad', hz)
         response_sets['v'] = Obs.create_response_set('float', 'rad', v)
-        response_sets['slopeDist'] = Obs.create_response_set('float' 'm', dist)
+        response_sets['slopeDist'] = Obs.create_response_set('float', 'm', dist)
 
         self.logger.debug(f'Calculated serial measurement with two faces for '
                           f'observation "{obs.get("name")}" of target '
