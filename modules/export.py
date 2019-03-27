@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, Union
 
 import arrow
-# import requests
+import requests
 
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
@@ -40,7 +40,7 @@ class CloudExporter(Prototype):
         user: User name for OpenADMS Server.
         password: Password for OpenADMS Server.
         authMethod: Authentication method (`basic` or `jwt`).
-        db: File name of the cache database (e.g.: `cache.json`).
+        db: File path of the cache database (e.g.: `cache.json`).
         storage: Storage type (`file` or `memory`).
 
     Example:
@@ -64,10 +64,9 @@ class CloudExporter(Prototype):
         self._user = config.get('user')
         self._password = config.get('password')
         self._auth_method = config.get('authMethod')
-        self._storage = config.get('storage')
+        self._storage = config.get('storage') or 'memory'
         self._db_file = config.get('db')
-
-        self._jwt_token = None
+        self._retry_delay = 10
         self._thread = None
 
         if self._storage not in ['file', 'memory']:
@@ -83,6 +82,7 @@ class CloudExporter(Prototype):
                                     f'"{self._db_file}" ...')
                 self._cache_db = TinyDB(self._db_file)
             except Exception:
+                self._cache_db = TinyDB(storage=MemoryStorage)
                 raise ValueError(f'Cache database "{self._db_file}" could not '
                                  f'be opened')
 
@@ -97,7 +97,7 @@ class CloudExporter(Prototype):
                           f'"{obs.get("target")}" (doc id = {doc_id})')
         return doc_id
 
-    def _get_cached_observation_data(self) -> Union[Dict[str, Any], None]:
+    def _get_cached_observation(self) -> Union[Dict[str, Any], None]:
         """"Returns a random observation data set from the cache database.
 
         Returns:
@@ -108,7 +108,7 @@ class CloudExporter(Prototype):
 
         return None
 
-    def _remove_observation_data(self, doc_id: int) -> None:
+    def _remove_observation(self, doc_id: int) -> None:
         """Removes a single observations from the cache database.
 
         Args:
@@ -118,11 +118,22 @@ class CloudExporter(Prototype):
         self.logger.debug('Removed observation from cache database '
                           '(document id = {})'.format(doc_id))
 
-    def _transfer_observation_data(self, obs_data: Dict[str, Any]) -> bool:
-        # TODO this method is a mock
-        self.logger.info(f'Transferred observation "{obs_data.get("name")}" '
-                         f'of target "{obs_data.get("target")}"')
-        return True
+    def _transfer_observation(self, obs_data: Dict[str, Any]) -> bool:
+        try:
+            r = requests.post(self._url, auth=(self._user, self._password), json=obs_data, timeout=10.0)
+
+            if r.status_code == 201:
+                self.logger.info(f'Transferred observation "{obs_data.get("name")}" '
+                                 f'of target "{obs_data.get("target")}" (status 201)')
+                return True
+            else:
+                self.logger.warning(f'Server error (status {r.status_code})')
+        except ConnectionError:
+             self.logger.warning(f'Connection to cloud server failed')
+        except ConnectionError:
+             self.logger.warning(f'Connection to cloud server timed out')
+
+        return False
 
     def has_cached_observation(self) -> bool:
         """Returns whether or not a cached observation exists in the database.
@@ -147,7 +158,7 @@ class CloudExporter(Prototype):
     def run(self) -> None:
         """Sends cached observation to RESTful service."""
         while self.is_running:
-            if not self.has_cached_observation_data():
+            if not self.has_cached_observation():
                 time.sleep(1.0)
                 continue
 
@@ -155,12 +166,12 @@ class CloudExporter(Prototype):
                 self.logger.warning('Cache stores > 500 observations')
 
             # Send cached observation data to OpenADMS Server.
-            obs_data = self._get_cached_observation_data()
-            is_transferred = self._transfer_observation_data(obs_data)
+            obs_data = self._get_cached_observation()
+            is_transferred = self._transfer_observation(obs_data)
 
             if is_transferred:
                 # Remove the transferred observation data from cache.
-                self._remove_observation_data(obs_data.doc_id)
+                self._remove_observation(obs_data.doc_id)
 
     def start(self) -> None:
         """Starts the module."""
@@ -224,10 +235,10 @@ class FileExporter(Prototype):
         """Appends data to a flat file in CSV format.
 
         Args:
-            obs: Observation object.
+            obs: `Observation` object.
 
         Returns:
-            The observation object.
+            The `Observation` object.
         """
         ts = arrow.get(obs.get('timestamp', 0))
 
@@ -311,8 +322,8 @@ class FileExporter(Prototype):
 
 class RealTimePublisher(Prototype):
     """
-    RealTimePublisher forwards incoming `Observation` objects to a list of
-    receivers.
+    RealTimePublisher forwards incoming `Observation` objects by MQTT to a list
+    of receivers.
 
     The JSON-based configuration for this module:
 

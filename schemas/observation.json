@@ -22,8 +22,8 @@
             "id": "/properties/nextReceiver",
             "type": "integer"
         },
-        "node": {
-            "id": "/properties/node",
+        "nid": {
+            "id": "/properties/nid",
             "type": "string"
         },
         "onetime": {
@@ -34,8 +34,8 @@
             "id": "/properties/portName",
             "type": "string"
         },
-        "project": {
-            "id": "/properties/project",
+        "pid": {
+            "id": "/properties/pid",
             "type": "string"
         },
         "receivers": {

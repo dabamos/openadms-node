@@ -40,8 +40,6 @@ class Job:
 
     def __init__(self,
                  name: str,
-                 project_id: str,
-                 node_id: str,
                  port_name: str,
                  obs: Observation,
                  is_enabled: bool,
@@ -50,8 +48,6 @@ class Job:
                  weekdays: Dict[str, List],
                  uplink: Callable[[str, Dict[str, Any], Dict[str, Any]], None]):
         self._name = name               # Name of the job.
-        self._project_id = project_id   # Project ID.
-        self._node_id = node_id         # Node ID.
         self._port_name = port_name     # Name of the port module.
         self._obs = obs                 # Observation object.
         self._is_enabled = is_enabled   # Job is enabled or not.
@@ -134,10 +130,8 @@ class Job:
         # observation in our observation set.
         obs_copy = copy.deepcopy(self._obs)
 
-        # Set IDs.
+        # Set the ID of the observation.
         obs_copy.set('id', Observation.get_new_id())
-        obs_copy.set('pid', self._project_id)
-        obs_copy.set('nid', self._node_id)
 
         # Insert the name of the port module or the virtual sensor at the
         # beginning of the receivers list.
@@ -236,8 +230,6 @@ class Scheduler(Prototype):
 
                 # Create a new job.
                 job = Job(obs_name,
-                          self._project_manager.project.id,
-                          self._node_manager.node.id,
                           self._port_name,
                           obs,
                           schedule.get('enabled'),
@@ -255,7 +247,7 @@ class Scheduler(Prototype):
 
         # FIXME: Wait for uplink connection.
         sleep_time = 5.0
-        self.logger.verbose('Starting jobs in {:3.1f} s'.format(sleep_time))
+        self.logger.verbose('Starting jobs in {:3.1f} s ...'.format(sleep_time))
         time.sleep(sleep_time)
 
         while self.is_running:
@@ -275,8 +267,8 @@ class Scheduler(Prototype):
             # Remove expired jobs from the jobs list.
             while zombies:
                 zombie = zombies.pop()
-                self.logger.debug(f'Deleting expired job "{zombie.name}"')
                 self._jobs.remove(zombie)
+                self.logger.debug(f'Deleted expired job "{zombie.name}"')
 
             t2 = time.time()
             dt = t2 - t1
@@ -290,7 +282,7 @@ class Scheduler(Prototype):
 
         super().start()
 
-        # Run the method run() within a thread.
+        # Run the method `run()` inside a thread.
         self._thread = threading.Thread(target=self.run)
         self._thread.daemon = True
         self._thread.start()
