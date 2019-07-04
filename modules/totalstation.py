@@ -417,7 +417,7 @@ class HelmertTransformer(Prototype):
             return obs
 
         if dist == 0:
-            self.logger.warning(f'Distance is zero in observation '
+            self.logger.warning(f'Slope distance is zero in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
@@ -1065,14 +1065,14 @@ class RefractionCorrector(Prototype):
 
         d = obs.get_response_value('slopeDist')
 
-        if not d:
+        if d is None:
             self.logger.error(f'Slope distance is missing in observation '
                               f'"{obs.get("name")}" of target '
                               f'"{obs.get("target")}"')
             return obs
 
-        if dist == 0:
-            self.logger.warning(f'Distance is zero in observation '
+        if d == 0:
+            self.logger.warning(f'Slope distance is zero in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
