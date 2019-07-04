@@ -416,6 +416,11 @@ class HelmertTransformer(Prototype):
                                 f'"{obs.get("target")}"')
             return obs
 
+        if dist == 0:
+            self.logger.warning(f'Distance is zero in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
+
         # Calculate the coordinates in the global system (X, Y, Z).
         x, y, z = self.calculate_point_coordinates(
             hz,
@@ -696,7 +701,15 @@ class HelmertTransformer(Prototype):
         dist = obs.get_response_value('slopeDist')
 
         if None in [hz, v, dist]:
+            self.logger.warning(f'Hz, V, or distance missing in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
             return
+
+        if dist == 0:
+            self.logger.warning(f'Distance is zero in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
 
         # Calculate the coordinates of the fixed point if the Helmert
         # transformation has been done already. Otherwise, use the datum from
@@ -925,7 +938,15 @@ class PolarTransformer(Prototype):
         dist = obs.get_response_value('slopeDist')
 
         if None in [hz, v, dist]:
+            self.logger.warning(f'Hz, V, or distance missing in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
             return obs
+
+        if dist == 0:
+            self.logger.warning(f'Distance is zero in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
 
         # Calculate the horizontal distance.
         dist_hz = math.sin(v) * dist
@@ -1045,7 +1066,15 @@ class RefractionCorrector(Prototype):
         d = obs.get_response_value('slopeDist')
 
         if not d:
+            self.logger.error(f'Slope distance is missing in observation '
+                              f'"{obs.get("name")}" of target '
+                              f'"{obs.get("target")}"')
             return obs
+
+        if dist == 0:
+            self.logger.warning(f'Distance is zero in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
 
         k = 0.13                    # Refraction coefficient.
         r = 6370000                 # Earth radius.
@@ -1098,6 +1127,9 @@ class SerialMeasurementProcessor(Prototype):
         dist1 = obs.get_response_value('slopeDist1')
 
         if None in [hz0, hz1, v0, v1, dist0, dist1]:
+            self.logger.warning(f'Hz, V, or distance missing in observation '
+                                f'"{obs.get("name")}" of target '
+                                f'"{obs.get("target")}"')
             return obs
 
         # Calculate new Hz, V, and slope distance.

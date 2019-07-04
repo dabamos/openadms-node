@@ -107,7 +107,7 @@ class Alerter(Prototype):
     def run(self) -> None:
         while self.is_running:
             record = self._queue.get()      # Blocking I/O.
-            self.logger.info('Processing alert message')
+            self.logger.info('Processing alert message ...')
             self.fire(record)
 
     def start(self) -> None:
@@ -168,6 +168,7 @@ class AlertMessageFormatter(Prototype):
         if self._msg_collection_enabled:
             # Cache the alert message. It will be processed by the threaded
             # `run()` method later.
+            self._logger.info(f'Appending alert message to message queue ...')
             self._queue.put(payload)
         else:
             # Process a single alert message immediately.
