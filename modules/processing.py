@@ -399,7 +399,7 @@ class ReturnCodeInspector(Prototype):
                 self.logger.info(f'Retrying observation "{obs.get("name")}" of '
                                  f'target "{obs.get("target")}" due to return '
                                  f'code {return_code} of response '
-                                 f'"{response_set}" (attempt {attempts + 1,} '
+                                 f'"{response_set}" (attempt {attempts + 1} '
                                  f'of {self._retries})')
             else:
                 obs.set('corrupted', True)

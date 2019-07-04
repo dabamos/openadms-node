@@ -74,6 +74,7 @@ class Alerter(Prototype):
     def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
         header = {
+            'from': self._name,
             'type': 'alert'
         }
 
@@ -359,45 +360,52 @@ class Camcorder(Prototype):
 
 class Heartbeat(Prototype):
     """
-    Heartbeat sends heartbeat messages ("pings") to the message broker by using
-    the message type `heartbeat`.
+    Heartbeat sends heartbeat messages (“pings”) to OpenADMS Server instances. A
+    HTTP PUT request is made to `<server>/api/v1/heartbeats/`.
 
     The JSON-based configuration for this module:
 
     Parameters:
-        interval (float): Interval for sending heartbeats.
-        receivers (List): List of topics to send heartbeats to.
+        host (string): IP address or FQDN of OpenADMS Server instance.
+        port (int): Port number of the server.
+        user (string): User name (HTTP BasicAuth).
+        password (string): Password (HTTP BasicAuth).
+        interval (float): Interval for sending heartbeats in seconds.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self._config_manager.get(self._name)
 
-        self._receivers = config.get('receivers')
+        self._host = config.get('host')
+        self._port = config.get('port') or (443 if self._host.startswith('https://') else 80)
+        self._user = config.get('user')
+        self._password = config.get('password')
         self._interval = config.get('interval')
 
+        self._url = '{}/api/v1/heartbeats/:{}'.format(self._host, self._port)
         self._thread = None
-        self._header = { 'type': 'heartbeat' }
-
-        self.add_handler('heartbeat', self.process_heartbeat)
-
-    def process_heartbeat(self,
-                          header: Dict[str, Any],
-                          payload: Dict[str, Any]) -> None:
-        self.logger.info(f'Received heartbeat at "{payload.get("dt")}" UTC '
-                         f'for project "{payload.get("project")}"')
 
     def run(self) -> None:
         project_id = self._project_manager.project.id
+        node_id = self._node_manager.node.id
 
-        while True:
-            payload = {
-                'dt': arrow.utcnow(),
-                'pid': project_id
-            }
+        while self._is_running:
+            try:
+                r = requests.put(self._url,
+                                 auth=(self._user, self._password),
+                                 data={'pid': project_id, 'nid': node_id},
+                                 timeout=10.0)
 
-            for target in self._receivers:
-                self.publish(target, self._header, payload)
+                if r.status_code == 201:
+                    self.logger.info(f'Sent heartbeat to "{self._url}"')
+                    return True
+                else:
+                    self.logger.warning(f'Server error (status {r.status_code})')
+            except ConnectionError:
+                 self.logger.warning(f'Connection to cloud server failed')
+            except ConnectionError:
+                 self.logger.warning(f'Connection to cloud server timed out') 
 
             time.sleep(self._interval)
 

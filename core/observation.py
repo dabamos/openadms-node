@@ -48,6 +48,7 @@ class Observation:
         else:
             self._data = data
             self._data.pop('description', None)     # Remove description text.
+            self._data['type'] = 'observation'      # Set or override data type.
 
     @staticmethod
     def create_response_set(type: str,
