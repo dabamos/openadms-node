@@ -29,7 +29,7 @@ from typing import Any, Dict, List
 
 # Third-party modules.
 import arrow
-import request
+import requests
 from mastodon import Mastodon
 
 # OpenADMS Node modules.
