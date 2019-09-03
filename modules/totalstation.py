@@ -417,7 +417,7 @@ class HelmertTransformer(Prototype):
             return obs
 
         if dist == 0:
-            self.logger.warning(f'Slope distance is zero in observation '
+            self.logger.warning(f'Slope distance is "0" in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
@@ -707,7 +707,7 @@ class HelmertTransformer(Prototype):
             return
 
         if dist == 0:
-            self.logger.warning(f'Distance is zero in observation '
+            self.logger.warning(f'Slope distance is "0" in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
@@ -944,7 +944,7 @@ class PolarTransformer(Prototype):
             return obs
 
         if dist == 0:
-            self.logger.warning(f'Distance is zero in observation '
+            self.logger.warning(f'Slope distance is "0" in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
@@ -993,9 +993,7 @@ class PolarTransformer(Prototype):
 
         if self._is_adjustment_enabled:
             response_sets['hzAdjusted'] = Obs.create_response_set(
-                'float',
-                'rad',
-                round(hz, 16))
+                'float', 'rad', round(hz, 16))
 
         return obs
 
@@ -1020,7 +1018,7 @@ class PolarTransformer(Prototype):
             target_point_y: Y coordinate of target point.
             hz: Horizontal direction between view point and target point.
             v: Vertical angle between view point and target point.
-            dist: Horizontal direction between view point and target point.
+            dist: Horizontal distance between view point and target point.
 
         Returns:
             X, Y, and Z coordinates of transformed target.
@@ -1072,7 +1070,7 @@ class RefractionCorrector(Prototype):
             return obs
 
         if d == 0:
-            self.logger.warning(f'Slope distance is zero in observation '
+            self.logger.warning(f'Slope distance is "0" in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
 
