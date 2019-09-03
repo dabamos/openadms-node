@@ -71,6 +71,8 @@ class Alerter(Prototype):
 
         if not self._is_enabled:
             self.logger.notice('Alerting is disabled')
+        else:
+            self.logger.notice('Alerting is enabled')
 
     def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
@@ -82,7 +84,7 @@ class Alerter(Prototype):
         # Iterate through the message agent modules.
         for module_name, module in self._modules.items():
             if not module.get('enabled'):
-                self.logger.notice(f'Skipping module "{module_name}" '
+                self.logger.notice(f'Module "{module_name}" skipped '
                                    f'(not enabled)')
                 continue
 
@@ -279,7 +281,7 @@ class AlertMessageFormatter(Prototype):
                         self.process_alert_messages(receiver, messages)
 
                 # Sleep some time.
-                self.logger.debug(f'Waiting {self._msg_collection_time} s')
+                self.logger.debug(f'Waiting {self._msg_collection_time} s ...')
                 time.sleep(self._msg_collection_time)
 
                 # Clear the messages cache.
@@ -721,10 +723,6 @@ class MailAgent(Prototype):
                 done = True
                 self.logger.info(f'E-mail has been send successfully to '
                                  f'"{mail_to}"')
-            except smtplib.ConnectionResetError:
-                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
-                                    f'(connection reset by peer)')
-                time.sleep(self._retry_delay)
             except smtplib.SMTPException:
                 self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
                                     f'(SMTP error)')
