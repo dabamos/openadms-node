@@ -245,7 +245,7 @@ class FileSystemPort(Prototype):
         obs.set('portName', self._name)
 
         requests_order = obs.get('requestsOrder', [])
-        request_sets = obs.get('requestSets')
+        #request_sets = obs.get('requestSets')
 
         if not requests_order:
             self.logger.notice(f'No requests order defined in observation '
@@ -253,33 +253,33 @@ class FileSystemPort(Prototype):
                                f'"{obs.get("target")}"')
 
         # Read files sequentially.
-        for request_name in requests_order:
-            request_set = request_sets.get(request_name)
+        # for request_name in requests_order:
+        #     request_set = request_sets.get(request_name)
 
-            if not request_set:
-                self.logger.error(f'Request set "{request_name}" not found in '
-                                  f'observation "{obs.get("name")}" of target '
-                                  f'"{obs.get("target")}"')
-                return
+        #     if not request_set:
+        #         self.logger.error(f'Request set "{request_name}" not found in '
+        #                           f'observation "{obs.get("name")}" of target '
+        #                           f'"{obs.get("target")}"')
+        #         return
 
-            # The response of the sensor.
-            response = ''
+        #     # The response of the sensor.
+        #     response = ''
 
-            # Data of the request set.
-            request = request_set.get('request')
-            sleep_time = request_set.get('sleepTime') or 0.0
+        #     # Data of the request set.
+        #     request = request_set.get('request')
+        #     sleep_time = request_set.get('sleepTime') or 0.0
 
-            # Send the request of the observation to the attached sensor.
-            self.logger.verbose(f'Sending request "{request_name}" of '
-                                f'observation "{obs.get("name")}" to sensor '
-                                f'"{obs.get("sensorName")}" ...')
+        #     # Send the request of the observation to the attached sensor.
+        #     self.logger.verbose(f'Sending request "{request_name}" of '
+        #                         f'observation "{obs.get("name")}" to sensor '
+        #                         f'"{obs.get("sensorName")}" ...')
 
-            # Add the raw response of the sensor to the observation set.
-            request_set['response'] = response
-            # Add the timestamp to the observation.
-            obs.set('timestamp', str(arrow.utcnow()))
-            # Sleep until the next request.
-            time.sleep(sleep_time)
+        #     # Add the raw response of the sensor to the observation set.
+        #     request_set['response'] = response
+        #     # Add the timestamp to the observation.
+        #     obs.set('timestamp', str(arrow.utcnow()))
+        #     # Sleep until the next request.
+        #     time.sleep(sleep_time)
 
         return obs
 
