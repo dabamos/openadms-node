@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Prototype class which can be used as a blueprint for other OpenADMS
 modules."""

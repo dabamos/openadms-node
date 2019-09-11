@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """The module class to bundle an OpenADMS Node worker with a messenger."""
 

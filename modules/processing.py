@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Module for data processing (pre-processing, atmospheric corrections,
 transformations, and so on)."""

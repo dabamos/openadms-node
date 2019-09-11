@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Module for sensor communication."""
 
@@ -219,6 +219,76 @@ class BluetoothPort(Prototype):
             data: Data to send.
         """
         self._sock.send(bytes(data, 'UTF-8'))
+
+
+class FileSystemPort(Prototype):
+    """
+    This module has nothing to configure.
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        self._config = self.get_module_config('ports', 'fs', self.name)
+        self._max_attempts = self._config.get('filePath')
+
+    def process_observation(self, obs: Observation) -> Union[Observation, None]:
+        """Processes an observation object. Open files in file system and
+        adds values to the observation.
+
+        Args:
+            obs: The observation object.
+
+        Returns:
+            The processed observation.
+        """
+        # Add the name of this serial port module to the observation.
+        obs.set('portName', self._name)
+
+        requests_order = obs.get('requestsOrder', [])
+        request_sets = obs.get('requestSets')
+
+        if not requests_order:
+            self.logger.notice(f'No requests order defined in observation '
+                               f'"{obs.get("name")}" of target '
+                               f'"{obs.get("target")}"')
+
+        # Read files sequentially.
+        for request_name in requests_order:
+            request_set = request_sets.get(request_name)
+
+            if not request_set:
+                self.logger.error(f'Request set "{request_name}" not found in '
+                                  f'observation "{obs.get("name")}" of target '
+                                  f'"{obs.get("target")}"')
+                return
+
+            # The response of the sensor.
+            response = ''
+
+            # Data of the request set.
+            request = request_set.get('request')
+            sleep_time = request_set.get('sleepTime') or 0.0
+
+            # Send the request of the observation to the attached sensor.
+            self.logger.verbose(f'Sending request "{request_name}" of '
+                                f'observation "{obs.get("name")}" to sensor '
+                                f'"{obs.get("sensorName")}" ...')
+
+            # Add the raw response of the sensor to the observation set.
+            request_set['response'] = response
+            # Add the timestamp to the observation.
+            obs.set('timestamp', str(arrow.utcnow()))
+            # Sleep until the next request.
+            time.sleep(sleep_time)
+
+        return obs
+
+    def sanitize(self, s: str) -> str:
+        """Escapes some non-printable characters in a given string."""
+        return s.replace('\n', '\\n')\
+                .replace('\r', '\\r')\
+                .replace('\t', '\\t')\
+                .strip()
 
 
 class SerialPortConfiguration:

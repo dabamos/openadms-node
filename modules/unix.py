@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Module for BSD-specific features, which are not available on other operating
 systems."""

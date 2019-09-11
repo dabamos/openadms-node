@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 __author__ = 'Philipp Engel'
 __copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'

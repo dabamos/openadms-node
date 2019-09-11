@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Various data structures, filters, formatters, and handlers for logging."""
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Module for Raspberry-Pi-specific features, which are not available on other
 systems."""

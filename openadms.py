@@ -1,9 +1,9 @@
-#!/usr/bin/env python3.7
+#!/usr/bin/env python3
 
 """OpenADMS - Open Automatic Deformation Monitoring System
 
 The Open Automatic Deformation Monitoring System (OpenADMS) is a free and
-open-source software for permanent observations, written in Python 3.7. It can
+open-source software for permanent observations, written in Python 3.6. It can
 be used to monitor buildings, terrain, and other objects with the help of
 geodetical or geotechnical sensors.
 

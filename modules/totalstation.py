@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python3
 
 """Module for the processing of observations of total station positioning
 systems (pre-processing, atmospheric corrections, transformations)."""
