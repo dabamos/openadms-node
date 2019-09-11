@@ -1,16 +1,7 @@
 #!/usr/bin/env python3.7
 
-import argparse
-import logging.handlers
 import signal
 import sys
-import time
-import traceback
-import types
-
-from pathlib import Path
-from threading import Thread
-from typing import Any
 
 from core.system import System
 from openadms import (exception_hook, get_args, main, setup_logging,
