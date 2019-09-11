@@ -22,13 +22,13 @@ used to observe objects like:
 The software is written in Python 3.6 and has been tested on:
 
 * Microsoft Windows 7 (x86, x86-64)
+* FreeBSD 12 (x86-64, ARMv7)
+* NetBSD 7 (ARMv7)
 * Debian 9, Raspbian Jessie (ARMv7)
 * Fedora 25 (x86-64)
-* FreeBSD 11 (x86-64, ARMv7)
-* NetBSD 7 (ARMv7)
 
-OpenADMS Node can either be used with [CPython 3.6+](https://www.python.org/) or
-[PyPy3.5](https://pypy.org/).
+OpenADMS Node can either be used with [CPython 3.6](https://www.python.org/)+ or
+[PyPy3.5](https://pypy.org/)+.
 
 The current development version of OpenADMS Node is 0.8 (code name “Hanoi”).
 For more information, see https://www.dabamos.de/.
@@ -37,12 +37,15 @@ For more information, see https://www.dabamos.de/.
 Either CPython 3.6+ or PyPy3.5 has to be installed. OpenADMS Node uses `pipenv`
 for dependency management and virtual environments. Make sure that `pipenv` is
 installed:
+
 ```
 $ pip3 install -U pipenv
 ```
+
 Download the [latest release](https://github.com/dabamos/openadms-node/releases)
 or clone the master branch with Git. Then, create a virtual environment with
 `pipenv`:
+
 ```
 $ git clone https://github.com/dabamos/openadms-node.git
 $ cd openadms-node/
@@ -52,14 +55,18 @@ $ pipenv sync
 
 ## Run
 Run OpenADMS Node from the command line:
+
 ```
 $ pipenv run ./openadms.py --config ./config/config.json --with-mqtt-broker --debug
 ```
+
 OpenADMS Node also features a graphical launcher. At first, run `install.bat` on
 Microsoft Windows or install the dependencies manually:
+
 ```
 $ pipenv install Gooey
 ```
+
 Execute `pipenv run ./openadms-launcher.pyw` to start the launcher.
 
 ## Message Broker
@@ -72,6 +79,7 @@ the parameter `--with-mqtt-broker`.
 OpenADMS Node must be configured by a JSON-based text file. Please define
 modules, serial ports, sensors, etc. in there. The file name of your custom
 configuration is taken as an argument. For instance, run:
+
 ```
 $ pipenv run ./openadms.py --config ./config/example.json
 ```
@@ -85,16 +93,20 @@ For a list of tested sensors, see https://dabamos.de/sensors/.
 
 ## Running Tests
 Development dependencies must be installed to run test:
+
 ```
 $ pipenv install --dev
 ```
+
 Execute the unit tests with:
 
 ```
 $ pipenv run python3 -m pytest
 ```
+
 These are work in progress. You can run passive checks with
 [pyflakes](https://pypi.python.org/pypi/pyflakes):
+
 ```
 $ pipenv run pyflakes *.py *.pyw core/*.py modules/*.py
 ```
