@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import signal
 import sys
 
@@ -12,6 +13,9 @@ CONFIG_FILE_PATH = './config/examples/virtual.json'
 
 
 if __name__ == '__main__':
+    # Change current directory.
+    os.chdir(os.path.dirname(__file__))
+
     # Add OpenADMS directory to the Python system path.
     sys.path.append(System.get_root_dir())
 

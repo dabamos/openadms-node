@@ -30,6 +30,7 @@ __license__ = 'BSD-2-Clause'
 
 import argparse
 import logging.handlers
+import os
 import signal
 import sys
 import time
@@ -314,6 +315,9 @@ def valid_path(path_str: str) -> str:
 
 
 if __name__ == '__main__':
+    # Change current directory.
+    os.chdir(os.path.dirname(__file__))
+
     # Add OpenADMS directory to the Python system path.
     sys.path.append(System.get_root_dir())
 
