@@ -1,0 +1,187 @@
+{
+    "core": {
+        "modules": {
+            "cloudExporter": "modules.export.CloudExporter",
+            "fileExporter": "modules.export.FileExporter",
+            "preProcessor": "modules.processing.PreProcessor",
+            "scheduler1": "modules.schedule.Scheduler",
+            "virtualDTM": "modules.virtual.VirtualDTM"
+        },
+        "project": {
+            "name": "Virtual Project",
+            "id": "4a2e8b9d87d849e38bb6911b9f2364ea",
+            "description": "Project for testing virtual sensors."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "6426bf58c20840768912f116740c4974",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms",
+                "tls": false
+            }
+        }
+    },
+    "sensors": {
+        "stsDTM": {
+            "description": "STS DTM meteorology sensor",
+            "type": "weatherStation",
+            "observations": [
+                {
+                    "description": "initialize the sensor.",
+                    "type": "observation",
+                    "enabled": true,
+                    "target": "init",
+                    "name": "initialize",
+                    "nextReceiver": 0,
+                    "onetime": true,
+                    "receivers": [
+                        "preProcessor"
+                    ],
+                    "requestSets": {
+                        "powerOn": {
+                            "enabled": true,
+                            "request": "A\r",
+                            "response": "",
+                            "responsePattern": "(?P<powerOn>#)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "setCommandSet": {
+                            "enabled": true,
+                            "request": "CMDT 1\r",
+                            "response": "",
+                            "responsePattern": "(?P<setCmd>\\*)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "save": {
+                            "enabled": true,
+                            "request": "SAVE\r",
+                            "response": "",
+                            "responsePattern": "(?P<save>\\*)",
+                            "responseDelimiter": "\r",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "requestsOrder": [
+                        "powerOn",
+                        "setCommandSet",
+                        "save"
+                    ],
+                    "responseSets": {
+                        "powerOn": {
+                            "type": "string",
+                            "unit": "none"
+                        },
+                        "setCmd": {
+                            "type": "string",
+                            "unit": "none"
+                        },
+                        "save": {
+                            "type": "string",
+                            "unit": "none"
+                        }
+                    },
+                    "sleepTime": 5.0
+                },
+                {
+                    "name": "getValues",
+                    "description": "gets temperature and pressure",
+                    "type": "observation",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter",
+                        "cloudExporter"
+                    ],
+                    "nextReceiver": 0,
+                    "enabled": true,
+                    "onetime": false,
+                    "target": "tp",
+                    "requestsOrder": [
+                        "getTemperature",
+                        "getPressure"
+                    ],
+                    "requestSets": {
+                        "getTemperature": {
+                            "enabled": true,
+                            "request": "TEMP ?\r",
+                            "response": "",
+                            "responseDelimiter": "\r",
+                            "responsePattern": "(?P<temperature>[+-]?\\d+\\.+\\d)",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        },
+                        "getPressure": {
+                            "enabled": true,
+                            "request": "PRES ?\r",
+                            "response": "",
+                            "responseDelimiter": "\r",
+                            "responsePattern": "(?P<pressure>[+-]?\\d+\\.+\\d)",
+                            "sleepTime": 1.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "responseSets": {
+                        "temperature": {
+                            "type": "float",
+                            "unit": "C"
+                        },
+                        "pressure": {
+                            "type": "float",
+                            "unit": "mbar"
+                        }
+                    },
+                    "sleepTime": 10.0
+                }
+            ]
+        }
+    },
+    "modules": {
+        "schedulers": {
+            "scheduler1": {
+                "port": "virtualDTM",
+                "sensor": "stsDTM",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2016-02-01",
+                        "endDate": "2030-07-30",
+                        "weekdays": {},
+                        "observations": [
+                            "initialize",
+                            "getValues"
+                        ]
+                    }
+                ]
+            }
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        },
+        "cloudExporter": {
+            "url": "https://db.dabamos.de/api/v1/observations/",
+            "user": "openadms-server",
+            "password": "bkXCNR8zwbp",
+            "authMethod": "basic",
+            "db": "cache.json",
+            "storage": "file"
+        }
+    }
+}

@@ -1581,6 +1581,7 @@
             }
         },
         "alerter": {
+            "enabled": false,
             "modules": {
                 "shortMessageFormatter": {
                     "enabled": false,
