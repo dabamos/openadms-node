@@ -124,7 +124,7 @@ class ConfigManager:
             self.logger.error(f'Configuration file "{config_path}" not found.')
             return False
 
-        with open(config_path) as config_file:
+        with open(config_path, encoding='utf-8', mode='r') as config_file:
             try:
                 self._config = json.loads(config_file.read())
                 self.logger.info(f'Loaded configuration file "{config_path}"')
@@ -571,7 +571,7 @@ class SchemaManager:
             self.logger.error(f'Schema file "{schema_path}" not found.')
             return False
 
-        with open(str(schema_path), encoding='utf-8') as data_file:
+        with open(str(schema_path), encoding='utf-8', mode='r') as data_file:
             try:
                 schema = json.loads(data_file.read())
                 jsonschema.Draft4Validator.check_schema(schema)
