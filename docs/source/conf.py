@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 # -- Project information -----------------------------------------------------
 
 project = 'OpenADMS Node'
-copyright = '2018, Hochschule Neubrandenburg – University of Applied Sciences'
+copyright = '2019, Hochschule Neubrandenburg – University of Applied Sciences'
 author = 'Hochschule Neubrandenburg – University of Applied Sciences'
 
 # The short X.Y version

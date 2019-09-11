@@ -27,6 +27,7 @@ observation was send to the modules ``com1``, ``preProcessor``, and
       "name": "getValues",
       "type": "observation",
       "description": "get sensor values (temperature, pressure)",
+      "sensorName": "stsDTM",
       "timestamp": "2017-04-05T21:48:00.805527",
       "target": "TempPress",
       "id": "6dc84c06018043ba84ac90636ed0f677",

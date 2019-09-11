@@ -44,7 +44,6 @@ This work is licenced under the `Creative Commons Attribution 3.0 Germany`_
    configuration
    system
    openadms-node-modules
-   database
 
 
 Indices and tables

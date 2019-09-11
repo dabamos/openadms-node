@@ -146,10 +146,10 @@ Nivel210 sensor requires at least four modules:
 
 The name of each module instance can be chosen freely (spaces and special
 characters are not allowed). It is recommended to write all names in lower camel
-case. As a sane practice, the scheduler and the serial port are named according
-to the used COM port (for example, ``COM1`` on Microsoft Windows and ``ttyU0``
-on Linux/Unix). All modules listed in the modules object are loaded
-automatically at run-time:
+case (i. e., ``lowerCamelCase``). As a sane practice, the scheduler and the
+serial port are named according to the used COM port (for example, ``COM1`` on
+Microsoft Windows and ``ttyU0`` on Linux/Unix). All modules listed in the
+modules object are loaded automatically at run-time:
 
 .. code:: javascript
 
