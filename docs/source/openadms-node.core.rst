@@ -22,6 +22,6 @@ Module contents
 ---------------
 
 .. automodule:: openadms-node.core
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:

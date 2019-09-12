@@ -20,7 +20,7 @@ to monitor objects like:
 OpenADMS Node is written in Python 3.6 and runs on a broad range of hardware
 platforms, like x86, x86-64, ARM, and MIPS. The software is compatible to
 desktop, industrial, embedded, and single-board computers with Microsoft Windows
-Vista/7/8/10, Linux, BSD Unix, or macOS.
+Vista/7/8/10, Linux, BSD Unix, macOS, or Android.
 
 .. _openadms_sensor_network:
 .. figure:: _static/openadms_sensor_network.png

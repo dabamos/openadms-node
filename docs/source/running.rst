@@ -51,6 +51,15 @@ The configuration will be re-read from file.
 
    Running OpenADMS on FreeBSD
 
+Android
+-------
+
+OpenADMS Node must be installed in ``qpython3/scripts3/openadms-node/``. Start
+QPython3 and select “Programs” in the main menu. Change to directors
+``openadms-node/`` and open ``android.py``. Change ``CONFIG_FILE_PATH`` to the
+path of your OpenADMS Node configuration file. Save and run the file to start
+OpenADMS Node.
+
 Command-Line Arguments
 ----------------------
 

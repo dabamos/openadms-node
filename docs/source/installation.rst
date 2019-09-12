@@ -6,7 +6,7 @@ Installation of OpenADMS Node
 The following dependencies have to be installed at first in order to run
 OpenADMS Node:
 
--  `CPython 3.6+`_ or `PyPy3.5`_,
+-  `CPython 3.6+`_ or `PyPy3.5+`_,
 -  the Python packaging tool `pipenv`_,
 -  *optional:* an MQTT message broker,
 -  *optional:* the `Git`_ version control system.
@@ -22,7 +22,7 @@ You can run OpenADMS Node by following these steps:
 
 3. Install ``pipenv`` with ``pip3 install --user pipenv``.
 
-4. In the OpenADMS Node directory, run ``pipenv lock`` and then ``pipenv sync``.
+4. Inside the OpenADMS Node directory, run ``pipenv lock`` and then ``pipenv sync``.
 
 5. Write a configuration file for OpenADMS Node (see directory
    ``config/examples/`` for examples).
@@ -66,6 +66,9 @@ macOS
     The latest version of Python is also available for download on the Python
     website.
 
+Android
+    Install `QPython3`_ from the Google Play Store.
+
 .. _python-path:
 .. figure:: _static/python_path.png
    :alt: Add Python to the ``PATH`` variable of Microsoft Windows
@@ -74,7 +77,7 @@ macOS
    Add Python to the ``PATH`` variable of Microsoft Windows
 
 Packages
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~
 
 The dependencies can be installed with the Python package manager `pipenv`_.  If
 not installed already, run:
@@ -100,6 +103,19 @@ Development packages can be installed additionally with:
 
 On Microsoft Windows, the batch file ``install.bat`` can be executed to install
 all dependencies.
+
+Android
+~~~~~~~
+
+Copy the OpenADMS Node directory to ``qpython3/scripts3/`` on you Android
+device. Start the QPython3 app and select QPYPI. Open the Pip console and enter:
+
+::
+
+   -->pip3 install -r scripts3/openadms-node/requirements.txt
+
+All dependencies are now installed. The ``uptime`` package may not be available
+on QPYPI. You can ignore any warnings.
 
 Message Broker
 --------------
@@ -303,7 +319,6 @@ To stop it, run:
 
     $ service openadms onestop
 
-
 Stand-Alone Executables for Microsoft Windows
 ---------------------------------------------
 
@@ -323,7 +338,6 @@ at first. PyInstaller can be obtained with ``pip``:
 
     > pipenv install --dev PyInstaller
 
-
 Build OpenADMS Node by running:
 
 ::
@@ -335,7 +349,6 @@ Build the graphical launcher with:
 ::
 
     > pipenv run pyinstaller --clean --windowed --noconfirm --icon="extra\dabamos.ico" --hidden-import "gooey" --hidden-import "openadms" --hidden-import "modules.database" --hidden-import "modules.export" --hidden-import "modules.notification" --hidden-import "modules.port" --hidden-import "modules.processing" --hidden-import "modules.prototype" --hidden-import "modules.schedule" --hidden-import "modules.server" --hidden-import "modules.testing" --hidden-import "modules.totalstation" --hidden-import "modules.virtual" openadms-launcher.pyw
-
 
 The binaries will be located in the sub-folder ``dist``. Copy the folders
 ``data``, ``config``, ``core``, ``modules``, ``schemes``, and ``sensors`` into
@@ -438,13 +451,13 @@ Nuitka is a Python compiler that translates Python code into a C program that
 is linked against ``libpython`` to execute it in the same way as CPython does.
 Before OpenADMS Node can be compiled, install:
 
--  Python 3.6,
+-  Python 3.6 or higher,
 -  Python 2.7 (for `SCons`_),
 -  Microsoft Visual Studio 2017 (and pywin32) or MinGW-w64,
 -  Nuitka for Python 3.6.
 
 If you prefer MinGW over Visual Studio, install it to ``C:\MinGW64`` and set the
-environment variable ``CC`` to ``C:\MinGW64\mingw64\bin\gcc.exe``.
+Windows environment variable ``CC`` to ``C:\MinGW64\mingw64\bin\gcc.exe``.
 
 Build OpenADMS Node with:
 
@@ -458,7 +471,7 @@ The compilation may take some time.
 .. _Creative Commons Attribution-ShareAlike 3.0 Germany: https://creativecommons.org/licenses/by-sa/3.0/de/
 .. _project website: https://www.dabamos.de/
 .. _CPython 3.6+: https://www.python.org/
-.. _PyPy3.5: https://pypy.org/
+.. _PyPy3.5+: https://pypy.org/
 .. _pipenv: https://pypi.org/project/pipenv/
 .. _Git: https://git-scm.com/
 .. _Python 3.6: https://www.python.org/
@@ -466,6 +479,7 @@ The compilation may take some time.
 .. _GitHub: https://github.com/dabamos/openadms-node/releases
 .. _GitHub repository: https://github.com/dabamos/openadms-node
 .. _Zip archive: https://github.com/dabamos/openadms-node/archive/master.zip
+.. _QPython3: https://play.google.com/store/apps/details?id=org.qpython.qpy3
 .. _installation notes: https://docs.python.org/3/using/windows.html
 .. _arrow: https://pypi.python.org/pypi/arrow
 .. _coloredlogs: https://pypi.python.org/pypi/coloredlogs
