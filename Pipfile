@@ -16,7 +16,6 @@ tinydb = "*"
 verboselogs = "*"
 CouchDB = "*"
 "Mastodon.py" = "*"
-pyflakes = "*"
 
 [dev-packages]
 Sphinx = "*"
