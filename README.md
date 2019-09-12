@@ -26,6 +26,7 @@ The software is written in Python 3.6 and has been tested on:
 * NetBSD 7 (ARMv7)
 * Debian 9, Raspbian Jessie (ARMv7)
 * Fedora 25 (x86-64)
+* Android 9 (ARM)
 
 OpenADMS Node can either be used with [CPython 3.6](https://www.python.org/)+ or
 [PyPy3.5](https://pypy.org/)+.
