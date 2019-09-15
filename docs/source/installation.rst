@@ -114,7 +114,7 @@ device. Start the QPython3 app and select QPYPI. Open the Pip console and enter:
 
    -->pip3 install -r scripts3/openadms-node/requirements.txt
 
-All dependencies are now installed. The ``uptime`` package may not be available
+This will install all dependencies. The ``uptime`` package may not be available
 on QPYPI. You can ignore any warnings.
 
 Message Broker
@@ -130,9 +130,10 @@ example:
 -  `HBMQTT`_,
 -  `RabbitMQ`_ (MQTT via plug-in).
 
-HBMQTT is installed as a dependency. The broker will be started by OpenADMS Node
-if the parameter ``--with-mqtt-broker`` is used. It is also possible to start
-HBMQTT manually in the command line with:
+HBMQTT is installed as a dependency automatically. The broker will be started by
+OpenADMS Node if the command-line argument ``--with-mqtt-broker`` is added. If
+the internal HBMQTT is used, a 3rd party message broker is not required. The
+HBMQTT server can be started manually from command line with:
 
 ::
 

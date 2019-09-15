@@ -105,15 +105,15 @@ the dynamically loaded modules must be placed under ``modules``.
 
 Example
 -------
-Geodetic inclinometers are not only used in industrial surveying but also in
-deformation monitoring. This tutorial explains how the OpenADMS monitoring
-system has to be configured in order to be used with a Leica Nivel210
-inclinometer. More sensors can be added easily. This setup works on all
-operating systems (Microsoft Windows, Linux, Unix).
+Geodetic and geotechnical inclinometers are not only used in industrial
+surveying but also in deformation monitoring. This example shows how the
+OpenADMS monitoring system has to be configured in order to be used with a Leica
+Nivel210 inclinometer.  More sensors can be added easily. This setup should work
+on most operating systems (Microsoft Windows, Linux, Unix).
 
-The example requires a Leica Nivel210 inclinometer with data cable and
-power supply unit, as well as a computer with an RS-232 port or USB serial
-adapter.
+The example requires a Leica Nivel210 inclinometer with serial data cable and
+power supply unit, as well as a system with a RS-232 port or a USB port with
+serial adapter.
 
 Create an empty configuration file under ``config/nivel210.json`` and copy the
 following JSON structure into it:
@@ -131,13 +131,13 @@ following JSON structure into it:
       "modules": {}
     }
 
-After that, fill the JSON objects with the actual configuration.
+Now, we can fill the JSON objects with the actual configuration.
 
 Loading the Modules
 ~~~~~~~~~~~~~~~~~~~
 Modules used for the monitoring job have to be added to the modules object in
-the ``core`` section of the configuration file. The control of a Leica
-Nivel210 sensor requires at least four modules:
+the ``core`` section of the configuration file. The control of a Leica Nivel210
+sensor requires at least four modules:
 
 - *Scheduler* for starting the observation,
 - *SerialPort* for sensor communication,
@@ -518,8 +518,7 @@ The complete configuration is listed below.
 
 Running OpenADMS
 ~~~~~~~~~~~~~~~~
-To start the monitoring, change to the OpenADMS directory and run the
-following command from the command-line:
+To start the monitoring, change to the OpenADMS directory and run:
 
 ::
 

@@ -14,7 +14,7 @@ by writing additional modules. Each module must be loaded before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`file-exporter`                | Exports observations to flat files in CSV format.      | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
-| :ref:`real-time-publisher`          | Distributes observations in real time over a network.  | 0.3 |
+| :ref:`real-time-publisher`          | Distributes observations in real time over MQTT.       | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
 | **Notification**                    |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
@@ -1986,9 +1986,9 @@ log messages.
 
 .. warning::
 
-    The web interface does not feature any kind of authentification or password
-    protection. For public Internet access it is recommended to use a reverse
-    proxy server, like Nginx or Hiawatha.
+    The web interface does not feature any kind of authentication or password
+    protection. For public Internet access it is strongly recommended to run a
+    reverse proxy server, like nginx or Hiawatha, in front of OpenADMS Node.
 
 .. _lcs:
 .. figure:: _static/localcontrolserver.png

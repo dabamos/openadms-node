@@ -16,18 +16,20 @@ as well as additional options have to be set by using command-line arguments.
 Microsoft Windows
 -----------------
 
-Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS from command-line:
+Run ``cmd.exe`` or ``PowerShell.exe`` to start OpenADMS Node from the
+command-line. Change to the OpenADMS Node directory and enter:
 
 ::
 
     > pipenv run openadms.py --config config\config.json --with-mqtt-broker
 
-Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node.
+Press ``^C`` (``CTRL`` + ``C``) to stop OpenADMS Node. If Git is installed, you
+might prefer Git Bash over the native Windows shells.
 
 Linux, Unix, and macOS
 ----------------------
 
-Run OpenADMS Node from your terminal:
+Open your terminal emulator, change to the OpenADMS Node directory, and run:
 
 ::
 
@@ -55,7 +57,7 @@ Android
 -------
 
 OpenADMS Node must be installed in ``qpython3/scripts3/openadms-node/``. Start
-QPython3 and select “Programs” in the main menu. Change to directors
+QPython3 and select “Programs” in the main menu. Change to directory
 ``openadms-node/`` and open ``android.py``. Change ``CONFIG_FILE_PATH`` to the
 path of your OpenADMS Node configuration file. Save and run the file to start
 OpenADMS Node.
