@@ -3,7 +3,7 @@
 """Structures to store observation data from sensors."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (C) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import json
@@ -13,7 +13,7 @@ from typing import Any, Dict, List, TypeVar, Union
 from uuid import uuid4
 
 # Type definition for the value inside a response set of an observation.
-# `ResponseType` can either be of type float, int, or str.
+# `ResponseType` can either be of type `float`, `int`, or `str`.
 ResponseType = TypeVar('ResponseType', float, int, str)
 ValueType = TypeVar('ValueType', float, int, str, List, Dict)
 

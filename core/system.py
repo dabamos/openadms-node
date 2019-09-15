@@ -3,20 +3,24 @@
 """Methods for getting system information."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
+import logging
 import platform
 import socket
 
 from pathlib import Path
 
 import arrow
-import uptime
 #import psutil
 
-from core.version import OPENADMS_VERSION, OPENADMS_VERSION_NAME
+try:
+    import uptime
+except ImportError:
+    logging.getLogger().warning('Importing Python module "uptime" failed')
 
+from core.version import OPENADMS_VERSION, OPENADMS_VERSION_NAME
 
 class System:
     """
@@ -191,7 +195,12 @@ class System:
         Returns:
             Uptime in seconds.
         """
-        return uptime.uptime()
+        try:
+            u = uptime.uptime()
+        except NameError:
+            u = 0.0
+
+        return u
 
 #    @staticmethod
 #    def get_used_memory():

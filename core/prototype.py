@@ -4,7 +4,7 @@
 modules."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import json

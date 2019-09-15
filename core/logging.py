@@ -3,7 +3,7 @@
 """Various data structures, filters, formatters, and handlers for logging."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2017 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import logging
@@ -19,10 +19,12 @@ class RootFilter(logging.Filter):
     """
 
     def filter(self, record: logging.LogRecord) -> bool:
-        """Returns whether a logging.LogRecord should be logged."""
+        """Returns whether a logging.LogRecord should be logged or not. Log
+        messages from selected Python modules will be discarded."""
         if record.name.startswith(('asyncio',
                                    'hbmqtt',
                                    'passlib',
+                                   'root',
                                    'urllib3',
                                    'transitions')):
             return False

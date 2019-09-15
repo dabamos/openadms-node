@@ -4,7 +4,7 @@
 systems."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import logging
@@ -16,7 +16,7 @@ import arrow
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    logging.getLogger().critical('Importing Python module "RPi.GPIO" failed')
+    logging.getLogger().warning('Importing Python module "RPi.GPIO" failed')
 
 from core.observation import Observation
 from core.manager import Manager

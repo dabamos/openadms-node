@@ -3,7 +3,7 @@
 """Connectivity modules for various NoSQL databases."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import logging
@@ -15,13 +15,13 @@ from typing import Any, Dict, Union
 try:
     import couchdb
 except ImportError:
-    logging.getLogger().critical('Importing Python module "couchdb" failed')
+    logging.getLogger().warning('Importing Python module "couchdb" failed')
 
 try:
     from tinydb import TinyDB
     from tinydb.storages import MemoryStorage
 except ImportError:
-    logging.getLogger().critical('Importing Python module "tinydb" failed')
+    logging.getLogger().warning('Importing Python module "tinydb" failed')
 
 from core.manager import Manager
 from core.observation import Observation
