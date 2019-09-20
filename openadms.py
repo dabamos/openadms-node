@@ -317,6 +317,7 @@ def valid_path(path_str: str) -> str:
 if __name__ == '__main__':
     # Change current directory.
     os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     # Add OpenADMS directory to the Python system path.
     sys.path.append(System.get_root_dir())
