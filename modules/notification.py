@@ -728,12 +728,16 @@ class MailAgent(Prototype):
                                     f'(SMTP error)')
                 time.sleep(self._retry_delay)
             except socket.gaierror:
-                self.logger.warning(f'E-mail could not be sent to "{mail_to}"'
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
                                     f'(connection error)')
                 time.sleep(self._retry_delay)
             except TimeoutError:
                 self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
                                     f'(timeout)')
+                time.sleep(self._retry_delay)
+            except OSError:
+                self.logger.warning(f'E-mail could not be sent to "{mail_to}" '
+                                    f'(no route to host)')
                 time.sleep(self._retry_delay)
 
 
