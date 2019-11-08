@@ -710,6 +710,7 @@ class HelmertTransformer(Prototype):
             self.logger.warning(f'Slope distance is "0" in observation '
                                 f'"{obs.get("name")}" of target '
                                 f'"{obs.get("target")}"')
+            return
 
         # Calculate the coordinates of the fixed point if the Helmert
         # transformation has been done already. Otherwise, use the datum from

@@ -18,7 +18,8 @@ You can run OpenADMS Node by following these steps:
 
 1. Download and install `Python 3.6`_ or higher.
 
-2. Download and unpack `OpenADMS`_.
+2. Download and unpack `OpenADMS Node`_. For the most recent version, clone the
+   master branch of the `GitHub repository`_.
 
 3. Install ``pipenv`` with ``pip3 install --user pipenv``.
 
@@ -28,15 +29,15 @@ You can run OpenADMS Node by following these steps:
    ``config/examples/`` for examples).
 
 6. Run ``pipenv run ./openadms.py --config config/config.json --with-mqtt-broker
-   --debug`` or start the graphical launcher ``pipenv run
-   ./openadms-launcher.pyw``.
+   --debug`` in the command-line or start the graphical launcher with
+   ``launcher.bat`` (Microsoft Windows) or ``launcher.sh`` (Unix-like).
 
 Source Code
 -----------
 
 The release versions of OpenADMS Node are hosted on `GitHub`_. If you like to
-download a more recent version, you can clone the master branch from the
-`GitHub repository`_ using the Git version control system:
+download the latest version, you can clone the master branch of the `GitHub
+repository`_ using the Git version control system:
 
 ::
 
@@ -49,8 +50,8 @@ Python
 ------
 
 OpenADMS Node is written in Python. A recent Python 3 interpreter is required to
-run the software. CPython 3.6 or higher and PyPy3.5 are supported.  Interpreters
-are available for all modern operating systems.
+run the software. CPython 3.6 (or higher) and PyPy3.5 (or higher) are supported.
+Interpreters are available for all modern operating systems.
 
 Microsoft Windows Vista/7/8/10
     Download the latest release from the Python website and execute the
@@ -476,7 +477,7 @@ The compilation may take some time.
 .. _pipenv: https://pypi.org/project/pipenv/
 .. _Git: https://git-scm.com/
 .. _Python 3.6: https://www.python.org/
-.. _OpenADMS: https://github.com/dabamos/openadms-node/releases
+.. _OpenADMS Node: https://github.com/dabamos/openadms-node/releases
 .. _GitHub: https://github.com/dabamos/openadms-node/releases
 .. _GitHub repository: https://github.com/dabamos/openadms-node
 .. _Zip archive: https://github.com/dabamos/openadms-node/archive/master.zip

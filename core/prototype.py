@@ -273,16 +273,13 @@ class Prototype:
                              f'"{obs.get("target")}" has been finished')
             return
 
-        # Name of the sending module.
-        sender = receivers[index - 1]
-
         # Increase the receivers index.
         next_receiver = receivers[index]
         obs.set('nextReceiver', index + 1)
 
         # Create header and payload.
         header = {
-            'from': sender,
+            'from': self._name,
             'type': 'observation'
         }
 

@@ -381,6 +381,7 @@ class ReturnCodeInspector(Prototype):
                 continue
 
             if return_code == 0:
+                # Observation was successful.
                 if obs.get('corrupted') is True:
                     obs.set('corrupted', False)
 
