@@ -11,8 +11,10 @@ import threading
 import time
 
 from enum import Enum
+from functools import reduce
 from pathlib import Path
 from typing import Any, Dict, Union
+from urllib.parse import urljoin
 
 import arrow
 import requests
@@ -36,18 +38,20 @@ class CloudExporter(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
-        url: URL of the OpenADMS Server instance.
-        user: User name for OpenADMS Server.
-        password: Password for OpenADMS Server.
-        authMethod: Authentication method (`basic` or `jwt`).
-        db: File path of the cache database (e.g.: `cache.json`).
-        storage: Storage type (`file` or `memory`).
+        server: FQDN of the OpenADMS Server instance.
+        api: The API name (`v1`).
+        user: User name for OpenADMS Server (HTTP Basic Auth).
+        password: Password for OpenADMS Server (HTTP Basic Auth).
+        authMethod: Authentication method (currently, only `basic`).
+        db: Path to the cache database file (e.g.: `cache.json`).
+        storage: Storage type (either `file` or `memory`).
 
     Example:
         The configuration may be::
 
             {
-                "url": "https://api.examples.com/",
+                "server": "https://api.examples.com/",
+                "api": "v1",
                 "user": "test",
                 "password": "secret",
                 "authMethod": "basic",
@@ -60,31 +64,36 @@ class CloudExporter(Prototype):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
-        self._url = config.get('url')
+        self._host = config.get('host')
+        self._api = config.get('api') or 'v1'
+        self._url = reduce(urljoin, [self._host, 'api/', self._api + '/', 'observations/'])
+
         self._user = config.get('user')
         self._password = config.get('password')
         self._auth_method = config.get('authMethod')
         self._storage = config.get('storage') or 'memory'
         self._db_file = config.get('db')
-        self._retry_delay = 10
+        self._retry_delay = 10.0
         self._thread = None
 
         if self._storage not in ['file', 'memory']:
-            raise ValueError('Invalid storage method')
+            raise ValueError('Invalid caching storage')
 
         if self._storage == 'memory':
+            # Create in-memory cache database.
             self._cache_db = TinyDB(storage=MemoryStorage)
             self.logger.verbose('Created in-memory cache database')
 
         if self._storage == 'file':
+            # Create file-based cache database.
             try:
                 self.logger.verbose(f'Opening local cache database '
                                     f'"{self._db_file}" ...')
                 self._cache_db = TinyDB(self._db_file)
             except Exception:
                 self._cache_db = TinyDB(storage=MemoryStorage)
-                raise ValueError(f'Cache database "{self._db_file}" could not '
-                                 f'be opened')
+                raise ValueError(f'Cache database file "{self._db_file}" could not '
+                                 f'be opened, using memory storage instead')
 
     def _cache_observation(self, obs: Observation) -> str:
         """Caches the given observation in the local cache database.
@@ -94,10 +103,10 @@ class CloudExporter(Prototype):
         """
         doc_id = self._cache_db.insert(obs.data)
         self.logger.debug(f'Cached observation "{obs.get("name")}" of target '
-                          f'"{obs.get("target")}" (doc id = {doc_id})')
+                          f'"{obs.get("target")}" (id {doc_id})')
         return doc_id
 
-    def _get_cached_observation(self) -> Union[Dict[str, Any], None]:
+    def _get_cached_observations(self) -> Union[Dict[str, Any], None]:
         """"Returns a random observation data set from the cache database.
 
         Returns:
@@ -112,26 +121,55 @@ class CloudExporter(Prototype):
         """Removes a single observations from the cache database.
 
         Args:
-            doc_id: Document id.
+            doc_id: The document id.
         """
         self._cache_db.remove(doc_ids=[doc_id])
-        self.logger.debug('Removed observation from cache database '
-                          '(document id = {})'.format(doc_id))
+        self.logger.debug('Removed observation from cache '
+                          '(id {})'.format(doc_id))
 
     def _transfer_observation(self, obs_data: Dict[str, Any]) -> bool:
-        try:
-            r = requests.post(self._url, auth=(self._user, self._password), json=obs_data, timeout=10.0)
+        """Sends an observersation to defined remote OpenADMS Server instance.
 
-            if r.status_code == 201:
-                self.logger.info(f'Transferred observation "{obs_data.get("name")}" '
-                                 f'of target "{obs_data.get("target")}" (status 201)')
-                return True
-            else:
-                self.logger.warning(f'Server error (status {r.status_code})')
-        except ConnectionError:
-             self.logger.warning(f'Connection to cloud server failed')
-        except ConnectionError:
-             self.logger.warning(f'Connection to cloud server timed out')
+        Args:
+            obs_data: The observation data dictionary.
+
+        Returns:
+            True on successful transmission, False on error.
+        """
+        self.logger.info(f'Sending observation "{obs_data.get("name")}" of '
+                         f'target "{obs_data.get("target")}" from port '
+                         f'"{obs_data.get("portName")}" to API '
+                         f'"{self._url}" ...')
+        try:
+            r = requests.post(self._url, auth=(self._user,
+                                               self._password),
+                                               json=obs_data,
+                                               timeout=10.0)
+        except requests.exceptions.ConnectionError:
+            self.logger.warning(f'Connection to API "{self._host}" failed')
+            return False
+        except requests.exceptions.HTTPError:
+            self.logger.warning(f'Invalid response from API "{self._host}"')
+            return False
+        except requests.exceptions.Timeout:
+            self.logger.warning(f'Connection to API "{self._host}" timed out')
+            return False
+        except requests.exceptions.TooManyRedirects:
+            self.logger.warning(f'Too many redirects by API "{self._host}"')
+            return False
+        except requests.exceptions.RequestException as e:
+            self.logger.warning(f'Connection to API "{self._host}" failed: {str(e)}')
+            return False
+
+        if r.status_code == 201:
+            self.logger.info(f'Successfully sent observation "{obs_data.get("name")}" '
+                             f'of target "{obs_data.get("target")}" from port '
+                             f'"{obs_data.get("portName")}" to API '
+                             f'"{self._host}" (server status 201)')
+            return True
+        else:
+            self.logger.warning(f'Sending observation to API "{self._host}" '
+                                f'failed (server error {r.status_code})')
 
         return False
 
@@ -157,21 +195,24 @@ class CloudExporter(Prototype):
 
     def run(self) -> None:
         """Sends cached observation to RESTful service."""
-        while self.is_running:
+        while self._is_running:
+            # Lazy waiting ...
             if not self.has_cached_observation():
                 time.sleep(1.0)
                 continue
 
             if len(self._cache_db) > 500:
-                self.logger.warning('Cache stores > 500 observations')
+                self.logger.warning('Cache stores more than 500 observations')
 
-            # Send cached observation data to OpenADMS Server.
-            obs_data = self._get_cached_observation()
-            is_transferred = self._transfer_observation(obs_data)
+            # Send cached observations to OpenADMS Server.
+            obs_data = self._get_cached_observations()
 
-            if is_transferred:
+            if self._transfer_observation(obs_data):
                 # Remove the transferred observation data from cache.
                 self._remove_observation(obs_data.doc_id)
+            else:
+                # On error, wait before retrying.
+                time.sleep(self._retry_delay)
 
     def start(self) -> None:
         """Starts the module."""
@@ -180,8 +221,7 @@ class CloudExporter(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
 

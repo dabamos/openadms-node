@@ -176,9 +176,10 @@
             "saveObservationId": true
         },
         "cloudExporter": {
-            "url": "https://db.dabamos.de/api/v1/observations/",
-            "user": "openadms-server",
-            "password": "bkXCNR8zwbp",
+            "server": "https://www.example.com/",
+            "api": "v1",
+            "user": "user",
+            "password": "password",
             "authMethod": "basic",
             "db": "cache.json",
             "storage": "file"

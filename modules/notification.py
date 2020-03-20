@@ -26,6 +26,7 @@ from email.utils import formatdate
 from pathlib import Path
 from string import Template
 from typing import Any, Dict, List
+from urllib.parse import urljoin
 
 # Third-party modules.
 import arrow
@@ -308,7 +309,7 @@ class Camcorder(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_module_config(self._name)
 
         self._command = config.get('command')
         self._interval = config.get('interval')
@@ -365,13 +366,12 @@ class Camcorder(Prototype):
 class Heartbeat(Prototype):
     """
     Heartbeat sends heartbeat messages (“pings”) to OpenADMS Server instances. A
-    HTTP PUT request is made to `<server>/api/v1/heartbeats/`.
+    HTTP PUT request is made to `<host>/api/v1/heartbeats/`.
 
     The JSON-based configuration for this module:
 
     Parameters:
         host (string): IP address or FQDN of OpenADMS Server instance.
-        port (int): Port number of the server.
         user (string): User name (HTTP BasicAuth).
         password (string): Password (HTTP BasicAuth).
         interval (float): Interval for sending heartbeats in seconds.
@@ -379,15 +379,15 @@ class Heartbeat(Prototype):
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
-        config = self._config_manager.get(self._name)
+        config = self.get_module_config(self._name)
 
         self._host = config.get('host')
-        self._port = config.get('port') or (443 if self._host.startswith('https://') else 80)
         self._user = config.get('user')
         self._password = config.get('password')
-        self._interval = config.get('interval')
+        self._frequency = max(3, config.get('frequency') or 60)
+        self._timeout = 10.0
 
-        self._url = '{}/api/v1/heartbeats/:{}'.format(self._host, self._port)
+        self._url = urljoin(self._host, '/api/v1/heartbeats/')
         self._thread = None
 
     def run(self) -> None:
@@ -396,22 +396,30 @@ class Heartbeat(Prototype):
 
         while self._is_running:
             try:
-                r = requests.put(self._url,
-                                 auth=(self._user, self._password),
-                                 data={'pid': project_id, 'nid': node_id},
-                                 timeout=10.0)
+                self.logger.info(f'Sending heartbeat to API "{self._url}" ...')
+                r = requests.post(self._url,
+                                  auth=(self._user, self._password),
+                                  data={'pid': project_id, 'nid': node_id, 'freq': self._frequency},
+                                  timeout=self._timeout)
+            except requests.exceptions.ConnectionError:
+                self.logger.warning(f'Connection to API "{self._host}" failed')
+            except requests.exceptions.HTTPError:
+                self.logger.warning(f'Invalid response from API "{self._host}"')
+            except requests.exceptions.Timeout:
+                self.logger.warning(f'Connection to API "{self._host}" timed out')
+            except requests.exceptions.TooManyRedirects:
+                self.logger.warning(f'Too many redirects by API "{self._host}"')
+            except requests.exceptions.RequestException as e:
+                self.logger.warning(f'Connection to API "{self._host}" failed: {str(e)}')
 
-                if r.status_code == 201:
-                    self.logger.info(f'Sent heartbeat to "{self._url}"')
-                    return True
-                else:
-                    self.logger.warning(f'Server error (status {r.status_code})')
-            except ConnectionError:
-                 self.logger.warning(f'Connection to cloud server failed')
-            except ConnectionError:
-                 self.logger.warning(f'Connection to cloud server timed out') 
+            if r.status_code == 201:
+                self.logger.info(f'Successfully sent heartbeat to API "{self._url}" '
+                                 f'(server status 201)')
+            else:
+                self.logger.warning(f'Sending heartbeat to cloud "{self._url}" failed '
+                                    f'(server error {r.status_code})')
 
-            time.sleep(self._interval)
+            time.sleep(self._frequency)
 
     def start(self) -> None:
         if self._is_running:
@@ -419,8 +427,7 @@ class Heartbeat(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
 

@@ -35,7 +35,7 @@ The current development version of OpenADMS Node is 0.8 (code name “Hanoi”).
 For more information, see https://www.dabamos.de/.
 
 ## Installation
-Either CPython 3.6+ or PyPy3.5 has to be installed. OpenADMS Node uses `pipenv`
+Either CPython 3.6+ or PyPy3.5+ has to be installed. OpenADMS Node uses `pipenv`
 for dependency management and virtual environments. Make sure that `pipenv` is
 installed:
 

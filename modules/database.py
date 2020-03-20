@@ -160,7 +160,7 @@ class CouchDriver(Prototype):
                               f'target "{obs_data.get("target")}" from port '
                               f'"{obs_data.get("portName")}" could not be '
                               f'saved in CouchDB database "{self._db_name}": '
-                              f'{e}')
+                              f'{str(e)}')
             return False
 
         return True
@@ -172,7 +172,7 @@ class CouchDriver(Prototype):
             doc_id: The document id.
         """
         self._cache_db.remove(doc_ids=[doc_id])
-        self.logger.debug(f'Removed observation from cache (doc id = {doc_id})')
+        self.logger.debug(f'Removed observation from cache (id {doc_id})')
 
     def has_cached_observation_data(self) -> bool:
         """Returns whether or not a cached observation exists in the local
@@ -188,8 +188,7 @@ class CouchDriver(Prototype):
 
         if doc_id:
             self.logger.debug(f'Cached observation "{obs.get("name")}" of '
-                              f'target "{obs.get("target")}" (doc id = '
-                              f'{doc_id})')
+                              f'target "{obs.get("target")}" (id {doc_id})')
         else:
             self.logger.error(f'Caching of observation "{obs.get("name")}" of '
                               f'target "{obs.get("target")}" failed')
@@ -218,7 +217,7 @@ class CouchDriver(Prototype):
             self.logger.debug(f'Trying to insert observation '
                               f'"{obs_data.get("name")}" of target '
                               f'"{obs_data.get("target")}" '
-                              f'(doc id = {obs_data.doc_id}) into CouchDB '
+                              f'(id {obs_data.doc_id}) into CouchDB '
                               f'database "{self._db_name}" ...')
 
             # Remove the inserted observation data from local cache.
@@ -234,8 +233,7 @@ class CouchDriver(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
 
@@ -264,7 +262,7 @@ class TinyDriver(Prototype):
             doc_id = db.insert(obs.data)
             self.logger.verbose(f'Saved observation "{obs.get("name")}" of '
                                 f'target "{obs.get("target")}" in document '
-                                f'store "{self._path}" (doc id = {doc_id})')
+                                f'store "{self._path}" (id {doc_id})')
 
             db.close()
             self.logger.debug(f'Closed TinyDB document store'

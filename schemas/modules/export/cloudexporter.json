@@ -3,7 +3,8 @@
     "type": "object",
     "$id": "modules/export/cloudexporter.json",
     "required": [
-        "url",
+        "host",
+        "api",
         "user",
         "password",
         "authMethod",
@@ -11,8 +12,12 @@
         "storage"
     ],
     "properties": {
-        "url": {
-            "$id": "/properties/url",
+        "host": {
+            "$id": "/properties/host",
+            "type": "string"
+        },
+        "api": {
+            "$id": "/properties/api",
             "type": "string"
         },
         "user": {

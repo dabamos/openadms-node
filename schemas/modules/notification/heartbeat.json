@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "id": "schemas/modules/notification/heartbeat.json",
+    "properties": {
+        "host": {
+            "id": "/properties/host",
+            "type": "string"
+        },
+        "user": {
+            "id": "/properties/user",
+            "type": "string"
+        },
+        "password": {
+            "id": "/properties/password",
+            "type": "string"
+        },
+        "frequency": {
+            "id": "/properties/frequency",
+            "type": "integer"
+        }
+    },
+    "required": [
+        "host",
+        "user",
+        "password",
+        "frequency"
+    ],
+    "type": "object"
+}

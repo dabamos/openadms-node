@@ -1,0 +1,122 @@
+{
+    "core": {
+        "modules": {
+            "ttyU0": "modules.port.SerialPort",
+            "preProcessor": "modules.processing.PreProcessor",
+            "scheduler": "modules.schedule.Scheduler",
+            "realTimePublisher": "modules.export.RealTimePublisher",
+            "fileExporter": "modules.export.FileExporter"
+        },
+        "project": {
+            "name": "Digital indicator project",
+            "id": "4a4ac656e4c543e8bffe83e40dbcd2d3",
+            "description": "Project for testing a Sylvac S_Dial ONE."
+        },
+        "node": {
+            "name": "Sensor Node 1",
+            "id": "21bcf8c16a664b17bbc9cd4221fd8541",
+            "description": "The only sensor node in this project."
+        },
+        "intercom": {
+            "mqtt": {
+                "host": "127.0.0.1",
+                "port": 1883,
+                "keepAlive": 60,
+                "topic": "openadms",
+                "tls": false
+            }
+        }
+    },
+    "sensors": {
+        "sylvac": {
+            "description": "Sylvac S_Dial ONE",
+            "type": "extensometer",
+            "observations": [
+                {
+                    "name": "getValue",
+                    "description": "Returns the current length.",
+                    "enabled": true,
+                    "nextReceiver": 0,
+                    "onetime": false,
+                    "target": "length",
+                    "receivers": [
+                        "preProcessor",
+                        "fileExporter"
+                    ],
+                    "requestSets": {
+                        "getValue": {
+                            "enabled": true,
+                            "request": "?\r",
+                            "responseDelimiter": "\r",
+                            "responsePattern": "(?P<length>\\d{3}.\\d{3})",
+                            "sleepTime": 0.0,
+                            "timeout": 1.0
+                        }
+                    },
+                    "requestsOrder": [
+                        "getValue"
+                    ],
+                    "responseSets": {
+                        "length": {
+                            "type": "float",
+                            "unit": "mm",
+                            "value": 0.0
+                        }
+                    },
+                    "sleepTime": 2.0
+                }
+            ]
+        }
+    },
+    "modules": {
+        "ports": {
+            "serial": {
+                "ttyU0": {
+                    "port": "/dev/ttyU0",
+                    "baudRate": 4800,
+                    "byteSize": 7,
+                    "stopBits": 2,
+                    "parity": "even",
+                    "timeout": 5.0,
+                    "softwareFlowControl": false,
+                    "hardwareFlowControl": false,
+                    "maxAttempts": 1
+                }
+            }
+        },
+        "schedulers": {
+            "scheduler": {
+                "port": "ttyU0",
+                "sensor": "sylvac",
+                "schedules": [
+                    {
+                        "enabled": true,
+                        "startDate": "2017-01-01",
+                        "endDate": "2030-12-31",
+                        "weekdays": {},
+                        "observations": [
+                            "getValue"
+                        ]
+                    }
+                ]
+            }
+        },
+        "realTimePublisher": {
+            "enabled": true,
+            "receivers": [
+                "onlineViewer"
+            ]
+        },
+        "fileExporter": {
+            "fileExtension": ".csv",
+            "fileName": "{{port}}_{{target}}_{{date}}",
+            "fileRotation": "monthly",
+            "paths": [
+                "./data"
+            ],
+            "separator": ",",
+            "dateTimeFormat": "YYYY-MM-DDTHH:mm:ss.SSSSS",
+            "saveObservationId": true
+        }
+    }
+}

@@ -15,12 +15,12 @@ from typing import Any, Callable, Dict, List, Type
 import paho.mqtt.client as paho
 
 try:
-    from hbmqtt.broker import Broker, BrokerException
+    from hbmqtt.broker import Broker
 except ImportError:
-    logging.getLogger().critical('Importing Python module "HBMQTT" failed')
+    logging.getLogger().warning('Importing Python module "HBMQTT" failed')
 
 
-class MQTTMessageBroker(Thread):
+class MQTTMessageBroker:
     """
     Wrapper class for the HBMQTT message broker.
     """
@@ -31,43 +31,55 @@ class MQTTMessageBroker(Thread):
             host: The host name (IP or FQDN).
             port: The port number.
         """
-        super().__init__()
-        self.daemon = True
         self.logger = logging.getLogger('mqtt')
-
+        self._broker = None
         self._config = {
             'listeners': {
                 'default': {
                     'max-connections': 50000,
-                    'bind': f'{host}:{port}',
+                    'bind': '127.0.0.1:1883',
                     'type': 'tcp',
                 },
             },
+            'plugins': [ 'auth_anonymous' ],
             'auth': {
-                'allow-anonymous': True
+                'allow-anonymous': True,
             },
-            'plugins': ['auth_anonymous'],
             'topic-check': {
-                'enabled': False
+                'enabled': True,
+                'plugins': ['topic_taboo'],
             },
         }
 
-    def run(self) -> None:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-        broker = Broker(config=self._config)
-
+    async def _broker_coroutine(self, config: Dict, loop: asyncio.AbstractEventLoop) -> None:
+        self._broker = Broker(config, loop)
         try:
-            loop.run_until_complete(broker.start())
-            self.logger.info('Starting local MQTT message broker ...')
+            await self._broker.start()
+        except asyncio.CancelledError:
+            self._broker.shutdown()
+
+    def start(self) -> None:
+        self.logger.info('Starting MQTT message broker ...')
+        loop = asyncio.new_event_loop()
+        thread = Thread(target=lambda: self.run(loop), daemon=True)
+        thread.start()
+
+    def run(self, loop: asyncio.AbstractEventLoop) -> None:
+        """Runs the HBMQTT broker asynchronously."""
+        try:
+            future = asyncio.gather(self._broker_coroutine(self._config, loop),
+                                    loop=loop,
+                                    return_exceptions=True)
+            loop.run_until_complete(future)
             loop.run_forever()
-        except BrokerException as e:
-            self.logger.critical(e)
+        except Exception as e:
+            self.logger.critical(f'MQTT message broker failed: {str(e)}')
         except KeyboardInterrupt:
-            loop.run_until_complete(broker.shutdown())
+            self.logger.info('Stopping MQTT message broker ...')
         finally:
-            loop.close()
+            self.logger.info('Stopping MQTT message broker ...')
+            loop.run_until_complete(self._broker.shutdown())
+            loop.stop()
 
 
 class MQTTMessenger:
@@ -202,7 +214,12 @@ class MQTTMessenger:
             qos: Quality of Service (0, 1, or 2).
             retain: Retained message or not.
         """
-        self._client.publish(topic, message, qos, retain)
+        result = self._client.publish(topic, message, qos, retain)
+
+        if result.rc == paho.MQTT_ERR_NO_CONN:
+            self.logger.error('Publishing message failed: no connection')
+        elif result.rc != paho.MQTT_ERR_SUCCESS:
+            self.logger.error(f'Publishing message failed: {paho.error_string(result.rc)}')
 
     def subscribe(self, topic) -> None:
         """Set the topic the client should subscribe from the message
