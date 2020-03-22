@@ -25,7 +25,7 @@ Example:
 """
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2018 Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2020 Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 import argparse
@@ -322,7 +322,7 @@ if __name__ == '__main__':
     sys.path.append(System.get_root_dir())
 
     # Set the hook for unhandled exceptions.
-    setup_thread_exception_hook()
+    # setup_thread_exception_hook()
     sys.excepthook = exception_hook
 
     # Use signal handlers to quit gracefully on SIGINT and to restart on SIGHUP.

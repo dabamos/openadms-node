@@ -74,6 +74,7 @@ class CloudExporter(Prototype):
         self._storage = config.get('storage') or 'memory'
         self._db_file = config.get('db')
         self._retry_delay = 10.0
+        self._timeout = 10.0
         self._thread = None
 
         if self._storage not in ['file', 'memory']:
@@ -136,15 +137,15 @@ class CloudExporter(Prototype):
         Returns:
             True on successful transmission, False on error.
         """
-        self.logger.info(f'Sending observation "{obs_data.get("name")}" of '
-                         f'target "{obs_data.get("target")}" from port '
-                         f'"{obs_data.get("portName")}" to API '
-                         f'"{self._url}" ...')
         try:
+            self.logger.info(f'Sending observation "{obs_data.get("name")}" of '
+                             f'target "{obs_data.get("target")}" from port '
+                             f'"{obs_data.get("portName")}" to API '
+                             f'"{self._url}" ...')
             r = requests.post(self._url, auth=(self._user,
                                                self._password),
                                                json=obs_data,
-                                               timeout=10.0)
+                                               timeout=self._timeout)
         except requests.exceptions.ConnectionError:
             self.logger.warning(f'Connection to API "{self._host}" failed')
             return False
@@ -161,11 +162,11 @@ class CloudExporter(Prototype):
             self.logger.warning(f'Connection to API "{self._host}" failed: {str(e)}')
             return False
 
-        if r.status_code == 201:
+        if (r.status_code == 200 or r.status_code == 201):
             self.logger.info(f'Successfully sent observation "{obs_data.get("name")}" '
                              f'of target "{obs_data.get("target")}" from port '
                              f'"{obs_data.get("portName")}" to API '
-                             f'"{self._host}" (server status 201)')
+                             f'"{self._host}" (server status {r.status_code})')
             return True
         else:
             self.logger.warning(f'Sending observation to API "{self._host}" '

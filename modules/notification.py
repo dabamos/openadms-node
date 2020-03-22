@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-"""Module for alerting."""
+"""Module for notifications and alerting."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2020, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
 # Build-in modules.
@@ -70,10 +70,10 @@ class Alerter(Prototype):
 
         manager.schema.add_schema('alert', 'alert.json')
 
-        if not self._is_enabled:
-            self.logger.notice('Alerting is disabled')
-        else:
+        if self._is_enabled:
             self.logger.notice('Alerting is enabled')
+        else:
+            self.logger.notice('Alerting is disabled')
 
     def fire(self, record: logging.LogRecord) -> None:
         # Set the header.
@@ -101,16 +101,16 @@ class Alerter(Prototype):
                 payload = {
                     'dt': record.asctime,
                     'level': record.levelname.lower(),
-                    'name': record.name,
+                    'module': record.name,
                     'message': record.message,
                     'receiver': receiver
                 }
-
                 self.publish(module_name, header, payload)
 
     def run(self) -> None:
         while self.is_running:
-            record = self._queue.get()      # Blocking I/O.
+            # Blocking I/O.
+            record = self._queue.get()
             self.logger.info('Processing alert message ...')
             self.fire(record)
 
@@ -296,15 +296,14 @@ class AlertMessageFormatter(Prototype):
 
         if self._msg_collection_enabled:
             # Threading for alert message caching.
-            self._thread = threading.Thread(target=self.run)
-            self._thread.daemon = True
+            self._thread = threading.Thread(target=self.run, daemon=True)
             self._thread.start()
 
 
-class Camcorder(Prototype):
+class Camera(Prototype):
     """
-    Camcorder captures pictures with an attached digital camera and forwards
-    them to a given MQTT topic.
+    Camera captures pictures using an attached digital camera or webcam and
+    forwards them to a given MQTT topic.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -358,8 +357,127 @@ class Camcorder(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
+        self._thread.start()
+
+
+class CloudAlerter(Prototype):
+    """
+    AlertMessageFormatter caches and formats alerts. They are then forwarded to
+    other modules for further processing and transmission.
+
+    Parameters:
+        messageCollectionEnabled (bool): If true, cache alert messages.
+        messageCollectionTime (float): Time to cache messages before sending.
+        properties (Dict): Additional properties to add to the message.
+        receiver (str): Name of the receiving module.
+        templates (Dict): Templates for `header`, `body`, and `footer`.
+        type (str): Type of the message to be send (`email`, `sms`, etc.).
+    """
+
+    def __init__(self, module_name: str, module_type: str, manager: Manager):
+        super().__init__(module_name, module_type, manager)
+        self._config = self.get_module_config(self._name)
+
+        # Configuration.
+        self._host = self._config.get('host')
+        self._user = self._config.get('user')
+        self._password = self._config.get('password')
+
+        self._url = urljoin(self._host, 'api/v1/logs/')
+        self._retry_delay = 10.0
+        self._timeout = 10.0
+        self._thread = None
+        self._queue = queue.Queue(1000)
+
+        # Message handler.
+        self.add_handler('alert', self.handle_alert_message)
+
+    def _transfer_log(self, log: Dict[str, Any]) -> bool:
+        """Sends a log message to a defined remote OpenADMS Server instance.
+
+        Args:
+            log: The log message dictionary.
+
+        Returns:
+            True on successful transmission, False on error.
+        """
+        project_id = self._project_manager.project.id
+        node_id = self._node_manager.node.id
+
+        try:
+            self.logger.info(f'Sending log message from module "{log.get("module")}" '
+                             f'to API "{self._url}" ...')
+            data = {
+                'pid': project_id,
+                'nid': node_id,
+                'dt': arrow.get(log.get('dt'), 'YYYY-MM-DDTHH:mm:ss').isoformat(),
+                'module': log.get('module'),
+                'level': log.get('level'),
+                'message': log.get('message')
+            }
+            r = requests.post(self._url,
+                              auth=(self._user, self._password),
+                              data=data,
+                              timeout=self._timeout)
+        except requests.exceptions.ConnectionError:
+            self.logger.warning(f'Connection to API "{self._host}" failed')
+            return False
+        except requests.exceptions.HTTPError:
+            self.logger.warning(f'Invalid response from API "{self._host}"')
+            return False
+        except requests.exceptions.Timeout:
+            self.logger.warning(f'Connection to API "{self._host}" timed out')
+            return False
+        except requests.exceptions.TooManyRedirects:
+            self.logger.warning(f'Too many redirects by API "{self._host}"')
+            return False
+        except (requests.exceptions.RequestException, Exception) as e:
+            self.logger.warning(f'Connection to API "{self._host}" failed: {str(e)}')
+            return False
+
+        if (r.status_code == 200 or r.status_code == 201):
+            self.logger.info(f'Successfully sent log message from module "{log.get("module")}" '
+                             f'to API "{self._host} (server status {r.status_code})')
+            return True
+        else:
+            self.logger.info(f'Sending log message from module "{log.get("module")}" '
+                             f'to API "{self._host} failed (server error {r.status_code})')
+
+        return False
+
+    def handle_alert_message(self,
+                             header: Dict[str, Any],
+                             payload: Dict[str, Any]) -> None:
+        """Caches messages of type `alert`.
+
+        Args:
+            header: The alert header.
+            payload: The alert payload.
+        """
+        self.logger.debug(f'Appending alert message to message queue ...')
+        self._queue.put(payload)
+
+    def run(self) -> None:
+        """Processes the cached alert messages."""
+        while self._is_running:
+            # Get a log message from the queue (blocking).
+            self.logger.spam('Waiting for log messages ...')
+            log = self._queue.get()
+
+            if (not self._transfer_log(log)):
+                self._queue.put(log)
+                self.logger.info(f'Sending log message from module "{log.get("module")} '
+                                 f'again in {self._retry_delay} seconds ...')
+                time.sleep(self._retry_delay)
+
+    def start(self) -> None:
+        if self._is_running:
+            return
+
+        super().start()
+
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
 
@@ -399,7 +517,11 @@ class Heartbeat(Prototype):
                 self.logger.info(f'Sending heartbeat to API "{self._url}" ...')
                 r = requests.post(self._url,
                                   auth=(self._user, self._password),
-                                  data={'pid': project_id, 'nid': node_id, 'freq': self._frequency},
+                                  data={
+                                      'pid': project_id,
+                                      'nid': node_id,
+                                      'freq': self._frequency
+                                  },
                                   timeout=self._timeout)
             except requests.exceptions.ConnectionError:
                 self.logger.warning(f'Connection to API "{self._host}" failed')
@@ -412,9 +534,9 @@ class Heartbeat(Prototype):
             except requests.exceptions.RequestException as e:
                 self.logger.warning(f'Connection to API "{self._host}" failed: {str(e)}')
 
-            if r.status_code == 201:
+            if (r.status_code == 200 or r.status_code == 201):
                 self.logger.info(f'Successfully sent heartbeat to API "{self._url}" '
-                                 f'(server status 201)')
+                                 f'(server status {r.status_code})')
             else:
                 self.logger.warning(f'Sending heartbeat to cloud "{self._url}" failed '
                                     f'(server error {r.status_code})')
@@ -609,8 +731,7 @@ class IrcAgent(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
 
 
@@ -1073,8 +1194,8 @@ class ShortMessageAgent(Prototype):
 class StatusPublisher(Prototype):
     """
     StatusPublisher sends retained messages to a given topic of the MQTT server.
-    The messages include project, node, and system information, current uptime,
-    loaded modules and sensors, and current timestamp.
+    The messages include project, node, and system information, as well as
+    current uptime, loaded modules and sensors, and current timestamp.
 
     The JSON-based configuration for this module:
 
@@ -1163,6 +1284,5 @@ class StatusPublisher(Prototype):
 
         super().start()
 
-        self._thread = threading.Thread(target=self.run)
-        self._thread.daemon = True
+        self._thread = threading.Thread(target=self.run, daemon=True)
         self._thread.start()
