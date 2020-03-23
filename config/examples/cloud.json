@@ -1,11 +1,15 @@
 {
     "core": {
         "modules": {
+            "alerter": "modules.notification.Alerter",
+            "cloudAgent": "modules.notification.CloudAgent",
             "cloudExporter": "modules.export.CloudExporter",
             "fileExporter": "modules.export.FileExporter",
+            "heartbeat": "modules.notification.Heartbeat",
             "preProcessor": "modules.processing.PreProcessor",
             "scheduler1": "modules.schedule.Scheduler",
-            "virtualDTM": "modules.virtual.VirtualDTM"
+            "virtualDTM": "modules.virtual.VirtualDTM",
+            "errorGenerator": "modules.testing.ErrorGenerator"
         },
         "project": {
             "name": "Virtual Project",
@@ -14,7 +18,7 @@
         },
         "node": {
             "name": "Sensor Node 1",
-            "id": "6426bf58c20840768912f116740c4974",
+            "id": "21bcf8c16a664b17bbc9cd4221fd8541",
             "description": "The only sensor node in this project."
         },
         "intercom": {
@@ -99,8 +103,8 @@
                     "type": "observation",
                     "receivers": [
                         "preProcessor",
-                        "fileExporter",
-                        "cloudExporter"
+                        "cloudExporter",
+                        "fileExporter"
                     ],
                     "nextReceiver": 0,
                     "enabled": true,
@@ -146,6 +150,36 @@
         }
     },
     "modules": {
+        "alerter": {
+            "enabled": true,
+            "modules": {
+                "cloudAgent": {
+                    "enabled": true,
+                    "receivers": {
+                        "warning": ["default"],
+                        "error": ["default"],
+                        "critical": ["default"]
+                    }
+                }
+            }
+        },
+        "cloudAgent": {
+            "host": "https://api.example.com/",
+            "user": "username",
+            "password": "password"
+        },
+        "errorGenerator": {
+            "warning": true,
+            "error": true,
+            "critical": true,
+            "interval": 10
+        },
+        "heartbeat": {
+            "host": "https://api.example.com/",
+            "user": "username",
+            "password": "password",
+            "frequency": 300
+        },
         "schedulers": {
             "scheduler1": {
                 "port": "virtualDTM",
@@ -176,13 +210,11 @@
             "saveObservationId": true
         },
         "cloudExporter": {
-            "server": "https://www.example.com/",
-            "api": "v1",
-            "user": "user",
+            "host": "https://api.example.com/",
+            "user": "username",
             "password": "password",
-            "authMethod": "basic",
             "db": "cache.json",
-            "storage": "file"
+            "cache": "file"
         }
     }
 }

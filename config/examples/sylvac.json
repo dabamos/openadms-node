@@ -103,7 +103,7 @@
         },
         "realTimePublisher": {
             "enabled": true,
-            "receivers": [
+            "topics": [
                 "onlineViewer"
             ]
         },

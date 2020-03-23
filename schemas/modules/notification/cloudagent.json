@@ -1,0 +1,24 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "id": "schemas/modules/notification/cloudagent.json",
+    "properties": {
+        "host": {
+            "id": "/properties/host",
+            "type": "string"
+        },
+        "user": {
+            "id": "/properties/user",
+            "type": "string"
+        },
+        "password": {
+            "id": "/properties/password",
+            "type": "string"
+        }
+    },
+    "required": [
+        "host",
+        "user",
+        "password"
+    ],
+    "type": "object"
+}

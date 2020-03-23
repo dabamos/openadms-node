@@ -6,10 +6,10 @@
             "id": "/properties/enabled",
             "type": "boolean"
         },
-        "receivers": {
-            "id": "/properties/receivers",
+        "topics": {
+            "id": "/properties/topics",
             "items": {
-                "id": "/properties/receivers/items",
+                "id": "/properties/topics/items",
                 "type": "string"
             },
             "minItems": 1,
@@ -19,7 +19,7 @@
     },
     "required": [
         "enabled",
-        "receivers"
+        "topics"
     ],
     "type": "object"
 }

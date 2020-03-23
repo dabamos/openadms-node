@@ -1638,12 +1638,6 @@
             "host": "10.59.0.40",
             "port": 1432
         },
-        "heartbeat": {
-            "receivers": [
-                "heartbeat"
-            ],
-            "interval": 10
-        },
         "mailAgent": {
             "defaultSubject": "[OpenADMS] Message",
             "charset": "utf-8",
@@ -1734,7 +1728,7 @@
         },
         "realTimePublisher": {
             "enabled": true,
-            "receivers": [
+            "topics": [
                 "onlineViewer"
             ]
         },

@@ -39,24 +39,20 @@ class CloudExporter(Prototype):
 
     Parameters:
         server: FQDN of the OpenADMS Server instance.
-        api: The API name (`v1`).
         user: User name for OpenADMS Server (HTTP Basic Auth).
         password: Password for OpenADMS Server (HTTP Basic Auth).
-        authMethod: Authentication method (currently, only `basic`).
         db: Path to the cache database file (e.g.: `cache.json`).
-        storage: Storage type (either `file` or `memory`).
+        cache: Caching type (either `file` or `memory`).
 
     Example:
         The configuration may be::
 
             {
                 "server": "https://api.examples.com/",
-                "api": "v1",
                 "user": "test",
                 "password": "secret",
-                "authMethod": "basic",
                 "db": "cache.json",
-                "storage": "file"
+                "cache": "file"
             }
     """
 
@@ -65,27 +61,25 @@ class CloudExporter(Prototype):
         config = self.get_module_config(self._name)
 
         self._host = config.get('host')
-        self._api = config.get('api') or 'v1'
-        self._url = reduce(urljoin, [self._host, 'api/', self._api + '/', 'observations/'])
+        self._url = reduce(urljoin, [self._host, 'api/v1/', 'observations/'])
 
         self._user = config.get('user')
         self._password = config.get('password')
-        self._auth_method = config.get('authMethod')
-        self._storage = config.get('storage') or 'memory'
+        self._cache = config.get('cache') or 'memory'
         self._db_file = config.get('db')
         self._retry_delay = 10.0
         self._timeout = 10.0
         self._thread = None
 
-        if self._storage not in ['file', 'memory']:
-            raise ValueError('Invalid caching storage')
+        if self._cache not in ['file', 'memory']:
+            raise ValueError('Invalid cache type')
 
-        if self._storage == 'memory':
+        if self._cache == 'memory':
             # Create in-memory cache database.
             self._cache_db = TinyDB(storage=MemoryStorage)
             self.logger.verbose('Created in-memory cache database')
 
-        if self._storage == 'file':
+        if self._cache == 'file':
             # Create file-based cache database.
             try:
                 self.logger.verbose(f'Opening local cache database '
@@ -368,26 +362,35 @@ class RealTimePublisher(Prototype):
 
     The JSON-based configuration for this module:
 
+    {
+      "realTimePublisher": {
+        "enabled": true,
+        "topics": [
+          "onlineViewer"
+        ]
+      }
+    }
+
     Parameters:
-        receivers (List): List of modules to send the observation to.
         enabled (bool): Turns processing of observations on or off.
+        topics (List): List of topics to send the observations to.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
         super().__init__(module_name, module_type, manager)
         config = self.get_module_config(self._name)
 
-        self._receivers = config.get('receivers')
+        self._topics = config.get('topics')
         self._is_enabled = config.get('enabled')
 
     def process_observation(self, obs: Observation) -> Observation:
         if not self._is_enabled:
             return obs
 
-        for receiver in self._receivers:
+        for topic in self._topics:
             obs_copy = copy.deepcopy(obs)
 
-            target = f'{receiver}/{obs_copy.get("target")}'
+            target = f'{topic}/{obs_copy.get("target")}'
 
             obs_copy.set('nextReceiver', 0)
             obs_copy.set('receivers', [target])

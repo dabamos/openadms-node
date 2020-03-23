@@ -2,22 +2,9 @@
     "$schema": "http://json-schema.org/draft-06/schema#",
     "type": "object",
     "$id": "modules/export/cloudexporter.json",
-    "required": [
-        "host",
-        "api",
-        "user",
-        "password",
-        "authMethod",
-        "db",
-        "storage"
-    ],
     "properties": {
         "host": {
             "$id": "/properties/host",
-            "type": "string"
-        },
-        "api": {
-            "$id": "/properties/api",
             "type": "string"
         },
         "user": {
@@ -28,17 +15,20 @@
             "$id": "/properties/password",
             "type": "string"
         },
-        "authMethod": {
-            "$id": "/properties/authMethod",
-            "type": "string"
-        },
         "db": {
             "$id": "/properties/db",
             "type": "string"
         },
-        "storage": {
-            "$id": "/properties/storage",
+        "cache": {
+            "$id": "/properties/cache",
             "type": "string"
         }
-    }
+    },
+    "required": [
+        "host",
+        "user",
+        "password",
+        "db",
+        "cache"
+    ]
 }

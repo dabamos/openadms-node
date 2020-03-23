@@ -12,6 +12,8 @@ by writing additional modules. Each module must be loaded before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 | **Export**                          |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
+| :ref:`cloud-exporter`               | Exports observations to an OpenADMS Server instance.   | 0.8 |
++-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`file-exporter`                | Exports observations to flat files in CSV format.      | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`real-time-publisher`          | Distributes observations in real time over MQTT.       | 0.3 |
@@ -22,7 +24,9 @@ by writing additional modules. Each module must be loaded before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`alert-message-formatter`      | Formats alert messages (e-mail, SMS, IRC, etc.).       | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
-| :ref:`heartbeat`                    | Broadcasts heartbeat messages.                         | 0.3 |
+| :ref:`cloud-agent`                  | Sends messages to an OpenADMS Server instance.         | 0.8 |
++-------------------------------------+--------------------------------------------------------+-----+
+| :ref:`heartbeat`                    | Sends heartbeats to an OpenADMS Server instance.       | 0.8 |
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`irc-agent`                    | Sends messages to an Internet Relay Chat network.      | 0.6 |
 +-------------------------------------+--------------------------------------------------------+-----+
@@ -32,7 +36,7 @@ by writing additional modules. Each module must be loaded before it can be used.
 +-------------------------------------+--------------------------------------------------------+-----+
 | :ref:`rss-agent`                    | Exports alert messages as RSS feed.                    | 0.6 |
 +-------------------------------------+--------------------------------------------------------+-----+
-| :ref:`short-message-agent`          | Sends short messages to an TCP/IP-based SMS server.    | 0.3 |
+| :ref:`short-message-agent`          | Sends short messages to an TCP/IP-based SMS gateway.   | 0.3 |
 +-------------------------------------+--------------------------------------------------------+-----+
 | **Port**                            |                                                        |     |
 +-------------------------------------+--------------------------------------------------------+-----+
@@ -136,10 +140,10 @@ CouchDriver
 CouchDriver is a connectivity module for `Apache CouchDB`_ 1/2 (see
 :numref:`couchdb`). It is used to store observation data sets (timeseries) in a
 CouchDB database defined in the module’s configuration. Observations are cached
-before inserting them into the database. On connection error, the cached
-observations will be send until the server has stored them successfully. If a
-file-based cache database is used, observation are persistent between restarts
-of OpenADMS Node.
+before inserting them into the database. On connection error, the transmission
+will be repeated until the server has stored them successfully. If a file-based
+cache database is used, observation are persistent between restarts of OpenADMS
+Node.
 
 .. _couchdb:
 .. figure:: _static/couchdb.png
@@ -209,6 +213,58 @@ Export
 
 Modules in the *Export* package store observation data locally or forward it to
 external receivers.
+
+.. _cloud-exporter:
+
+CloudExporter
+~~~~~~~~~~~~
+
+The CloudExporter module sends observations to local or remote OpenADMS Server
+instances. Make sure to add the name of the CloudExporter module to the
+``receivers`` list of the observations that should be transmitted to the
+server.
+
+Loading the Module
+^^^^^^^^^^^^^^^^^^
+
+Add the CloudExporter to the ``modules`` section of the core configuration:
+
+.. code:: javascript
+
+    {
+      "modules": {
+        "cloudExporter": "modules.export.CloudExporter"
+      }
+    }
+
+Configuration
+^^^^^^^^^^^^^
+
+.. code:: javascript
+
+    {
+      "cloudExporter": {
+        "host": "https://api.example.com/",
+        "user": "<username>",
+        "password": "<password>",
+        "cache": "file",
+        "db": "cache.json"
+      }
+    }
+
++-----------------------+-------------+-------------------------------------------------+
+| Name                  | Data Type   | Description                                     |
++=======================+=============+=================================================+
+| ``host``              | String      | OpenADMS Server URL or IP address.              |
++-----------------------+-------------+-------------------------------------------------+
+| ``user``              | String      | OpenADMS Sever user name.                       |
++-----------------------+-------------+-------------------------------------------------+
+| ``password``          | String      | OpenADMS Sever password.                        |
++-----------------------+-------------+-------------------------------------------------+
+| ``cache``             | String      | Cache type (either ``file`` or ``memory``).     |
++-----------------------+-------------+-------------------------------------------------+
+| ``db``                | String      | File name of the cache database (if ``file``).  |
++-----------------------+-------------+-------------------------------------------------+
 
 .. _file-exporter:
 
@@ -312,13 +368,12 @@ Configuration
 RealTimePublisher
 ~~~~~~~~~~~~~~~~~
 
-The RealTimePublisher module pushes an observation to a list of receivers. The
-receivers can be any third party application connected to the MQTT server.
+The RealTimePublisher module pushes an observation to a list of MQTT topics.
+The receivers can be any third party application connected to the MQTT server.
 
-For each receiver defined in the configuration an MQTT topic will be created.
-The topic name is set to the target name of an observation.  For example, an
-observation with target name “bridge1” and a receiver “onlineViewer” will be
-published to the MQTT topic ``onlineViewer/bridge1``.
+Observation are published under their target name. For example, observations
+with target “bridge1” and a topic “onlineViewer” will be published to the MQTT
+topic ``onlineViewer/bridge1``.
 
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
@@ -341,7 +396,7 @@ Configuration
     {
       "realTimePublisher": {
         "enabled": true,
-        "receivers": [
+        "topics": [
           "onlineViewer"
         ]
       }
@@ -362,6 +417,8 @@ to MailAgent, ShortMessageAgent, RssAgent, IrcAgent, or MastodonAgent modules,
 where they are send to their defined receivers.
 
 The sequences could be:
+
+-  Alerter → CloudAgent
 
 -  Alerter → AlertMessageFormatter → MailAgent
 
@@ -401,7 +458,7 @@ the type ``alert``. Example:
       {
         "dt": "2017-09-12 21:40:57",
         "level": "error",
-        "name": "serialPort",
+        "module": "serialPort",
         "message": "Observation 'getP09' of 'P09': No target detected",
         "receiver": "engineer@example.com"
       }
@@ -414,7 +471,7 @@ the type ``alert``. Example:
 +--------------+-------------+---------------------------------------------------------+
 | ``level``    | String      | Alert level (``warning``, ``error``, or ``critical``).  |
 +--------------+-------------+---------------------------------------------------------+
-| ``name``     | String      | Name of the module which sent the message.              |
+| ``module``   | String      | Name of the module which sent the message.              |
 +--------------+-------------+---------------------------------------------------------+
 | ``message``  | String      | Message text.                                           |
 +--------------+-------------+---------------------------------------------------------+
@@ -431,27 +488,26 @@ Configuration
       "alerter": {
         "enabled": true,
         "modules": {
+          "cloudAgent": {
+            "enabled": true,
+            "receivers": {
+              "critical": [ "default" ],
+              "error": [ "default" ],
+              "warning": [ "default" ]
+            }
+          },
           "shortMessageFormatter": {
             "enabled": true,
             "receivers": {
-              "error": [
-                "+49152 12345678"
-              ],
-              "critical": [
-                "+49178 110010101"
-              ]
+              "error": [ "+49152 12345678" ],
+              "critical": [ "+49178 110010101" ]
             }
           },
           "mailFormatter": {
             "enabled": true,
             "receivers": {
-              "warning": [
-                "warnings@example.com"
-              ],
-              "error": [
-                "engineer@example.com",
-                "customer@example.com"
-              ]
+              "warning": [ "warnings@example.com" ],
+              "error": [ "engineer@example.com", "customer@example.com" ]
             }
           }
         }
@@ -461,7 +517,7 @@ Configuration
 +---------------+-------------+---------------------------------------------------------+
 | Name          | Data Type   | Description                                             |
 +===============+=============+=========================================================+
-| ``module``    | Object      | Modules to process alert messages.                      |
+| ``modules``   | Object      | Modules to process alert messages.                      |
 +---------------+-------------+---------------------------------------------------------+
 | ``enabled``   | Boolean     | Turns forwarding to module on/off.                      |
 +---------------+-------------+---------------------------------------------------------+
@@ -596,14 +652,89 @@ The templates ``header``, ``body``, and ``footer`` are parsed for placeholders:
 | ``{{project}}``         | Name of the project.                                    |
 +-------------------------+---------------------------------------------------------+
 
+.. _cloud-agent:
+
+CloudAgent
+~~~~~~~~~~~~
+
+The CloudAgent module sends log messages to local or remote OpenADMS Server
+instances.
+
+Loading the Module
+^^^^^^^^^^^^^^^^^^
+
+Add the CloudAgent to the ``modules`` section of the core configuration:
+
+.. code:: javascript
+
+    {
+      "modules": {
+        "cloudAgent": "modules.notification.CloudAgent"
+      }
+    }
+
+Configuration
+^^^^^^^^^^^^^
+
+Add the connection details of the OpenADMS Server you want to access to the
+configuration:
+
+.. code:: javascript
+
+    {
+      "cloudAgent": {
+        "host": "https://api.example.com/",
+        "user": "<username>",
+        "password": "<password>"
+      }
+    }
+
++------------------------------+-------------+----------------------------------------------+
+| Name                         | Data Type   | Description                                  |
++==============================+=============+==============================================+
+| ``host``                     | String      | OpenADMS Server URL or IP address.           |
++------------------------------+-------------+----------------------------------------------+
+| ``user``                     | String      | OpenADMS Server user name.                   |
++------------------------------+-------------+----------------------------------------------+
+| ``password``                 | String      | OpenADMS Server password.                    |
++------------------------------+-------------+----------------------------------------------+
+
+Connect the :ref:`alerter` module with the CloudAgent:
+
+.. code:: javascript
+
+    {
+      "alerter": {
+        "enabled": true,
+        "modules": {
+          "cloudAgent": {
+            "enabled": true,
+            "receivers": {
+              "warning": ["default"],
+              "error": ["default"],
+              "critical": ["default"]
+            }
+          }
+        }
+      },
+      "cloudAgent": {
+        "host": "https://api.example.com/",
+        "user": "<username>",
+        "password": "<password>"
+      }
+    }
+
+It is necessary to add dummy receivers (e. g., ``default``) to the Alerter
+module.
+
 .. _heartbeat:
 
 Heartbeat
 ~~~~~~~~~
 
 The Heartbeat sends signals periodically in a defined interval to a list of
-receivers. The module is used to inform the receivers that the OpenADMS instance
-is still alive (see `Wikipedia`_).
+receivers. The module is used to inform the receivers that the OpenADMS Node
+instance is still alive (see `Wikipedia`_).
 
 Loading the Module
 ^^^^^^^^^^^^^^^^^^
@@ -625,17 +756,23 @@ Configuration
 
     {
       "heartbeat": {
-        "receivers": ["heartbeat"],
-        "interval": 10
+        "host": "https://api.example.com/",
+        "user": "<username>",
+        "password" : "<password>",
+        "frequency": 300
       }
     }
 
 +------------------+-------------+------------------------------------------------------+
 | Name             | Data Type   | Description                                          |
 +==================+=============+======================================================+
-| ``receivers``    | Array       | List of receivers (topics).                          |
+| ``host``         | String      | OpenADMS Server URL or IP address.                   |
 +------------------+-------------+------------------------------------------------------+
-| ``interval``     | Integer     | Message sending interval in seconds.                 |
+| ``user``         | String      | OpenADMS Server user name.                           |
++------------------+-------------+------------------------------------------------------+
+| ``password``     | String      | OpenADMS Server password.                            |
++------------------+-------------+------------------------------------------------------+
+| ``frequency``    | Integer     | Heartbeat frequency in seconds.                      |
 +------------------+-------------+------------------------------------------------------+
 
 .. _irc-agent:
@@ -2662,7 +2799,7 @@ Configuration
 +-------------------+-------------+---------------------------------------------------+
 | Name              | Data Type   | Description                                       |
 +===================+=============+===================================================+
-| ``defaultStarte`` | Integer     | Default state of the pin (either ``0`` or ``1``). |
+| ``defaultState``  | Integer     | Default state of the pin (either ``0`` or ``1``). |
 +-------------------+-------------+---------------------------------------------------+
 | ``duration``      | Float       | Duration of the state change.                     |
 +-------------------+-------------+---------------------------------------------------+

@@ -15,6 +15,7 @@ Submodules
 .. toctree::
 
    openadms-node.android
+   openadms-node.mqtt
    openadms-node.openadms
 
 Module contents

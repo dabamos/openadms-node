@@ -47,7 +47,7 @@ class Alerter(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
-        is_enabled (bool): If true, alerter is enabled.
+        enabled (bool): If true, alerter is enabled.
         modules (Dict): Modules to send alert messages to.
     """
 
@@ -361,18 +361,14 @@ class Camera(Prototype):
         self._thread.start()
 
 
-class CloudAlerter(Prototype):
+class CloudAgent(Prototype):
     """
-    AlertMessageFormatter caches and formats alerts. They are then forwarded to
-    other modules for further processing and transmission.
+    Sends logs messages to OpenADMS Server instances.
 
     Parameters:
-        messageCollectionEnabled (bool): If true, cache alert messages.
-        messageCollectionTime (float): Time to cache messages before sending.
-        properties (Dict): Additional properties to add to the message.
-        receiver (str): Name of the receiving module.
-        templates (Dict): Templates for `header`, `body`, and `footer`.
-        type (str): Type of the message to be send (`email`, `sms`, etc.).
+        host (str): URL or IP address of OpenADMS Sever instance.
+        user (str): OpenADMS Server user name.
+        password (str): OpenADMS Server password.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -489,10 +485,10 @@ class Heartbeat(Prototype):
     The JSON-based configuration for this module:
 
     Parameters:
-        host (string): IP address or FQDN of OpenADMS Server instance.
-        user (string): User name (HTTP BasicAuth).
-        password (string): Password (HTTP BasicAuth).
-        interval (float): Interval for sending heartbeats in seconds.
+        host (str): IP address or FQDN of OpenADMS Server instance.
+        user (str): User name (HTTP BasicAuth).
+        password (str): Password (HTTP BasicAuth).
+        frequency (int): Heartbeat frequency in seconds.
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
@@ -565,7 +561,7 @@ class IrcAgent(Prototype):
         channel (str): IRC channel to join (e.g.: ``#test``).
         host (str): FQDN or IP address of IRC server.
         port (int): Port number of IRC server.
-        is_tls (bool): If true, use TLS encryption.
+        tls (bool): If true, use TLS encryption.
         nickname (str): Nickname to use (default: ``openadms``).
         password (str): Password of registered nickname (optional).
         target (str): IRC channel or user to send messages to.
