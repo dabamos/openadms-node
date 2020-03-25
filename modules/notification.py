@@ -60,11 +60,12 @@ class Alerter(Prototype):
         self._thread = None
         self._queue = queue.Queue(1000)
 
-        # Add logging handler to the root logger. Only capture WARNING, ERROR,
-        # and CRITICAL.
+        # Add logging handler to the root logger. Only capture the levels
+        # WARNING, ERROR, CRITICAL, and higher.
         qh = logging.handlers.QueueHandler(self._queue)
         qh.addFilter(RootFilter())
         qh.setLevel(logging.WARNING)
+        qh.setFormatter(logging.Formatter('%(message)s', '%Y-%m-%dT%H:%M:%S%z'))
         root = logging.getLogger()
         root.addHandler(qh)
 
@@ -131,6 +132,8 @@ class AlertMessageFormatter(Prototype):
     """
     AlertMessageFormatter caches and formats alerts. They are then forwarded to
     other modules for further processing and transmission.
+
+    The JSON-based configuration for this module:
 
     Parameters:
         messageCollectionEnabled (bool): If true, cache alert messages.
@@ -365,6 +368,8 @@ class CloudAgent(Prototype):
     """
     Sends logs messages to OpenADMS Server instances.
 
+    The JSON-based configuration for this module:
+
     Parameters:
         host (str): URL or IP address of OpenADMS Sever instance.
         user (str): OpenADMS Server user name.
@@ -407,11 +412,12 @@ class CloudAgent(Prototype):
             data = {
                 'pid': project_id,
                 'nid': node_id,
-                'dt': arrow.get(log.get('dt'), 'YYYY-MM-DDTHH:mm:ss').isoformat(),
+                'dt': log.get('dt'),
                 'module': log.get('module'),
                 'level': log.get('level'),
                 'message': log.get('message')
             }
+
             r = requests.post(self._url,
                               auth=(self._user, self._password),
                               data=data,
