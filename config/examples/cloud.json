@@ -13,7 +13,7 @@
         },
         "project": {
             "name": "Virtual Project",
-            "id": "4a2e8b9d87d849e38bb6911b9f2364ea",
+            "id": "a39e40b4acfd431d912e0229fe1ddc41",
             "description": "Project for testing virtual sensors."
         },
         "node": {
@@ -165,7 +165,7 @@
         },
         "cloudAgent": {
             "host": "https://api.example.com/",
-            "user": "username",
+            "user": "user",
             "password": "password"
         },
         "errorGenerator": {
@@ -176,7 +176,7 @@
         },
         "heartbeat": {
             "host": "https://api.example.com/",
-            "user": "username",
+            "user": "user",
             "password": "password",
             "frequency": 300
         },
@@ -211,7 +211,7 @@
         },
         "cloudExporter": {
             "host": "https://api.example.com/",
-            "user": "username",
+            "user": "user",
             "password": "password",
             "db": "cache.json",
             "cache": "file"

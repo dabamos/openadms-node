@@ -5,7 +5,7 @@
 ![OpenADMS Node](https://www.dabamos.de/github/openadms.png)
 
 The **Open Automatic Deformation Monitoring System** (OpenADMS) is a free and
-open-source software for sensor control, observation data processing, and
+open-source platform for sensor control, observation data processing, and
 spatial data storage in the Internet of Things (IoT).
 
 The **OpenADMS Node** software runs on single sensor node instances in a sensor
@@ -48,7 +48,7 @@ or clone the master branch with Git. Then, create a virtual environment with
 `pipenv`:
 
 ```
-$ git clone https://github.com/dabamos/openadms-node.git
+$ git clone https://github.com/dabamos/openadms-node
 $ cd openadms-node/
 $ pipenv lock
 $ pipenv sync
@@ -73,7 +73,7 @@ Execute `pipenv run ./openadms-launcher.pyw` to start the launcher.
 ## Message Broker
 The MQTT protocol is used for the message exchange in OpenADMS Node. You can
 either use an external MQTT message broker, like
-[Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by using
+[Eclipse Mosquitto](https://mosquitto.org/), or start the internal one by adding
 the parameter `--with-mqtt-broker`.
 
 ## Configuration
@@ -102,7 +102,7 @@ $ pipenv install --dev
 Execute the unit tests with:
 
 ```
-$ pipenv run python3 -m pytest
+$ pipenv run pytest
 ```
 
 These are work in progress. You can run passive checks with

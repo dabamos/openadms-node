@@ -35,8 +35,6 @@ class CouchDriver(Prototype):
     defined the configuration. TinyDB is used for caching (either file-based
     or in-memory).
 
-    The JSON-based configuration for this module:
-
     Parameters:
         server (str): FQDN or IP address of CouchDB server.
         path (str): Additional CouchDB instance path or blank.
@@ -240,8 +238,6 @@ class CouchDriver(Prototype):
 class TinyDriver(Prototype):
     """
     TinyDriver stores observations in a TinyDB document store.
-
-    The JSON-based configuration for this module:
 
     Parameters:
         path (str): Path to the database file.

@@ -151,16 +151,16 @@ def main(config_file_path: str) -> None:
     y = arrow.utcnow().format('YYYY')
 
     logger = logging.getLogger('openadms')
-    logger.debug(f'+-----------------------------------------------+')
-    logger.debug(f'|   _____             _____ ____  _____ _____   |')
-    logger.debug(f'|  |     |___ ___ ___|  _  |    \|     |   __|  |')
-    logger.debug(f'|  |  |  | . | -_|   |     |  |  | | | |__   |  |')
-    logger.debug(f'|  |_____|  _|___|_|_|__|__|____/|_|_|_|_____|  |')
+    logger.debug("+-----------------------------------------------+")
+    logger.debug("|   _____             _____ ____  _____ _____   |")
+    logger.debug("|  |     |___ ___ ___|  _  |    \|     |   __|  |")
+    logger.debug("|  |  |  | . | -_|   |     |  |  | | | |__   |  |")
+    logger.debug("|  |_____|  _|___|_|_|__|__|____/|_|_|_|_____|  |")
     logger.debug(f'|        |_|                        Node v.{v}  |')
-    logger.debug(f'|                                               |')
+    logger.debug("|                                               |")
     logger.debug(f'| Copyright (c) {y}, Hochschule Neubrandenburg |')
-    logger.debug(f'| Distributed under the BSD-2-Clause licence.   |')
-    logger.debug(f'+-----------------------------------------------+')
+    logger.debug("| Distributed under the BSD-2-Clause licence.   |")
+    logger.debug("+-----------------------------------------------+")
 
     # Start the monitoring.
     global monitor

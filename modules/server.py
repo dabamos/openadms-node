@@ -51,10 +51,8 @@ class LocalControlServer(Prototype):
 
         # Store the last 50 log messages of level INFO.
         log_handler = RingBufferLogHandler(logging.INFO, 50)
-        log_formatter = StringFormatter()
-
         log_handler.addFilter(RootFilter())
-        log_handler.setFormatter(log_formatter)
+        log_handler.setFormatter(StringFormatter())
 
         # Add local log handler to root handler.
         root = logging.getLogger()

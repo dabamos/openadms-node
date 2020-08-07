@@ -175,7 +175,7 @@ class AlertMessageFormatter(Prototype):
         if self._msg_collection_enabled:
             # Cache the alert message. It will be processed by the threaded
             # `run()` method later.
-            self.logger.info(f'Appending alert message to message queue ...')
+            self.logger.info("Appending alert message to message queue ...")
             self._queue.put(payload)
         else:
             # Process a single alert message immediately.
@@ -457,7 +457,7 @@ class CloudAgent(Prototype):
             header: The alert header.
             payload: The alert payload.
         """
-        self.logger.debug(f'Appending alert message to message queue ...')
+        self.logger.debug("Appending alert message to message queue ...")
         self._queue.put(payload)
 
     def run(self) -> None:

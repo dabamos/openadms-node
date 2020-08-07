@@ -3,9 +3,10 @@
 """Module for the export of observations."""
 
 __author__ = 'Philipp Engel'
-__copyright__ = 'Copyright (c) 2019, Hochschule Neubrandenburg'
+__copyright__ = 'Copyright (c) 2020, Hochschule Neubrandenburg'
 __license__ = 'BSD-2-Clause'
 
+# Build-in modules.
 import copy
 import threading
 import time
@@ -16,12 +17,14 @@ from pathlib import Path
 from typing import Any, Dict, Union
 from urllib.parse import urljoin
 
+# Third-party modules.
 import arrow
 import requests
 
 from tinydb import TinyDB
 from tinydb.storages import MemoryStorage
 
+# OpenADMS Node modules.
 from core.manager import Manager
 from core.observation import Observation
 from core.prototype import Prototype
@@ -45,7 +48,7 @@ class CloudExporter(Prototype):
         cache: Caching type (either `file` or `memory`).
 
     Example:
-        The configuration may be::
+        Example configuration::
 
             {
                 "server": "https://api.examples.com/",
@@ -358,22 +361,23 @@ class FileExporter(Prototype):
 class RealTimePublisher(Prototype):
     """
     RealTimePublisher forwards incoming `Observation` objects by MQTT to a list
-    of receivers.
-
-    The JSON-based configuration for this module:
-
-    {
-      "realTimePublisher": {
-        "enabled": true,
-        "topics": [
-          "onlineViewer"
-        ]
-      }
-    }
+    of topics.
 
     Parameters:
         enabled (bool): Turns processing of observations on or off.
         topics (List): List of topics to send the observations to.
+
+    Example:
+        Example configuration::
+
+            {
+              "realTimePublisher": {
+                "enabled": true,
+                "topics": [
+                  "onlineViewer"
+                ]
+              }
+            }
     """
 
     def __init__(self, module_name: str, module_type: str, manager: Manager):
