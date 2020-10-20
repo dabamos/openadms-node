@@ -69,12 +69,6 @@ class DistanceCorrector(Prototype):
             self.logger.warning(f'Sensor type "{sensor_type}" not supported')
             return obs
 
-        # Check if atmospheric data has been set.
-        if None in [self.temperature, self.pressure, not self.humidity]:
-            self.logger.warning('Missing temperature, air pressure, or '
-                                'humidity')
-            return obs
-
         # Check the age of the atmospheric data.
         if self.last_update - time.time() > self._max_age:
             self.logger.warning(f'Atmospheric data is older than '
@@ -297,8 +291,8 @@ class HelmertTransformer(Prototype):
         if self._is_fixed_point(obs):
             self._update_fixed_point(obs)
 
-        # Only calculate the view point's coordinates if all fixed points have
-        # been measured at least once.
+        # Only calculate the view point's and the target's coordinates if all
+        # fixed points have been measured at least once.
         if self._is_ready():
             if self._is_fixed_point(obs):
                 # Calculate the coordinates of the view point by using the
